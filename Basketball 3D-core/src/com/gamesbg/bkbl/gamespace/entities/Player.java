@@ -1,4 +1,4 @@
-package com.gamesbg.bkbl.gamespace.entities.players;
+package com.gamesbg.bkbl.gamespace.entities;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -25,8 +25,6 @@ import com.badlogic.gdx.physics.bullet.collision.btCollisionShape;
 import com.badlogic.gdx.physics.bullet.collision.btSphereShape;
 import com.badlogic.gdx.physics.bullet.dynamics.btRigidBody;
 import com.gamesbg.bkbl.gamespace.GameMap;
-import com.gamesbg.bkbl.gamespace.entities.Entity;
-import com.gamesbg.bkbl.gamespace.entities.EntityType;
 import com.gamesbg.bkbl.gamespace.tools.CustomAnimation;
 
 public abstract class Player extends Entity {

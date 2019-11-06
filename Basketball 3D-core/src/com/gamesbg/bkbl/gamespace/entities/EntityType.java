@@ -8,7 +8,6 @@ import com.badlogic.gdx.utils.reflect.ClassReflection;
 import com.badlogic.gdx.utils.reflect.ReflectionException;
 import com.gamesbg.bkbl.gamespace.GameMap;
 import com.gamesbg.bkbl.gamespace.entities.players.Opponent;
-import com.gamesbg.bkbl.gamespace.entities.players.Player;
 import com.gamesbg.bkbl.gamespace.entities.players.Teammate;
 
 public enum EntityType {

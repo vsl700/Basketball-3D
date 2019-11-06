@@ -28,7 +28,7 @@ import com.badlogic.gdx.physics.bullet.dynamics.btRigidBody;
 import com.badlogic.gdx.physics.bullet.dynamics.btSequentialImpulseConstraintSolver;
 import com.gamesbg.bkbl.gamespace.entities.Entity;
 import com.gamesbg.bkbl.gamespace.entities.EntityType;
-import com.gamesbg.bkbl.gamespace.entities.players.Player;
+import com.gamesbg.bkbl.gamespace.entities.Player;
 import com.gamesbg.bkbl.gamespace.objects.GameObject;
 import com.gamesbg.bkbl.gamespace.objects.ObjectType;
 
