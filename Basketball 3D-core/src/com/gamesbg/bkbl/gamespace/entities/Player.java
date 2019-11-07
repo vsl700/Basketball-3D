@@ -897,13 +897,21 @@ public abstract class Player extends Entity {
 	}
 	
 	private void catchBall(boolean left) {
-		if(left)
+		if(left) {
 			leftHoldingBall = true;
-		else rightHoldingBall = true;
+			
+			if(leftHandInWorld)
+				disableHandDynColl(left);
+		}
+		else {
+			rightHoldingBall = true;
+			
+			if(rightHandInWorld)
+				disableHandDynColl(left);
+		}
 		
-		disableHandDynColl(left);
-		
-		disableUpperBodyDynColl();
+		if(!downBody)
+			disableUpperBodyDynColl();
 		
 		//map.removeRigidBody(map.getBall().getMainBody());
 		//map.addRigidBody(map.getBall().getMainBody(), 1, 0);
@@ -1205,14 +1213,38 @@ public abstract class Player extends Entity {
 		
 		//map.getBall().getModelInstance().transform = map.getBall().getMainBody().getWorldTransform();
 		//map.getBall().getMainBody().setMassProps(map.getBall().getType().getMass(), map.getBall().getMainBody().getLocalInertia());
-		map.getBall().getMainBody().setGravity(map.getDynamicsWorld().getGravity());
+		/*map.getBall().getMainBody().setGravity(map.getDynamicsWorld().getGravity());
 		map.getBall().getMainBody().activate();
 		map.getBall().setCollisionTransform();
-		map.getBall().setWorldTransform(bodiesMap.get("handL").getWorldTransform().cpy());
+		if(leftThrowBall)
+			map.getBall().setWorldTransform(bodiesMap.get("handL").getWorldTransform().cpy());
+		else map.getBall().setWorldTransform(bodiesMap.get("handR").getWorldTransform().cpy());*/
+		if(leftThrowBall) {
+			releaseBall(bodiesMap.get("handL").getWorldTransform().cpy());
+			
+			leftThrowBall = false;
+		}
+		else {
+			releaseBall(bodiesMap.get("handR").getWorldTransform().cpy());
+			
+			rightThrowBall = false;
+		}
+		
 		map.getBall().getMainBody().setLinearVelocity(tempVec);
+		
+		
 		//map.getBall().getMainBody().getInterpolationLinearVelocity();
 		//map.getBall().getMainBody().applyCentralForce(tempVec);
 		
+	}
+	
+	private void releaseBall(Matrix4 trans) {
+		map.getBall().getMainBody().setGravity(map.getDynamicsWorld().getGravity());
+		map.getBall().getMainBody().activate();
+		map.getBall().setCollisionTransform();
+		map.getBall().setWorldTransform(trans);
+		
+		leftHoldingBall = rightHoldingBall = false;
 	}
 	
 	/*private void setBodiesTransform() {
@@ -1234,21 +1266,20 @@ public abstract class Player extends Entity {
 		lockRotationAndRandomFloating(true);
 		
 		if (leftHoldingBall) {
-			// map.getBall().setCopyTransform(bodiesMap.get("handL").getWorldTransform());
+			//map.getBall().setCopyTransform(bodiesMap.get("handL").getWorldTransform());
+			map.getBall().setWorldTransform(bodiesMap.get("handL").getWorldTransform().cpy());
 
 			if (dribbleL) {
-				if (!armLController.current.animation.id.equals("dribblePhase1ArmL")) {
+				if (!armLController.current.animation.id.equals("dribblePhase1ArmL") && !armLController.current.animation.id.equals("dribblePhase2ArmL")) {
 					armLController.setAnimation("dribblePhase1ArmL", 1, 1, new AnimationListener() {
 
 						@Override
 						public void onEnd(AnimationDesc animation) {
-							// TODO Auto-generated method stub
-							
+							releaseBall(bodiesMap.get("handL").getWorldTransform().cpy());
 						}
 
 						@Override
 						public void onLoop(AnimationDesc animation) {
-							// TODO Auto-generated method stub
 							
 						}
 						
@@ -1257,7 +1288,7 @@ public abstract class Player extends Entity {
 			} else if (dribbleR) {
 
 			} else {
-				map.getBall().setWorldTransform(bodiesMap.get("handL").getWorldTransform().cpy());
+				//map.getBall().setWorldTransform(bodiesMap.get("handL").getWorldTransform().cpy());
 				
 				if (leftAimBall) {
 					float transistion = 0.25f;
@@ -1313,10 +1344,10 @@ public abstract class Player extends Entity {
 						@Override
 						public void onEnd(AnimationDesc animation) {
 							// System.out.println("Animation Ended");
+							throwBall();
+							
 							leftThrowBall = false;
 							leftHoldingBall = false;
-
-							throwBall();
 						}
 
 						@Override
@@ -1376,7 +1407,7 @@ public abstract class Player extends Entity {
 		}
 		
 		else if (!ballColl) {
-			if (!leftHandInWorld) {
+			if (!leftHandInWorld && !dribbleL) {
 				if (cycleTimeout > 5) {
 					enableHandDynColl(true);
 					enableUpperBodyDynColl();
@@ -1389,7 +1420,7 @@ public abstract class Player extends Entity {
 					cycleTimeout++;
 			}
 
-			else if (!rightHandInWorld) {
+			else if (!rightHandInWorld && !dribbleR) {
 				if (cycleTimeout > 5) {
 					enableHandDynColl(false);
 					enableUpperBodyDynColl();
@@ -1413,14 +1444,14 @@ public abstract class Player extends Entity {
 		if (walking) {
 			// controller.animate("walk", 0.25f);
 			if (!leftThrowBall && !rightThrowBall) {
-				if (!leftHoldingBall && !armLController.current.animation.id.equals("walkArmL") && !armLController.current.animation.id.equals("aimLArmL") && !armLController.current.animation.id.equals("aimRArmL")) {
+				if (!leftHoldingBall && !dribbleL && !armLController.current.animation.id.equals("walkArmL") && !armLController.current.animation.id.equals("aimLArmL") && !armLController.current.animation.id.equals("aimRArmL")) {
 					animateArmL("walk");
 
 					if (prevTime < modelInstance.getAnimation("stayArmL").duration / 2)
 						armLController.current.time = 0.5f;
 				}
 
-				if (!armRController.current.animation.id.equals("walkArmR") && !armRController.current.animation.id.equals("aimLArmR") && !armRController.current.animation.id.equals("aimRArmR") && !armRController.current.animation.id.equals("dribbleIdleArmR")) {
+				if (!rightHoldingBall && !dribbleR && !armRController.current.animation.id.equals("walkArmR") && !armRController.current.animation.id.equals("aimLArmR") && !armRController.current.animation.id.equals("aimRArmR")) {
 					animateArmR("walk");
 
 					if (prevTime < modelInstance.getAnimation("stayArmR").duration / 2)
@@ -1542,7 +1573,7 @@ public abstract class Player extends Entity {
 
 						@Override
 						public void onEnd(AnimationDesc animation) {
-
+							System.out.println("stayR Ended");
 						}
 
 						@Override
