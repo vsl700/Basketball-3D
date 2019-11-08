@@ -41,6 +41,7 @@ public class GameMap {
 										  {5, 0.1f, 10}}; //Use this for spawning players on the following positions
 	
 	//final static short PART_FLAG = 1 << 3; //The entity's part (they should not collide by themselves)
+	public final static short CAMERA_FLAG = 1 << 3;
 	public final static short PLAYER_FLAG = 1 << 4;
 	public final static short ENT_SPECIAL_FLAG = 1 << 5; //The special flag of an entity
 	public final static short OBJECT_FLAG = 1 << 6;
@@ -157,6 +158,7 @@ public class GameMap {
 	Entity ball;
 	
 	GameObject terrain, basket1, basket2;
+	GameObject camera;
 	
 	btCollisionConfiguration dynCollConfig;
     btDispatcher dynDispatcher;
@@ -197,6 +199,20 @@ public class GameMap {
 		
 		objectsMap = new HashMap<Integer, String>();
 		//motionListener = new MotionListener();
+		
+		camera = ObjectType.createGameObject(ObjectType.CAMERA.getId(), this, 0, 0, 0);
+		for(btRigidBody co : camera.getBodies()) {
+			co.setUserValue(index);
+			//co.setCollisionFlags(co.getCollisionFlags() | btCollisionObject.CollisionFlags.CF_CUSTOM_MATERIAL_CALLBACK);
+			dynamicsWorld.addRigidBody(co);
+			//System.out.println(co.getUserValue());
+			co.setContactCallbackFlag(CAMERA_FLAG);
+			co.setContactCallbackFilter(GROUND_FLAG);
+			
+			objectsMap.put(index, ObjectType.CAMERA.getId());
+			
+			index++;
+		}
 		
 		terrain = ObjectType.createGameObject(ObjectType.TERRAIN.getId(), this, 0, 0, 0);
 		for(btRigidBody co : terrain.getBodies()) {
@@ -582,6 +598,10 @@ public class GameMap {
 			
 			e.dispose();
 		}
+	}
+	
+	public void setCameraTrans(Matrix4 trans) {
+		camera.getBodies().get(0).proceedToTransform(trans);
 	}
 	
 	private void controlPlayer(float delta) {

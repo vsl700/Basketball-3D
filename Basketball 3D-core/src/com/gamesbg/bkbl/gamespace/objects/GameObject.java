@@ -115,10 +115,12 @@ public abstract class GameObject {
 	}*/
 	
 	protected void setBodies() {
-		modelInstance.calculateTransforms();
+		if(modelInstance != null)
+			modelInstance.calculateTransforms();
 		
-		for(int i = 0; i < bodies.size(); i++)
-			bodies.get(i).proceedToTransform(calcTransformFromNodesTransform(nodes.get(i).globalTransform));
+		//if(nodes != null)
+		for(int i = 0; i < bodies.size() && modelInstance != null; i++)
+				bodies.get(i).proceedToTransform(calcTransformFromNodesTransform(nodes.get(i).globalTransform));
 	}
 	
 	protected Matrix4 calcTransformFromNodesTransform(Matrix4 nodeTrans) {
@@ -148,7 +150,9 @@ public abstract class GameObject {
 			//System.out.println(temp.getTranslation(new Vector3()).z);
 			//System.out.println(nodes.get(i).id);
 			motionStates.add(new MotionState());
-			motionStates.get(i).transform = calcTransformFromNodesTransform(nodes.get(i).globalTransform);
+			if(nodes.size() > i && nodes.get(i) != null)
+				motionStates.get(i).transform = calcTransformFromNodesTransform(nodes.get(i).globalTransform);
+			else motionStates.get(i).transform = new Matrix4();
 			bodies.get(i).setMotionState(motionStates.get(i));
 		}
 	}

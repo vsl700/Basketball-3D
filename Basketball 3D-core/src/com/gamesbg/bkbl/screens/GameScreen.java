@@ -10,6 +10,7 @@ import com.badlogic.gdx.graphics.g3d.attributes.ColorAttribute;
 import com.badlogic.gdx.graphics.g3d.environment.DirectionalLight;
 import com.badlogic.gdx.graphics.g3d.utils.FirstPersonCameraController;
 import com.badlogic.gdx.math.Matrix4;
+import com.badlogic.gdx.math.Quaternion;
 import com.badlogic.gdx.math.Vector3;
 import com.gamesbg.bkbl.MyGdxGame;
 import com.gamesbg.bkbl.gamespace.GameMap;
@@ -145,6 +146,8 @@ public class GameScreen implements Screen {
 		//pCam.lookAt(map.getMainPlayerTranslation());
 		//pCam.up.set(Vector3.Y);
 		customLookAt(new Matrix4(map.getMainPlayer().getModelInstance().transform).mul(new Matrix4().setToTranslation(0, map.getMainPlayer().getHeight(), 0)).getTranslation(new Vector3())); 
+		
+		map.setCameraTrans(pCam.combined);
 		//pCam.direction.set(map.getMainPlayerRotation().y, 0, 1);
 		//controlPlayer();
 	}
