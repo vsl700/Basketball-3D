@@ -201,6 +201,66 @@ public abstract class Player extends Entity {
 		custom.addRotationKeyFrame(0, 1, 0, -30, 0.25f);
 		
 		
+		custom.addAnimation("aimRArmL", 0.01f);
+		
+		custom.addNodeAnimation("shoulderL");
+		custom.addRotationsKeyFrame(new float[][]{{1, 0, 0, -140}, {0, 1, 0, 110}, {1, 0, 1, 70}}, 0);
+		//custom.addRotationKeyFrame(0, 1, 0, 110, 0);
+		//custom.addRotationKeyFrame(1, 0, 0, 30, 0);
+		//custom.addRotationKeyFrame(0, 1, 0, 110, 1);
+		
+		
+		custom.addAnimation("aimRArmR", 0.01f);
+		
+		//float tempX = 1, tempY = 1, tempA = 210;
+		custom.addNodeAnimation("shoulderR");
+		custom.addRotationKeyFrame(0, 1.2f, 1.4f, 90, 0);
+		//custom.addRotationKeyFrame(1, 0, 0, 30, 0);
+		custom.addRotationKeyFrame(0, 1.2f, 1.4f, 90, 0.01f);
+		
+		custom.addNodeAnimation("elbowR");
+		custom.addRotationKeyFrame(1, 0, 0, -60, 0);
+		custom.addRotationKeyFrame(1, 0, 0, -60, 0.01f);
+		
+		
+		custom.addAnimation("aimRBody", 0.01f);
+		
+		custom.addNodeAnimation("spine2");
+		custom.addRotationKeyFrame(0, 1, 0, -30, 0);
+		custom.addRotationKeyFrame(0, 1, 0, -30, 0.01f);
+		
+		custom.addNodeAnimation("spine1");
+		custom.addRotationKeyFrame(0, 1, 0, -30, 0);
+		custom.addRotationKeyFrame(0, 1, 0, -30, 0.01f);
+		
+		
+		custom.addAnimation("throwRArmL", 0.25f);
+		
+		custom.addNodeAnimation("shoulderL");
+		custom.addRotationsKeyFrame(new float[][]{{1, 0, 0, 40}, {0, 1, 0, 110}, {1, 0, 1, 50}}, 0);
+		custom.addRotationsKeyFrame(new float[][]{{1, 0, 0, 40}, {0, 1, 0, 110}, {1, 0, 1, 50}}, 0.25f);
+		
+		custom.addAnimation("throwRArmR", 0.25f);
+		custom.addNodeAnimation("shoulderR");
+		custom.addRotationsKeyFrame(new float[][]{{1, 0, 0, -140}, {0, 1, 0, -110}, {1, 0, 1, 70}}, 0);
+		custom.addRotationsKeyFrame(new float[][]{{1, 0, 0, -140}, {0, 1, 0, -110}, {1, 0, 1, 70}}, 0.25f);
+		
+		custom.addNodeAnimation("elbowR");
+		custom.addRotationKeyFrame(1, 0, 0, 0, 0);
+		custom.addRotationKeyFrame(1, 0, 0, 0, 0.25f);
+		
+		
+		custom.addAnimation("throwRBody", 0.25f);
+		
+		custom.addNodeAnimation("spine1");
+		custom.addRotationKeyFrame(0, 1, 0, 30, 0);
+		custom.addRotationKeyFrame(0, 1, 0, 30, 0.25f);
+		
+		custom.addNodeAnimation("spine2");
+		custom.addRotationKeyFrame(0, 1, 0, 30, 0);
+		custom.addRotationKeyFrame(0, 1, 0, 30, 0.25f);
+		
+		
 		custom.addAnimation("dribbleIdleArmL", 1);
 		
 		custom.addNodeAnimation("shoulderL");
@@ -216,7 +276,7 @@ public abstract class Player extends Entity {
 		
 		custom.addNodeAnimation("shoulderL");
 		custom.addRotationKeyFrame(1, 0, 0, -10, 0);
-		custom.addRotationKeyFrame(1, 0, 0, -10, 1);
+		custom.addRotationKeyFrame(1, 0, 0, -10, 0.25f);
 		
 		custom.addNodeAnimation("elbowL");
 		custom.addRotationKeyFrame(1, 0, 0, -80, 0);
@@ -227,9 +287,41 @@ public abstract class Player extends Entity {
 		
 		custom.addNodeAnimation("shoulderL");
 		custom.addRotationKeyFrame(1, 0, 0, -10, 0);
-		custom.addRotationKeyFrame(1, 0, 0, -10, 1);
+		custom.addRotationKeyFrame(1, 0, 0, -10, 0.25f);
 		
 		custom.addNodeAnimation("elbowL");
+		custom.addRotationKeyFrame(1, 0, 0, -50, 0);
+		custom.addRotationKeyFrame(1, 0, 0, -80, 0.25f);
+		
+		custom.addAnimation("dribbleIdleArmR", 1);
+		
+		custom.addNodeAnimation("shoulderR");
+		custom.addRotationKeyFrame(1, 0, 0, -10, 0);
+		custom.addRotationKeyFrame(1, 0, 0, -10, 1);
+		
+		custom.addNodeAnimation("elbowR");
+		custom.addRotationKeyFrame(1, 0, 0, -80, 0);
+		custom.addRotationKeyFrame(1, 0, 0, -80, 1);
+		
+		
+		custom.addAnimation("dribblePhase1ArmR", 0.25f);
+		
+		custom.addNodeAnimation("shoulderR");
+		custom.addRotationKeyFrame(1, 0, 0, -10, 0);
+		custom.addRotationKeyFrame(1, 0, 0, -10, 0.25f);
+		
+		custom.addNodeAnimation("elbowR");
+		custom.addRotationKeyFrame(1, 0, 0, -80, 0);
+		custom.addRotationKeyFrame(1, 0, 0, -50, 0.25f);
+		
+		
+		custom.addAnimation("dribblePhase2ArmR", 0.25f);
+		
+		custom.addNodeAnimation("shoulderR");
+		custom.addRotationKeyFrame(1, 0, 0, -10, 0);
+		custom.addRotationKeyFrame(1, 0, 0, -10, 0.25f);
+		
+		custom.addNodeAnimation("elbowR");
 		custom.addRotationKeyFrame(1, 0, 0, -50, 0);
 		custom.addRotationKeyFrame(1, 0, 0, -80, 0.25f);
 		
@@ -860,6 +952,12 @@ public abstract class Player extends Entity {
 		}
 	}
 	
+	public void interactWithBallR() {
+		if(rightHoldingBall) {
+			dribbleR = true;
+		}
+	}
+	
 	public void interactWithBallE() {
 		if (ballColl) {
 			/*if(!handLBallColl) {
@@ -884,7 +982,7 @@ public abstract class Player extends Entity {
 						// map.getBall().setCopyTransform(bodiesMap.get("handL").getWorldTransform());
 					}
 				} else {
-					catchBall(true);
+					catchBall(false);
 					// map.getBall().setCopyTransform(bodiesMap.get("handL").getWorldTransform());
 				}
 			//}
@@ -1224,7 +1322,7 @@ public abstract class Player extends Entity {
 			
 			leftThrowBall = false;
 		}
-		else {
+		else{
 			releaseBall(bodiesMap.get("handR").getWorldTransform().cpy());
 			
 			rightThrowBall = false;
@@ -1265,145 +1363,373 @@ public abstract class Player extends Entity {
 		
 		lockRotationAndRandomFloating(true);
 		
-		if (leftHoldingBall) {
-			//map.getBall().setCopyTransform(bodiesMap.get("handL").getWorldTransform());
+		if (dribbleL) {
+			if (!armLController.current.animation.id.equals("dribblePhase1ArmL")) {
+				armLController.setAnimation("dribblePhase1ArmL", 1, 1, new AnimationListener() {
+
+					@Override
+					public void onEnd(AnimationDesc animation) {
+						releaseBall(bodiesMap.get("handL").getWorldTransform().cpy());
+						
+						map.getBall().getMainBody().setLinearVelocity(new Vector3(0, -10, 0));
+					}
+
+					@Override
+					public void onLoop(AnimationDesc animation) {
+						
+					}
+					
+				});
+			}
+			else {
+				if (!leftHoldingBall) {
+					if (ballColl && leftReadyBall) {
+						if (!armLController.current.animation.id.equals("dribblePhase2ArmL")) {
+							armLController.setAnimation("dribblePhase2ArmL", 1, 1, new AnimationListener() {
+
+								@Override
+								public void onEnd(AnimationDesc animation) {
+									// armLController.animate("dribbleIdleArmL",
+									// 0.15f);
+									animateArmL("dribbleIdle");
+								}
+
+								@Override
+								public void onLoop(AnimationDesc animation) {
+
+								}
+
+							});
+
+							catchBall(true);
+							dribbleL = false;
+							leftReadyBall = false;
+							cycleTimeout = 0;
+						}
+					} else {
+						Matrix4 temp = map.getBall().getMainBody().getWorldTransform();
+						Vector3 tempVec = new Vector3();
+						temp.getTranslation(tempVec);
+
+						Matrix4 temp1 = bodiesMap.get("handL").getWorldTransform().cpy();
+						Vector3 tempVec1 = new Vector3();
+						temp1.getTranslation(tempVec1);
+
+						map.getBall().setWorldTransform(new Matrix4().set(new Vector3(tempVec1.x, tempVec.y, tempVec1.z), map.getBall().getMainBody().getWorldTransform().getRotation(new Quaternion())));
+
+						if(cycleTimeout * delta > 0.75f) {
+							dribbleL = false;
+							leftReadyBall = false;
+							cycleTimeout = 0;
+						}
+						else if (cycleTimeout > 5 && !leftReadyBall) {
+							leftReadyBall = true;
+						} else {
+							cycleTimeout++;
+						}
+					}
+				}
+				else
+					map.getBall().setWorldTransform(bodiesMap.get("handL").getWorldTransform().cpy());
+			}
+		} else if (dribbleR) {
+			if (!armRController.current.animation.id.equals("dribblePhase1ArmR")) {
+				armRController.setAnimation("dribblePhase1ArmR", 1, 1, new AnimationListener() {
+
+					@Override
+					public void onEnd(AnimationDesc animation) {
+						releaseBall(bodiesMap.get("handR").getWorldTransform().cpy());
+						
+						map.getBall().getMainBody().setLinearVelocity(new Vector3(0, -10, 0));
+					}
+
+					@Override
+					public void onLoop(AnimationDesc animation) {
+						
+					}
+					
+				});
+			}
+			else {
+				if (!rightHoldingBall) {
+					if (ballColl && rightReadyBall) {
+						if (!armRController.current.animation.id.equals("dribblePhase2ArmR")) {
+							armRController.setAnimation("dribblePhase2ArmR", 1, 1, new AnimationListener() {
+
+								@Override
+								public void onEnd(AnimationDesc animation) {
+									// armLController.animate("dribbleIdleArmL",
+									// 0.15f);
+									animateArmR("dribbleIdle");
+								}
+
+								@Override
+								public void onLoop(AnimationDesc animation) {
+
+								}
+
+							});
+
+							catchBall(false);
+							dribbleR = false;
+							rightReadyBall = false;
+							cycleTimeout = 0;
+						}
+					} else {
+						Matrix4 temp = map.getBall().getMainBody().getWorldTransform();
+						Vector3 tempVec = new Vector3();
+						temp.getTranslation(tempVec);
+
+						Matrix4 temp1 = bodiesMap.get("handR").getWorldTransform().cpy();
+						Vector3 tempVec1 = new Vector3();
+						temp1.getTranslation(tempVec1);
+
+						map.getBall().setWorldTransform(new Matrix4().set(new Vector3(tempVec1.x, tempVec.y, tempVec1.z), map.getBall().getMainBody().getWorldTransform().getRotation(new Quaternion())));
+						
+						if(cycleTimeout * delta > 0.75f) {
+							dribbleR = false;
+							rightReadyBall = false;
+							cycleTimeout = 0;
+						}
+						else if (cycleTimeout > 5 && !rightReadyBall) {
+							rightReadyBall = true;
+						} else {
+							cycleTimeout++;
+						}
+					}
+				}
+				else
+					map.getBall().setWorldTransform(bodiesMap.get("handR").getWorldTransform().cpy());
+			}
+		}
+		else if (leftHoldingBall) {
+			// map.getBall().setCopyTransform(bodiesMap.get("handL").getWorldTransform());
 			map.getBall().setWorldTransform(bodiesMap.get("handL").getWorldTransform().cpy());
 
-			if (dribbleL) {
-				if (!armLController.current.animation.id.equals("dribblePhase1ArmL") && !armLController.current.animation.id.equals("dribblePhase2ArmL")) {
-					armLController.setAnimation("dribblePhase1ArmL", 1, 1, new AnimationListener() {
+			// map.getBall().setWorldTransform(bodiesMap.get("handL").getWorldTransform().cpy());
+
+			if (leftAimBall) {
+				float transistion = 0.25f;
+				if (!armLController.current.animation.id.equals("aimLArmL")) {
+					armLController.animate("aimLArmL", transistion);
+					// animateArmL("aimL");
+					// System.out.println("Animated aimL");
+					armLController.setAnimation("aimLArmL", -1, new AnimationListener() {
 
 						@Override
 						public void onEnd(AnimationDesc animation) {
-							releaseBall(bodiesMap.get("handL").getWorldTransform().cpy());
+							// controller.queue("testAnim", loopCount,
+							// speed,
+							// listener, transitionTime)
+
 						}
 
 						@Override
 						public void onLoop(AnimationDesc animation) {
-							
+							if (armLController.transitionCurrentTime >= armLController.transitionTargetTime)
+								leftReadyBall = true;
 						}
-						
+
 					});
 				}
-			} else if (dribbleR) {
 
-			} else {
-				//map.getBall().setWorldTransform(bodiesMap.get("handL").getWorldTransform().cpy());
-				
-				if (leftAimBall) {
-					float transistion = 0.25f;
-					if (!armLController.current.animation.id.equals("aimLArmL")) {
-						armLController.animate("aimLArmL", transistion);
-						// animateArmL("aimL");
-						// System.out.println("Animated aimL");
-						armLController.setAnimation("aimLArmL", -1, new AnimationListener() {
+				if (!armRController.current.animation.id.equals("aimLArmR")) {
+					armRController.animate("aimLArmR", transistion);
+					animateArmR("aimL");
+				}
 
-							@Override
-							public void onEnd(AnimationDesc animation) {
-								// controller.queue("testAnim", loopCount,
-								// speed,
-								// listener, transitionTime)
+				if (!bodyController.current.animation.id.equals("aimLBody")) {
+					bodyController.animate("aimLBody", transistion);
+					animateBody("aimL");
+				}
+			}
 
-							}
+			else if (leftReadyBall) {
 
-							@Override
-							public void onLoop(AnimationDesc animation) {
-								if (armLController.transitionCurrentTime >= armLController.transitionTargetTime)
-									leftReadyBall = true;
-							}
+				// if
+				// (armLController.current.animation.id.equals("throwLArmL"))
+				// {
+				// leftReadyBall = false;
 
-						});
+				// }
+				// else {
+				leftThrowBall = true;
+				leftReadyBall = false;
+				// System.out.println("Animated throwL");
+				armLController.animate("throwLArmL", 0.25f);
+				armLController.setAnimation("throwLArmL", 1, new AnimationListener() {
+
+					@Override
+					public void onEnd(AnimationDesc animation) {
+						// System.out.println("Animation Ended");
+						throwBall();
+
+						leftThrowBall = false;
+						leftHoldingBall = false;
 					}
 
-					if (!armRController.current.animation.id.equals("aimLArmR")) {
-						armRController.animate("aimLArmR", transistion);
-						animateArmR("aimL");
+					@Override
+					public void onLoop(AnimationDesc animation) {
+						// System.out.println("Animation Ended");
+						// leftThrowBall = false;
+						// leftHoldingBall = false;
+
 					}
 
-					if (!bodyController.current.animation.id.equals("aimLBody")) {
-						bodyController.animate("aimLBody", transistion);
-						animateBody("aimL");
+				});
+
+				armRController.animate("throwLArmR", 0.25f);
+				armRController.setAnimation("throwLArmR", 1, new AnimationListener() {
+
+					@Override
+					public void onEnd(AnimationDesc animation) {
+
 					}
-				}
 
-				else if (leftReadyBall) {
+					@Override
+					public void onLoop(AnimationDesc animation) {
 
-					// if
-					// (armLController.current.animation.id.equals("throwLArmL"))
-					// {
-					// leftReadyBall = false;
+					}
 
-					// }
-					// else {
-					leftThrowBall = true;
-					leftReadyBall = false;
-					// System.out.println("Animated throwL");
-					armLController.animate("throwLArmL", 0.25f);
-					armLController.setAnimation("throwLArmL", 1, new AnimationListener() {
+				});
 
-						@Override
-						public void onEnd(AnimationDesc animation) {
-							// System.out.println("Animation Ended");
-							throwBall();
-							
-							leftThrowBall = false;
-							leftHoldingBall = false;
-						}
+				bodyController.animate("throwLBody", 0.25f);
+				bodyController.setAnimation("throwLBody", 1, new AnimationListener() {
 
-						@Override
-						public void onLoop(AnimationDesc animation) {
-							// System.out.println("Animation Ended");
-							// leftThrowBall = false;
-							// leftHoldingBall = false;
+					@Override
+					public void onEnd(AnimationDesc animation) {
 
-						}
+					}
 
-					});
+					@Override
+					public void onLoop(AnimationDesc animation) {
 
-					armRController.animate("throwLArmR", 0.25f);
-					armRController.setAnimation("throwLArmR", 1, new AnimationListener() {
+					}
 
-						@Override
-						public void onEnd(AnimationDesc animation) {
+				});
+				// }
+			}
 
-						}
-
-						@Override
-						public void onLoop(AnimationDesc animation) {
-
-						}
-
-					});
-
-					bodyController.animate("throwLBody", 0.25f);
-					bodyController.setAnimation("throwLBody", 1, new AnimationListener() {
-
-						@Override
-						public void onEnd(AnimationDesc animation) {
-
-						}
-
-						@Override
-						public void onLoop(AnimationDesc animation) {
-
-						}
-
-					});
-					// }
-				}
-				
-				else if(!leftThrowBall) {
-					armLController.animate("dribbleIdleArmL", 0.15f);
-					animateArmL("dribbleIdle");
-				}
+			else if (!leftThrowBall && !armLController.current.animation.id.equals("dribbleIdleArmL")) {
+				armLController.animate("dribbleIdleArmL", 0.15f);
+				animateArmL("dribbleIdle");
 			}
 		}
 		
 		else if(rightHoldingBall) {
-			map.getBall().setCopyTransform(bodiesMap.get("handR").getWorldTransform());
-			
-			if(!rightAimBall && rightReadyBall)
+			map.getBall().setWorldTransform(bodiesMap.get("handR").getWorldTransform().cpy());
+
+			// map.getBall().setWorldTransform(bodiesMap.get("handL").getWorldTransform().cpy());
+
+			if (rightAimBall) {
+				float transistion = 0.25f;
+				if (!armLController.current.animation.id.equals("aimRArmL")) {
+					armLController.animate("aimRArmL", transistion);
+					// animateArmL("aimL");
+					// System.out.println("Animated aimL");
+					armLController.setAnimation("aimRArmL", -1, new AnimationListener() {
+
+						@Override
+						public void onEnd(AnimationDesc animation) {
+							// controller.queue("testAnim", loopCount,
+							// speed,
+							// listener, transitionTime)
+
+						}
+
+						@Override
+						public void onLoop(AnimationDesc animation) {
+							if (armLController.transitionCurrentTime >= armLController.transitionTargetTime)
+								rightReadyBall = true;
+						}
+
+					});
+				}
+
+				if (!armRController.current.animation.id.equals("aimRArmR")) {
+					armRController.animate("aimRArmR", transistion);
+					animateArmR("aimR");
+				}
+
+				if (!bodyController.current.animation.id.equals("aimRBody")) {
+					bodyController.animate("aimRBody", transistion);
+					animateBody("aimR");
+				}
+			}
+
+			else if (rightReadyBall) {
+
+				// if
+				// (armLController.current.animation.id.equals("throwLArmL"))
+				// {
+				// leftReadyBall = false;
+
+				// }
+				// else {
 				rightThrowBall = true;
+				rightReadyBall = false;
+				// System.out.println("Animated throwL");
+				armLController.animate("throwRArmL", 0.25f);
+				armLController.setAnimation("throwRArmL", 1, new AnimationListener() {
+
+					@Override
+					public void onEnd(AnimationDesc animation) {
+						// System.out.println("Animation Ended");
+						throwBall();
+
+						rightThrowBall = false;
+						rightHoldingBall = false;
+					}
+
+					@Override
+					public void onLoop(AnimationDesc animation) {
+						// System.out.println("Animation Ended");
+						// leftThrowBall = false;
+						// leftHoldingBall = false;
+						throwBall();
+
+						rightThrowBall = false;
+						rightHoldingBall = false;
+					}
+
+				});
+
+				armRController.animate("throwRArmR", 0.25f);
+				armRController.setAnimation("throwRArmR", 1, new AnimationListener() {
+
+					@Override
+					public void onEnd(AnimationDesc animation) {
+
+					}
+
+					@Override
+					public void onLoop(AnimationDesc animation) {
+
+					}
+
+				});
+
+				bodyController.animate("throwRBody", 0.25f);
+				bodyController.setAnimation("throwRBody", 1, new AnimationListener() {
+
+					@Override
+					public void onEnd(AnimationDesc animation) {
+
+					}
+
+					@Override
+					public void onLoop(AnimationDesc animation) {
+
+					}
+
+				});
+				// }
+			}
+
+			else if (!rightThrowBall && !armRController.current.animation.id.equals("dribbleIdleArmR")) {
+				armRController.animate("dribbleIdleArmR", 0.15f);
+				animateArmR("dribbleIdle");
+			}
 		}
 		
 		else if (!ballColl) {
@@ -1443,15 +1769,15 @@ public abstract class Player extends Entity {
 		//else
 		if (walking) {
 			// controller.animate("walk", 0.25f);
-			if (!leftThrowBall && !rightThrowBall) {
-				if (!leftHoldingBall && !dribbleL && !armLController.current.animation.id.equals("walkArmL") && !armLController.current.animation.id.equals("aimLArmL") && !armLController.current.animation.id.equals("aimRArmL")) {
+			if (!leftThrowBall && !rightThrowBall && !leftAimBall && !rightAimBall) {
+				if (!leftHoldingBall && !dribbleL && !armLController.current.animation.id.equals("walkArmL")) {
 					animateArmL("walk");
 
 					if (prevTime < modelInstance.getAnimation("stayArmL").duration / 2)
 						armLController.current.time = 0.5f;
 				}
 
-				if (!rightHoldingBall && !dribbleR && !armRController.current.animation.id.equals("walkArmR") && !armRController.current.animation.id.equals("aimLArmR") && !armRController.current.animation.id.equals("aimRArmR")) {
+				if (!rightHoldingBall && !dribbleR && !armRController.current.animation.id.equals("walkArmR")) {
 					animateArmR("walk");
 
 					if (prevTime < modelInstance.getAnimation("stayArmR").duration / 2)
@@ -1495,14 +1821,14 @@ public abstract class Player extends Entity {
 		}*/
 		
 		else if(running) {
-			if (!armLController.current.animation.id.equals("runArmL") && !armLController.current.animation.id.equals("dribbleIdleArmL")) {
+			if (!armLController.current.animation.id.equals("runArmL") && !leftHoldingBall && !dribbleL) {
 				animateArmL("run");
 
 				if (prevTime < modelInstance.getAnimation("stayArmL").duration / 2)
 					armLController.current.time = 0.375f;
 			}
 			
-			if (!armRController.current.animation.id.equals("runArmR") && !armRController.current.animation.id.equals("dribbleIdleArmR")) {
+			if (!armRController.current.animation.id.equals("runArmR") && !rightHoldingBall && !dribbleR) {
 				animateArmR("run");
 
 				if (prevTime < modelInstance.getAnimation("stayArmR").duration / 2)
@@ -1537,9 +1863,9 @@ public abstract class Player extends Entity {
 			
 			String id = armLController.current.animation.id;
 			
-			if (!armLController.current.animation.id.equals("stayArmL") && !armLController.current.animation.id.equals("aimLArmL") && !armRController.current.animation.id.equals("aimLArmR") && !armLController.current.animation.id.equals("aimRArmL") && !armRController.current.animation.id.equals("aimRArmR")) {
+			if (!leftAimBall && !rightAimBall) {
 				
-				if (!leftHoldingBall && !armLController.current.animation.id.equals("stayArmL") && !armLController.current.animation.id.equals("dribbleIdleArmL")) {
+				if (!leftHoldingBall && !armLController.current.animation.id.equals("stayArmL") && !armLController.current.animation.id.equals("dribbleIdleArmL") && !dribbleL) {
 					armLController.animate("stayArmL", 0.25f);
 					armLController.setAnimation("stayArmL", -1, 1, new AnimationListener() {
 
@@ -1567,7 +1893,7 @@ public abstract class Player extends Entity {
 					}
 				}
 				
-				if (!rightHoldingBall && !armRController.current.animation.id.equals("stayArmR") && !armRController.current.animation.id.equals("dribbleIdleArmR")) {
+				if (!rightHoldingBall && !armRController.current.animation.id.equals("stayArmR") && !armRController.current.animation.id.equals("dribbleIdleArmR") && !dribbleR) {
 					armRController.animate("stayArmR", 0.25f);
 					armRController.setAnimation("stayArmR", -1, 1, new AnimationListener() {
 
@@ -1616,7 +1942,7 @@ public abstract class Player extends Entity {
 		legLController.update(delta);
 		legRController.update(delta);
 		bodyController.update(delta);
-		
+		//System.out.println(armRController.current.animation.id);
 		/*walking = false;
 		running = false;
 		leftHandBall = false;

@@ -294,14 +294,14 @@ public class GameMap {
 			// ball.getBody().setCollisionFlags(ball.getBody().getCollisionFlags()
 			// | btCollisionObject.CollisionFlags.CF_CUSTOM_MATERIAL_CALLBACK);
 			co.setCollisionFlags(co.getCollisionFlags() | btCollisionObject.CollisionFlags.CF_CUSTOM_MATERIAL_CALLBACK);
-			co.applyCentralForce(new Vector3(0, 550, 0));
+			//co.applyCentralForce(new Vector3(0, 550, 0));
 			//co.applyCentralForce(new Vector3());
 			//dynamicsWorld.addRigidBody(co);
 			//co.setActivationState(Collision.WANTS_DEACTIVATION);
 			//System.out.println(co.getUserValue());
 			dynamicsWorld.addRigidBody(co, ENTITY_FLAG, ALL_FLAG);
 			co.setContactCallbackFlag(ENTITY_FLAG);
-			co.setContactCallbackFilter(PLAYER_FLAG);
+			co.setContactCallbackFilter(ENTITY_FLAG);
 			
 			//System.out.println(co.getContactCallbackFlag());
 			//System.out.println(co.getContactCallbackFilter());
@@ -345,15 +345,15 @@ public class GameMap {
 					
 					////System.out.println(co.getUserValue());
 					if(teammate.getMainBody().equals(co)) {
-						dynamicsWorld.addRigidBody(co, PLAYER_FLAG, ALL_FLAG);
-						co.setContactCallbackFlag(PLAYER_FLAG);
+						dynamicsWorld.addRigidBody(co, ENTITY_FLAG, ALL_FLAG);
+						co.setContactCallbackFlag(ENTITY_FLAG);
 						co.setContactCallbackFilter(ALL_FLAG);
 						
 						objectsMap.put(index2, EntityType.TEAMMATE.getId());
 					}
 					else {
-						dynamicsWorld.addRigidBody(co, PLAYER_FLAG, ALL_FLAG);
-						co.setContactCallbackFlag(PLAYER_FLAG);
+						dynamicsWorld.addRigidBody(co, ENTITY_FLAG, ALL_FLAG);
+						co.setContactCallbackFlag(ENTITY_FLAG);
 						co.setContactCallbackFilter(ALL_FLAG);
 						
 						objectsMap.put(index2, EntityType.TEAMMATE.getId() + "Hand");
@@ -415,7 +415,7 @@ public class GameMap {
 				//co.setCollisionFlags(co.getCollisionFlags() | btCollisionObject.CollisionFlags.CF_CUSTOM_MATERIAL_CALLBACK);
 				
 				//if(co.equals(opponent.getMainBody())) {
-					dynamicsWorld.addRigidBody(co, PLAYER_FLAG, ALL_FLAG);
+					dynamicsWorld.addRigidBody(co, ENTITY_FLAG, ALL_FLAG);
 					//System.out.println(co.getUserValue());
 					objectsMap.put(index2, EntityType.OPPONENT.getId());
 					//co.setContactCallbackFlag(PLAYER_FLAG);
@@ -655,6 +655,9 @@ public class GameMap {
 		
 		else if(Gdx.input.isButtonPressed(Buttons.LEFT)) {
 			mainPlayer.interactWithBallL();
+		}
+		else if(Gdx.input.isButtonPressed(Buttons.RIGHT)) {
+			mainPlayer.interactWithBallR();
 		}
 		
 		//if(Gdx.input.isKeyJustPressed(Keys.SPACE))
