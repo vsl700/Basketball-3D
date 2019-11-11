@@ -54,7 +54,8 @@ public class GameScreen implements Screen {
 		// camController = new CameraInputController(pCam);
 		// System.out.println(Keys.toString(camController.translateButton));
 
-		map = new GameMap();
+		map = new GameMap(pCam.combined);
+		
 	}
 
 	@Override
@@ -63,6 +64,8 @@ public class GameScreen implements Screen {
 		
 		//Gdx.input.setInputProcessor(camController);
 		map.spawnPlayers(amount);
+		//map.getCamera().getBodies().get(0).getMotionState().getWorldTransform(pCam.combined);
+		//map.setCameraTrans(pCam.combined);
 		
 	}
 
@@ -73,12 +76,19 @@ public class GameScreen implements Screen {
 		
 		//if(Gdx.input.isButtonPressed(Buttons.LEFT))
 			//camController.update();
-		
-		map.update(delta);
-		posTheCam();
-		
-		pCam.update();
+		//System.out.println(pCam.combined.getTranslation(new Vector3()).x);
 
+		//pCam.update();
+		//posTheCam();
+		//map.setCameraTrans(pCam.combined);
+		map.update(delta);
+		//pCam.update();
+		//map.getCamera().getBodies().get(0).getMotionState().getWorldTransform(pCam.combined);
+		//map.getCamera().getBodies().get(0).getWorldTransform().getTranslation(pCam.position);
+		//map.getCamera().getBodies().get(0).getWorldTransform().getRotation(new Quaternion()).transform(pCam.direction);
+		//map.getCamera().getBodies().get(0).getWorldTransform(pCam.combined);
+		pCam.update();
+		
 		mBatch.begin(pCam);
 		map.render(mBatch, environment);
 		mBatch.end();
@@ -88,6 +98,7 @@ public class GameScreen implements Screen {
 	public void resize(int width, int height) {
 		pCam.viewportWidth = width;
 		pCam.viewportHeight = height;
+		//pCam.update();
 	}
 
 	@Override
@@ -108,6 +119,7 @@ public class GameScreen implements Screen {
 	@Override
 	public void dispose() {
 		mBatch.dispose();
+		map.dispose();
 	}
 	
 	public void setPlayersAmount(int amount) {
@@ -147,7 +159,7 @@ public class GameScreen implements Screen {
 		//pCam.up.set(Vector3.Y);
 		customLookAt(new Matrix4(map.getMainPlayer().getModelInstance().transform).mul(new Matrix4().setToTranslation(0, map.getMainPlayer().getHeight(), 0)).getTranslation(new Vector3())); 
 		
-		map.setCameraTrans(pCam.combined);
+		
 		//pCam.direction.set(map.getMainPlayerRotation().y, 0, 1);
 		//controlPlayer();
 	}

@@ -24,6 +24,7 @@ public abstract class GameObject {
 	protected Model model;
 	protected ModelInstance modelInstance;
 	protected ArrayList<Node> nodes;
+	protected ArrayList<Matrix4> matrixes;
 	protected ArrayList<btCollisionShape> visibleCollShapes;
 	protected ArrayList<btCollisionShape> invisibleCollShapes;
 	protected ArrayList<btCollisionObject> collisionObjects; //Used for invisible objects that should have collisions with others but should not change the forces of the objects
@@ -63,6 +64,35 @@ public abstract class GameObject {
 		//motionState.transform = modelInstance.transform;
 		
 		setCollisions();
+		//manuallySetCollisions();
+		
+	}
+	
+	public void create(ObjectType type, GameMap map, Matrix4 trans) {
+		this.type = type;
+		this.map = map;
+		
+		matrixes = new ArrayList<Matrix4>();
+		matrixes.add(trans);
+		
+		visibleCollShapes = new ArrayList<btCollisionShape>();
+		invisibleCollShapes = new ArrayList<btCollisionShape>();
+		constructionInfos = new ArrayList<btRigidBody.btRigidBodyConstructionInfo>();
+		invisConstructionInfos = new ArrayList<btRigidBody.btRigidBodyConstructionInfo>();
+		motionStates = new ArrayList<MotionState>();
+		invisMotionStates = new ArrayList<MotionState>();
+		bodies = new ArrayList<btRigidBody>();
+		//invisBodies = new ArrayList<btRigidBody>();
+		//collisionObjects = new ArrayList<btCollisionObject>();
+		
+		nodes = new ArrayList<Node>();
+		createModels();
+		createCollisionShapes();
+		
+		//motionState = new MotionState();
+		//motionState.transform = modelInstance.transform;
+		
+		setCollisions(trans);
 		//manuallySetCollisions();
 		
 	}
@@ -115,12 +145,14 @@ public abstract class GameObject {
 	}*/
 	
 	protected void setBodies() {
-		if(modelInstance != null)
-			modelInstance.calculateTransforms();
+		modelInstance.calculateTransforms();
 		
-		//if(nodes != null)
-		for(int i = 0; i < bodies.size() && modelInstance != null; i++)
-				bodies.get(i).proceedToTransform(calcTransformFromNodesTransform(nodes.get(i).globalTransform));
+		for(int i = 0;i < bodies.size(); i++)
+			bodies.get(i).proceedToTransform(calcTransformFromNodesTransform(nodes.get(i).globalTransform));
+	}
+	
+	protected void setBodies(Matrix4 givenTrans) {
+		bodies.get(0).proceedToTransform(givenTrans);
 	}
 	
 	protected Matrix4 calcTransformFromNodesTransform(Matrix4 nodeTrans) {
@@ -131,7 +163,7 @@ public abstract class GameObject {
 		return new Matrix4().set(nodeTrans.cpy().translate(x, y, z));
 	}*/
 	
-	protected void setCollisions() {
+	private void constructBodies() {
 		for(btCollisionShape shape : visibleCollShapes) {
 			btRigidBody.btRigidBodyConstructionInfo constInfo = new btRigidBody.btRigidBodyConstructionInfo(0, null, shape, localInertia);
 			//constInfo.setRestitution(0.5f);
@@ -139,6 +171,10 @@ public abstract class GameObject {
 			constructionInfos.add(constInfo);
 			bodies.add(new btRigidBody(constInfo));
 		}
+	}
+	
+	protected void setCollisions() {
+		constructBodies();
 		
 		setBodies();
 		
@@ -152,8 +188,32 @@ public abstract class GameObject {
 			motionStates.add(new MotionState());
 			if(nodes.size() > i && nodes.get(i) != null)
 				motionStates.get(i).transform = calcTransformFromNodesTransform(nodes.get(i).globalTransform);
+			else if(matrixes != null && matrixes.size() > i && matrixes.get(i) != null)
+				motionStates.get(i).transform = matrixes.get(i);
 			else motionStates.get(i).transform = new Matrix4();
 			bodies.get(i).setMotionState(motionStates.get(i));
+		}
+	}
+	
+	protected void setCollisions(Matrix4 givenTrans) {
+		constructBodies();
+		
+		setBodies(givenTrans);
+		
+		for(int i = 0; i < visibleCollShapes.size(); i++) {
+			/*Matrix4 temp = new Matrix4();
+			//temp.set(nodes.get(i).translation.cpy().add(x, y, z), nodes.get(i).rotation.cpy().setFromAxis(rX, rY, rZ, rA));
+			Matrix4 glTr = nodes.get(i).globalTransform;
+			temp.set(glTr.cpy().setToTranslation(glTr.getTranslation(new Vector3()).add(x, y, z)).getTranslation(new Vector3()), new Quaternion().setFromAxis(rX, rY, rZ, rA));*/
+			//System.out.println(temp.getTranslation(new Vector3()).z);
+			//System.out.println(nodes.get(i).id);
+			motionStates.add(new MotionState());
+			//if(nodes.size() > i && nodes.get(i) != null)
+				//motionStates.get(i).transform = calcTransformFromNodesTransform(nodes.get(i).globalTransform);
+			//else if(matrixes != null && matrixes.size() > i && matrixes.get(i) != null)
+			motionStates.get(i).transform = givenTrans;
+			//else motionStates.get(i).transform = new Matrix4();
+			//bodies.get(i).setMotionState(motionStates.get(i));
 		}
 	}
 	

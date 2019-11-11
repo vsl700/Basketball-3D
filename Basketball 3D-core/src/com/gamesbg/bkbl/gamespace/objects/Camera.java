@@ -5,6 +5,8 @@ import com.badlogic.gdx.physics.bullet.collision.btBoxShape;
 
 public class Camera extends GameObject {
 
+	
+	
 	@Override
 	protected void createModels() {
 		// TODO Auto-generated method stub
@@ -14,7 +16,7 @@ public class Camera extends GameObject {
 	@Override
 	protected void createCollisionShapes() {
 		// TODO Auto-generated method stub
-		visibleCollShapes.add(new btBoxShape(new Vector3(getWidth() * 2, getHeight() / 2, getDepth() * 2)));
+		visibleCollShapes.add(new btBoxShape(new Vector3(getWidth(), getHeight(), getDepth())));
 	}
 
 	@Override

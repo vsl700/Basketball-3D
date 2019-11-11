@@ -3,6 +3,7 @@ package com.gamesbg.bkbl.gamespace.objects;
 import java.util.HashMap;
 
 import com.badlogic.gdx.Gdx;
+import com.badlogic.gdx.math.Matrix4;
 import com.badlogic.gdx.utils.reflect.ClassReflection;
 import com.badlogic.gdx.utils.reflect.ReflectionException;
 import com.gamesbg.bkbl.gamespace.GameMap;
@@ -42,6 +43,19 @@ public enum ObjectType {
 			return entity;
 		} catch (ReflectionException e) {
 			// TODO Auto-generated catch block
+			Gdx.app.error("Entity Loader", "Could not load entity of type " + type.id);
+			return null;
+		}
+	}
+	
+	public static GameObject createGameObject(String id, GameMap map, Matrix4 trans){
+		ObjectType type = objectTypes.get(id); 
+		try {
+			@SuppressWarnings("unchecked")
+			GameObject entity = ClassReflection.newInstance(type.loaderClass);
+			entity.create(type, map, trans);
+			return entity;
+		} catch (ReflectionException e) {
 			Gdx.app.error("Entity Loader", "Could not load entity of type " + type.id);
 			return null;
 		}
