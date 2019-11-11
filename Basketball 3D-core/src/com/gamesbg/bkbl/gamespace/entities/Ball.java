@@ -81,10 +81,10 @@ public class Ball extends Entity {
 		matrixes.add(modelInstance.transform);
 		
 		invisCollShapes = new ArrayList<btCollisionShape>();
-		invisCollShapes.add(new btSphereShape(0.5f));
-		matrixes.add(matrixes.get(0));
+		//invisCollShapes.add(new btSphereShape(0.5f));
+		//matrixes.add(matrixes.get(0));
 		
-		invisCollShapes = new ArrayList<btCollisionShape>();
+		//invisCollShapes = new ArrayList<btCollisionShape>();
 		invisCollShapes.add(new btSphereShape(0.15f));
 		matrixes.add(matrixes.get(0));
 		
