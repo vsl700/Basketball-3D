@@ -64,8 +64,8 @@ public class CustomAnimation {
 	}
 	
 	/**
-	 * Adds a new rotation keyframe where the rotation is on multiple axises, which axises have different angles
-	 * @param axisAngles - [a rotation to add][0 - x, 1- y, 2 - z, 3 - angle]
+	 * Adds a new rotation keyframe where the rotation is on multiple axises, which have different angles
+	 * @param axisAngles - [a rotation to add][0 - x, 1 - y, 2 - z, 3 - angle]
 	 * @param keyframe - the animation keyframe
 	 */
 	public void addRotationsKeyFrame(float[][] axisAngles, float keyframe) {
@@ -79,6 +79,16 @@ public class CustomAnimation {
 			temp.rotate(axisAngles[i][0], axisAngles[i][1], axisAngles[i][2], axisAngles[i][3]);
 		
 		nodeAnim.rotation.add(new NodeKeyframe<Quaternion>(keyframe, new Quaternion().setFromMatrix(temp)));
+	}
+	
+	//FIXME add a "addRotationsKeyFrame" method with the same arguments, but calculating the rotations by something like percents according to the given angles (probably according to the first angle)
+	public void addRotationsKeyFrame2(float[][] axisAngles, float keyframe) {
+		NodeAnimation nodeAnim = model.animations.get(currentIndex).nodeAnimations.get(currentNodeIndex);
+		
+		if(nodeAnim.rotation == null)
+			nodeAnim.rotation = new Array<NodeKeyframe<Quaternion>>();
+		
+		
 	}
 	
 	public void markAnimation(int index) {
