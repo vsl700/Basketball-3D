@@ -82,14 +82,17 @@ public class CustomAnimation {
 	}
 	
 	//FIXME add a "addRotationsKeyFrame" method with the same arguments, but calculating the rotations by something like percents according to the given angles (probably according to the first angle)
-	public void addRotationsKeyFrame2(float[][] axisAngles, float keyframe) {
+	/*public void addRotationsKeyFrame2(float[][] axisAngles, float keyframe) {
 		NodeAnimation nodeAnim = model.animations.get(currentIndex).nodeAnimations.get(currentNodeIndex);
 		
 		if(nodeAnim.rotation == null)
 			nodeAnim.rotation = new Array<NodeKeyframe<Quaternion>>();
 		
-		
-	}
+		float x = axisAngles[0][0], y = axisAngles[0][1], z = axisAngles[0][2], angle = axisAngles[0][3];
+		for(int i = 1; i < axisAngles.length; i++) {
+			
+		}
+	}*/
 	
 	public void markAnimation(int index) {
 		currentIndex = index;

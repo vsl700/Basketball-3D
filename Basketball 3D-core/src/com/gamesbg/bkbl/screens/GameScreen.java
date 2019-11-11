@@ -8,6 +8,7 @@ import com.badlogic.gdx.graphics.g3d.Environment;
 import com.badlogic.gdx.graphics.g3d.ModelBatch;
 import com.badlogic.gdx.graphics.g3d.attributes.ColorAttribute;
 import com.badlogic.gdx.graphics.g3d.environment.DirectionalLight;
+import com.badlogic.gdx.graphics.g3d.environment.PointLight;
 import com.badlogic.gdx.graphics.g3d.utils.FirstPersonCameraController;
 import com.badlogic.gdx.math.Matrix4;
 import com.badlogic.gdx.math.Vector3;
@@ -35,7 +36,10 @@ public class GameScreen implements Screen {
 
 		environment = new Environment();
 		environment.set(new ColorAttribute(ColorAttribute.AmbientLight, 0.4f, 0.4f, 0.4f, 1f));
-		environment.add(new DirectionalLight().set(1, 1, 1, 0, -10, 0));
+		environment.add(new DirectionalLight().set(0.6f, 0.6f, 0.6f, 0, -10, 0));
+		environment.add(new PointLight().set(1, 1, 1, 0, 9, -15, 40));
+		environment.add(new PointLight().set(1, 1, 1, 0, 9, 15, 40));
+		//environment.add(new PointLight().set(1, 1, 1, 0, 9, 0, 40));
 
 		pCam = new PerspectiveCamera(40, Gdx.graphics.getWidth(), Gdx.graphics.getHeight());
 		pCam.position.set(3, 1, 0);

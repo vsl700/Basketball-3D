@@ -4,7 +4,6 @@ import java.util.ArrayList;
 import java.util.HashMap;
 
 import com.badlogic.gdx.Gdx;
-import com.badlogic.gdx.Input.Buttons;
 import com.badlogic.gdx.Input.Keys;
 import com.badlogic.gdx.graphics.g3d.Environment;
 import com.badlogic.gdx.graphics.g3d.ModelBatch;
@@ -31,6 +30,7 @@ import com.gamesbg.bkbl.gamespace.entities.EntityType;
 import com.gamesbg.bkbl.gamespace.entities.Player;
 import com.gamesbg.bkbl.gamespace.objects.GameObject;
 import com.gamesbg.bkbl.gamespace.objects.ObjectType;
+import com.gamesbg.bkbl.gamespace.tools.InputController;
 
 public class GameMap {
 	
@@ -169,12 +169,16 @@ public class GameMap {
     
     ObjectContactListener contactListener;
     
+    InputController inputs;
+    
     HashMap<Integer, String> objectsMap;
     //MotionListener motionListener;
     
     int index = 0;
 	
 	public GameMap() {
+		inputs = new InputController();
+		
 		Bullet.init();
 		
 		//collisionConfig = new btDefaultCollisionConfiguration();
@@ -472,6 +476,8 @@ public class GameMap {
 			
 		}
 			
+		
+		Gdx.input.setInputProcessor(inputs);
 	}
 	
 	public void clear() {
@@ -615,8 +621,8 @@ public class GameMap {
 				mainPlayer.run(new Vector3(dirZ * -delta, 0, dirX * delta));*/
 		//}
 		//else {
-		if(Gdx.input.isKeyPressed(Keys.SHIFT_LEFT)) {
-			if (Gdx.input.isKeyPressed(Keys.W)) {
+		if(inputs.isSprintPressed()) {
+			if (inputs.isForwardPressed()) {
 				// mainPlayer.getBody().setLinearVelocity(new Vector3(dirX * delta * multiplier, 0, dirZ * delta * multiplier));
 				mainPlayer.run(new Vector3(dirX * delta, 0, dirZ * delta));
 				
@@ -629,34 +635,36 @@ public class GameMap {
 			}
 		}
 		else {
-			if (Gdx.input.isKeyPressed(Keys.W)) {
+			if (inputs.isForwardPressed()) {
 				// mainPlayer.getBody().setLinearVelocity(new Vector3(dirX * delta * multiplier, 0, dirZ * delta * multiplier));
 				mainPlayer.walk(new Vector3(dirX * delta, 0, dirZ * delta));
 			}
-			else if (Gdx.input.isKeyPressed(Keys.S))
+			else if (inputs.isBackwardPressed())
 				// mainPlayer.getBody().setLinearVelocity(new Vector3(dirX * -delta * multiplier, 0, dirZ * -delta * multiplier));
 				mainPlayer.walk(new Vector3(dirX * -delta, 0, dirZ * -delta));
 			// else mainPlayer.getBody().setLinearVelocity(new Vector3());
 
-			if (Gdx.input.isKeyPressed(Keys.A))
+			if (inputs.isStrLeftPressed())
 				// mainPlayer.getBody().setLinearVelocity(new Vector3(dirZ * delta * multiplier, 0, dirX * -delta * multiplier));
 				mainPlayer.walk(new Vector3(dirZ * delta, 0, dirX * -delta));
-			else if (Gdx.input.isKeyPressed(Keys.D))
+			else if (inputs.isStrRightPressed())
 				// mainPlayer.getBody().setLinearVelocity(new Vector3(dirZ * -delta * multiplier, 0, dirX * delta * multiplier));
 				mainPlayer.walk(new Vector3(dirZ * -delta, 0, dirX * delta));
 		}
 		
+		mainPlayer.shootPowerScroll(-inputs.GetScroll());
+		
 		if(Gdx.input.isKeyPressed(Keys.E))
 			mainPlayer.interactWithBallE();
 		
-		else if(Gdx.input.isKeyPressed(Keys.CONTROL_LEFT)) {
+		else if(inputs.isShootPressed()) {
 			mainPlayer.interactWithBallS();
 		}
 		
-		else if(Gdx.input.isButtonPressed(Buttons.LEFT)) {
+		else if(inputs.isDribbleLPressed()) {
 			mainPlayer.interactWithBallL();
 		}
-		else if(Gdx.input.isButtonPressed(Buttons.RIGHT)) {
+		else if(inputs.isDribbleRPressed()) {
 			mainPlayer.interactWithBallR();
 		}
 		
@@ -691,6 +699,8 @@ public class GameMap {
 		else if(Gdx.input.getY() < substractor)
 			Gdx.input.setCursorPosition(Gdx.input.getX(), Gdx.graphics.getHeight() - substractor);
 		
+		
+		inputs.update();
 		//Gdx.input.setCursorPosition(0, 0);
 		//else mainPlayer.getBody().setLinearVelocity(new Vector3());
 		/*if (Gdx.input.isKeyPressed(Keys.W))

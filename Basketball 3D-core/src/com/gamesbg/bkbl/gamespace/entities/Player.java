@@ -63,6 +63,7 @@ public abstract class Player extends Entity {
 	boolean leftHandInWorld, rightHandInWorld;
 	boolean downBody;
 	
+	int shootingPower = 10;
 	int cycleTimeout;
 	
 	@Override
@@ -983,7 +984,7 @@ public abstract class Player extends Entity {
 						// map.getBall().setCopyTransform(bodiesMap.get("handL").getWorldTransform());
 					}
 				} else {
-					catchBall(false);
+					catchBall(true);
 					// map.getBall().setCopyTransform(bodiesMap.get("handL").getWorldTransform());
 				}
 			//}
@@ -993,6 +994,14 @@ public abstract class Player extends Entity {
 		}
 		
 		//throwBall();
+	}
+	
+	public void shootPowerScroll(float value) {
+		if(value > 0)
+			shootingPower = (int) Math.min(20, shootingPower + value);
+		
+		else if(value < 0)
+			shootingPower = (int) Math.max(10, shootingPower + value);
 	}
 	
 	private void catchBall(boolean left) {
@@ -1293,7 +1302,10 @@ public abstract class Player extends Entity {
 		//tempVec.rotate(-camNode.globalTransform.getRotation(new Quaternion()).getPitch(), 1, 0, 0);
 		//tempVec.y = -tempVec.y;
 		tempVec.y = (-camNode.globalTransform.getRotation(new Quaternion()).getPitch() / 100) * 2;
-		tempVec.scl(15);
+		tempVec.x *= shootingPower;
+		tempVec.y *= shootingPower * 1.4f;
+		tempVec.z *= shootingPower;
+		//tempVec.scl(shootingPower);
 		//tempVec.y *= 2;
 		//tempVec.x = tempVec.x;
 		//tempVec.z = tempVec.z;
@@ -1361,7 +1373,7 @@ public abstract class Player extends Entity {
 		else lockRotationAndRandomFloating(true);*/
 		
 		//setBodiesTransform();
-		
+		System.out.println(shootingPower);
 		lockRotationAndRandomFloating(true);
 		
 		if (dribbleL) {
