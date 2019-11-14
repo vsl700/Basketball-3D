@@ -1357,6 +1357,7 @@ public abstract class Player extends Entity {
 
 							map.getBall().getMainBody().setLinearVelocity(makeBallDribbleVelocity(true).add(0, -10, 0));
 							disableHandDynColl(true);
+							enableHandDynColl(false);
 							//animateArmL("stayL");
 							animateArmR("stay");
 						}
