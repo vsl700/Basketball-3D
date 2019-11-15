@@ -53,6 +53,8 @@ public abstract class Player extends Entity {
 	static final float scale7 = 0.315f;
 	static final float handPercentage = 0.4f;
 	
+	static final float dribbleSpeed = 0.1f;
+	
 	boolean walking, running, jumping;
 	boolean leftHoldingBall, rightHoldingBall;
 	boolean leftAimBall, rightAimBall;
@@ -274,15 +276,15 @@ public abstract class Player extends Entity {
 		custom.addRotationKeyFrame(1, 0, 0, -80, 1);
 		
 		
-		custom.addAnimation("dribblePhase1ArmL", 0.25f);
+		custom.addAnimation("dribblePhase1ArmL", dribbleSpeed);
 		
 		custom.addNodeAnimation("shoulderL");
 		custom.addRotationKeyFrame(1, 0, 0, -10, 0);
-		custom.addRotationKeyFrame(1, 0, 0, -10, 0.25f);
+		custom.addRotationKeyFrame(1, 0, 0, -10, dribbleSpeed);
 		
 		custom.addNodeAnimation("elbowL");
 		custom.addRotationKeyFrame(1, 0, 0, -80, 0);
-		custom.addRotationKeyFrame(1, 0, 0, -50, 0.25f);
+		custom.addRotationKeyFrame(1, 0, 0, -50, dribbleSpeed);
 		
 		
 		custom.addAnimation("dribbleIdle1ArmL", 1);
@@ -296,15 +298,15 @@ public abstract class Player extends Entity {
 		custom.addRotationKeyFrame(1, 0, 0, -50, 1);
 		
 		
-		custom.addAnimation("dribblePhase2ArmL", 0.25f);
+		custom.addAnimation("dribblePhase2ArmL", dribbleSpeed);
 		
 		custom.addNodeAnimation("shoulderL");
 		custom.addRotationKeyFrame(1, 0, 0, -10, 0);
-		custom.addRotationKeyFrame(1, 0, 0, -10, 0.25f);
+		custom.addRotationKeyFrame(1, 0, 0, -10, dribbleSpeed);
 		
 		custom.addNodeAnimation("elbowL");
 		custom.addRotationKeyFrame(1, 0, 0, -50, 0);
-		custom.addRotationKeyFrame(1, 0, 0, -80, 0.25f);
+		custom.addRotationKeyFrame(1, 0, 0, -80, dribbleSpeed);
 		
 		
 		custom.addAnimation("dribbleIdleArmR", 1);
@@ -318,15 +320,15 @@ public abstract class Player extends Entity {
 		custom.addRotationKeyFrame(1, 0, 0, -80, 1);
 		
 		
-		custom.addAnimation("dribblePhase1ArmR", 0.25f);
+		custom.addAnimation("dribblePhase1ArmR", dribbleSpeed);
 		
 		custom.addNodeAnimation("shoulderR");
 		custom.addRotationKeyFrame(1, 0, 0, -10, 0);
-		custom.addRotationKeyFrame(1, 0, 0, -10, 0.25f);
+		custom.addRotationKeyFrame(1, 0, 0, -10, dribbleSpeed);
 		
 		custom.addNodeAnimation("elbowR");
 		custom.addRotationKeyFrame(1, 0, 0, -80, 0);
-		custom.addRotationKeyFrame(1, 0, 0, -50, 0.25f);
+		custom.addRotationKeyFrame(1, 0, 0, -50, dribbleSpeed);
 		
 		
 		custom.addAnimation("dribbleIdle1ArmR", 1);
@@ -340,15 +342,15 @@ public abstract class Player extends Entity {
 		custom.addRotationKeyFrame(1, 0, 0, -50, 1);
 		
 		
-		custom.addAnimation("dribblePhase2ArmR", 0.25f);
+		custom.addAnimation("dribblePhase2ArmR", dribbleSpeed);
 		
 		custom.addNodeAnimation("shoulderR");
 		custom.addRotationKeyFrame(1, 0, 0, -10, 0);
-		custom.addRotationKeyFrame(1, 0, 0, -10, 0.25f);
+		custom.addRotationKeyFrame(1, 0, 0, -10, dribbleSpeed);
 		
 		custom.addNodeAnimation("elbowR");
 		custom.addRotationKeyFrame(1, 0, 0, -50, 0);
-		custom.addRotationKeyFrame(1, 0, 0, -80, 0.25f);
+		custom.addRotationKeyFrame(1, 0, 0, -80, dribbleSpeed);
 		
 		/*custom.addAnimation("jump", 1.5f);
 		
@@ -1369,7 +1371,7 @@ public abstract class Player extends Entity {
 
 					});
 
-					armLController.animate("dribbleIdle1ArmL", 0.25f);
+					armLController.animate("dribbleIdle1ArmL", dribbleSpeed);
 					armLController.setAnimation("dribbleIdle1ArmL", 1);
 				}
 				else map.getBall().setWorldTransform(bodiesMap.get("handR").getWorldTransform().cpy());
@@ -1443,7 +1445,7 @@ public abstract class Player extends Entity {
 							leftReadyBall = false;
 							cycleTimeout = 0;
 						}
-						else if (cycleTimeout > 5 && !leftReadyBall) {
+						else if (cycleTimeout * delta > 0.15f && !leftReadyBall) {
 							leftReadyBall = true;
 						} else {
 							cycleTimeout++;
@@ -1512,7 +1514,7 @@ public abstract class Player extends Entity {
 							rightReadyBall = false;
 							cycleTimeout = 0;
 						}
-						else if (cycleTimeout > 5 && !rightReadyBall) {
+						else if (cycleTimeout * delta > 0.15f && !rightReadyBall) {
 							rightReadyBall = true;
 						} else {
 							cycleTimeout++;
