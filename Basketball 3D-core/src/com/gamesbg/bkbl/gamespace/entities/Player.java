@@ -1429,30 +1429,32 @@ public abstract class Player extends Entity {
 						}
 
 					} else {
+						//The current translation of the ball
+						Matrix4 ballTrans = map.getBall().getMainBody().getWorldTransform();
 						Vector3 tempBallVec = new Vector3();
-						map.getBall().getMainBody().getWorldTransform().getTranslation(tempBallVec);
+						ballTrans.getTranslation(tempBallVec);
 						
 						if(armLController.current.animation.id.equals("dribbleIdle1ArmL")) {
+							//The player's previous translation
 							Vector3 tempPlayerVec = new Vector3();
 							prevTrans.getTranslation(tempPlayerVec);
+							
+							//The difference between the player's previous translation
 							Vector3 ballSubPlayer = tempBallVec.cpy().sub(tempPlayerVec);
-							//ballSubPlayer.y = tempBallVec.y;
-							//Matrix4 newBallTrans = modelInstance.transform.cpy().mul(new Matrix4().setToTranslation(ballSubPlayer));
-							//Vector3 newBallVec = new Vector3();
-							//modelInstance.transform.getTranslation(newBallVec);
+							//Getting the player's previous rotation
 							Quaternion tempVecRot = new Quaternion();
 							prevTrans.getRotation(tempVecRot);
-							//tempVecRot.add(0, -tempVecRot.y * 2, 0, 0);
-							//tempVecRot.y -= tempVecRot.y * 2;
+							//Rotating the difference vector so that we get the difference when the player's y-rotation is zero and multiply it with the matrix without getting different mul results
 							ballSubPlayer.rotate(-tempVecRot.getYaw(), 0, 1, 0);
-							//Matrix4 newBallTrans = new Matrix4().setToTranslation(newBallVec);
-							Matrix4 newBallTrans = modelInstance.transform.cpy().mul(new Matrix4().setToTranslation(ballSubPlayer));
 							
-							Vector3 someCorrections = new Vector3();
-							newBallTrans.getTranslation(someCorrections);
-							someCorrections.y = tempBallVec.y;
-							map.getBall().setWorldTransform(new Matrix4().set(someCorrections, newBallTrans.getRotation(new Quaternion())));
+							//Creating the new ball matrix
+							Matrix4 newBallTrans = modelInstance.transform.cpy().mul(new Matrix4().set(ballSubPlayer, ballTrans.getRotation(new Quaternion())));
 							
+							//Finally setting the world transform of the ball
+							map.getBall().setWorldTransform(new Matrix4(newBallTrans));
+							
+							
+							//Setting the ball's velocity
 							Vector3 tempVelVec = makeBallDribbleVelocity(true);
 							tempVelVec.y = map.getBall().getMainBody().getLinearVelocity().y;
 							
