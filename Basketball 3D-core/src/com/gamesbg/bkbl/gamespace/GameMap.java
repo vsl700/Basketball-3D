@@ -58,7 +58,8 @@ public class GameMap {
 			//if(((userValue0 == 11 || userValue0 == 19) && userValue1 == 21) || ((userValue1 == 11 || userValue1 == 19) && userValue0 == 21))
 				//System.out.println(userValue0 + " collided with " + userValue1);
 			//if((objectsMap.get(userValue0).equals("ballObj") && objectsMap.get(userValue1).equals("teamObj")) || (objectsMap.get(userValue1).equals("ballObj") && objectsMap.get(userValue0).equals("teamObj")))
-			if(objectsMap.get(userValue0).equals("ball") || objectsMap.get(userValue0).equals("ballObj") || objectsMap.get(userValue1).equals("ball") || objectsMap.get(userValue1).equals("ballObj"))
+			//if(objectsMap.get(userValue0).equals("ball") || objectsMap.get(userValue0).equals("ballObj") || objectsMap.get(userValue1).equals("ball") || objectsMap.get(userValue1).equals("ballObj"))
+			if(objectsMap.get(userValue0).equals("cam") || objectsMap.get(userValue1).equals("cam"))
 				System.out.println(userValue0 + " (" + objectsMap.get(userValue0) + ")" + " with " + userValue1 + " (" + objectsMap.get(userValue1) + ")");
 			//if(userValue0 == 23 || userValue1 == 23)
 				//System.out.println(userValue0 + " and " + userValue1);
@@ -204,26 +205,12 @@ public class GameMap {
 		objectsMap = new HashMap<Integer, String>();
 		//motionListener = new MotionListener();
 		
-		camera = ObjectType.createGameObject(ObjectType.CAMERA.getId(), this, 0, 0, 0);
-		for(btRigidBody co : camera.getBodies()) {
-			co.setUserValue(index);
-			//co.setCollisionFlags(co.getCollisionFlags() | btCollisionObject.CollisionFlags.CF_CUSTOM_MATERIAL_CALLBACK);
-			dynamicsWorld.addRigidBody(co);
-			//System.out.println(co.getUserValue());
-			co.setContactCallbackFlag(CAMERA_FLAG);
-			co.setContactCallbackFilter(GROUND_FLAG);
-			
-			objectsMap.put(index, ObjectType.CAMERA.getId());
-			
-			index++;
-		}
-		
 		terrain = ObjectType.createGameObject(ObjectType.TERRAIN.getId(), this, 0, 0, 0);
 		for(btRigidBody co : terrain.getBodies()) {
 			co.setUserValue(index);
 			//System.out.println(co.getUserValue());
 			co.setCollisionFlags(co.getCollisionFlags() | btCollisionObject.CollisionFlags.CF_KINEMATIC_OBJECT);
-			dynamicsWorld.addRigidBody(co);
+			dynamicsWorld.addRigidBody(co, GROUND_FLAG, ALL_FLAG);
 			co.setContactCallbackFlag(GROUND_FLAG);
 			co.setContactCallbackFilter(ENTITY_FLAG);
 			co.setActivationState(Collision.DISABLE_DEACTIVATION);
@@ -236,7 +223,7 @@ public class GameMap {
 		for(btRigidBody co : terrain.getInvisBodies()) {
 			co.setUserValue(index);
 			//co.setCollisionFlags(co.getCollisionFlags() | btCollisionObject.CollisionFlags.CF_CUSTOM_MATERIAL_CALLBACK);
-			dynamicsWorld.addRigidBody(co);
+			dynamicsWorld.addRigidBody(co, GROUND_FLAG, ALL_FLAG);
 			//System.out.println(co.getUserValue());
 			co.setContactCallbackFlag(GROUND_FLAG);
 			co.setContactCallbackFilter(ENTITY_FLAG);
@@ -244,6 +231,20 @@ public class GameMap {
 			//co.setActivationState(Collision.WANTS_DEACTIVATION);
 			
 			objectsMap.put(index, ObjectType.TERRAIN.getId() + "Inv");
+			
+			index++;
+		}
+		
+		camera = ObjectType.createGameObject(ObjectType.CAMERA.getId(), this, 0, 0, 0);
+		for(btRigidBody co : camera.getBodies()) {
+			co.setUserValue(index);
+			co.setCollisionFlags(co.getCollisionFlags() | btCollisionObject.CollisionFlags.CF_CUSTOM_MATERIAL_CALLBACK);
+			dynamicsWorld.addRigidBody(co, CAMERA_FLAG, GROUND_FLAG);
+			//System.out.println(co.getUserValue());
+			co.setContactCallbackFlag(CAMERA_FLAG);
+			co.setContactCallbackFilter(GROUND_FLAG);
+			
+			objectsMap.put(index, ObjectType.CAMERA.getId());
 			
 			index++;
 		}
@@ -512,6 +513,8 @@ public class GameMap {
 		
 		//System.out.println("UPDATE");
 		
+		camera.setWorldTransform(new Matrix4(mainPlayer.getModelInstance().transform).mul(mainPlayer.getCamNode().globalTransform).mul(new Matrix4().setToTranslation(0, mainPlayer.getHeight(), -10)));
+		
 		float delta2 = Math.min(1f / 30f, delta);
 		dynamicsWorld.stepSimulation(delta2, 5, 1f / 60f);
 		/*ball.getBody().getWorldTransform(ball.getModelInstance().transform);
@@ -608,6 +611,7 @@ public class GameMap {
 	
 	public void setCameraTrans(Matrix4 trans) {
 		camera.getBodies().get(0).proceedToTransform(trans);
+		
 	}
 	
 	private void controlPlayer(float delta) {
@@ -835,6 +839,10 @@ public class GameMap {
 	
 	public GameObject getTerrain() {
 		return terrain;
+	}
+	
+	public GameObject getCamera() {
+		return camera;
 	}
 	
 	public ArrayList<btRigidBody> getBodiesOfAll(){

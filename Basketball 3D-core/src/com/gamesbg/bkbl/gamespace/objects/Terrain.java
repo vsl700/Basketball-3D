@@ -42,9 +42,9 @@ public class Terrain extends GameObject {
 		model = mb.createBox(getWidth(), getHeight(), getDepth(), material, attribs);
 		model.manageDisposable(court);
 		
-		nodes.add(model.nodes.get(0));
-		
 		modelInstance = new ModelInstance(model, x, y - getHeight() / 2, z);
+		
+		matrixes.add(modelInstance.transform);
 	}
 
 	@Override

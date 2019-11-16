@@ -1335,6 +1335,12 @@ public abstract class Player extends Entity {
 		bodiesMap.get("model").setWorldTransform(temp.translate(0, -getHeight() / 2, 0));
 	}*/
 	
+	/**
+	 * The transform of the player in the previous frame. Used for dribble hand switching when the ball has to follow the player and also dynamically follow its other hand.
+	 */
+	private Matrix4 prevTrans;
+	
+	@Override
 	public void update(float delta) {
 		//System.out.println("x: " + modelInstance.animations.get(0).nodeAnimations.get(0).node.globalTransform.getScaleX() + " y: " + modelInstance.animations.get(0).nodeAnimations.get(0).node.globalTransform.getScaleX() + " z: " + modelInstance.animations.get(0).nodeAnimations.get(0).node.globalTransform.getScaleX());
 		//System.out.println();
@@ -1398,7 +1404,7 @@ public abstract class Player extends Entity {
 			}
 			else {
 				if (!leftHoldingBall) {
-					if (leftHandBall && leftReadyBall) {
+					if (leftHandBall && leftReadyBall) { //If the ball is being touched by the player's hand after some time (to make sure it will jump to the ground) it should be caught and the dribble should be over.
 						if (!armLController.current.animation.id.equals("dribblePhase2ArmL")) {
 							armLController.setAnimation("dribblePhase2ArmL", 1, new AnimationListener() {
 
@@ -1423,29 +1429,55 @@ public abstract class Player extends Entity {
 						}
 
 					} else {
-						if(!armLController.current.animation.id.equals("dribbleIdle1ArmL")) {
-							Matrix4 temp = map.getBall().getMainBody().getWorldTransform();
-							Vector3 tempVec = new Vector3();
-							temp.getTranslation(tempVec);
-
-							Matrix4 temp1 = bodiesMap.get("handL").getWorldTransform().cpy();
-							Vector3 tempVec1 = new Vector3();
-							temp1.getTranslation(tempVec1);
+						Vector3 tempBallVec = new Vector3();
+						map.getBall().getMainBody().getWorldTransform().getTranslation(tempBallVec);
+						
+						if(armLController.current.animation.id.equals("dribbleIdle1ArmL")) {
+							Vector3 tempPlayerVec = new Vector3();
+							prevTrans.getTranslation(tempPlayerVec);
+							Vector3 ballSubPlayer = tempBallVec.cpy().sub(tempPlayerVec);
+							//ballSubPlayer.y = tempBallVec.y;
+							//Matrix4 newBallTrans = modelInstance.transform.cpy().mul(new Matrix4().setToTranslation(ballSubPlayer));
+							//Vector3 newBallVec = new Vector3();
+							//modelInstance.transform.getTranslation(newBallVec);
+							Quaternion tempVecRot = new Quaternion();
+							prevTrans.getRotation(tempVecRot);
+							//tempVecRot.add(0, -tempVecRot.y * 2, 0, 0);
+							//tempVecRot.y -= tempVecRot.y * 2;
+							ballSubPlayer.rotate(-tempVecRot.getYaw(), 0, 1, 0);
+							//Matrix4 newBallTrans = new Matrix4().setToTranslation(newBallVec);
+							Matrix4 newBallTrans = modelInstance.transform.cpy().mul(new Matrix4().setToTranslation(ballSubPlayer));
 							
-							map.getBall().setWorldTransform(new Matrix4().set(new Vector3(tempVec1.x, tempVec.y, tempVec1.z), map.getBall().getMainBody().getWorldTransform().getRotation(new Quaternion())));
-						}else {
+							Vector3 someCorrections = new Vector3();
+							newBallTrans.getTranslation(someCorrections);
+							someCorrections.y = tempBallVec.y;
+							map.getBall().setWorldTransform(new Matrix4().set(someCorrections, newBallTrans.getRotation(new Quaternion())));
+							
 							Vector3 tempVelVec = makeBallDribbleVelocity(true);
 							tempVelVec.y = map.getBall().getMainBody().getLinearVelocity().y;
 							
 							map.getBall().getMainBody().setLinearVelocity(tempVelVec);
+							
+						}else {
+							//Matrix4 temp = map.getBall().getMainBody().getWorldTransform();
+							//Vector3 tempVec = new Vector3();
+							//temp.getTranslation(tempVec);
+
+							
+							//Vector3 tempVec1 = new Vector3();
+							Vector3 tempHandVec = new Vector3();
+							Matrix4 tempHand = bodiesMap.get("handL").getWorldTransform().cpy();
+							tempHand.getTranslation(tempHandVec);
+							
+							map.getBall().setWorldTransform(new Matrix4().set(new Vector3(tempHandVec.x, tempBallVec.y, tempHandVec.z), map.getBall().getMainBody().getWorldTransform().getRotation(new Quaternion())));
 						}
-						System.out.println(map.getBall().getMainBody().getLinearVelocity().y);
+						//System.out.println(map.getBall().getMainBody().getLinearVelocity().y);
 						if(cycleTimeout * delta > 0.75f) {
 							dribbleL = false;
 							leftReadyBall = false;
 							cycleTimeout = 0;
 						}
-						else if (cycleTimeout * delta > 0.15f && !leftReadyBall) {
+						else if (!leftReadyBall && cycleTimeout * delta > 0.15f) {
 							leftReadyBall = true;
 						} else {
 							cycleTimeout++;
@@ -1934,6 +1966,8 @@ public abstract class Player extends Entity {
 		leftHoldingBall = false;
 		leftHoldingBall = false;*/
 		super.update(delta);
+		
+		prevTrans = modelInstance.transform.cpy();
 		//System.out.println(getHeight());
 	}
 	

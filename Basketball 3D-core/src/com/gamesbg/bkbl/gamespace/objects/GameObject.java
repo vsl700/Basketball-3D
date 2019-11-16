@@ -6,7 +6,6 @@ import com.badlogic.gdx.graphics.g3d.Environment;
 import com.badlogic.gdx.graphics.g3d.Model;
 import com.badlogic.gdx.graphics.g3d.ModelBatch;
 import com.badlogic.gdx.graphics.g3d.ModelInstance;
-import com.badlogic.gdx.graphics.g3d.model.Node;
 import com.badlogic.gdx.math.Matrix4;
 import com.badlogic.gdx.math.Quaternion;
 import com.badlogic.gdx.math.Vector3;
@@ -23,7 +22,8 @@ public abstract class GameObject {
 	//protected MotionState motionState;
 	protected Model model;
 	protected ModelInstance modelInstance;
-	protected ArrayList<Node> nodes;
+	//protected ArrayList<Node> nodes;
+	protected ArrayList<Matrix4> matrixes;
 	protected ArrayList<btCollisionShape> visibleCollShapes;
 	protected ArrayList<btCollisionShape> invisibleCollShapes;
 	protected ArrayList<btCollisionObject> collisionObjects; //Used for invisible objects that should have collisions with others but should not change the forces of the objects
@@ -33,7 +33,10 @@ public abstract class GameObject {
 	protected ArrayList<MotionState> invisMotionStates;
 	protected ArrayList<btRigidBody.btRigidBodyConstructionInfo> constructionInfos;
 	protected ArrayList<btRigidBody.btRigidBodyConstructionInfo> invisConstructionInfos;
+	protected Matrix4 mainTrans;
 	protected static final Vector3 localInertia = new Vector3(0, 0, 0);
+	
+	protected int mainBodyIndex;
 	
 	protected float x, y, z;
 	protected float rX, rY, rZ, rA;
@@ -55,8 +58,13 @@ public abstract class GameObject {
 		//invisBodies = new ArrayList<btRigidBody>();
 		//collisionObjects = new ArrayList<btCollisionObject>();
 		
-		nodes = new ArrayList<Node>();
+		//nodes = new ArrayList<Node>();
+		matrixes = new ArrayList<Matrix4>();
+		
 		createModels();
+		if(modelInstance != null)
+			mainTrans = modelInstance.transform;
+		else mainTrans = new Matrix4(); 
 		createCollisionShapes();
 		
 		//motionState = new MotionState();
@@ -120,7 +128,9 @@ public abstract class GameObject {
 		
 		//if(nodes != null)
 		for(int i = 0; i < bodies.size() && modelInstance != null; i++)
-				bodies.get(i).proceedToTransform(calcTransformFromNodesTransform(nodes.get(i).globalTransform));
+			if(i == mainBodyIndex)
+				bodies.get(i).proceedToTransform(mainTrans);
+			else bodies.get(i).proceedToTransform(calcTransformFromNodesTransform(matrixes.get(i)));
 	}
 	
 	protected Matrix4 calcTransformFromNodesTransform(Matrix4 nodeTrans) {
@@ -150,9 +160,12 @@ public abstract class GameObject {
 			//System.out.println(temp.getTranslation(new Vector3()).z);
 			//System.out.println(nodes.get(i).id);
 			motionStates.add(new MotionState());
-			if(nodes.size() > i && nodes.get(i) != null)
+			/*if(nodes.size() > i && nodes.get(i) != null)
 				motionStates.get(i).transform = calcTransformFromNodesTransform(nodes.get(i).globalTransform);
-			else motionStates.get(i).transform = new Matrix4();
+			else motionStates.get(i).transform = new Matrix4();*/
+			if(i == mainBodyIndex)
+				motionStates.get(i).transform = mainTrans;
+			else motionStates.get(i).transform = calcTransformFromNodesTransform(matrixes.get(i));
 			bodies.get(i).setMotionState(motionStates.get(i));
 		}
 	}
@@ -164,7 +177,7 @@ public abstract class GameObject {
 			/*Matrix4 temp = new Matrix4();
 			Matrix4 glTr = nodes.get(i).globalTransform;
 			temp.set(glTr.cpy().setToTranslation(glTr.getTranslation(new Vector3()).add(x, y, z)).getTranslation(new Vector3()), new Quaternion().setFromAxis(rX, rY, rZ, rA));*/
-			motionStates.get(i).transform = calcTransformFromNodesTransform(nodes.get(i).globalTransform);
+			motionStates.get(i).transform = calcTransformFromNodesTransform(matrixes.get(i));
 			bodies.get(i).setMotionState(motionStates.get(i));
 		}
 	}
@@ -174,6 +187,12 @@ public abstract class GameObject {
 	 */
 	protected abstract void specialFunction();
 		
+	public void setWorldTransform(Matrix4 trans) {
+		mainTrans = trans;
+		
+		//setBodies();
+	}
+	
 	public ObjectType getType() {
 		return type;
 	}
@@ -188,6 +207,10 @@ public abstract class GameObject {
 
 	public ModelInstance getModelInstance() {
 		return modelInstance;
+	}
+	
+	public Matrix4 getMainTrans() {
+		return mainTrans;
 	}
 	
 	public ArrayList<btRigidBody> getBodies() {

@@ -67,7 +67,7 @@ public class GameScreen implements Screen {
 		
 		//Gdx.input.setInputProcessor(camController);
 		map.spawnPlayers(amount);
-		
+		//map.setCameraTrans(pCam.combined);
 	}
 
 	@Override
@@ -79,8 +79,10 @@ public class GameScreen implements Screen {
 			//camController.update();
 		
 		map.update(delta);
-		posTheCam();
-		
+		//posTheCam();
+		map.getCamera().getMainTrans().getTranslation(pCam.position);
+		//map.getCamera().getMainTrans().getRotation(new Quaternion()).transform(pCam.direction);
+		customLookAt(new Matrix4(map.getMainPlayer().getModelInstance().transform).mul(new Matrix4().setToTranslation(0, map.getMainPlayer().getHeight(), 0)).getTranslation(new Vector3()));
 		pCam.update();
 
 		mBatch.begin(pCam);
@@ -92,6 +94,7 @@ public class GameScreen implements Screen {
 	public void resize(int width, int height) {
 		pCam.viewportWidth = width;
 		pCam.viewportHeight = height;
+		//pCam.update();
 	}
 
 	@Override
@@ -127,9 +130,7 @@ public class GameScreen implements Screen {
 	 * as it sets only the direction vector, as the original method set both the direction and the up vector and after that resetting the up vector
 	 * to prevent from screen tilting.
 	 * 
-	 * @param x - the x-axis
-	 * @param y - the y-axis
-	 * @param z - the z-axis
+	 * @param trans - the translation of the object
 	 */
 	private void customLookAt(Vector3 trans) {
 		//Vector3 tmpVec = trans.cpy().sub(pCam.position).nor();
