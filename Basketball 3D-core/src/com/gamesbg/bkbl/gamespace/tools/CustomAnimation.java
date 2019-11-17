@@ -12,6 +12,8 @@ import com.badlogic.gdx.utils.Array;
 /**
  * Used to make animations for a model through code
  * 
+ * (MAKE A ROTATION KEYFRAME FROM VECTORS!!!)
+ * 
  * @author studi
  *
  */

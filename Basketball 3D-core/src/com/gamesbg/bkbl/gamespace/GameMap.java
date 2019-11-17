@@ -4,7 +4,6 @@ import java.util.ArrayList;
 import java.util.HashMap;
 
 import com.badlogic.gdx.Gdx;
-import com.badlogic.gdx.Input.Keys;
 import com.badlogic.gdx.graphics.g3d.Environment;
 import com.badlogic.gdx.graphics.g3d.ModelBatch;
 import com.badlogic.gdx.math.Matrix4;
@@ -42,7 +41,7 @@ public class GameMap {
 	
 	//final static short PART_FLAG = 1 << 3; //The entity's part (they should not collide by themselves)
 	public final static short CAMERA_FLAG = 1 << 3;
-	public final static short PLAYER_FLAG = 1 << 4;
+	//public final static short PLAYER_FLAG = 1 << 4;
 	public final static short ENT_SPECIAL_FLAG = 1 << 5; //The special flag of an entity
 	public final static short OBJECT_FLAG = 1 << 6;
 	public final static short SPECIAL_FLAG = 1 << 7; //The special flag of an object
@@ -59,8 +58,8 @@ public class GameMap {
 				//System.out.println(userValue0 + " collided with " + userValue1);
 			//if((objectsMap.get(userValue0).equals("ballObj") && objectsMap.get(userValue1).equals("teamObj")) || (objectsMap.get(userValue1).equals("ballObj") && objectsMap.get(userValue0).equals("teamObj")))
 			//if(objectsMap.get(userValue0).equals("ball") || objectsMap.get(userValue0).equals("ballObj") || objectsMap.get(userValue1).equals("ball") || objectsMap.get(userValue1).equals("ballObj"))
-			if(objectsMap.get(userValue0).equals("cam") || objectsMap.get(userValue1).equals("cam"))
-				System.out.println(userValue0 + " (" + objectsMap.get(userValue0) + ")" + " with " + userValue1 + " (" + objectsMap.get(userValue1) + ")");
+			//if(objectsMap.get(userValue0).equals("cam") || objectsMap.get(userValue1).equals("cam"))
+				//System.out.println(userValue0 + " (" + objectsMap.get(userValue0) + ")" + " with " + userValue1 + " (" + objectsMap.get(userValue1) + ")");
 			//if(userValue0 == 23 || userValue1 == 23)
 				//System.out.println(userValue0 + " and " + userValue1);
 			//System.out.println(userValue0 + " and " + userValue1);
@@ -322,7 +321,7 @@ public class GameMap {
 			//System.out.println(co.getUserValue());
 			dynamicsWorld.addRigidBody(co, ENTITY_FLAG, ALL_FLAG);
 			co.setContactCallbackFlag(ENTITY_FLAG);
-			co.setContactCallbackFilter(ENTITY_FLAG);
+			co.setContactCallbackFilter(ALL_FLAG);
 			
 			//System.out.println(co.getContactCallbackFlag());
 			//System.out.println(co.getContactCallbackFilter());
@@ -516,7 +515,7 @@ public class GameMap {
 		camera.setWorldTransform(new Matrix4(mainPlayer.getModelInstance().transform).mul(mainPlayer.getCamNode().globalTransform).mul(new Matrix4().setToTranslation(0, mainPlayer.getHeight(), -10)));
 		
 		float delta2 = Math.min(1f / 30f, delta);
-		dynamicsWorld.stepSimulation(delta2, 5, 1f / 60f);
+		dynamicsWorld.stepSimulation(delta2, 15, 1f / 60f);
 		/*ball.getBody().getWorldTransform(ball.getModelInstance().transform);
 		for(Entity e : players) {
 			e.getBody().getWorldTransform(e.getModelInstance().transform);
@@ -678,10 +677,7 @@ public class GameMap {
 		
 		mainPlayer.shootPowerScroll(-inputs.GetScroll());
 		
-		if(Gdx.input.isKeyPressed(Keys.E))
-			mainPlayer.interactWithBallE();
-		
-		else if(inputs.isShootPressed()) {
+		if(inputs.isShootPressed()) {
 			mainPlayer.interactWithBallS();
 		}
 		
@@ -723,8 +719,7 @@ public class GameMap {
 		else if(Gdx.input.getY() < substractor)
 			Gdx.input.setCursorPosition(Gdx.input.getX(), Gdx.graphics.getHeight() - substractor);
 		
-		
-		inputs.update();
+		inputs.update(mainPlayer.holdingBall());
 		//Gdx.input.setCursorPosition(0, 0);
 		//else mainPlayer.getBody().setLinearVelocity(new Vector3());
 		/*if (Gdx.input.isKeyPressed(Keys.W))
