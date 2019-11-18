@@ -11,7 +11,6 @@ import com.badlogic.gdx.graphics.g3d.environment.DirectionalLight;
 import com.badlogic.gdx.graphics.g3d.environment.PointLight;
 import com.badlogic.gdx.graphics.g3d.utils.FirstPersonCameraController;
 import com.badlogic.gdx.math.Matrix4;
-import com.badlogic.gdx.math.Quaternion;
 import com.badlogic.gdx.math.Vector3;
 import com.gamesbg.bkbl.MyGdxGame;
 import com.gamesbg.bkbl.gamespace.GameMap;
@@ -58,7 +57,7 @@ public class GameScreen implements Screen {
 		// camController = new CameraInputController(pCam);
 		// System.out.println(Keys.toString(camController.translateButton));
 
-		map = new GameMap();
+		//map = game.getMap();
 	}
 
 	@Override
@@ -66,6 +65,11 @@ public class GameScreen implements Screen {
 		//The text panels use the setInputProcessor option so we need to set the controller as an Input Processor every time we start playing
 		
 		//Gdx.input.setInputProcessor(camController);
+		if(map == null)
+			game.load3DGraphics();
+		
+		map = game.getMap();
+		
 		map.spawnPlayers(amount);
 		//map.setCameraTrans(pCam.combined);
 	}
@@ -82,7 +86,7 @@ public class GameScreen implements Screen {
 		//posTheCam();
 		map.getCamera().getMainTrans().getTranslation(pCam.position);
 		//map.getCamera().getMainTrans().getRotation(new Quaternion()).transform(pCam.direction);
-		customLookAt(new Matrix4(map.getMainPlayer().getModelInstance().transform).mul(new Matrix4().setToTranslation(0, map.getMainPlayer().getHeight(), 0)).getTranslation(new Vector3()));
+		game.customLookAt(pCam, new Matrix4(map.getMainPlayer().getModelInstance().transform).mul(new Matrix4().setToTranslation(0, map.getMainPlayer().getHeight(), 0)).getTranslation(new Vector3()));
 		pCam.update();
 
 		mBatch.begin(pCam);
@@ -145,7 +149,7 @@ public class GameScreen implements Screen {
 	private void posTheCam() {
 		//Vector3 tempVec = map.getMainPlayerTranslation().cpy();
 		//pCam.position.set(0, 0, 0).mul(new Matrix4().setToTranslation(tempVec.x, tempVec.y + map.getMainPlayer().getHeight() / 2, tempVec.z - 10));
-		pCam.position.set(new Matrix4(map.getMainPlayer().getModelInstance().transform).mul(map.getMainPlayer().getCamNode().globalTransform).mul(new Matrix4().setToTranslation(0, map.getMainPlayer().getHeight(), -10)).getTranslation(new Vector3()));
+		pCam.position.set(new Matrix4(map.getMainPlayer().getModelInstance().transform).mul(map.getMainPlayer().getCamMatrix()).mul(new Matrix4().setToTranslation(0, map.getMainPlayer().getHeight(), -10)).getTranslation(new Vector3()));
 		//pCam.position.set(map.getMainPlayerTranslation().mul(new Matrix4().setToTranslation(0, map.getMainPlayer().getHeight() * 2, -10)));
 		//pCam.normalizeUp();
 		//pCam.lookAt(map.getMainPlayerTranslation());
@@ -156,31 +160,5 @@ public class GameScreen implements Screen {
 		//pCam.direction.set(map.getMainPlayerRotation().y, 0, 1);
 		//controlPlayer();
 	}
-
-	/*private void controlPlayer() {
-		float dirX = pCam.direction.x;
-		float dirY = pCam.direction.y;
-		float dirZ = pCam.direction.z;
-		float delta = Gdx.graphics.getDeltaTime();
-		float multiplier = 5;
-
-		if (Gdx.input.isKeyPressed(Keys.W))
-			pCam.translate(dirX * delta * multiplier, dirY * delta * multiplier, dirZ * delta * multiplier);
-		else if (Gdx.input.isKeyPressed(Keys.S))
-			pCam.translate(dirX * -delta * multiplier, dirY * -delta * multiplier, dirZ * -delta * multiplier);
-
-		if (Gdx.input.isKeyPressed(Keys.A))
-			pCam.translate(dirZ * delta * multiplier, 0, dirX * -delta * multiplier);
-		else if (Gdx.input.isKeyPressed(Keys.D))
-			pCam.translate(dirZ * -delta * multiplier, 0, dirX * delta * multiplier);
-
-		/*if (Gdx.input.isButtonPressed(Buttons.LEFT)) {
-			float a = Gdx.input.getDeltaY();
-			float b = Gdx.input.getDeltaX();
-
-			pCam.rotate(new Vector3(0.1f, 0, 0), -a / 6);
-			pCam.rotate(new Vector3(0, 0.1f, 0), -b / 6);
-		}
-	}*/
 
 }

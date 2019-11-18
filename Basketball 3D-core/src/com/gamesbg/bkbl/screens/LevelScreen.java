@@ -46,8 +46,8 @@ public class LevelScreen implements Screen {
 		
 		textUpDown = new TextUpDown(btnFont, textFont, batch, shape, Color.WHITE, cam, new String[] {"Easy", "Hard", "Very Hard"});
 		
-		play = new Button("Play", btnFont, batch, shape, Color.GREEN.cpy().sub(0, 0.3f, 0, 1), cam, true, true, 0);
-		back = new Button("Go Back", btnFont, batch, shape, Color.GREEN.cpy().sub(0, 0.3f, 0, 1), cam, true, true, 0);
+		play = new Button("Play", btnFont, batch, shape, Color.ORANGE.cpy().sub(0, 0.3f, 0, 1), cam, true, true, 0);
+		back = new Button("Go Back", btnFont, batch, shape, Color.ORANGE.cpy().sub(0, 0.3f, 0, 1), cam, true, true, 0);
 		
 		tmPlAmount = new Label("THE AMOUNT OF PLAYERS PER TEAM", btnFont, batch, Color.WHITE, cam, true);
 		

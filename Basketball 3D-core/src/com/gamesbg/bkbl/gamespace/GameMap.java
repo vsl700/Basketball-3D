@@ -140,18 +140,6 @@ public class GameMap {
 		}
 	}
 	
-	/*public static class MotionState extends btMotionState{
-		public Matrix4 transform;
-		
-		@Override
-        public void getWorldTransform (Matrix4 worldTrans) {
-            worldTrans.set(transform);
-        }
-        @Override
-        public void setWorldTransform (Matrix4 worldTrans) {
-            transform.set(worldTrans);
-        }
-	}*/
 	
 	ArrayList<Player> players;
 	Player mainPlayer;
@@ -163,10 +151,7 @@ public class GameMap {
 	btCollisionConfiguration dynCollConfig;
     btDispatcher dynDispatcher;
     btBroadphaseInterface dynBroadphase;
-	//btCollisionWorld collisionWorld;
 	btDynamicsWorld dynamicsWorld;
-	//btSoftRigidDynamicsWorld softWorld;
-    //btSequentialImpulseConstraintSolver softConstSolver;
     btConstraintSolver constraintSolver;
     
     ObjectContactListener contactListener;
@@ -174,7 +159,12 @@ public class GameMap {
     InputController inputs;
     
     HashMap<Integer, String> objectsMap;
-    //MotionListener motionListener;
+    
+    //Current game properties
+    int teamScore, oppScore;
+    
+    boolean gameRunning;//Whether or not the players can play
+    
     
     int index = 0;
 	
@@ -182,32 +172,20 @@ public class GameMap {
 		inputs = new InputController();
 		
 		Bullet.init();
-		
-		//collisionConfig = new btDefaultCollisionConfiguration();
-        //dispatcher = new btCollisionDispatcher(collisionConfig);
-        //broadphase = new btDbvtBroadphase();
         dynCollConfig = new btDefaultCollisionConfiguration();
         dynDispatcher = new btCollisionDispatcher(dynCollConfig);
         dynBroadphase = new btDbvtBroadphase();
         constraintSolver = new btSequentialImpulseConstraintSolver();
-        //softCollConfig = new btSoftBodyRigidBodyCollisionConfiguration();
-        //softDispatcher = new btCollisionDispatcher(softCollConfig);
-        //softBroadphase = new btDbvtBroadphase();
-        //softConstSolver = new btSequentialImpulseConstraintSolver();
-		//collisionWorld = new btCollisionWorld(dispatcher, broadphase, collisionConfig);
         dynamicsWorld = new btDiscreteDynamicsWorld(dynDispatcher, dynBroadphase, constraintSolver, dynCollConfig);
-        //softWorld = new btSoftRigidDynamicsWorld(softDispatcher, softBroadphase, softConstSolver, softCollConfig);
-        //softWorld.setGravity(new Vector3(0, -9.8f, 0));
         dynamicsWorld.setGravity(new Vector3(0, -9.8f, 0));
 		contactListener = new ObjectContactListener();
 		
 		objectsMap = new HashMap<Integer, String>();
-		//motionListener = new MotionListener();
 		
 		terrain = ObjectType.createGameObject(ObjectType.TERRAIN.getId(), this, 0, 0, 0);
 		for(btRigidBody co : terrain.getBodies()) {
 			co.setUserValue(index);
-			//System.out.println(co.getUserValue());
+			
 			co.setCollisionFlags(co.getCollisionFlags() | btCollisionObject.CollisionFlags.CF_KINEMATIC_OBJECT);
 			dynamicsWorld.addRigidBody(co, GROUND_FLAG, ALL_FLAG);
 			co.setContactCallbackFlag(GROUND_FLAG);
@@ -308,7 +286,7 @@ public class GameMap {
 			//dynamicsWorld.addRigidBody(co);
 		}
 		
-		ball = EntityType.createEntity(EntityType.BALL.getId(), this, new Vector3(0, 0, 25.235f));
+		ball = EntityType.createEntity(EntityType.BALL.getId(), this, new Vector3(0, 0, 0));
 		for (btRigidBody co : ball.getBodies()) {
 			co.setUserValue(index);
 			// ball.getBody().setCollisionFlags(ball.getBody().getCollisionFlags()
@@ -512,7 +490,7 @@ public class GameMap {
 		
 		//System.out.println("UPDATE");
 		
-		camera.setWorldTransform(new Matrix4(mainPlayer.getModelInstance().transform).mul(mainPlayer.getCamNode().globalTransform).mul(new Matrix4().setToTranslation(0, mainPlayer.getHeight(), -10)));
+		camera.setWorldTransform(new Matrix4(mainPlayer.getModelInstance().transform).mul(mainPlayer.getCamMatrix()).mul(new Matrix4().setToTranslation(0, mainPlayer.getHeight(), -10)));
 		
 		float delta2 = Math.min(1f / 30f, delta);
 		dynamicsWorld.stepSimulation(delta2, 15, 1f / 60f);
@@ -804,10 +782,6 @@ public class GameMap {
 		return null;
 	}
 	
-	/*public btSoftRigidDynamicsWorld getSoftWorld() {
-		return softWorld;
-	}*/
-	
 	public btDynamicsWorld getDynamicsWorld() {
 		return dynamicsWorld;
 	}
@@ -838,6 +812,18 @@ public class GameMap {
 	
 	public GameObject getCamera() {
 		return camera;
+	}
+	
+	public int teamScore() {
+		return teamScore;
+	}
+	
+	public int oppScore() {
+		return oppScore;
+	}
+	
+	public boolean isGameRunning() {
+		return gameRunning;
 	}
 	
 	public ArrayList<btRigidBody> getBodiesOfAll(){
@@ -900,26 +886,4 @@ public class GameMap {
 		return tempObj;
 	}
 	
-	/*private boolean checkCollision(btCollisionObject obj0, btCollisionObject obj1) {
-		CollisionObjectWrapper co0 = new CollisionObjectWrapper(obj0);
-		CollisionObjectWrapper co1 = new CollisionObjectWrapper(obj1);
-
-		btCollisionAlgorithm algorithm = dispatcher.findAlgorithm(co0.wrapper, co1.wrapper);
-
-		btDispatcherInfo info = new btDispatcherInfo();
-		btManifoldResult result = new btManifoldResult(co0.wrapper, co1.wrapper);
-
-		algorithm.processCollision(co0.wrapper, co1.wrapper, info, result);
-
-		boolean r = result.getPersistentManifold().getNumContacts() > 0;
-
-		dispatcher.freeCollisionAlgorithm(algorithm.getCPointer());
-		result.dispose();
-		info.dispose();
-		co1.dispose();
-		co0.dispose();
-
-		return r;
-	}*/
-
 }

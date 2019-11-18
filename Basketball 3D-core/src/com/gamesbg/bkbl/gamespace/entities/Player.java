@@ -3,6 +3,9 @@ package com.gamesbg.bkbl.gamespace.entities;
 import java.util.ArrayList;
 import java.util.HashMap;
 
+import com.badlogic.gdx.ai.btree.BehaviorTree;
+import com.badlogic.gdx.ai.fsm.DefaultStateMachine;
+import com.badlogic.gdx.ai.fsm.StateMachine;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.VertexAttributes;
@@ -26,6 +29,7 @@ import com.badlogic.gdx.physics.bullet.collision.btSphereShape;
 import com.badlogic.gdx.physics.bullet.dynamics.btRigidBody;
 import com.gamesbg.bkbl.gamespace.GameMap;
 import com.gamesbg.bkbl.gamespace.tools.CustomAnimation;
+import com.gamesbg.bkbl.gamespace.entities.players.ai.*;
 
 public abstract class Player extends Entity {
 
@@ -34,16 +38,24 @@ public abstract class Player extends Entity {
 	//static final float JUMPING_VELOCITY = 15;
 	//static final float JUMPING_TIME = 1.5f;
 	
-	Node camNode;
+	//The node which should be followed by the camera
+	//Node camNode;
+	Matrix4 camMatrix;
 	
+	//Collision objects maps for reaching an object just by calling its mostly used name
 	HashMap<String, btRigidBody> bodiesMap;
 	HashMap<String, btCollisionObject> collObjMap;
 	
+	//Animation controllers for each body part that has an animation
 	AnimationController armLController;
 	AnimationController armRController;
 	AnimationController legLController;
 	AnimationController legRController;
 	AnimationController bodyController;
+	
+	//AI
+	BehaviorTree<Player> bTree;
+	StateMachine<Player, PlayerState> stateMachine;
 	
 	static final float scale1 = 0.5f;
 	static final float scale2 = 1;
@@ -110,6 +122,8 @@ public abstract class Player extends Entity {
 		
 		stopLegsAnim();
 		stopBodyAnim();
+		
+		stateMachine = new DefaultStateMachine<Player, PlayerState>(this, PlayerState.IDLING);
 
 	}
 	
@@ -585,7 +599,8 @@ public abstract class Player extends Entity {
 		//head.translation.set(x, y + scale5 + scale5 / 2 + 0.07f * 2 + scale5 / 2 + scale3 * 7 + scale1, z);
 		head.translation.set(0, scale1 / 2 + scale3 / 2 + 0.1f, 0);
 		SphereShapeBuilder.build(childMB.part(head.id, GL20.GL_TRIANGLES, VertexAttributes.Usage.Position | VertexAttributes.Usage.Normal, material), scale1, scale1, scale1, divisionU, divisionV);
-		camNode = head;
+		//camNode = head;
+		camMatrix = head.globalTransform;
 		
 		Node spine1 = childMB.node();
 		spine1.id = "spine1";
@@ -888,7 +903,7 @@ public abstract class Player extends Entity {
 	 * @param x - the x-axis
 	 */
 	public void turnX(float x) {
-		Matrix4 mainNodeTrans = camNode.globalTransform;
+		Matrix4 mainNodeTrans = camMatrix;
 		float pitch = mainNodeTrans.getRotation(new Quaternion()).getPitch();
 		
 		if(Math.abs(pitch + x) < 38)
@@ -925,7 +940,7 @@ public abstract class Player extends Entity {
 		if (!isShooting()) {
 			if (leftHoldingBall || rightHoldingBall) {
 				dribbleL = true;
-			} else if (map.getBall().isGrounded()) {
+			} else if (!map.getBall().isGrounded()) {
 				if (!running)
 					leftPointBall = true;
 
@@ -1104,7 +1119,7 @@ public abstract class Player extends Entity {
 		Vector3 tempVec = new Vector3(0, 0, 1);
 		tempVec.rotate(dir.getYaw(), 0, 1, 0);
 
-		tempVec.y = (-camNode.globalTransform.getRotation(new Quaternion()).getPitch() / 100) * 2;
+		tempVec.y = (-camMatrix.getRotation(new Quaternion()).getPitch() / 100) * 2;
 		tempVec.x *= shootingPower;
 		tempVec.y *= shootingPower * 1.4f;
 		tempVec.z *= shootingPower;
@@ -1384,6 +1399,8 @@ public abstract class Player extends Entity {
 	@Override
 	public void update(float delta) {
 		lockRotationAndRandomFloating(true);
+		
+		stateMachine.update();
 		
 		String prevIdArmL = armLController.current.animation.id;
 		String prevIdArmR = armLController.current.animation.id;
@@ -1689,9 +1706,14 @@ public abstract class Player extends Entity {
 		prevTrans = modelInstance.transform.cpy();
 	}
 
-	public Node getCamNode() {
-		return camNode;
+	public Matrix4 getCamMatrix() {
+		return camMatrix;
 	}
+	
+	public StateMachine<Player, PlayerState> getStateMachine() {
+		return stateMachine;
+	}
+	
 
 	@Override
 	public float getWidth() {

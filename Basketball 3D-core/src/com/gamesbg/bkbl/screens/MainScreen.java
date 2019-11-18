@@ -31,9 +31,9 @@ public class MainScreen implements Screen {
 		font = new BitmapFont();
 		font.getData().setScale(1);
 		
-		play = new Button("Play", font, batch, shape, Color.GREEN.cpy().sub(0, 0.3f, 0, 1), cam, true, true, 0);
-		settings = new Button("Settings", font, batch, shape, Color.GREEN.cpy().sub(0, 0.3f, 0, 1), cam, true, true, 0);
-		quit = new Button("Quit", font, batch, shape, Color.GREEN.cpy().sub(0, 0.3f, 0, 1), cam, true, true, 0);
+		play = new Button("Play", font, batch, shape, Color.ORANGE.cpy().sub(0, 0.3f, 0, 1), cam, true, true, 0);
+		settings = new Button("Settings", font, batch, shape, Color.ORANGE.cpy().sub(0, 0.3f, 0, 1), cam, true, true, 0);
+		quit = new Button("Quit", font, batch, shape, Color.ORANGE.cpy().sub(0, 0.3f, 0, 1), cam, true, true, 0);
 	}
 
 	@Override
