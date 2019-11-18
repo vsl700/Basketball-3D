@@ -983,7 +983,8 @@ public abstract class Player extends Entity {
 			dribbleL = true;
 		}
 		else if(!map.getBall().isGrounded()) {
-			leftPointBall = true;
+			if(!running)
+				leftPointBall = true;
 			
 			if(!leftHoldingBall && leftHandBall)
 				catchBall(true);
@@ -997,7 +998,8 @@ public abstract class Player extends Entity {
 			dribbleR = true;
 		}
 		else if(!map.getBall().isGrounded()) {
-			rightPointBall = true;
+			if(!running)
+				rightPointBall = true;
 			
 			if(!rightHoldingBall && rightHandBall)
 				catchBall(false);
@@ -1589,15 +1591,15 @@ public abstract class Player extends Entity {
 		//Vector3 tempHandRotVec = new Vector3(0, 0, -1); //Use this to make an animated pointing!!!
 		//tempHand.getRotation(new Quaternion()).transform(tempHandRotVec);
 		//System.out.println(tempHandRotVec.x + "; " + tempHandRotVec.y + "; " + tempHandRotVec.z);
-		tempBallTrans.x = Math.abs(tempBallTrans.x);
-		tempBallTrans.y = Math.abs(tempBallTrans.y);
-		tempBallTrans.z = Math.abs(tempBallTrans.z);
+		//tempBallTrans.x = Math.abs(tempBallTrans.x);
+		//tempBallTrans.y = Math.abs(tempBallTrans.y);
+		//tempBallTrans.z = Math.abs(tempBallTrans.z);
 		
-		tempHandVec.x = Math.abs(tempHandVec.x);
-		tempHandVec.y = Math.abs(tempHandVec.y);
-		tempHandVec.z = Math.abs(tempHandVec.z);
+		//tempHandVec.x = Math.abs(tempHandVec.x);
+		//tempHandVec.y = Math.abs(tempHandVec.y);
+		//tempHandVec.z = Math.abs(tempHandVec.z);
 		
-		Vector3 newHandRotVec = tempBallTrans.cpy().sub(tempHandVec).nor().add(new Vector3(tempHandRot.x, -1, 0)); //Taken from GameScreen.customLookAt()
+		Vector3 newHandRotVec = tempBallTrans.cpy().sub(tempHandVec).unrotate(modelInstance.transform).nor().add(new Vector3(0, -1, 0));
 		
 		//System.out.print(newHandRotVec.x + "; ");
 		//if(newHandRotVec.z > 0)
@@ -1613,13 +1615,9 @@ public abstract class Player extends Entity {
 		modelInstance.getNode("shoulder" + id).isAnimated = true;
 		tempLocal.set(tempLocal.getTranslation(new Vector3()), newHandRot).rotate(0, 1, 0, 180);
 		
-		//modelInstance.getNode("arm1" + id).globalTransform.set(modelInstance.getNode("shoulder" + id).globalTransform.mul(modelInstance.getNode("arm1" + id).localTransform));
-		//modelInstance.getNode("elbow" + id).globalTransform.set(modelInstance.getNode("arm1" + id).globalTransform.mul(modelInstance.getNode("elbow" + id).localTransform));
-		//modelInstance.getNode("arm2" + id).globalTransform.set(modelInstance.getNode("elbow" + id).globalTransform.mul(modelInstance.getNode("arm2" + id).localTransform));
-		//modelInstance.getNode("hand" + id).globalTransform.set(modelInstance.getNode("arm2" + id).globalTransform.mul(modelInstance.getNode("hand" + id).localTransform));
 		modelInstance.calculateTransforms();
 		
-		//setCollisionTransform();
+		setCollisionTransform();
 	}
 	
 	@Override

@@ -68,7 +68,7 @@ public class Ball extends Entity {
 	public void update(float delta) {
 		manuallySetCollTransform();
 		//System.out.println(getMainBody().getWorldTransform());
-		getMainBody().getWorldTransform(); //For some reason I had to call this to make everything work :|
+		getMainBody().getWorldTransform(); //For some reason I had to call this to make everything work :| (ball's modelInstance teleports into the main player's stomach)
 		//printBallTrans();
 		//System.out.println(grounded);
 		
