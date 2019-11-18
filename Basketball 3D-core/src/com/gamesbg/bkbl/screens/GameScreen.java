@@ -11,6 +11,7 @@ import com.badlogic.gdx.graphics.g3d.environment.DirectionalLight;
 import com.badlogic.gdx.graphics.g3d.environment.PointLight;
 import com.badlogic.gdx.graphics.g3d.utils.FirstPersonCameraController;
 import com.badlogic.gdx.math.Matrix4;
+import com.badlogic.gdx.math.Quaternion;
 import com.badlogic.gdx.math.Vector3;
 import com.gamesbg.bkbl.MyGdxGame;
 import com.gamesbg.bkbl.gamespace.GameMap;
@@ -66,7 +67,7 @@ public class GameScreen implements Screen {
 		
 		//Gdx.input.setInputProcessor(camController);
 		map.spawnPlayers(amount);
-		
+		//map.setCameraTrans(pCam.combined);
 	}
 
 	@Override
@@ -78,8 +79,10 @@ public class GameScreen implements Screen {
 			//camController.update();
 		
 		map.update(delta);
-		posTheCam();
-		
+		//posTheCam();
+		map.getCamera().getMainTrans().getTranslation(pCam.position);
+		//map.getCamera().getMainTrans().getRotation(new Quaternion()).transform(pCam.direction);
+		customLookAt(new Matrix4(map.getMainPlayer().getModelInstance().transform).mul(new Matrix4().setToTranslation(0, map.getMainPlayer().getHeight(), 0)).getTranslation(new Vector3()));
 		pCam.update();
 
 		mBatch.begin(pCam);
@@ -91,6 +94,7 @@ public class GameScreen implements Screen {
 	public void resize(int width, int height) {
 		pCam.viewportWidth = width;
 		pCam.viewportHeight = height;
+		//pCam.update();
 	}
 
 	@Override
@@ -126,9 +130,7 @@ public class GameScreen implements Screen {
 	 * as it sets only the direction vector, as the original method set both the direction and the up vector and after that resetting the up vector
 	 * to prevent from screen tilting.
 	 * 
-	 * @param x - the x-axis
-	 * @param y - the y-axis
-	 * @param z - the z-axis
+	 * @param trans - the translation of the object
 	 */
 	private void customLookAt(Vector3 trans) {
 		//Vector3 tmpVec = trans.cpy().sub(pCam.position).nor();
@@ -149,6 +151,8 @@ public class GameScreen implements Screen {
 		//pCam.lookAt(map.getMainPlayerTranslation());
 		//pCam.up.set(Vector3.Y);
 		customLookAt(new Matrix4(map.getMainPlayer().getModelInstance().transform).mul(new Matrix4().setToTranslation(0, map.getMainPlayer().getHeight(), 0)).getTranslation(new Vector3())); 
+		
+		map.setCameraTrans(pCam.combined);
 		//pCam.direction.set(map.getMainPlayerRotation().y, 0, 1);
 		//controlPlayer();
 	}

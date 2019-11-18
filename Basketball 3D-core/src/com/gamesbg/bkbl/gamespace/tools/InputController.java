@@ -21,10 +21,16 @@ public class InputController implements InputProcessor {
 	//boolean dribbleLBtnPressed, dribbleRBtnPressed;
 	
 	//boolean updateDribbleL, updateDribbleR;
-	
-	public void update() {
-		dribbleLPressed = false;
-		dribbleRPressed = false;
+	/**
+	 * Resets the scroll amount and the dribble (and ball pointing) buttons indicators
+	 * @param resetDribble - whether to reset the ball dribble indicators
+	 */
+	public void update(boolean resetDribble) {
+		if(resetDribble) {
+			dribbleLPressed = false;
+			dribbleRPressed = false;
+		}
+		
 		scroll = 0;
 	}
 	
@@ -135,7 +141,14 @@ public class InputController implements InputProcessor {
 
 	@Override
 	public boolean touchUp(int screenX, int screenY, int pointer, int button) {
-		
+		switch(button) {
+		case dribbleL:
+			dribbleLPressed = false;
+			break;
+		case dribbleR:
+			dribbleRPressed = false;
+			break;
+		}
 		return false;
 	}
 

@@ -10,6 +10,7 @@ import com.gamesbg.bkbl.gamespace.objects.baskets.*;
 
 public enum ObjectType {
 
+	CAMERA(Camera.class, "cam"),
 	TERRAIN(Terrain.class, "terrain"),
 	HOMEBASKET(Home.class, "home"),
 	AWAYBASKET(Away.class, "away");

@@ -47,6 +47,8 @@ public abstract class Entity {
 	
 	protected boolean grounded; //We need this because of the ball, which should be caught even if it collides with other parts of the body only when it's on ground!
 	
+	float timeout;
+	
 	//protected float x, y, z;
 	
 	public void create(EntityType type, GameMap map, Vector3 pos) {
@@ -144,7 +146,10 @@ public abstract class Entity {
 	 * This method should be called when the update cycle is ending to clear the booleans and get them ready for the next cycle
 	 */
 	public void onCycleEnd() {
-		grounded = false;
+		if(isTimeoutOver()) {
+			grounded = false;
+			timeout = 0;
+		}
 	}
 	
 	/**
@@ -300,6 +305,16 @@ public abstract class Entity {
 	public void setCopyTransform(Matrix4 trans) {
 		matrixes.get(mainBodyIndex).set(trans.val);
 		setCollisionTransform();
+	}
+	
+	private boolean isTimeoutOver() {
+		if(timeout > 13) {
+			return true;
+		}
+		else {
+			timeout++;
+			return false;
+		}
 	}
 	
 	public EntityType getType() {

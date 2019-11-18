@@ -4,7 +4,6 @@ import java.util.ArrayList;
 import java.util.HashMap;
 
 import com.badlogic.gdx.Gdx;
-import com.badlogic.gdx.Input.Keys;
 import com.badlogic.gdx.graphics.g3d.Environment;
 import com.badlogic.gdx.graphics.g3d.ModelBatch;
 import com.badlogic.gdx.math.Matrix4;
@@ -41,7 +40,8 @@ public class GameMap {
 										  {5, 0.1f, 10}}; //Use this for spawning players on the following positions
 	
 	//final static short PART_FLAG = 1 << 3; //The entity's part (they should not collide by themselves)
-	public final static short PLAYER_FLAG = 1 << 4;
+	public final static short CAMERA_FLAG = 1 << 3;
+	//public final static short PLAYER_FLAG = 1 << 4;
 	public final static short ENT_SPECIAL_FLAG = 1 << 5; //The special flag of an entity
 	public final static short OBJECT_FLAG = 1 << 6;
 	public final static short SPECIAL_FLAG = 1 << 7; //The special flag of an object
@@ -57,8 +57,9 @@ public class GameMap {
 			//if(((userValue0 == 11 || userValue0 == 19) && userValue1 == 21) || ((userValue1 == 11 || userValue1 == 19) && userValue0 == 21))
 				//System.out.println(userValue0 + " collided with " + userValue1);
 			//if((objectsMap.get(userValue0).equals("ballObj") && objectsMap.get(userValue1).equals("teamObj")) || (objectsMap.get(userValue1).equals("ballObj") && objectsMap.get(userValue0).equals("teamObj")))
-			if(objectsMap.get(userValue0).equals("ball") || objectsMap.get(userValue0).equals("ballObj") || objectsMap.get(userValue1).equals("ball") || objectsMap.get(userValue1).equals("ballObj"))
-				System.out.println(userValue0 + " (" + objectsMap.get(userValue0) + ")" + " with " + userValue1 + " (" + objectsMap.get(userValue1) + ")");
+			//if(objectsMap.get(userValue0).equals("ball") || objectsMap.get(userValue0).equals("ballObj") || objectsMap.get(userValue1).equals("ball") || objectsMap.get(userValue1).equals("ballObj"))
+			//if(objectsMap.get(userValue0).equals("cam") || objectsMap.get(userValue1).equals("cam"))
+				//System.out.println(userValue0 + " (" + objectsMap.get(userValue0) + ")" + " with " + userValue1 + " (" + objectsMap.get(userValue1) + ")");
 			//if(userValue0 == 23 || userValue1 == 23)
 				//System.out.println(userValue0 + " and " + userValue1);
 			//System.out.println(userValue0 + " and " + userValue1);
@@ -157,6 +158,7 @@ public class GameMap {
 	Entity ball;
 	
 	GameObject terrain, basket1, basket2;
+	GameObject camera;
 	
 	btCollisionConfiguration dynCollConfig;
     btDispatcher dynDispatcher;
@@ -207,7 +209,7 @@ public class GameMap {
 			co.setUserValue(index);
 			//System.out.println(co.getUserValue());
 			co.setCollisionFlags(co.getCollisionFlags() | btCollisionObject.CollisionFlags.CF_KINEMATIC_OBJECT);
-			dynamicsWorld.addRigidBody(co);
+			dynamicsWorld.addRigidBody(co, GROUND_FLAG, ALL_FLAG);
 			co.setContactCallbackFlag(GROUND_FLAG);
 			co.setContactCallbackFilter(ENTITY_FLAG);
 			co.setActivationState(Collision.DISABLE_DEACTIVATION);
@@ -220,7 +222,7 @@ public class GameMap {
 		for(btRigidBody co : terrain.getInvisBodies()) {
 			co.setUserValue(index);
 			//co.setCollisionFlags(co.getCollisionFlags() | btCollisionObject.CollisionFlags.CF_CUSTOM_MATERIAL_CALLBACK);
-			dynamicsWorld.addRigidBody(co);
+			dynamicsWorld.addRigidBody(co, GROUND_FLAG, ALL_FLAG);
 			//System.out.println(co.getUserValue());
 			co.setContactCallbackFlag(GROUND_FLAG);
 			co.setContactCallbackFilter(ENTITY_FLAG);
@@ -228,6 +230,20 @@ public class GameMap {
 			//co.setActivationState(Collision.WANTS_DEACTIVATION);
 			
 			objectsMap.put(index, ObjectType.TERRAIN.getId() + "Inv");
+			
+			index++;
+		}
+		
+		camera = ObjectType.createGameObject(ObjectType.CAMERA.getId(), this, 0, 0, 0);
+		for(btRigidBody co : camera.getBodies()) {
+			co.setUserValue(index);
+			co.setCollisionFlags(co.getCollisionFlags() | btCollisionObject.CollisionFlags.CF_CUSTOM_MATERIAL_CALLBACK);
+			dynamicsWorld.addRigidBody(co, CAMERA_FLAG, GROUND_FLAG);
+			//System.out.println(co.getUserValue());
+			co.setContactCallbackFlag(CAMERA_FLAG);
+			co.setContactCallbackFilter(GROUND_FLAG);
+			
+			objectsMap.put(index, ObjectType.CAMERA.getId());
 			
 			index++;
 		}
@@ -305,7 +321,7 @@ public class GameMap {
 			//System.out.println(co.getUserValue());
 			dynamicsWorld.addRigidBody(co, ENTITY_FLAG, ALL_FLAG);
 			co.setContactCallbackFlag(ENTITY_FLAG);
-			co.setContactCallbackFilter(ENTITY_FLAG);
+			co.setContactCallbackFilter(ALL_FLAG);
 			
 			//System.out.println(co.getContactCallbackFlag());
 			//System.out.println(co.getContactCallbackFilter());
@@ -496,8 +512,10 @@ public class GameMap {
 		
 		//System.out.println("UPDATE");
 		
+		camera.setWorldTransform(new Matrix4(mainPlayer.getModelInstance().transform).mul(mainPlayer.getCamNode().globalTransform).mul(new Matrix4().setToTranslation(0, mainPlayer.getHeight(), -10)));
+		
 		float delta2 = Math.min(1f / 30f, delta);
-		dynamicsWorld.stepSimulation(delta2, 5, 1f / 60f);
+		dynamicsWorld.stepSimulation(delta2, 15, 1f / 60f);
 		/*ball.getBody().getWorldTransform(ball.getModelInstance().transform);
 		for(Entity e : players) {
 			e.getBody().getWorldTransform(e.getModelInstance().transform);
@@ -590,6 +608,11 @@ public class GameMap {
 		}
 	}
 	
+	public void setCameraTrans(Matrix4 trans) {
+		camera.getBodies().get(0).proceedToTransform(trans);
+		
+	}
+	
 	private void controlPlayer(float delta) {
 		Matrix4 playerM = new Matrix4().set(mainPlayer.getMainBody().getWorldTransform().val);
 		
@@ -654,10 +677,7 @@ public class GameMap {
 		
 		mainPlayer.shootPowerScroll(-inputs.GetScroll());
 		
-		if(Gdx.input.isKeyPressed(Keys.E))
-			mainPlayer.interactWithBallE();
-		
-		else if(inputs.isShootPressed()) {
+		if(inputs.isShootPressed()) {
 			mainPlayer.interactWithBallS();
 		}
 		
@@ -699,8 +719,7 @@ public class GameMap {
 		else if(Gdx.input.getY() < substractor)
 			Gdx.input.setCursorPosition(Gdx.input.getX(), Gdx.graphics.getHeight() - substractor);
 		
-		
-		inputs.update();
+		inputs.update(mainPlayer.holdingBall());
 		//Gdx.input.setCursorPosition(0, 0);
 		//else mainPlayer.getBody().setLinearVelocity(new Vector3());
 		/*if (Gdx.input.isKeyPressed(Keys.W))
@@ -815,6 +834,10 @@ public class GameMap {
 	
 	public GameObject getTerrain() {
 		return terrain;
+	}
+	
+	public GameObject getCamera() {
+		return camera;
 	}
 	
 	public ArrayList<btRigidBody> getBodiesOfAll(){

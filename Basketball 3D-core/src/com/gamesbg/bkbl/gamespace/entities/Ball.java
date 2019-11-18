@@ -68,7 +68,7 @@ public class Ball extends Entity {
 	public void update(float delta) {
 		manuallySetCollTransform();
 		//System.out.println(getMainBody().getWorldTransform());
-		getMainBody().getWorldTransform(); //For some reason I had to call this to make everything work :|
+		getMainBody().getWorldTransform(); //For some reason I had to call this to make everything work :| (ball's modelInstance teleports into the main player's stomach)
 		//printBallTrans();
 		//System.out.println(grounded);
 		
@@ -81,11 +81,18 @@ public class Ball extends Entity {
 		matrixes.add(modelInstance.transform);
 		
 		invisCollShapes = new ArrayList<btCollisionShape>();
-		//invisCollShapes.add(new btSphereShape(0.5f));
-		//matrixes.add(matrixes.get(0));
+		/*
+		 * This is the main coll obj. It is used to detect collisions between the ball from its outside part to its center and the player's hands. IT CANNOT BE USED FOR BASKETS!
+		 */
+		invisCollShapes.add(new btSphereShape(0.5f));
+		matrixes.add(matrixes.get(0));
 		
 		//invisCollShapes = new ArrayList<btCollisionShape>();
-		invisCollShapes.add(new btSphereShape(0.15f));
+		/*
+		 * When the ball gets around a basket, with its normal collision object the game would detect a collision even if the ball doesnt get in. This coll obj will 
+		 * detect if the center of the ball gets inside a basket.
+		 */
+		invisCollShapes.add(new btSphereShape(0.15f)); 
 		matrixes.add(matrixes.get(0));
 		
 		//invisCollShapes.add(new btSphereShape(0.25f));
