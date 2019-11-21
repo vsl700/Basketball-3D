@@ -124,41 +124,5 @@ public class GameScreen implements Screen {
 	public void setPlayersAmount(int amount) {
 		this.amount = amount;
 	}
-	
-	/**
-	 * I needed a custom lookat method because the original one modifies the up vector of the camera which makes the camera to rotate the screen
-	 * 
-	 * <br><br>
-	 * 
-	 * By the way, setting the up vector manually would also fix the problem, but I think this method would do whatever has to be done much faster
-	 * as it sets only the direction vector, as the original method set both the direction and the up vector and after that resetting the up vector
-	 * to prevent from screen tilting.
-	 * 
-	 * @param trans - the translation of the object
-	 */
-	private void customLookAt(Vector3 trans) {
-		//Vector3 tmpVec = trans.cpy().sub(pCam.position).nor();
-		//if (!tmpVec.isZero()) {
-		pCam.direction.set(trans.cpy().sub(pCam.position).nor());
-		//}
-	}
-	
-	/**
-	 * Sets the camera's position and direction according to the main player
-	 */
-	private void posTheCam() {
-		//Vector3 tempVec = map.getMainPlayerTranslation().cpy();
-		//pCam.position.set(0, 0, 0).mul(new Matrix4().setToTranslation(tempVec.x, tempVec.y + map.getMainPlayer().getHeight() / 2, tempVec.z - 10));
-		pCam.position.set(new Matrix4(map.getMainPlayer().getModelInstance().transform).mul(map.getMainPlayer().getCamMatrix()).mul(new Matrix4().setToTranslation(0, map.getMainPlayer().getHeight(), -10)).getTranslation(new Vector3()));
-		//pCam.position.set(map.getMainPlayerTranslation().mul(new Matrix4().setToTranslation(0, map.getMainPlayer().getHeight() * 2, -10)));
-		//pCam.normalizeUp();
-		//pCam.lookAt(map.getMainPlayerTranslation());
-		//pCam.up.set(Vector3.Y);
-		customLookAt(new Matrix4(map.getMainPlayer().getModelInstance().transform).mul(new Matrix4().setToTranslation(0, map.getMainPlayer().getHeight(), 0)).getTranslation(new Vector3())); 
-		
-		map.setCameraTrans(pCam.combined);
-		//pCam.direction.set(map.getMainPlayerRotation().y, 0, 1);
-		//controlPlayer();
-	}
 
 }

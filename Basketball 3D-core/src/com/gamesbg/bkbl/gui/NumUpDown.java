@@ -13,31 +13,31 @@ public class NumUpDown extends UpDown {
 
 	int min, max;
 
-	public NumUpDown(BitmapFont btnFont, BitmapFont textFont, SpriteBatch batch, ShapeRenderer shape, Color color, OrthographicCamera cam, int min, int max) {
+	public NumUpDown(BitmapFont btnFont, BitmapFont textFont, Color color, Color fillColor, Color textFillColor, int min, int max) {
 		this.min = min;
 		this.max = max;
 
 		num = min;
 
-		create(btnFont, textFont, batch, shape, color, cam);
+		create(btnFont, fillColor);
 		
-		textPanel = new TextPanel(textFont, batch, shape, color, cam, min, max);
+		textPanel = new TextPanel(textFont, color, textFillColor, min, max);
 		textPanel.setTextChangeListener(this);
 		textPanel.setText(num);
 	}
 
-	public void render() {
-		super.render();
-		textPanel.render();
+	@Override
+	public void render(SpriteBatch batch, ShapeRenderer shape, OrthographicCamera cam) {
+		super.render(batch, shape, cam);
 		
-		if (down.justReleased()) {
+		if (down.justReleased(cam)) {
 			//num = Integer.parseInt(textPanel.getText());
 			
 			if (num > min) {
 				num--;
 				textPanel.setText(num);
 			}
-		} else if (up.justReleased()) {
+		} else if (up.justReleased(cam)) {
 			//num = Integer.parseInt(textPanel.getText());
 			
 			if (num < max) {
@@ -46,12 +46,13 @@ public class NumUpDown extends UpDown {
 			}
 		}
 
+		textPanel.render(batch, shape, cam);
 	}
 
-	void resize() {
+	protected void onResize() {
 		/*down.setPosAndSize(x, y, 30, height);
 		up.setPosAndSize(x + width + 50, y, 30, height);*/
-		super.resize();
+		super.onResize();
 		textPanel.setPosAndSize(x + 40, y, width, height);
 	}
 

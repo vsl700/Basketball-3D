@@ -11,7 +11,6 @@ import com.badlogic.gdx.math.Vector3;
 import com.badlogic.gdx.physics.bullet.collision.btCollisionObject;
 import com.badlogic.gdx.physics.bullet.collision.btCollisionShape;
 import com.badlogic.gdx.physics.bullet.dynamics.btRigidBody;
-import com.badlogic.gdx.physics.bullet.softbody.btSoftBody;
 import com.gamesbg.bkbl.gamespace.GameMap;
 import com.gamesbg.bkbl.gamespace.MotionState;
 import com.gamesbg.bkbl.gamespace.objects.ObjectType;
@@ -24,20 +23,13 @@ public abstract class Entity {
 	protected ArrayList<MotionState> invisMotionStates;
 	protected Model model;
 	protected ModelInstance modelInstance;
-	//protected ArrayList<btCollisionShape> collisionShapes;
-	//protected ArrayList<btCollisionObject> collisionObjects;
 	protected ArrayList<btCollisionShape> collisionShapes;
 	protected ArrayList<btCollisionShape> invisCollShapes; //Used to hide collision shapes from the Entity's automatic adding method if we want to build bodies or objects manually
 	protected ArrayList<btRigidBody> bodies;
-	protected ArrayList<btSoftBody> softBodies;
-	//protected btRigidBody mainBody;
 	protected ArrayList<btCollisionObject> collisionObjects; //That idea came from the fact that the ball (a rigid body) cannot collide dynamically with a collision object (the basket's entering part)
 	protected ArrayList<btRigidBody> invisBodies;
 	protected ArrayList<btRigidBody.btRigidBodyConstructionInfo> constructionInfos;
 	protected ArrayList<btRigidBody.btRigidBodyConstructionInfo> invisConstructionInfos;
-	//protected ArrayList<Integer> collObjIndexes; //The user values of each body in the bullet's collision worlds
-	//protected btRigidBody.btRigidBodyConstructionInfo invisConstructionInfo;
-	//protected Vector3 localInertia;
 	
 	protected ArrayList<Matrix4> matrixes; //In case we have multiple collision parts we make this which will contain the transform for each collision object
 	
@@ -49,7 +41,6 @@ public abstract class Entity {
 	
 	float timeout;
 	
-	//protected float x, y, z;
 	
 	public void create(EntityType type, GameMap map, Vector3 pos) {
 		this.type = type;
@@ -124,9 +115,6 @@ public abstract class Entity {
 			o.dispose();
 		
 		for(btRigidBody o : bodies)
-			o.dispose();
-		
-		for(btSoftBody o : softBodies)
 			o.dispose();
 		
 		for(btCollisionShape s : collisionShapes)
@@ -257,25 +245,6 @@ public abstract class Entity {
 				j++;
 			}
 		
-		if(softBodies != null)
-			for(int i = 0; i < softBodies.size(); i++) {
-				if (manualSetTransforms != null) {
-					if (!manualSetTransforms.contains(j)) {
-						if (j == mainBodyIndex)
-							softBodies.get(i).setWorldTransform(matrixes.get(j));
-						else
-							softBodies.get(i).setWorldTransform((calcTransformFromNodesTransform(matrixes.get(j))));
-					}
-				} else {
-					if (j == mainBodyIndex)
-						softBodies.get(i).setWorldTransform(matrixes.get(j));
-					else
-						softBodies.get(i).setWorldTransform((calcTransformFromNodesTransform(matrixes.get(j))));
-				}
-				
-				j++;
-			}
-		
 		if(collisionObjects != null)
 			for(int i = 0; i < collisionObjects.size(); i++) {
 				if (manualSetTransforms != null) {
@@ -353,10 +322,6 @@ public abstract class Entity {
 		return invisBodies;
 	}
 	
-	public ArrayList<btSoftBody> getSoftBodies(){
-		return softBodies;
-	}
-	
 	public ArrayList<btCollisionObject> getCollisionObjects(){
 		return collisionObjects;
 	}
@@ -371,8 +336,6 @@ public abstract class Entity {
 		if(collisionObjects != null)
 			tempObj.addAll(collisionObjects);
 		
-		if(softBodies != null)
-			tempObj.addAll(softBodies);
 		
 		return tempObj;
 	}

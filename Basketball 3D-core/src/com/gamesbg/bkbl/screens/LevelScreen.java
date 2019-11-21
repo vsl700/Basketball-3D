@@ -41,17 +41,17 @@ public class LevelScreen implements Screen {
 		textFont = new BitmapFont();
 		textFont.getData().setScale(2);
 		
-		numUpDown = new NumUpDown(btnFont, textFont, batch, shape, Color.WHITE, cam, 1, 5);
+		numUpDown = new NumUpDown(btnFont, textFont, Color.WHITE, Color.BROWN, new Color().set(0.8f, 0.4f, 0, 1), 1, 5);
 		numUpDown.setOption(3);
 		
-		textUpDown = new TextUpDown(btnFont, textFont, batch, shape, Color.WHITE, cam, new String[] {"Easy", "Hard", "Very Hard"});
+		textUpDown = new TextUpDown(btnFont, textFont, Color.WHITE, Color.BROWN, new Color().set(0.8f, 0.4f, 0, 1), new String[] {"Easy", "Hard", "Very Hard"}, true);
 		
-		play = new Button("Play", btnFont, batch, shape, Color.ORANGE.cpy().sub(0, 0.3f, 0, 1), cam, true, true, 0);
-		back = new Button("Go Back", btnFont, batch, shape, Color.ORANGE.cpy().sub(0, 0.3f, 0, 1), cam, true, true, 0);
+		play = new Button("Play", btnFont, Color.ORANGE.cpy().sub(0, 0.3f, 0, 1), true, true);
+		back = new Button("Go Back", btnFont, Color.ORANGE.cpy().sub(0, 0.3f, 0, 1), true, true);
 		
-		tmPlAmount = new Label("THE AMOUNT OF PLAYERS PER TEAM", btnFont, batch, Color.WHITE, cam, true);
+		tmPlAmount = new Label("THE AMOUNT OF PLAYERS PER TEAM", btnFont, Color.BROWN, true);
 		
-		difficulty = new Label("THE DIFFICULTY OF THE GAME", btnFont, batch, Color.WHITE, cam, true);
+		difficulty = new Label("THE DIFFICULTY OF THE GAME", btnFont, Color.BROWN, true);
 	}
 	
 	@Override
@@ -63,17 +63,17 @@ public class LevelScreen implements Screen {
 	public void render(float delta) {
 		cam.update();
 		
-		numUpDown.render();
-		textUpDown.render();
-		play.render();
-		back.render();
+		numUpDown.render(batch, shape, cam);
+		textUpDown.render(batch, shape, cam);
+		play.render(batch, shape, cam);
+		back.render(batch, shape, cam);
 		
-		tmPlAmount.render();
-		difficulty.render();
+		tmPlAmount.render(batch, shape, cam);
+		difficulty.render(batch, shape, cam);
 		
-		if(back.justReleased())
+		if(back.justReleased(cam))
 			game.setScreen(game.main);
-		else if(play.justReleased()) {
+		else if(play.justReleased(cam)) {
 			game.game.setPlayersAmount(numUpDown.getOption());
 			game.setScreen(game.game);
 		}

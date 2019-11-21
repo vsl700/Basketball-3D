@@ -34,6 +34,7 @@ public class MyGdxGame extends Game {
 	public MainScreen main;
 	public LevelScreen level;
 	public GameScreen game;
+	public SettingsScreen settings;
 	
 	public static int WIDTH = 1920;
 	public static int HEIGHT = 1080;
@@ -54,10 +55,12 @@ public class MyGdxGame extends Game {
 		else background = new Texture(Gdx.files.internal("application/bkbl_background.png"));
 		
 		main = new MainScreen(this);
-		setScreen(main);
+		//setScreen(main);
 		
 		level = new LevelScreen(this);
 		game = new GameScreen(this);
+		settings = new SettingsScreen(this);
+		setScreen(settings);
 	}
 	
 	public void load3DGraphics() {
@@ -117,7 +120,7 @@ public class MyGdxGame extends Game {
 		batch.begin();
 		//if(!beautifulBack)
 			//batch.draw(background, WIDTH / 2 - background.getWidth() / 2, HEIGHT / 2 - background.getHeight() / 2);
-		font.draw(batch, Gdx.graphics.getFramesPerSecond() + " fps; SNAPSHOT (v0.5.1)", 0, 13);
+		font.draw(batch, Gdx.graphics.getFramesPerSecond() + " fps; ALPHA v0.1", 0, 13);
 		batch.end();
 	}
 	
@@ -153,6 +156,8 @@ public class MyGdxGame extends Game {
 	@Override
 	public void dispose () {
 		batch.dispose();
+		mBatch.dispose();
+		map.dispose();
 	}
 	
 	public GameMap getMap() {

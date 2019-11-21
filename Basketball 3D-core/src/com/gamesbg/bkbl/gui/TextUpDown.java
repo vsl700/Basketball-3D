@@ -14,32 +14,32 @@ public class TextUpDown extends UpDown {
 	
 	//int index;
 	
-	public TextUpDown(BitmapFont btnFont, BitmapFont textFont, SpriteBatch batch, ShapeRenderer shape, Color color, OrthographicCamera cam, String[] options) {
+	public TextUpDown(BitmapFont btnFont, BitmapFont textFont, Color color, Color fillColor, Color textFillColor, String[] options, boolean textShorten) {
 		this.options = options;
 		
-		create(btnFont, textFont, batch, shape, color, cam);
+		create(btnFont, fillColor);
 		
-		label = new Label(options[0], textFont, batch, shape, color, cam, false);
+		label = new Label(options[0], textFont, color, textFillColor, textShorten);
 	}
 
 	@Override
-	public void render() {
+	public void render(SpriteBatch batch, ShapeRenderer shape, OrthographicCamera cam) {
 		// TODO Auto-generated method stub
-		super.render();
-		label.render();
+		super.render(batch, shape, cam);
+		label.render(batch, shape, cam);
 		
-		if(down.justReleased() && num > 0) {
+		if(down.justReleased(cam) && num > 0) {
 			num--;
 			label.setText(options[num]);
 		}
-		else if(up.justReleased() && num < options.length - 1) {
+		else if(up.justReleased(cam) && num < options.length - 1) {
 			num++;
 			label.setText(options[num]);
 		}
 	}
 	
-	void resize() {
-		super.resize();
+	protected void onResize() {
+		super.onResize();
 		label.setPosAndSize(x + 40, y, width, height);
 	}
 	

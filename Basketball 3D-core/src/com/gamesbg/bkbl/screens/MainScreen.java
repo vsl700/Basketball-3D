@@ -31,9 +31,9 @@ public class MainScreen implements Screen {
 		font = new BitmapFont();
 		font.getData().setScale(1);
 		
-		play = new Button("Play", font, batch, shape, Color.ORANGE.cpy().sub(0, 0.3f, 0, 1), cam, true, true, 0);
-		settings = new Button("Settings", font, batch, shape, Color.ORANGE.cpy().sub(0, 0.3f, 0, 1), cam, true, true, 0);
-		quit = new Button("Quit", font, batch, shape, Color.ORANGE.cpy().sub(0, 0.3f, 0, 1), cam, true, true, 0);
+		play = new Button("Play", font, Color.ORANGE.cpy().sub(0, 0.3f, 0, 1), true, true);
+		settings = new Button("Settings", font, Color.ORANGE.cpy().sub(0, 0.3f, 0, 1), true, true);
+		quit = new Button("Quit", font, Color.ORANGE.cpy().sub(0, 0.3f, 0, 1), true, true);
 	}
 
 	@Override
@@ -47,13 +47,15 @@ public class MainScreen implements Screen {
 		//batch.begin();
 		cam.update();
 		
-		play.render();
-		settings.render();
-		quit.render();
+		play.render(batch, shape, cam);
+		settings.render(batch, shape, cam);
+		quit.render(batch, shape, cam);
 		
-		if(quit.justReleased())
+		if(quit.justReleased(cam))
 			Gdx.app.exit();
-		else if(play.justReleased())
+		else if(settings.justReleased(cam))
+			game.setScreen(game.settings);
+		else if(play.justReleased(cam))
 			game.setScreen(game.level);
 		//batch.end();
 	}

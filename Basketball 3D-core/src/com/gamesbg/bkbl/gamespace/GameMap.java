@@ -557,12 +557,11 @@ public class GameMap {
         //collisionConfig.dispose();
         //collisionWorld.dispose();
 		//broadphase.dispose();
-		
+        dynamicsWorld.dispose();		
 		dynDispatcher.dispose();
         dynCollConfig.dispose();
         dynBroadphase.dispose();
         constraintSolver.dispose();
-        dynamicsWorld.dispose();
         
         /*softDispatcher.dispose();
         softCollConfig.dispose();
@@ -574,6 +573,7 @@ public class GameMap {
 	}
 	
 	private void disposePlayers() {
+		if(players != null)
 		for(Player e : players) {
 			for(btRigidBody co : e.getBodies())
 			//dynamicsWorld.removeCollisionObject(co);

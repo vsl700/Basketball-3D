@@ -8,37 +8,19 @@ import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 
 public class Label extends Text {
 
-	BitmapFont font;
-	OrthographicCamera cam;
-	ShapeRenderer shape;
-	SpriteBatch batch;
-
 	// String text;
 
 	// float r, g, b, a; // text color
 	// float x, y, width;
+	
+	float fR, fG, fB, fA;
 
-	boolean multiline;
+	boolean multiline, textShorten;
 
-	public Label(String text, BitmapFont font, SpriteBatch batch, Color color, OrthographicCamera cam, boolean multiline) {
-		this.font = font;
-		this.batch = batch;
-		this.cam = cam;
+	public Label(String text, BitmapFont font, Color color, boolean multiline) {
+		//new Label(text, font, fillColor, multiline);
 		this.text = text;
-		this.multiline = multiline;
-
-		r = color.r;
-		g = color.g;
-		b = color.b;
-		a = color.a;
-	}
-
-	public Label(String text, BitmapFont font, SpriteBatch batch, ShapeRenderer shape, Color color, OrthographicCamera cam, boolean multiline) {
 		this.font = font;
-		this.batch = batch;
-		this.shape = shape;
-		this.cam = cam;
-		this.text = text;
 		this.multiline = multiline;
 
 		r = color.r;
@@ -49,20 +31,51 @@ public class Label extends Text {
 		//new Label(text, font, batch, color, cam, multiline);
 		//this.shape = shape;
 	}
+	
+	public Label(String text, BitmapFont font, Color color, Color fillColor, boolean textShorten) {
+		//new Label(text, font, fillColor, multiline);
+		this.text = text;
+		this.font = font;
+		this.textShorten = textShorten;
 
-	public void render() {
+		r = color.r;
+		g = color.g;
+		b = color.b;
+		a = color.a;
+		
+		fR = fillColor.r;
+		fG = fillColor.g;
+		fB = fillColor.b;
+		fA = fillColor.a;
+		
+		//new Label(text, font, batch, color, cam, multiline);
+		//this.shape = shape;
+	}
+	
+	private void renderShapes(ShapeRenderer shape, OrthographicCamera cam) {
+		if (shape != null) {
+			float r1 = shape.getColor().r;
+			float g1 = shape.getColor().g;
+			float b1 = shape.getColor().b;
+			float a1 = shape.getColor().a;
+			
+			shape.setColor(fR, fG, fB, fA);
+			
+			shape.setProjectionMatrix(cam.combined);
+			shape.begin(ShapeRenderer.ShapeType.Filled);
+			shape.rect(x, y, width, height);
+			shape.end();
+
+			shape.setColor(r1, g1, b1, a1);
+		}
+	}
+	
+	private void renderText(SpriteBatch batch, OrthographicCamera cam) {
 		float r1 = font.getColor().r;
 		float g1 = font.getColor().g;
 		float b1 = font.getColor().b;
 		float a1 = font.getColor().a;
-
-		if (shape != null) {
-			shape.setProjectionMatrix(cam.combined);
-			shape.begin(ShapeRenderer.ShapeType.Line);
-			shape.rect(x, y, width, height);
-			shape.end();
-		}
-
+		
 		font.setColor(r, g, b, a);
 
 		batch.setProjectionMatrix(cam.combined);
@@ -75,19 +88,25 @@ public class Label extends Text {
 			String[] rows = text.split("\n");
 			
 			for (int i = 0; i < rows.length; i++) {
-				font.draw(batch, rows[i], x + width / 2 - textSize(rows[i]) / 2, y + (rows.length - i) * font.getLineHeight());
+				font.draw(batch, rows[i], x + width / 2 - textSize(font, rows[i]) / 2, y + (rows.length - i) * font.getLineHeight());
 			}
-		}else {
-			float textW = textSize(text);
-			if(textW >= width) {
-				String[] words = text.split(" ");
-				String temp = "";
-				
-				for(int i = 0; i < words.length; i++)
-					temp+= words[i].charAt(0);
-				
-				font.draw(batch, temp, x + width / 2 - textSize(temp) / 2, y + height / 2 + font.getLineHeight() / 2 - 10);
+		} else {
+			float textW = textSize(font, text);
+			if (textShorten) {
+				if (textW >= width) { // If there is not enough space for the
+										// text, it turns into a text with the
+										// original text's first letters
+					String[] words = text.split(" ");
+					String temp = "";
+
+					for (int i = 0; i < words.length; i++)
+						temp += words[i].charAt(0);
+
+					font.draw(batch, temp, x + width / 2 - textSize(font, temp) / 2, y + height / 2 + font.getLineHeight() / 2 - 10);
+				} else
+					font.draw(batch, text, x + width / 2 - textW / 2, y + height / 2 + font.getLineHeight() / 2 - 10);
 			}
+			
 			else
 				font.draw(batch, text, x + width / 2 - textW / 2, y + height / 2 + font.getLineHeight() / 2 - 10);
 		}
@@ -96,24 +115,18 @@ public class Label extends Text {
 		font.setColor(r1, g1, b1, a1);
 	}
 
-	float textSize(String t) {
-		float textW = 0;
-
-		for (int i = 0; i < t.length(); i++) {
-			char ch = text.charAt(i);
-			if (ch != '\n') {
-				textW += font.getData().getGlyph(ch).width * font.getScaleX();
-			}
-		}
-
-		return textW;
+	@Override
+	public void render(SpriteBatch batch, ShapeRenderer shape, OrthographicCamera cam) {
+		renderShapes(shape, cam);
+		
+		renderText(batch, cam);
 	}
 
-	void onResize() {
+	protected void onResize() {
 		StringBuilder sb = new StringBuilder();
 
 		// String[] words = text.split(" ");
-		//TODO Try to use textX,Y,W,H variables in here with the abstract class
+		//FIXME Try to use textX,Y,W,H variables in here with the abstract class
 		float textW = 0;
 
 		for (int i = 0; i < text.length(); i++) {

@@ -8,39 +8,29 @@ import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 import com.badlogic.gdx.math.Vector3;
 
-public class Button extends Text {
+public class Button extends GUI {
 	String text;
+
 	BitmapFont font;
-	// Color color;
-	OrthographicCamera cam;
-	ShapeRenderer shape;
-	SpriteBatch batch;
-
+	
 	byte multitouch = 0;
-	int type; // 0 - normal, 1 - toggle, 2 - radio
-	float x;
-	float y;
-	float width;
-	float height;
-
+	//int type; // 0 - normal, 1 - toggle, 2 - radio
+	
+	
 	float r, g, b, a; // color variables
 
 	boolean mark;
 	boolean filled;
 
 	boolean touched;
-	boolean toggled;
+	//boolean toggled;
 	boolean touchable;
 
-	public Button(String text, BitmapFont font, SpriteBatch batch, ShapeRenderer shape, Color color, OrthographicCamera cam, boolean mark, boolean filled, int type) {
-		this.text = text;
+	public Button(String text, BitmapFont font, Color color, boolean mark, boolean filled) {
 		this.font = font;
+		this.text = text;
 		this.mark = mark;
 		this.filled = filled;
-		this.type = type;
-		this.cam = cam;
-		this.shape = shape;
-		this.batch = batch;
 
 		r = color.r;
 		g = color.g;
@@ -48,7 +38,8 @@ public class Button extends Text {
 		a = color.a;
 	}
 
-	public void render() {
+	@Override
+	public void render(SpriteBatch batch, ShapeRenderer shape, OrthographicCamera cam) {
 		touchable = true;
 
 		shape.setProjectionMatrix(cam.combined);
@@ -62,11 +53,11 @@ public class Button extends Text {
 		float b1 = shape.getColor().b;
 		float a1 = shape.getColor().a;
 
-		if (isMouseOn()) {
-			if ((isLocalTouched() || justLocalTouched() || toggled) && mark)
-				shape.setColor(r - 0.3f, g - 0.3f, b - 0.3f, a);
+		if (isMouseOn(cam) && mark) {
+			if (isLocalTouched(cam) || justLocalTouched(cam))
+				shape.setColor(markColorClick());
 			else
-				shape.setColor(r + 0.3f, g + 0.3f, b + 0.3f, a);
+				shape.setColor(markColorMouse());
 		} else
 			shape.setColor(r, g, b, a);
 
@@ -90,14 +81,14 @@ public class Button extends Text {
 		batch.end();
 	}
 
-	public boolean isMouseOn() {
+	public boolean isMouseOn(OrthographicCamera cam) {
 		Vector3 touchPos = new Vector3(Gdx.input.getX(), Gdx.input.getY(), 0);
 		cam.unproject(touchPos);
 
 		return touchPos.x >= x && touchPos.x <= x + width && touchPos.y <= y + height && touchPos.y >= y;
 	}
 
-	public boolean isLocalTouched() {
+	public boolean isLocalTouched(OrthographicCamera cam) {
 		// if(type == 0)
 		if (touchable) {
 			// if(type == 0)
@@ -111,8 +102,8 @@ public class Button extends Text {
 				if (touched) {
 					// touchable = false;
 					multitouch = (byte) i;
-					if (type != 0 && !toggled)
-						toggled = true;
+					//if (type != 0 && !toggled)
+						//toggled = true;
 					return true;
 				}
 				// else if(type == 1){
@@ -122,8 +113,8 @@ public class Button extends Text {
 				// }
 			}
 			// else
-			if (type != 0)
-				return toggled;
+			//if (type != 0)
+				//return toggled;
 		}
 		// else if(type == 1){
 		// if()
@@ -132,7 +123,7 @@ public class Button extends Text {
 		return false;
 	}
 
-	public boolean isTouched() {
+	public boolean isTouched(OrthographicCamera cam) {
 		// if(type == 0)
 		if (touchable) {
 			touchable = false;
@@ -148,8 +139,8 @@ public class Button extends Text {
 				if (touched) {
 					// touchable = false;
 					multitouch = (byte) i;
-					if (type != 0 && !toggled)
-						toggled = true;
+					//if (type != 0 && !toggled)
+						///toggled = true;
 					return true;
 				}
 				// else if(type == 1){
@@ -158,8 +149,8 @@ public class Button extends Text {
 				// return toggled;
 				// }
 			}
-			if (type != 0)
-				return toggled;
+			//if (type != 0)
+				//return toggled;
 		}
 		// else if(type == 1){
 		// if()
@@ -168,7 +159,7 @@ public class Button extends Text {
 		return false;
 	}
 
-	public boolean justReleased() {
+	public boolean justReleased(OrthographicCamera cam) {
 		Vector3 touchPos = new Vector3(Gdx.input.getX(multitouch), Gdx.input.getY(multitouch), 0);
 		cam.unproject(touchPos);
 		//FIXME There is a problem between touched and justReleased (or touch methods) (create wasTouched boolean and use it)
@@ -180,7 +171,7 @@ public class Button extends Text {
 		return false;
 	}
 
-	public boolean justLocalTouched() {
+	public boolean justLocalTouched(OrthographicCamera cam) {
 		if (touchable) {
 			for (int i = 0; i < 5; i++) {
 				Vector3 touchPos = new Vector3(Gdx.input.getX(i), Gdx.input.getY(i), 0);
@@ -189,18 +180,7 @@ public class Button extends Text {
 				boolean touch = Gdx.input.justTouched() && touchPos.x >= x && touchPos.x <= x + width && touchPos.y <= y + height && touchPos.y >= y;
 
 				if (touch) {
-					switch (type) {
-					case 0:
-						return true;
-					case 1:
-						toggled = !toggled;
-						break;
-					case 2:
-						if (!toggled)
-							toggled = true;
-						break;
-					}
-					break;
+					return true;
 				}
 
 				// if(touch)
@@ -210,7 +190,7 @@ public class Button extends Text {
 		return false;
 	}
 
-	public boolean justTouched() {
+	public boolean justTouched(OrthographicCamera cam) {
 		if (touchable) {
 			touchable = false;
 			for (int i = 0; i < 5; i++) {
@@ -220,58 +200,21 @@ public class Button extends Text {
 				boolean touch = Gdx.input.justTouched() && touchPos.x >= x && touchPos.x <= x + width && touchPos.y <= y + height && touchPos.y >= y;
 
 				if (touch) {
-					switch (type) {
-					case 0:
-						return true;
-					case 1:
-						toggled = !toggled;
-						break;
-					case 2:
-						if (!toggled)
-							toggled = true;
-						break;
-					}
-					break;
+					return true;
 				}
 			}
 		}
 		return false;
 	}
-
-	public void setToggled(boolean b) {
-		toggled = b;
+	
+	protected Color markColorClick() {
+		return new Color(r - 0.3f, g - 0.3f, b - 0.3f, a);
+	}
+	
+	protected Color markColorMouse() {
+		return new Color(r + 0.3f, g + 0.3f, b + 0.3f, a);
 	}
 
-	public void setX(float x) {
-		this.x = x;
-	}
-
-	public void setY(float y) {
-		this.y = y;
-	}
-
-	public void setWidth(float width) {
-		this.width = width;
-	}
-
-	public void setHeight(float height) {
-		this.height = height;
-	}
-
-	public void setPos(float x, float y) {
-		this.x = x;
-		this.y = y;
-	}
-
-	public void setSize(float width, float height) {
-		this.width = width;
-		this.height = height;
-	}
-
-	public void setPosAndSize(float x, float y, float w, float h) {
-		setPos(x, y);
-		setSize(w, h);
-	}
 
 	public float getX() {
 		return x;
@@ -306,7 +249,7 @@ public class Button extends Text {
 	}
 
 	@Override
-	void onResize() {
+	protected void onResize() {
 		// TODO This method is used inside the Text class which should probably use the button and text class' variables x, y, width and height. I dunno. I just want to remind you about the thing you were about to do here.
 		
 	}

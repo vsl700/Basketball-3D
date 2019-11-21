@@ -24,6 +24,8 @@ public enum PlayerState implements State<Player> {
 		public void update(Player player) {
 			if(player.getMap().isGameRunning())
 				player.getStateMachine().changeState(BALL_CHASE);
+			
+			System.out.println("idle update");
 		}
 	};
 
@@ -36,7 +38,7 @@ public enum PlayerState implements State<Player> {
 	@Override
 	public void update(Player entity) {
 		// TODO Auto-generated method stub
-		
+		System.out.println("regular update");
 	}
 
 	@Override

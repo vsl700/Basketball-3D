@@ -10,12 +10,14 @@ import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 import com.badlogic.gdx.math.Vector3;
 
+/**
+ * Represents an editable text panel in which you can edit text by methods or keyboard. It can be also set to a numeric text panel
+ * so that it only writes and allows writing numbers. Useful function when using numeric-up-down.
+ * 
+ * @author studi
+ *
+ */
 public class TextPanel extends Text implements InputProcessor {
-
-	BitmapFont font;
-	OrthographicCamera cam;
-	ShapeRenderer shape;
-	SpriteBatch batch;
 
 	//String text;
 	String prevText;
@@ -27,77 +29,76 @@ public class TextPanel extends Text implements InputProcessor {
 	//float x, y, width, height;
 	float textX, textY, textW, textH;
 	
+	float fR, fG, fB, fA; //Filling colors
+	
 	int min, max;
 
 	boolean active, cursor;
 
-	public TextPanel(BitmapFont font, SpriteBatch batch, ShapeRenderer shape, Color color, OrthographicCamera cam) {
-		/*this.font = font;
-		this.batch = batch;
-		this.shape = shape;
-		this.cam = cam;
-
-		r = color.r;
-		g = color.g;
-		b = color.b;
-		a = color.a;
-
-		text = "";
-		
-		time = System.currentTimeMillis();*/
-		
-		new TextPanel(font, batch, shape, color, cam, 0, 0);
-	}
-	
-	public TextPanel(BitmapFont font, SpriteBatch batch, ShapeRenderer shape, Color color, OrthographicCamera cam, int min, int max) {
+	public TextPanel(BitmapFont font, Color color, Color fillColor) {
+		//new TextPanel(font, color, fillColor, 0, 0);
 		this.font = font;
-		this.batch = batch;
-		this.shape = shape;
-		this.cam = cam;
-		this.min = min;
-		this.max = max;
 
 		r = color.r;
 		g = color.g;
 		b = color.b;
 		a = color.a;
+		
+		fR = fillColor.r;
+		fG = fillColor.g;
+		fB = fillColor.b;
+		fA = fillColor.a;
 
 		text = "";
 		prevText = "";
 		
 		time = System.currentTimeMillis();
-		
-		//textListener = new TextListener();
 	}
+	
+	public TextPanel(BitmapFont font, Color color, Color fillColor, int min, int max) {
+		this.min = min;
+		this.max = max;
+		this.font = font;
 
-	public void render() {
-		// visible = true;
+		r = color.r;
+		g = color.g;
+		b = color.b;
+		a = color.a;
+		
+		fR = fillColor.r;
+		fG = fillColor.g;
+		fB = fillColor.b;
+		fA = fillColor.a;
 
-		if (justTouched())
-			active = true;
-		else if(justTouchedOut()) {
-			deactive();
-		}
-
-		if (active) {
-			if (System.currentTimeMillis() - time >= 500) {
-				cursor = !cursor;
-				time = System.currentTimeMillis();
-			}
-			
-			Gdx.input.setInputProcessor(this);
-		}
-
+		text = "";
+		prevText = "";
+		
+		time = System.currentTimeMillis();
+	}
+	
+	private void renderShapes(ShapeRenderer shape, OrthographicCamera cam) {
+		float r1 = shape.getColor().r;
+		float g1 = shape.getColor().g;
+		float b1 = shape.getColor().b;
+		float a1 = shape.getColor().a;
+		
+		shape.setColor(fR, fG, fB, fA);
+		
 		shape.setProjectionMatrix(cam.combined);
-		shape.begin(ShapeRenderer.ShapeType.Line);
+		shape.begin(ShapeRenderer.ShapeType.Filled);
 		shape.rect(x, y, width, height);
 
 		if (cursor) {
+			shape.setColor(1 - fR, 1 - fG, 1 - fB, 1 - fA);
 			shape.line(textX + textW + 10, textY, textX + textW + 10, textY - textH / 2 - 5);
 		}
 
 		shape.end();
+		
+		shape.setColor(r1, g1, b1, a1);
+	}
 
+	private void renderText(SpriteBatch batch, OrthographicCamera cam) {
 		float r1 = font.getColor().r;
 		float g1 = font.getColor().g;
 		float b1 = font.getColor().b;
@@ -112,8 +113,32 @@ public class TextPanel extends Text implements InputProcessor {
 		
 		font.setColor(r1, g1, b1, a1);
 	}
+	
+	@Override
+	public void render(SpriteBatch batch, ShapeRenderer shape, OrthographicCamera cam) {
+		
+		if (justTouched(cam)) {
+			active = true;
+			
+			Gdx.input.setInputProcessor(this);
+		}
+		else if(justTouchedOut(cam)) {
+			deactive();
+		}
 
-	void onResize() {
+		if (active) {
+			if (System.currentTimeMillis() - time >= 500) {
+				cursor = !cursor;
+				time = System.currentTimeMillis();
+			}
+		}
+
+		renderShapes(shape, cam);
+
+		renderText(batch, cam);
+	}
+
+	protected void onResize() {
 		textW = 0;
 
 		for (int i = 0; i < text.length(); i++) {
@@ -145,7 +170,7 @@ public class TextPanel extends Text implements InputProcessor {
 		}
 	}
 
-	boolean justTouched() {
+	boolean justTouched(OrthographicCamera cam) {
 		// for (int i = 0; i < 5; i++) {
 		Vector3 touchPos = new Vector3(Gdx.input.getX(), Gdx.input.getY(), 0);
 		cam.unproject(touchPos);
@@ -158,7 +183,7 @@ public class TextPanel extends Text implements InputProcessor {
 	 * 
 	 * @return true if the pointer touches outside of the panel
 	 */
-	boolean justTouchedOut() {
+	boolean justTouchedOut(OrthographicCamera cam) {
 		Vector3 touchPos = new Vector3(Gdx.input.getX(), Gdx.input.getY(), 0);
 		cam.unproject(touchPos);
 
