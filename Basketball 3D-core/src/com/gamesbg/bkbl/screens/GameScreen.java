@@ -71,6 +71,8 @@ public class GameScreen implements Screen {
 		map = game.getMap();
 		
 		map.spawnPlayers(amount);
+		
+		//Gdx.graphics.setCursor(null);
 		//map.setCameraTrans(pCam.combined);
 	}
 

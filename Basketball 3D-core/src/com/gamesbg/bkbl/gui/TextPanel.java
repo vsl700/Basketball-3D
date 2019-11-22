@@ -33,7 +33,7 @@ public class TextPanel extends Text implements InputProcessor {
 	
 	int min, max;
 
-	boolean active, cursor;
+	boolean active, cursor, locked;
 
 	public TextPanel(BitmapFont font, Color color, Color fillColor) {
 		//new TextPanel(font, color, fillColor, 0, 0);
@@ -117,7 +117,7 @@ public class TextPanel extends Text implements InputProcessor {
 	@Override
 	public void render(SpriteBatch batch, ShapeRenderer shape, OrthographicCamera cam) {
 		
-		if (justTouched(cam)) {
+		if (justTouched(cam) && !locked) {
 			active = true;
 			
 			Gdx.input.setInputProcessor(this);
@@ -155,18 +155,20 @@ public class TextPanel extends Text implements InputProcessor {
 	 *  Must be called when a deactivation command is executed
 	 */
 	void deactive() {
-		active = false;
-		cursor = false;
-		
-		if(min != 0 && max != 0 && text.equals("")) {
-			text = prevText.toString();
-			onResize();
-		}
-		
-		else {
-			prevText = text.toString();
-			textChangeListener.onTextChanged(text);
-			//textListener.onTextChanged(text);
+		if (active) {
+			active = false;
+			cursor = false;
+
+			if ((min != 0 || max != 0) && text.equals("")) {
+				text = prevText.toString();
+				onResize();
+			}
+
+			else {
+				prevText = text.toString();
+				textChangeListener.onTextChanged(text);
+				// textListener.onTextChanged(text);
+			}
 		}
 	}
 
@@ -189,13 +191,35 @@ public class TextPanel extends Text implements InputProcessor {
 
 		return Gdx.input.justTouched() && (touchPos.x < x || touchPos.x > x + width || touchPos.y > y + height || touchPos.y < y);
 	}
+	
+	boolean isNumeric() {
+		return min != 0 || max != 0;
+	}
+	
+	public void setText(String text, boolean listen) {
+		//this.text = text;
+		
+		super.setText(text, listen);
+		prevText = text.toString();
+		
+		onResize();
+		
+		if(isNumeric() && containsDiffFromNum(text))
+			locked = true;
+		else locked = false;
+	}
 
 	public void setText(String text) {
 		//this.text = text;
+		
 		super.setText(text);
 		prevText = text.toString();
 		
 		onResize();
+		
+		if(isNumeric() && containsDiffFromNum(text))
+			locked = true;
+		else locked = false;
 	}
 	
 	public void setText(int num) {
@@ -203,7 +227,7 @@ public class TextPanel extends Text implements InputProcessor {
 		prevText = text.toString();
 		
 		onResize();*/
-		setText(Integer.toString(num));
+		setText(Integer.toString(num), false);
 	}
 
 	public void setMin(int min) {
@@ -278,7 +302,7 @@ public class TextPanel extends Text implements InputProcessor {
 	}
 
 	public String getText() {
-		if((min != 0 || max != 0) && text == "") 
+		if(isNumeric() && text == "") 
 			return Integer.toString(min);
 			
 		return text;
@@ -289,7 +313,7 @@ public class TextPanel extends Text implements InputProcessor {
 		String key = Keys.toString(keycode);
 		if(active) {
 			if(key.length() == 1) { //A letter or a number
-				if(min != 0 || max != 0) {
+				if(isNumeric()) {
 					if(Character.isDigit(key.toCharArray()[0]) && Integer.parseInt(text + key) <= max && Integer.parseInt(text + key) >= min)
 						text += key;
 				}

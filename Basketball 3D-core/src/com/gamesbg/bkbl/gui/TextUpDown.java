@@ -28,32 +28,45 @@ public class TextUpDown extends UpDown {
 	public void render(SpriteBatch batch, ShapeRenderer shape, OrthographicCamera cam) {
 		// TODO Auto-generated method stub
 		super.render(batch, shape, cam);
-		label.render(batch, shape, cam);
 		
 		if(down.justReleased(cam) && num > 0) {
 			num--;
 			label.setText(options.get(num));
+			
+			sendSignalToListen();
 		}
 		else if(up.justReleased(cam) && num < options.size() - 1) {
 			num++;
 			label.setText(options.get(num));
+			
+			sendSignalToListen();
 		}
+		
+		label.render(batch, shape, cam);
 	}
 	
+	@Override
 	protected void onResize() {
 		super.onResize();
 		label.setPosAndSize(x + 40, y, width, height);
 	}
 	
+	public void setTextOption(String s) {
+		int n = options.indexOf(s);
+		if(n > -1)
+			setOption(n);
+	}
+	
+	public String getTextOption() {
+		return options.get(num);
+	}
+	
+	@Override
 	public void setOption(int i) {
+		super.setOption(num);
+		
 		num = i;
 		label.setText(options.get(i));
-	}
-
-	@Override
-	public void onTextChanged(String text) {
-		// TODO Auto-generated method stub
-		
 	}
 
 }

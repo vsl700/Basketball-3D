@@ -6,7 +6,9 @@ import com.badlogic.gdx.graphics.g2d.BitmapFont;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 
-public abstract class UpDown extends GUI implements TextChangeListener {
+public abstract class UpDown extends GUI {
+	
+	UpDownListener listener;
 	
 	protected Button down, up;
 	//protected Text textPanel;
@@ -18,6 +20,10 @@ public abstract class UpDown extends GUI implements TextChangeListener {
 	protected void create(BitmapFont font, Color color) {
 		down = new Button("<", font, color, true, true);
 		up = new Button(">", font, color, true, true);
+	}
+	
+	public void setListener(UpDownListener listener) {
+		this.listener = listener;
 	}
 	
 	@Override
@@ -33,7 +39,14 @@ public abstract class UpDown extends GUI implements TextChangeListener {
 		//textPanel.setPosAndSize(x + 40, y, width, height);
 	}
 	
-	public abstract void setOption(int i);
+	protected void sendSignalToListen() {
+		if(listener != null)
+			listener.onOptionChanged(this, num);
+	}
+	
+	public void setOption(int i) {
+		sendSignalToListen();
+	}
 	
 	public int getOption() {
 		return num;

@@ -15,11 +15,36 @@ public abstract class Text extends GUI {
 	protected float r, g, b, a;
 	//protected float x, y, width, height;
 	
+	protected boolean containsDiffFromLetter(String text) {
+		for(int i = 0; i < text.length(); i++) {
+			if(!Character.isLetter(text.charAt(i)))
+				return true;
+		}
+		
+		return false;
+	}
+	
+	protected boolean containsDiffFromNum(String text) {
+		for(int i = 0; i < text.length(); i++) {
+			if(!Character.isDigit(text.charAt(i)))
+				return true;
+		}
+		
+		return false;
+	}
+	
 	public void setText(String text) {
 		this.text = text;
 		
-		//textListener.onTextChanged(text);
 		textChangeListener.onTextChanged(text);
+	}
+	
+	public void setText(String text, boolean listen) {
+		this.text = text;
+		
+		//textListener.onTextChanged(text);
+		if(listen)
+			textChangeListener.onTextChanged(text);
 	}
 	
 	public void setTextChangeListener(TextChangeListener listener) {

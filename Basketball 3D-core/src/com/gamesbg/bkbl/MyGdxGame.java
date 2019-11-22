@@ -36,8 +36,8 @@ public class MyGdxGame extends Game {
 	public GameScreen game;
 	public SettingsScreen settings;
 	
-	public static int WIDTH = 1920;
-	public static int HEIGHT = 1080;
+	public static int WIDTH = 1280;
+	public static int HEIGHT = 720;
 	
 	boolean beautifulBack = true;
 	
@@ -52,7 +52,7 @@ public class MyGdxGame extends Game {
 		
 		if(beautifulBack)
 			load3DGraphics();
-		else background = new Texture(Gdx.files.internal("application/bkbl_background.png"));
+		else loadTexture();
 		
 		main = new MainScreen(this);
 		//setScreen(main);
@@ -61,6 +61,10 @@ public class MyGdxGame extends Game {
 		game = new GameScreen(this);
 		settings = new SettingsScreen(this);
 		setScreen(settings);
+	}
+	
+	private void loadTexture() {
+		background = new Texture(Gdx.files.internal("application/bkbl_background.png"));
 	}
 	
 	public void load3DGraphics() {
@@ -104,8 +108,10 @@ public class MyGdxGame extends Game {
 				
 				batch.setProjectionMatrix(cam.combined);
 				batch.begin();
-				if(!beautifulBack)
+				if(!beautifulBack) {
+					if(background == null) loadTexture();
 					batch.draw(background, WIDTH / 2 - background.getWidth() / 2, HEIGHT / 2 - background.getHeight() / 2);
+				}
 				//System.out.println(WIDTH - background.getWidth());
 				batch.end();
 			}
@@ -123,6 +129,17 @@ public class MyGdxGame extends Game {
 		font.draw(batch, Gdx.graphics.getFramesPerSecond() + " fps; ALPHA v0.1", 0, 13);
 		batch.end();
 	}
+	
+	/**
+	 * This method is being overriden inside the LwjglApplication's constructor, where we can modify the LwjglApplicationConfiguration's values from, something we cannot
+	 * do in other way in runtime.
+	 * @param fps
+	 */
+	public void setForegroundFps(int fps) {}
+	
+	public int getForegroundFps() {return 0;}
+	
+	public void setResolution(int width, int height) {}
 	
 	/**
 	 * I needed a custom lookat method because the original one modifies the up vector of the camera which makes the camera to rotate the screen
@@ -156,14 +173,27 @@ public class MyGdxGame extends Game {
 	@Override
 	public void dispose () {
 		batch.dispose();
-		mBatch.dispose();
-		map.dispose();
+		
+		if(map != null) {
+			mBatch.dispose();
+			map.dispose();
+		}
+		else
+			background.dispose();
 	}
 	
 	public GameMap getMap() {
 		return map;
 	}
 	
+	public boolean isBeautifulBack() {
+		return beautifulBack;
+	}
+	
+	public void setBeautifulBack(boolean beautifulBack) {
+		this.beautifulBack = beautifulBack;
+	}
+
 	public float pixelXByCurrentSize(float value) {
 	
 		return value * cam.viewportWidth / 1280;

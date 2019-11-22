@@ -76,6 +76,10 @@ public class CheckButton extends Button {
 		
 	}
 	
+	public void setToggled(boolean toggled) {
+		this.toggled = toggled;
+	}
+	
 	public boolean isToggled() {
 		return toggled;
 	}

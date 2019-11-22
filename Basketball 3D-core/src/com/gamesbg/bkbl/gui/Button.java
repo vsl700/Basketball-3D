@@ -96,7 +96,7 @@ public class Button extends GUI {
 				Vector3 touchPos = new Vector3(Gdx.input.getX(i), Gdx.input.getY(i), 0);
 				cam.unproject(touchPos);
 
-				if(!touched)
+				if(!touched) //The justReleased method will not work if that if statement is not here.
 				touched = Gdx.input.isTouched(i) && touchPos.x >= x && touchPos.x <= x + width && touchPos.y <= y + height && touchPos.y >= y;
 
 				if (touched) {
