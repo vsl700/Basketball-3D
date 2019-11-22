@@ -1,5 +1,7 @@
 package com.gamesbg.bkbl.gui;
 
+import java.util.ArrayList;
+
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.g2d.BitmapFont;
@@ -10,16 +12,16 @@ public class TextUpDown extends UpDown {
 	
 	Label label;
 	
-	String[] options;
+	ArrayList<String> options;
 	
 	//int index;
 	
-	public TextUpDown(BitmapFont btnFont, BitmapFont textFont, Color color, Color fillColor, Color textFillColor, String[] options, boolean textShorten) {
+	public TextUpDown(BitmapFont btnFont, BitmapFont textFont, Color color, Color fillColor, Color textFillColor, ArrayList<String> options, boolean textShorten) {
 		this.options = options;
 		
 		create(btnFont, fillColor);
 		
-		label = new Label(options[0], textFont, color, textFillColor, textShorten);
+		label = new Label(options.get(0), textFont, color, textFillColor, textShorten);
 	}
 
 	@Override
@@ -30,11 +32,11 @@ public class TextUpDown extends UpDown {
 		
 		if(down.justReleased(cam) && num > 0) {
 			num--;
-			label.setText(options[num]);
+			label.setText(options.get(num));
 		}
-		else if(up.justReleased(cam) && num < options.length - 1) {
+		else if(up.justReleased(cam) && num < options.size() - 1) {
 			num++;
-			label.setText(options[num]);
+			label.setText(options.get(num));
 		}
 	}
 	
@@ -45,7 +47,7 @@ public class TextUpDown extends UpDown {
 	
 	public void setOption(int i) {
 		num = i;
-		label.setText(options[i]);
+		label.setText(options.get(i));
 	}
 
 	@Override

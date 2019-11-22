@@ -1,5 +1,10 @@
 package com.gamesbg.bkbl.screens;
 
+import java.awt.DisplayMode;
+import java.awt.GraphicsDevice;
+import java.awt.GraphicsEnvironment;
+import java.util.ArrayList;
+
 import com.badlogic.gdx.Screen;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.OrthographicCamera;
@@ -15,6 +20,9 @@ public class SettingsScreen implements Screen {
 
 	MyGdxGame game;
 	
+	static ArrayList<String> res;
+	
+	
 	SpriteBatch batch;
 	ShapeRenderer shape;
 	OrthographicCamera cam;
@@ -22,10 +30,30 @@ public class SettingsScreen implements Screen {
 	
 	Button goBack;
 	CheckButton beautifulGfx, fullscreen;
-	TextUpDown resolutions;
+	TextUpDown resUpDown;
 	
 	public SettingsScreen(MyGdxGame mg) {
 		game = mg;
+		
+		res = new ArrayList<String>();
+		
+		//Code for getting possible resolutions taken from StackOverflow.
+		GraphicsDevice[] devices = GraphicsEnvironment.getLocalGraphicsEnvironment().getScreenDevices();
+		    for (int i = 0; i < devices.length; i++) {
+		        GraphicsDevice dev = devices[i];
+		        System.out.println("device " + i);
+		        DisplayMode[] modes = dev.getDisplayModes();
+		        for (int j = 0; j < modes.length; j++) {
+		            DisplayMode m = modes[j];
+		            String s = m.getWidth() + "x" + m.getHeight();
+		            
+		            if(!res.contains(s))
+		            	res.add(s);
+		            
+		            //System.out.println(" " + j + ": " + m.getWidth() + " x " + m.getHeight());
+		            
+		        }
+		    }
 		
 		cam = new OrthographicCamera();
 		
@@ -34,11 +62,15 @@ public class SettingsScreen implements Screen {
 		font = new BitmapFont();
 		font.getData().setScale(1);
 		
+		createGui();
+	}
+	
+	private void createGui() {
 		goBack = new Button("Go Back", font, Color.ORANGE.cpy().sub(0, 0.3f, 0, 1), true, true);
 		beautifulGfx = new CheckButton("Beautiful Background", font, Color.ORANGE.cpy().sub(0, 0.3f, 0, 1), true, true);
 		fullscreen = new CheckButton("Fullscreen", font, Color.ORANGE.cpy().sub(0, 0.3f, 0, 1), true, true);
 		
-		resolutions = new TextUpDown(font, font, Color.WHITE, Color.BROWN, new Color().set(0.8f, 0.4f, 0, 1), new String[] {"800x600", "1024x768", "1280x720"}, false);
+		resUpDown = new TextUpDown(font, font, Color.WHITE, Color.BROWN, new Color().set(0.8f, 0.4f, 0, 1), res, false);
 	}
 	
 	@Override
@@ -56,7 +88,7 @@ public class SettingsScreen implements Screen {
 		beautifulGfx.render(batch, shape, cam);
 		fullscreen.render(batch, shape, cam);
 		
-		resolutions.render(batch, shape, cam);
+		resUpDown.render(batch, shape, cam);
 		
 		if(goBack.justReleased(cam))
 			game.setScreen(game.main);
@@ -70,12 +102,12 @@ public class SettingsScreen implements Screen {
 		goBack.setSize(game.pixelXByCurrentSize(223), game.pixelYByCurrentSize(30));
 		goBack.setPos(width / 2 - goBack.getWidth() / 2, 60);
 		
-		resolutions.setSize(game.pixelXByCurrentSize(74), game.pixelYByCurrentSize(45));
-		resolutions.setPos(width / 2 - resolutions.getTotalWidth() / 2, height / 2 - resolutions.getHeight() / 2);
+		resUpDown.setSize(game.pixelXByCurrentSize(74), game.pixelYByCurrentSize(45));
+		resUpDown.setPos(width / 2 - resUpDown.getTotalWidth() / 2, height / 2 - resUpDown.getHeight() / 2);
 		
-		beautifulGfx.setPosAndSize(resolutions.getX() + resolutions.getTotalWidth() + 90, game.pixelYByCurrentSize(325), 40, 40);
+		beautifulGfx.setPosAndSize(resUpDown.getX() + resUpDown.getTotalWidth() + 90, game.pixelYByCurrentSize(325), 40, 40);
 		fullscreen.setSize(40, 40);
-		fullscreen.setPos(resolutions.getX() - 230, game.pixelYByCurrentSize(325));
+		fullscreen.setPos(resUpDown.getX() - 230, game.pixelYByCurrentSize(325));
 	}
 
 	@Override

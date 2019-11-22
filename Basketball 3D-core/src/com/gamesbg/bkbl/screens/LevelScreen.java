@@ -1,5 +1,7 @@
 package com.gamesbg.bkbl.screens;
 
+import java.util.ArrayList;
+
 import com.badlogic.gdx.Screen;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.OrthographicCamera;
@@ -41,10 +43,18 @@ public class LevelScreen implements Screen {
 		textFont = new BitmapFont();
 		textFont.getData().setScale(2);
 		
+		createGui();
+	}
+	
+	private void createGui() {
 		numUpDown = new NumUpDown(btnFont, textFont, Color.WHITE, Color.BROWN, new Color().set(0.8f, 0.4f, 0, 1), 1, 5);
 		numUpDown.setOption(3);
 		
-		textUpDown = new TextUpDown(btnFont, textFont, Color.WHITE, Color.BROWN, new Color().set(0.8f, 0.4f, 0, 1), new String[] {"Easy", "Hard", "Very Hard"}, true);
+		ArrayList<String> choices = new ArrayList<String>();
+		choices.add("Easy");
+		choices.add("Hard");
+		choices.add("Very Hard");
+		textUpDown = new TextUpDown(btnFont, textFont, Color.WHITE, Color.BROWN, new Color().set(0.8f, 0.4f, 0, 1), choices, true);
 		
 		play = new Button("Play", btnFont, Color.ORANGE.cpy().sub(0, 0.3f, 0, 1), true, true);
 		back = new Button("Go Back", btnFont, Color.ORANGE.cpy().sub(0, 0.3f, 0, 1), true, true);
