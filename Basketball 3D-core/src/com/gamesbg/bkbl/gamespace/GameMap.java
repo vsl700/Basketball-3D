@@ -69,8 +69,12 @@ public class GameMap {
 			//FIXME I think there is a way to achieve the same thing only with one iteration. Think it again and try to shorten the operations. It would be great!
 			btCollisionObject collObj0 = null, collObj1 = null;
 			collObj0 = getCollObjByUserValueAndEntity(ball, userValue0);
-			if(collObj0 == null)
-				for(Player p : teammates) {
+			if(collObj0 == null) {
+				ArrayList<Player> temp = new ArrayList<Player>();
+				temp.addAll(teammates);
+				temp.addAll(opponents);
+				
+				for(Player p : temp) {
 					collObj0 = getCollObjByUserValueAndEntity(p, userValue0);
 					if(collObj0 != null) {
 						temp0 = p;
@@ -78,17 +82,23 @@ public class GameMap {
 					}
 						
 				}
+			}
 			else temp0 = ball;
 			
 			collObj1 = getCollObjByUserValueAndEntity(ball, userValue1);
-			if(collObj1 == null)
-				for(Player p : teammates) {
+			if(collObj1 == null) {
+				ArrayList<Player> temp = new ArrayList<Player>();
+				temp.addAll(teammates);
+				temp.addAll(opponents);
+				
+				for(Player p : temp) {
 					collObj1 = getCollObjByUserValueAndEntity(p, userValue1);
 					if(collObj1 != null) {
 						temp1 = p;
 						break;
 					}
 				}
+			}
 			else temp1 = ball;
 			
 			if(collObj0 == null) {
@@ -162,6 +172,8 @@ public class GameMap {
     HashMap<Integer, String> objectsMap;
     
     //Current game properties
+    int currentPlayerHoldTeam, currentPlayerHoldOpp;
+    
     int teamScore, oppScore;
     
     boolean gameRunning = true;//Whether or not the players can play
@@ -468,6 +480,9 @@ public class GameMap {
 					opponent.getBodies().get(j).setIgnoreCollisionCheck(opponent.getBodies().get(k), true);*/
 			
 			opponents.add(opponent);
+			
+			currentPlayerHoldTeam = -1;
+			currentPlayerHoldOpp = -1;
 		}
 		
 		mainPlayer = teammates.get(0);
@@ -619,6 +634,15 @@ public class GameMap {
 	public void setCameraTrans(Matrix4 trans) {
 		camera.getBodies().get(0).proceedToTransform(trans);
 		
+	}
+	
+	public void setHoldingPlayer(Player player) {
+		currentPlayerHoldTeam = teammates.indexOf(player);
+		currentPlayerHoldOpp = opponents.indexOf(player);
+	}
+	
+	public void playerReleaseBall() {
+		currentPlayerHoldTeam = currentPlayerHoldOpp = -1;
 	}
 	
 	private void controlPlayer(float delta) {
@@ -868,6 +892,14 @@ public class GameMap {
 		return camera;
 	}
 	
+	public int getCurrentPlayerHoldTeam() {
+		return currentPlayerHoldTeam;
+	}
+
+	public int getCurrentPlayerHoldOpp() {
+		return currentPlayerHoldOpp;
+	}
+
 	public int teamScore() {
 		return teamScore;
 	}
@@ -881,17 +913,11 @@ public class GameMap {
 	}
 	
 	public boolean isBallInTeam() {
-		if(getTeammateHolding() != null)
-			return true;
-		
-		return false;
+		return currentPlayerHoldTeam > -1;
 	}
 	
 	public boolean isBallInOpp() {
-		if(getOpponentHolding() != null)
-			return true;
-		
-		return false;
+		return currentPlayerHoldOpp > -1;
 	}
 	
 	public ArrayList<btRigidBody> getBodiesOfAll(){
@@ -913,6 +939,10 @@ public class GameMap {
 			if(player.getBodies() != null)
 				tempObj.addAll(player.getBodies());
 		
+		for(Player player : opponents)
+			if(player.getBodies() != null)
+				tempObj.addAll(player.getBodies());
+		
 		if(terrain.getInvisBodies() != null)
 			tempObj.addAll(terrain.getInvisBodies());
 		
@@ -926,6 +956,10 @@ public class GameMap {
 			tempObj.addAll(ball.getInvisBodies());
 		
 		for(Player player : teammates)
+			if(player.getInvisBodies() != null)
+				tempObj.addAll(player.getInvisBodies());
+		
+		for(Player player : opponents)
 			if(player.getInvisBodies() != null)
 				tempObj.addAll(player.getInvisBodies());
 		
@@ -948,6 +982,10 @@ public class GameMap {
 			tempObj.addAll(ball.getCollisionObjects());
 		
 		for(Player player : teammates)
+			if(player.getCollisionObjects() != null)
+				tempObj.addAll(player.getCollisionObjects());
+		
+		for(Player player : opponents)
 			if(player.getCollisionObjects() != null)
 				tempObj.addAll(player.getCollisionObjects());
 		

@@ -36,8 +36,8 @@ public class MyGdxGame extends Game {
 	public GameScreen game;
 	public SettingsScreen settings;
 	
-	public static int WIDTH = 1280;
-	public static int HEIGHT = 720;
+	public static int WIDTH = 848;
+	public static int HEIGHT = 480;
 	
 	boolean beautifulBack = true;
 	
@@ -55,12 +55,12 @@ public class MyGdxGame extends Game {
 		else loadTexture();
 		
 		main = new MainScreen(this);
-		//setScreen(main);
+		setScreen(main);
 		
 		level = new LevelScreen(this);
 		game = new GameScreen(this);
 		settings = new SettingsScreen(this);
-		setScreen(settings);
+		//setScreen(settings);
 	}
 	
 	private void loadTexture() {

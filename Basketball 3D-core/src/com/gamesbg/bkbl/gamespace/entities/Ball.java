@@ -19,9 +19,12 @@ import com.gamesbg.bkbl.gamespace.objects.ObjectType;
 
 public class Ball extends Entity {
 	
+	ArrayList<BallListener> listeners;
+	
 	public void create(EntityType type, GameMap map, Vector3 pos) {
 		super.create(type, map, pos);
 		
+		listeners = new ArrayList<BallListener>();
 		//bodies.get(0).setDamping(-3, -3);
 		//createCollisions();
 	}
@@ -180,6 +183,10 @@ public class Ball extends Entity {
 	@Override
 	public float getDepth() {
 		return model.nodes.get(0).scale.z;
+	}
+	
+	public void addListener() {
+		
 	}
 
 	@Override

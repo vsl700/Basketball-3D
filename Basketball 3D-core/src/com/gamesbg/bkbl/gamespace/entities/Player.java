@@ -30,7 +30,10 @@ import com.badlogic.gdx.physics.bullet.collision.btSphereShape;
 import com.badlogic.gdx.physics.bullet.dynamics.btRigidBody;
 import com.gamesbg.bkbl.gamespace.GameMap;
 import com.gamesbg.bkbl.gamespace.tools.CustomAnimation;
+import com.gamesbg.bkbl.gamespace.entities.players.Opponent;
+import com.gamesbg.bkbl.gamespace.entities.players.Teammate;
 import com.gamesbg.bkbl.gamespace.entities.players.ai.*;
+import com.gamesbg.bkbl.gamespace.objects.ObjectType;
 
 public abstract class Player extends Entity {
 
@@ -979,23 +982,26 @@ public abstract class Player extends Entity {
 	}
 	
 	private void catchBall(boolean left) {
-		if(left) {
-			leftHoldingBall = true;
-			
-			if(leftHandInWorld)
-				disableHandDynColl(left);
+		if (!map.isBallInTeam() && !map.isBallInOpp()) {
+			if (left) {
+				leftHoldingBall = true;
+
+				if (leftHandInWorld)
+					disableHandDynColl(left);
+			} else {
+				rightHoldingBall = true;
+
+				if (rightHandInWorld)
+					disableHandDynColl(left);
+			}
+
+			if (!downBody)
+				disableUpperBodyDynColl();
+
+			map.getBall().getMainBody().setGravity(new Vector3());
+
+			map.setHoldingPlayer(this);
 		}
-		else {
-			rightHoldingBall = true;
-			
-			if(rightHandInWorld)
-				disableHandDynColl(left);
-		}
-		
-		if(!downBody)
-			disableUpperBodyDynColl();
-		
-		map.getBall().getMainBody().setGravity(new Vector3());
 	}
 	
 	private void enableHandDynColl(boolean left) {
@@ -1149,6 +1155,9 @@ public abstract class Player extends Entity {
 		map.getBall().setWorldTransform(trans);
 		
 		leftHoldingBall = rightHoldingBall = false;
+		
+		if(!isDribbling())
+			map.playerReleaseBall();
 	}
 	
 	private Vector3 makeBallDribbleVelocity(boolean left) {
@@ -1373,8 +1382,8 @@ public abstract class Player extends Entity {
 		Vector3 tempHandVec = new Vector3();
 		tempHand.getTranslation(tempHandVec);
 		
-		Vector3 tempHandRot = new Vector3(0, 0, -1);
-		modelInstance.transform.getRotation(new Quaternion()).transform(tempHandRot);
+		//Vector3 tempHandRot = new Vector3(0, 0, -1);
+		//modelInstance.transform.getRotation(new Quaternion()).transform(tempHandRot);
 		
 		Vector3 newHandRotVec = tempBallTrans.cpy().sub(tempHandVec).unrotate(modelInstance.transform).nor().add(new Vector3(0, -1, 0));
 		
@@ -1400,12 +1409,18 @@ public abstract class Player extends Entity {
 		setCollisionTransform();
 	}
 	
-	private Vector3 lookAt(Vector3 target) {
+	/**
+	 * Gets the distance between this player and the target vector
+	 * @param target
+	 * @return
+	 */
+	private Vector3 distance(Vector3 target) {
 		return target.cpy().sub(modelInstance.transform.getTranslation(new Vector3()));
 	}
 	
-	public void roamAround(Matrix4 target) {
-		Matrix4 temp = target.cpy().rotate(0, 1, 0, 10).mul(new Matrix4().setToTranslation(0, 0, -3));
+	public Vector3 roamAround(Matrix4 target, Matrix4 block, float xDist, float zDist, boolean forceSprint) {
+		//The point's trans where the player should go to
+		Matrix4 temp = target.cpy().mul(new Matrix4().setToTranslation(xDist, 0, zDist));
 		
 		//The translation of the point
 		Vector3 tempVec = new Vector3();
@@ -1415,27 +1430,65 @@ public abstract class Player extends Entity {
 		Vector3 targetVec = new Vector3();
 		target.getTranslation(targetVec);
 		
-		Vector3 diff = lookAt(tempVec);
+		//The vector used in players walking + distance measurment between the point and the player
+		Vector3 diffWalk = distance(tempVec);
+		
+		//Distance between this player and the target one
+		Vector3 diffDist = distance(targetVec);
+		
+		float xDiff = diffDist.x;
+		float zDiff = diffDist.z;
+		diffWalk.nor().scl(Gdx.graphics.getDeltaTime());
+		if(forceSprint || (Math.abs(xDiff) + Math.abs(zDiff) > xDist + zDist + 6))
+			run(diffWalk);
+		else if(Math.abs(xDiff) > Math.abs(xDist) + 0.5f || Math.abs(zDiff) > Math.abs(zDist) + 0.5f)
+			walk(diffWalk);
 		
 		
-		float xDiff = diff.x;
-		float zDiff = diff.z;
-		diff.scl(Gdx.graphics.getDeltaTime());
-		if(xDiff > MAX_WALKING_VELOCITY || zDiff > MAX_WALKING_VELOCITY)
-			run(diff);
-		else if(xDiff > 3 || zDiff > 3)
-			walk(diff);
+		
+		// The new rotation of the player
+		//targetVec.x = Math.abs(targetVec.x);
+		//targetVec.y = Math.abs(targetVec.y);
+		//targetVec.z = Math.abs(targetVec.z);
+		
+		Vector3 thisVec = modelInstance.transform.getTranslation(new Vector3());
+		//thisVec.x = Math.abs(thisVec.x);
+		//thisVec.y = Math.abs(thisVec.y);
+		//thisVec.z = Math.abs(thisVec.z);
+		
+		Vector3 rotVec = targetVec.cpy().sub(thisVec).nor();
+		rotVec.y = 0;
+		//rotVec.scl(Gdx.graphics.getDeltaTime());
+		Quaternion tempQuat = new Quaternion().set(diffWalk, 180);
+		tempQuat.setEulerAngles(tempQuat.getYaw(), 0, 0);
+		
+		turnY(tempQuat.getYaw() * Gdx.graphics.getDeltaTime());
+		//tempQuat.x = 0; 
+		//tempQuat.z = 0;
+		// tempQuat.x = tempQuat.z = 0;
+		//modelInstance.transform.set(modelInstance.transform.getTranslation(new Vector3()), tempQuat);
+		//modelInstance.transform.setToLookAt(thisVec, tempVec, new Vector3(0, 0, 1)).trn(thisVec).rotate(modelInstance.transform.getRotation(new Quaternion()));
+			
+		return diffWalk;
 	}
 	
 	@Override
 	public void update(float delta) {
 		lockRotationAndRandomFloating(true);
 		
-		//if(!isMainPlayer())
+		if(!holdingBall() && isDribbling()) {
+			dribbleL = dribbleR = false;
+		}
+		
+		if(!isMainPlayer())
 			stateMachine.update();
 		
 		String prevIdArmL = armLController.current.animation.id;
 		String prevIdArmR = armLController.current.animation.id;
+		
+		//if(Math.abs(getMainBody().getLinearVelocity().x) < 0.0008f && Math.abs(getMainBody().getLinearVelocity().z) < 0.0008f) {
+			//walking = running = false;
+		//}
 		
 		if (dribbleL) {
 			dribble(delta, true);
@@ -1791,6 +1844,11 @@ public abstract class Player extends Entity {
 				leftHandBall = true;
 			else if(objInside.equals(collObjMap.get("handR")))
 				rightHandBall = true;
+			
+			//if(objInside.equals(getMainBody())) {
+				//if(map.getObjectsMap().get(objOutside.getUserValue()).equals(ObjectType.TERRAIN.getId() + "Inv"))
+					//walking = running = false;
+			//}
 		}
 	}
 	
@@ -1819,7 +1877,27 @@ public abstract class Player extends Entity {
 	}
 	
 	public boolean holdingBall() {
-		return leftHoldingBall || rightHoldingBall || dribbleL || dribbleR;
+		if(this instanceof Teammate) {
+			System.out.println(map.getTeammates().indexOf(this));
+			if(map.getCurrentPlayerHoldTeam() > -1 && map.getTeammates().indexOf(this) == map.getCurrentPlayerHoldTeam()) {
+				System.out.println("Team holding");
+				return true;
+			}
+		}
+		else if(this instanceof Opponent) {
+			if(map.getCurrentPlayerHoldOpp() > -1 && map.getOpponents().get(map.getCurrentPlayerHoldOpp()).equals(this)) {
+				System.out.println("Opp holding");
+				return true;
+			}
+		}
+		
+		System.out.println(map.getCurrentPlayerHoldTeam());
+		System.out.println("Not holding");
+		return dribbleL || dribbleR;
+	}
+	
+	public boolean isDribbling() {
+		return dribbleL || dribbleR;
 	}
 	
 	public boolean isShooting() {
