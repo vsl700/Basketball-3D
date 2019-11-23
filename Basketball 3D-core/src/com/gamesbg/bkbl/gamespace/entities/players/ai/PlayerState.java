@@ -19,23 +19,39 @@ public enum PlayerState implements State<Player> {
 		@Override
 		public void update(Player player) {
 			super.update(player);
-			
-			if((time += Gdx.graphics.getDeltaTime()) > 1) {
-				ArrayList<Player> tempOpp;
-				if(player instanceof Teammate) 
-					tempOpp = player.getMap().getOpponents();
-				else tempOpp = player.getMap().getTeammates();
+
+			ArrayList<Player> tempOpp;
+			if (player instanceof Teammate)
+				tempOpp = player.getMap().getOpponents();
+			else
+				tempOpp = player.getMap().getTeammates();
+
+			ArrayList<Integer> sides = poleSurround(player, tempOpp);
+			if (sides.size() > 2) {
+				ArrayList<Player> tempTeam;
+				if (player instanceof Teammate)
+					tempTeam = player.getMap().getTeammates();
+				else
+					tempTeam = player.getMap().getOpponents();
 				
-				ArrayList<Integer> sides = poleSurround(player, tempOpp);
-				if(sides.size() > 2) {
-					
-				}
-				else {
-					player.interactWithBallL();
-					
-					time = 0;
-				}
+				Vector3 playerVec = player.getModelInstance().transform.getTranslation(new Vector3());
+				
+				Vector3 tempTeamVec = getShortestDistance(playerVec, tempTeam).nor().scl(Gdx.graphics.getDeltaTime());
+				
+				player.turnY(tempTeamVec.x + tempTeamVec.z);
+				
+			} else if(sides.contains(0)) {
+				
+			}else if(sides.contains(2)) {//We don't need south (which is the back of the player)
+				
+			}else if(sides.contains(3)) {
+				
+			} else if ((time += Gdx.graphics.getDeltaTime()) > 0.75f) {
+				player.interactWithBallL();
+
+				time = 0;
 			}
+
 		}
 		
 		
@@ -46,7 +62,7 @@ public enum PlayerState implements State<Player> {
 		public void update(Player player) {
 			super.update(player);
 			
-			System.out.println("Chasing");
+			//System.out.println("Chasing");
 			
 			//player.interactWithBallL();
 			player.roamAround(player.getMap().getBall().getModelInstance().transform, null, 0, 0, true);
@@ -75,20 +91,7 @@ public enum PlayerState implements State<Player> {
 			
 			Matrix4 blockTrans = new Matrix4();
 			
-			Vector3 tempVec = tempOpp.get(0).getModelInstance().transform.getTranslation(new Vector3());
-			Vector3 diff = player.getModelInstance().transform.getTranslation(new Vector3()).cpy().sub(tempVec);
-			for(int i = 1; i < tempOpp.size(); i++) {
-				Matrix4 tempTrans2 = tempOpp.get(i).getModelInstance().transform;
-				
-				Vector3 tempVec2 = tempTrans2.getTranslation(new Vector3());
-				
-				Vector3 diff2 = playerVec.cpy().sub(tempVec2);
-				
-				if(diff2.x + diff2.z < diff.x + diff.z) {
-					tempVec = tempVec2;
-					diff = diff2;
-				}
-			}
+			Vector3 tempVec = getShortestDistance(playerVec, tempOpp);
 				
 			blockTrans.setToTranslation(tempVec);
 			
@@ -128,6 +131,8 @@ public enum PlayerState implements State<Player> {
 		}
 	};
 
+	
+	
 	@Override
 	public void enter(Player entity) {
 		// TODO Auto-generated method stub
@@ -207,6 +212,23 @@ public enum PlayerState implements State<Player> {
 		return sides;
 	}
 
-	
+	protected Vector3 getShortestDistance(Vector3 position, ArrayList<Player> players) {
+		Vector3 tempTeamVec = players.get(0).getModelInstance().transform.getTranslation(new Vector3());
+		Vector3 diff = position.cpy().sub(tempTeamVec);
+		for(int i = 1; i < players.size(); i++) {
+			Matrix4 tempTrans2 = players.get(i).getModelInstance().transform;
+			
+			Vector3 tempVec2 = tempTrans2.getTranslation(new Vector3());
+			
+			Vector3 diff2 = position.cpy().sub(tempVec2);
+			
+			if(diff2.x + diff2.z < diff.x + diff.z) {
+				tempTeamVec = tempVec2;
+				diff = diff2;
+			}
+		}
+		
+		return tempTeamVec;
+	}
 	
 }

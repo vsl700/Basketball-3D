@@ -67,12 +67,13 @@ public class GameMap {
 			Entity temp0 = null, temp1 = null;
 			//GameObject tempObj = null;
 			//FIXME I think there is a way to achieve the same thing only with one iteration. Think it again and try to shorten the operations. It would be great!
+			ArrayList<Player> temp = new ArrayList<Player>();
+			temp.addAll(teammates);
+			temp.addAll(opponents);
+			
 			btCollisionObject collObj0 = null, collObj1 = null;
 			collObj0 = getCollObjByUserValueAndEntity(ball, userValue0);
 			if(collObj0 == null) {
-				ArrayList<Player> temp = new ArrayList<Player>();
-				temp.addAll(teammates);
-				temp.addAll(opponents);
 				
 				for(Player p : temp) {
 					collObj0 = getCollObjByUserValueAndEntity(p, userValue0);
@@ -87,10 +88,6 @@ public class GameMap {
 			
 			collObj1 = getCollObjByUserValueAndEntity(ball, userValue1);
 			if(collObj1 == null) {
-				ArrayList<Player> temp = new ArrayList<Player>();
-				temp.addAll(teammates);
-				temp.addAll(opponents);
-				
 				for(Player p : temp) {
 					collObj1 = getCollObjByUserValueAndEntity(p, userValue1);
 					if(collObj1 != null) {
@@ -430,12 +427,25 @@ public class GameMap {
 			//players.add(EntityType.createEntity("team", this, 0, 0, 0));
 			for (btRigidBody co : opponent.getBodies()) {
 				co.setUserValue(index2);
-				//co.setCollisionFlags(co.getCollisionFlags() | btCollisionObject.CollisionFlags.CF_CUSTOM_MATERIAL_CALLBACK);
+				co.setCollisionFlags(co.getCollisionFlags() | btCollisionObject.CollisionFlags.CF_CUSTOM_MATERIAL_CALLBACK);
 				
 				//if(co.equals(opponent.getMainBody())) {
-					dynamicsWorld.addRigidBody(co, ENTITY_FLAG, ALL_FLAG);
-					//System.out.println(co.getUserValue());
-					objectsMap.put(index2, EntityType.OPPONENT.getId());
+					
+					////System.out.println(co.getUserValue());
+					if(opponent.getMainBody().equals(co)) {
+						dynamicsWorld.addRigidBody(co, ENTITY_FLAG, ALL_FLAG);
+						co.setContactCallbackFlag(ENTITY_FLAG);
+						co.setContactCallbackFilter(ALL_FLAG);
+						
+						objectsMap.put(index2, EntityType.OPPONENT.getId());
+					}
+					else {
+						dynamicsWorld.addRigidBody(co, ENTITY_FLAG, ALL_FLAG);
+						co.setContactCallbackFlag(ENTITY_FLAG);
+						co.setContactCallbackFilter(ALL_FLAG);
+						
+						objectsMap.put(index2, EntityType.OPPONENT.getId() + "Hand");
+					}
 					//co.setContactCallbackFlag(PLAYER_FLAG);
 					//co.setContactCallbackFilter(ALL_FLAG);
 				//}else {
@@ -453,7 +463,10 @@ public class GameMap {
 				
 				//if(co.equals(opponent.getMainBody())) {
 					dynamicsWorld.addCollisionObject(co, SPECIAL_FLAG, ENT_SPECIAL_FLAG);
-					//System.out.println(co.getUserValue());
+					co.setContactCallbackFlag(SPECIAL_FLAG);
+					co.setContactCallbackFilter(ENT_SPECIAL_FLAG);
+					
+					////System.out.println(co.getUserValue());
 					objectsMap.put(index2, EntityType.OPPONENT.getId() + "Obj");
 					//co.setContactCallbackFlag(PLAYER_FLAG);
 					//co.setContactCallbackFilter(ALL_FLAG);
@@ -474,16 +487,20 @@ public class GameMap {
 				
 				index2++;
 			}*/
-			
 			/*for(int j = 0; j < opponent.getBodies().size(); j++)
 				for(int k = j + 1; k < opponent.getBodies().size(); k++)
 					opponent.getBodies().get(j).setIgnoreCollisionCheck(opponent.getBodies().get(k), true);*/
 			
 			opponents.add(opponent);
 			
-			currentPlayerHoldTeam = -1;
-			currentPlayerHoldOpp = -1;
+			//Skipping the main player
+			if(playerIndex > 0)
+				opponent.setPlayerIndex(playerIndex);
+			playerIndex++;
 		}
+		
+		currentPlayerHoldTeam = -1;
+		currentPlayerHoldOpp = -1;
 		
 		mainPlayer = teammates.get(0);
 		
