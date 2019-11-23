@@ -3,6 +3,7 @@ package com.gamesbg.bkbl.gamespace.entities;
 import java.util.ArrayList;
 import java.util.HashMap;
 
+import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.ai.btree.BehaviorTree;
 import com.badlogic.gdx.ai.fsm.DefaultStateMachine;
 import com.badlogic.gdx.ai.fsm.StateMachine;
@@ -82,6 +83,8 @@ public abstract class Player extends Entity {
 	int shootingPower = 10;
 	int cycleTimeout;
 	
+	int playerIndex;
+	
 	@Override
 	public void create(EntityType type, GameMap map, Vector3 pos) {
 		super.create(type, map, pos);
@@ -123,7 +126,8 @@ public abstract class Player extends Entity {
 		stopLegsAnim();
 		stopBodyAnim();
 		
-		stateMachine = new DefaultStateMachine<Player, PlayerState>(this, PlayerState.IDLING);
+		//if(!isMainPlayer())
+			stateMachine = new DefaultStateMachine<Player, PlayerState>(this, PlayerState.IDLING);
 
 	}
 	
@@ -1165,7 +1169,7 @@ public abstract class Player extends Entity {
 	private Matrix4 prevTrans;
 	
 	/**
-	 * This method helps modifing the dribble function for both of the hands at the same time
+	 * This method helps modifying the dribble function for both of the hands at the same time
 	 * @param left - true for left dribble command, false for right
 	 */
 	private void dribble(float delta, final boolean left) {
@@ -1396,11 +1400,39 @@ public abstract class Player extends Entity {
 		setCollisionTransform();
 	}
 	
+	private Vector3 lookAt(Vector3 target) {
+		return target.cpy().sub(modelInstance.transform.getTranslation(new Vector3()));
+	}
+	
+	public void roamAround(Matrix4 target) {
+		Matrix4 temp = target.cpy().rotate(0, 1, 0, 10).mul(new Matrix4().setToTranslation(0, 0, -3));
+		
+		//The translation of the point
+		Vector3 tempVec = new Vector3();
+		temp.getTranslation(tempVec);
+		
+		//The translation of the target
+		Vector3 targetVec = new Vector3();
+		target.getTranslation(targetVec);
+		
+		Vector3 diff = lookAt(tempVec);
+		
+		
+		float xDiff = diff.x;
+		float zDiff = diff.z;
+		diff.scl(Gdx.graphics.getDeltaTime());
+		if(xDiff > MAX_WALKING_VELOCITY || zDiff > MAX_WALKING_VELOCITY)
+			run(diff);
+		else if(xDiff > 3 || zDiff > 3)
+			walk(diff);
+	}
+	
 	@Override
 	public void update(float delta) {
 		lockRotationAndRandomFloating(true);
 		
-		stateMachine.update();
+		//if(!isMainPlayer())
+			stateMachine.update();
 		
 		String prevIdArmL = armLController.current.animation.id;
 		String prevIdArmR = armLController.current.animation.id;
@@ -1778,12 +1810,24 @@ public abstract class Player extends Entity {
 		rightPointBall = false;
 	}
 	
+	public void setPlayerIndex(int playerIndex) {
+		this.playerIndex = playerIndex;
+	}
+	
+	public int getPlayerIndex() {
+		return playerIndex;
+	}
+	
 	public boolean holdingBall() {
-		return leftHoldingBall || rightHoldingBall;
+		return leftHoldingBall || rightHoldingBall || dribbleL || dribbleR;
 	}
 	
 	public boolean isShooting() {
 		return leftThrowBall || leftAimBall || rightThrowBall || rightAimBall;
+	}
+	
+	public boolean isMainPlayer() {
+		return map.getMainPlayer().equals(this);
 	}
 	
 }

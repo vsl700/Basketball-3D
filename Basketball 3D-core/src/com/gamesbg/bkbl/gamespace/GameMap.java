@@ -70,7 +70,7 @@ public class GameMap {
 			btCollisionObject collObj0 = null, collObj1 = null;
 			collObj0 = getCollObjByUserValueAndEntity(ball, userValue0);
 			if(collObj0 == null)
-				for(Player p : players) {
+				for(Player p : teammates) {
 					collObj0 = getCollObjByUserValueAndEntity(p, userValue0);
 					if(collObj0 != null) {
 						temp0 = p;
@@ -82,7 +82,7 @@ public class GameMap {
 			
 			collObj1 = getCollObjByUserValueAndEntity(ball, userValue1);
 			if(collObj1 == null)
-				for(Player p : players) {
+				for(Player p : teammates) {
 					collObj1 = getCollObjByUserValueAndEntity(p, userValue1);
 					if(collObj1 != null) {
 						temp1 = p;
@@ -141,7 +141,8 @@ public class GameMap {
 	}
 	
 	
-	ArrayList<Player> players;
+	ArrayList<Player> teammates;
+	ArrayList<Player> opponents;
 	Player mainPlayer;
 	Entity ball;
 	
@@ -163,7 +164,7 @@ public class GameMap {
     //Current game properties
     int teamScore, oppScore;
     
-    boolean gameRunning;//Whether or not the players can play
+    boolean gameRunning = true;//Whether or not the players can play
     
     
     int index = 0;
@@ -326,11 +327,13 @@ public class GameMap {
 		}
 		
 		
-		players = new ArrayList<Player>();
+		teammates = new ArrayList<Player>(5);
+		opponents = new ArrayList<Player>(5);
 	}
 	
 	public void spawnPlayers(int count) {
 		int index2 = index;
+		int playerIndex = 0;
 		
 		for(int i = 0; i < count; i++) {
 			Player teammate = EntityType.createPlayer(EntityType.TEAMMATE.getId(), this, new Vector3(spawnCoords[i][0], spawnCoords[i][1], spawnCoords[i][2]));
@@ -402,7 +405,12 @@ public class GameMap {
 				for(int k = j + 1; k < opponent.getBodies().size(); k++)
 					opponent.getBodies().get(j).setIgnoreCollisionCheck(opponent.getBodies().get(k), true);*/
 			
-			players.add(teammate);
+			teammates.add(teammate);
+			
+			//Skipping the main player
+			if(playerIndex > 0)
+				teammate.setPlayerIndex(playerIndex);
+			playerIndex++;
 		}
 		
 		for(int i = 0; i < count; i++) {
@@ -459,10 +467,10 @@ public class GameMap {
 				for(int k = j + 1; k < opponent.getBodies().size(); k++)
 					opponent.getBodies().get(j).setIgnoreCollisionCheck(opponent.getBodies().get(k), true);*/
 			
-			players.add(opponent);
+			opponents.add(opponent);
 		}
 		
-		mainPlayer = players.get(0);
+		mainPlayer = teammates.get(0);
 		
 		for(btCollisionObject co : getCollObjectsOfAll()) {
 			for(btRigidBody bo : getBodiesOfAll())
@@ -476,7 +484,8 @@ public class GameMap {
 	
 	public void clear() {
 		disposePlayers();
-		players.clear();
+		teammates.clear();
+		opponents.clear();
 	}
 	
 	public void update(float delta) {
@@ -509,17 +518,26 @@ public class GameMap {
 		
 		ball.update(delta);
 		
-		for(Player e : players)
+		for(Player e : teammates)
+			e.update(delta);
+		
+		for(Player e : opponents)
 			e.update(delta);
 		
 		ball.onCycleEnd();
 		
-		for(Player e : players)
+		for(Player e : teammates)
+			e.onCycleEnd();
+		
+		for(Player e : opponents)
 			e.onCycleEnd();
 	}
 	
 	public void render(ModelBatch mBatch, Environment environment) {
-		for(Player e : players)
+		for(Player e : teammates)
+			e.render(mBatch, environment);
+		
+		for(Player e : opponents)
 			e.render(mBatch, environment);
 		
 		ball.render(mBatch, environment);
@@ -573,8 +591,8 @@ public class GameMap {
 	}
 	
 	private void disposePlayers() {
-		if(players != null)
-		for(Player e : players) {
+		//if(teammates != null)
+		for(Player e : teammates) {
 			for(btRigidBody co : e.getBodies())
 			//dynamicsWorld.removeCollisionObject(co);
 			dynamicsWorld.removeRigidBody(co);
@@ -584,6 +602,18 @@ public class GameMap {
 			
 			e.dispose();
 		}
+		
+		//if(opponents != null)
+			for(Player e : opponents) {
+				for(btRigidBody co : e.getBodies())
+				//dynamicsWorld.removeCollisionObject(co);
+				dynamicsWorld.removeRigidBody(co);
+				
+				for(btCollisionObject co : e.getCollisionObjects())
+					dynamicsWorld.removeCollisionObject(co);
+				
+				e.dispose();
+			}
 	}
 	
 	public void setCameraTrans(Matrix4 trans) {
@@ -794,6 +824,30 @@ public class GameMap {
 		return mainPlayer;
 	}
 	
+	public Player getTeammateHolding() {
+		for(Player player : teammates)
+			if(player.holdingBall())
+				return player;
+		
+		return null;
+	}
+	
+	public Player getOpponentHolding() {
+		for(Player player : opponents)
+			if(player.holdingBall())
+				return player;
+		
+		return null;
+	}
+	
+	public ArrayList<Player> getTeammates(){
+		return teammates;
+	}
+	
+	public ArrayList<Player> getOpponents(){
+		return opponents;
+	}
+	
 	public Vector3 getMainPlayerTranslation() {
 		return mainPlayer.getMainBody().getWorldTransform().getTranslation(new Vector3());
 	}
@@ -826,6 +880,20 @@ public class GameMap {
 		return gameRunning;
 	}
 	
+	public boolean isBallInTeam() {
+		if(getTeammateHolding() != null)
+			return true;
+		
+		return false;
+	}
+	
+	public boolean isBallInOpp() {
+		if(getOpponentHolding() != null)
+			return true;
+		
+		return false;
+	}
+	
 	public ArrayList<btRigidBody> getBodiesOfAll(){
 		ArrayList<btRigidBody> tempObj = new ArrayList<btRigidBody>();
 		
@@ -841,7 +909,7 @@ public class GameMap {
 		if(ball.getBodies() != null)
 			tempObj.addAll(ball.getBodies());
 		
-		for(Player player : players)
+		for(Player player : teammates)
 			if(player.getBodies() != null)
 				tempObj.addAll(player.getBodies());
 		
@@ -857,7 +925,7 @@ public class GameMap {
 		if(ball.getInvisBodies() != null)
 			tempObj.addAll(ball.getInvisBodies());
 		
-		for(Player player : players)
+		for(Player player : teammates)
 			if(player.getInvisBodies() != null)
 				tempObj.addAll(player.getInvisBodies());
 		
@@ -879,7 +947,7 @@ public class GameMap {
 		if(ball.getCollisionObjects() != null)
 			tempObj.addAll(ball.getCollisionObjects());
 		
-		for(Player player : players)
+		for(Player player : teammates)
 			if(player.getCollisionObjects() != null)
 				tempObj.addAll(player.getCollisionObjects());
 		
