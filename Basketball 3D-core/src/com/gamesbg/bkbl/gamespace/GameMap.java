@@ -63,7 +63,12 @@ public class GameMap {
 			//if(userValue0 == 23 || userValue1 == 23)
 				//System.out.println(userValue0 + " and " + userValue1);
 			//System.out.println(userValue0 + " and " + userValue1);
-			
+			if(//objectsMap.get(userValue0).equals("teamNorth") || objectsMap.get(userValue0).equals("teamSouth") || objectsMap.get(userValue0).equals("teamEast") || objectsMap.get(userValue0).equals("teamWest") ||
+					//objectsMap.get(userValue1).equals("teamNorth") || objectsMap.get(userValue1).equals("teamSouth") || objectsMap.get(userValue1).equals("teamEast") || objectsMap.get(userValue1).equals("teamWest")||
+					objectsMap.get(userValue0).equals("oppNorth") || objectsMap.get(userValue0).equals("oppSouth") || objectsMap.get(userValue0).equals("oppEast") || objectsMap.get(userValue0).equals("oppWest") ||
+					objectsMap.get(userValue1).equals("oppNorth") || objectsMap.get(userValue1).equals("oppSouth") || objectsMap.get(userValue1).equals("oppEast") || objectsMap.get(userValue1).equals("teamWest"))
+				System.out.println(objectsMap.get(userValue0) + ";" + objectsMap.get(userValue1));
+				
 			Entity temp0 = null, temp1 = null;
 			//GameObject tempObj = null;
 			//FIXME I think there is a way to achieve the same thing only with one iteration. Think it again and try to shorten the operations. It would be great!
@@ -352,20 +357,15 @@ public class GameMap {
 				co.setCollisionFlags(co.getCollisionFlags() | btCollisionObject.CollisionFlags.CF_CUSTOM_MATERIAL_CALLBACK);
 				
 				//if(co.equals(opponent.getMainBody())) {
-					
+				
+				dynamicsWorld.addRigidBody(co, ENTITY_FLAG, ALL_FLAG);
+				co.setContactCallbackFlag(ENTITY_FLAG);
+				co.setContactCallbackFilter(ALL_FLAG);
 					////System.out.println(co.getUserValue());
 					if(teammate.getMainBody().equals(co)) {
-						dynamicsWorld.addRigidBody(co, ENTITY_FLAG, ALL_FLAG);
-						co.setContactCallbackFlag(ENTITY_FLAG);
-						co.setContactCallbackFilter(ALL_FLAG);
-						
 						objectsMap.put(index2, EntityType.TEAMMATE.getId());
 					}
 					else {
-						dynamicsWorld.addRigidBody(co, ENTITY_FLAG, ALL_FLAG);
-						co.setContactCallbackFlag(ENTITY_FLAG);
-						co.setContactCallbackFilter(ALL_FLAG);
-						
 						objectsMap.put(index2, EntityType.TEAMMATE.getId() + "Hand");
 					}
 					//co.setContactCallbackFlag(PLAYER_FLAG);
@@ -384,12 +384,46 @@ public class GameMap {
 				co.setCollisionFlags(co.getCollisionFlags() | btCollisionObject.CollisionFlags.CF_CUSTOM_MATERIAL_CALLBACK);
 				
 				//if(co.equals(opponent.getMainBody())) {
-					dynamicsWorld.addCollisionObject(co, SPECIAL_FLAG, ENT_SPECIAL_FLAG);
-					co.setContactCallbackFlag(SPECIAL_FLAG);
-					co.setContactCallbackFilter(ENT_SPECIAL_FLAG);
+					//dynamicsWorld.addCollisionObject(co, SPECIAL_FLAG, ENT_SPECIAL_FLAG);
+					//co.setContactCallbackFlag(SPECIAL_FLAG);
+					//co.setContactCallbackFilter(ENT_SPECIAL_FLAG);
 					
 					////System.out.println(co.getUserValue());
-					objectsMap.put(index2, EntityType.TEAMMATE.getId() + "Obj");
+					if(co.getUserIndex() == 1) {
+						dynamicsWorld.addCollisionObject(co, ENT_SPECIAL_FLAG, SPECIAL_FLAG);
+						co.setContactCallbackFlag(ENT_SPECIAL_FLAG);
+						co.setContactCallbackFilter(SPECIAL_FLAG);
+						
+						objectsMap.put(index2, EntityType.TEAMMATE.getId() + "North");
+					}
+					else if(co.getUserIndex() == 2) {
+						dynamicsWorld.addCollisionObject(co, ENT_SPECIAL_FLAG, SPECIAL_FLAG);
+						co.setContactCallbackFlag(ENT_SPECIAL_FLAG);
+						co.setContactCallbackFilter(SPECIAL_FLAG);
+					
+						objectsMap.put(index2, EntityType.TEAMMATE.getId() + "South");
+					}
+					else if(co.getUserIndex() == 3) {
+						dynamicsWorld.addCollisionObject(co, ENT_SPECIAL_FLAG, SPECIAL_FLAG);
+						co.setContactCallbackFlag(ENT_SPECIAL_FLAG);
+						co.setContactCallbackFilter(SPECIAL_FLAG);
+						
+						objectsMap.put(index2, EntityType.TEAMMATE.getId() + "East");
+					}
+					else if(co.getUserIndex() == 4) {
+						dynamicsWorld.addCollisionObject(co, ENT_SPECIAL_FLAG, SPECIAL_FLAG);
+						co.setContactCallbackFlag(ENT_SPECIAL_FLAG);
+						co.setContactCallbackFilter(SPECIAL_FLAG);
+						
+						objectsMap.put(index2, EntityType.TEAMMATE.getId() + "West");
+					}
+					else {
+						dynamicsWorld.addCollisionObject(co, SPECIAL_FLAG, ENT_SPECIAL_FLAG);
+						co.setContactCallbackFlag(SPECIAL_FLAG);
+						co.setContactCallbackFilter(ENT_SPECIAL_FLAG);
+						
+						objectsMap.put(index2, EntityType.TEAMMATE.getId() + "Obj");
+					}
 					//co.setContactCallbackFlag(PLAYER_FLAG);
 					//co.setContactCallbackFilter(ALL_FLAG);
 				//}else {
@@ -430,20 +464,14 @@ public class GameMap {
 				co.setCollisionFlags(co.getCollisionFlags() | btCollisionObject.CollisionFlags.CF_CUSTOM_MATERIAL_CALLBACK);
 				
 				//if(co.equals(opponent.getMainBody())) {
-					
+				dynamicsWorld.addRigidBody(co, ENTITY_FLAG, ALL_FLAG);
+				co.setContactCallbackFlag(ENTITY_FLAG);
+				co.setContactCallbackFilter(ALL_FLAG);
 					////System.out.println(co.getUserValue());
 					if(opponent.getMainBody().equals(co)) {
-						dynamicsWorld.addRigidBody(co, ENTITY_FLAG, ALL_FLAG);
-						co.setContactCallbackFlag(ENTITY_FLAG);
-						co.setContactCallbackFilter(ALL_FLAG);
-						
 						objectsMap.put(index2, EntityType.OPPONENT.getId());
 					}
 					else {
-						dynamicsWorld.addRigidBody(co, ENTITY_FLAG, ALL_FLAG);
-						co.setContactCallbackFlag(ENTITY_FLAG);
-						co.setContactCallbackFilter(ALL_FLAG);
-						
 						objectsMap.put(index2, EntityType.OPPONENT.getId() + "Hand");
 					}
 					//co.setContactCallbackFlag(PLAYER_FLAG);
@@ -462,12 +490,45 @@ public class GameMap {
 				co.setCollisionFlags(co.getCollisionFlags() | btCollisionObject.CollisionFlags.CF_CUSTOM_MATERIAL_CALLBACK);
 				
 				//if(co.equals(opponent.getMainBody())) {
-					dynamicsWorld.addCollisionObject(co, SPECIAL_FLAG, ENT_SPECIAL_FLAG);
-					co.setContactCallbackFlag(SPECIAL_FLAG);
-					co.setContactCallbackFilter(ENT_SPECIAL_FLAG);
+					
 					
 					////System.out.println(co.getUserValue());
-					objectsMap.put(index2, EntityType.OPPONENT.getId() + "Obj");
+					if(co.getUserIndex() == 1) {
+						dynamicsWorld.addCollisionObject(co, ENT_SPECIAL_FLAG, SPECIAL_FLAG);
+						co.setContactCallbackFlag(ENT_SPECIAL_FLAG);
+						co.setContactCallbackFilter(SPECIAL_FLAG);
+						
+						objectsMap.put(index2, EntityType.OPPONENT.getId() + "North");
+					}
+					else if(co.getUserIndex() == 2) {
+						dynamicsWorld.addCollisionObject(co, ENT_SPECIAL_FLAG, SPECIAL_FLAG);
+						co.setContactCallbackFlag(ENT_SPECIAL_FLAG);
+						co.setContactCallbackFilter(SPECIAL_FLAG);
+					
+						objectsMap.put(index2, EntityType.OPPONENT.getId() + "South");
+					}
+					else if(co.getUserIndex() == 3) {
+						dynamicsWorld.addCollisionObject(co, ENT_SPECIAL_FLAG, SPECIAL_FLAG);
+						co.setContactCallbackFlag(ENT_SPECIAL_FLAG);
+						co.setContactCallbackFilter(SPECIAL_FLAG);
+						
+						objectsMap.put(index2, EntityType.OPPONENT.getId() + "East");
+					}
+					else if(co.getUserIndex() == 4) {
+						dynamicsWorld.addCollisionObject(co, ENT_SPECIAL_FLAG, SPECIAL_FLAG);
+						co.setContactCallbackFlag(ENT_SPECIAL_FLAG);
+						co.setContactCallbackFilter(SPECIAL_FLAG);
+						
+						objectsMap.put(index2, EntityType.OPPONENT.getId() + "West");
+					}
+					else {
+						dynamicsWorld.addCollisionObject(co, SPECIAL_FLAG, ENT_SPECIAL_FLAG);
+						co.setContactCallbackFlag(SPECIAL_FLAG);
+						co.setContactCallbackFilter(ENT_SPECIAL_FLAG);
+						
+						objectsMap.put(index2, EntityType.OPPONENT.getId() + "Obj");
+					}
+				
 					//co.setContactCallbackFlag(PLAYER_FLAG);
 					//co.setContactCallbackFilter(ALL_FLAG);
 				//}else {

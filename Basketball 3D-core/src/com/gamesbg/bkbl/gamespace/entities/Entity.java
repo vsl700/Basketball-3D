@@ -33,7 +33,7 @@ public abstract class Entity {
 	
 	protected ArrayList<Matrix4> matrixes; //In case we have multiple collision parts we make this which will contain the transform for each collision object
 	
-	protected ArrayList<Integer> manualSetTransforms;
+	protected ArrayList<btCollisionObject> manualSetTransformsBody, manualSetTransformsInvBody, manualSetTransformsObj;
 	
 	protected int mainBodyIndex;
 	
@@ -169,7 +169,7 @@ public abstract class Entity {
 	 * @param nodeTrans - The transform of the node
 	 * @return the transform of the given node according to the transform of the model instance
 	 */
-	protected Matrix4 calcTransformFromNodesTransform(Matrix4 nodeTrans) {
+	public Matrix4 calcTransformFromNodesTransform(Matrix4 nodeTrans) {
 		return modelInstance.transform.cpy().mul(nodeTrans);
 	}
 	
@@ -215,8 +215,8 @@ public abstract class Entity {
 		
 		//if(bodies != null)
 		for(int i = 0; i < bodies.size(); i++) {
-			if (manualSetTransforms != null) {
-				if (!manualSetTransforms.contains(j)) {
+			if (manualSetTransformsBody != null) {
+				if (!manualSetTransformsBody.contains(bodies.get(i))) {
 					if (j == mainBodyIndex)
 						bodies.get(i).proceedToTransform(matrixes.get(j));
 					else
@@ -234,8 +234,8 @@ public abstract class Entity {
 		
 		if (invisBodies != null)
 			for (int i = 0; i < invisBodies.size(); i++) {
-				if (manualSetTransforms == null) {
-					if (!manualSetTransforms.contains(j))
+				if (manualSetTransformsInvBody == null) {
+					if (!manualSetTransformsInvBody.contains(invisBodies.get(i)))
 						invisBodies.get(i).setWorldTransform(calcTransformFromNodesTransform(matrixes.get(j)));
 				}
 				else {
@@ -247,15 +247,18 @@ public abstract class Entity {
 		
 		if(collisionObjects != null)
 			for(int i = 0; i < collisionObjects.size(); i++) {
-				if (manualSetTransforms != null) {
-					if (!manualSetTransforms.contains(j))
+				if (manualSetTransformsObj != null) {
+					if (!manualSetTransformsObj.contains(collisionObjects.get(i))) {
 						collisionObjects.get(i).setWorldTransform(calcTransformFromNodesTransform(matrixes.get(j)));
+						
+						j++;
+					}
 				}
 				else {
 					collisionObjects.get(i).setWorldTransform(calcTransformFromNodesTransform(matrixes.get(j)));
+					
+					j++;
 				}
-				
-				j++;
 			}
 		
 		//if(type == EntityType.BALL)

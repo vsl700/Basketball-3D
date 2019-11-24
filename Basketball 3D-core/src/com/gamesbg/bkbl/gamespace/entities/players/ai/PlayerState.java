@@ -6,7 +6,6 @@ import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.ai.fsm.State;
 import com.badlogic.gdx.ai.msg.Telegram;
 import com.badlogic.gdx.math.Matrix4;
-import com.badlogic.gdx.math.Rectangle;
 import com.badlogic.gdx.math.Vector3;
 import com.gamesbg.bkbl.gamespace.entities.Player;
 import com.gamesbg.bkbl.gamespace.entities.players.Opponent;
@@ -40,20 +39,26 @@ public enum PlayerState implements State<Player> {
 				
 				player.turnY(tempTeamVec.x + tempTeamVec.z);
 				
-			} else if(sides.contains(0)) {
-				
+			}else if(sides.contains(0)) {
+				if(sides.contains(2))
+					player.turnY(-90 * Gdx.graphics.getDeltaTime());
+				else if(sides.contains(3))
+					player.turnY(90 * Gdx.graphics.getDeltaTime());
 			}if(sides.contains(2)) {//We don't need south (which is the back of the player)
 				if(player.rightHolding())
 					player.interactWithBallL();
 			}if(sides.contains(3)) {
 				if(player.leftHolding())
 					player.interactWithBallR();
-			} else if ((time += Gdx.graphics.getDeltaTime()) > 0.75f) {
-				player.interactWithBallL();
+			} else if (time > 0.75f) {
+				if(player.leftHolding())
+					player.interactWithBallL();
+				else if(player.rightHolding())
+					player.interactWithBallR();
 
 				time = 0;
 			}
-
+			time += Gdx.graphics.getDeltaTime();
 		}
 		
 		
@@ -66,7 +71,18 @@ public enum PlayerState implements State<Player> {
 			
 			//System.out.println("Chasing");
 			
-			player.interactWithBallL();
+			Vector3 ballVec = player.getMap().getBall().getModelInstance().transform.getTranslation(new Vector3());
+			ArrayList<Vector3> handVecs = new ArrayList<Vector3>();
+			handVecs.add(player.getShoulderLTrans().getTranslation(new Vector3()));
+			handVecs.add(player.getShoulderRTrans().getTranslation(new Vector3()));
+			
+			Vector3 tempHandVec = getShortestDistanceWVectors(ballVec, handVecs);
+			
+			if(tempHandVec.idt(handVecs.get(0)))
+				player.interactWithBallL();
+			else if(tempHandVec.idt(handVecs.get(1)))
+				player.interactWithBallR();
+			
 			player.roamAround(player.getMap().getBall().getModelInstance().transform, null, 0, 0, true);
 		}
 	},
@@ -184,40 +200,109 @@ public enum PlayerState implements State<Player> {
 		Matrix4 playerTrans = player.getModelInstance().transform;
 		
 		final float rectLength = 5;
-		Vector3 north = playerTrans.cpy().mul(new Matrix4().setToTranslation(-rectLength / 2, 0, player.getDepth() / 2)).getTranslation(new Vector3());
-		Vector3 south = playerTrans.cpy().mul(new Matrix4().setToTranslation(-rectLength / 2, 0, -player.getDepth() / 2 - rectLength)).getTranslation(new Vector3());
-		Vector3 east = playerTrans.cpy().mul(new Matrix4().setToTranslation(player.getWidth() / 2, 0, -rectLength / 2)).getTranslation(new Vector3());
-		Vector3 west = playerTrans.cpy().mul(new Matrix4().setToTranslation(-player.getWidth() / 2 - rectLength, 0, -rectLength / 2)).getTranslation(new Vector3());
+		/*Vector3 north = player.calcTransformFromNodesTransform(new Matrix4().setToTranslation(-rectLength / 2, 0, player.getDepth() / 2))
+				.getTranslation(new Vector3());
+		Vector3 south = player.calcTransformFromNodesTransform(new Matrix4().setToTranslation(-rectLength / 2, 0, -player.getDepth() / 2 - rectLength))
+				//.mul(new Matrix4().setToTranslation(0, 0, -player.getDepth() / 2 - rectLength))
+				.getTranslation(new Vector3());
+		Vector3 east = player.calcTransformFromNodesTransform(new Matrix4().setToTranslation(player.getWidth() / 2, 0, -rectLength / 2))
+				//.mul(new Matrix4().setToTranslation(player.getWidth() / 2, 0, 0))
+				.getTranslation(new Vector3());
+		Vector3 west = player.calcTransformFromNodesTransform(new Matrix4().setToTranslation(-player.getWidth() / 2 - rectLength, 0, -rectLength / 2))
+				//.mul(new Matrix4().setToTranslation(-player.getWidth() / 2 - rectLength, 0, 0))
+				.getTranslation(new Vector3());*/
 		
-		Rectangle northRect = new Rectangle(north.x, north.z, rectLength, rectLength);
-		Rectangle southRect = new Rectangle(south.x, south.z, rectLength, rectLength);
-		Rectangle eastRect = new Rectangle(east.x, east.z, rectLength, rectLength);
-		Rectangle westRect = new Rectangle(west.x, west.z, rectLength, rectLength);
+		//System.out.println(playerTrans.getTranslation(new Vector3()).x + " " + playerTrans.getTranslation(new Vector3()).z);
+		//System.out.println(north.x + " " + north.z);
+		//System.out.println(south.x + " " + south.z);
+		//System.out.println(east.x + " " + east.z);
+		//System.out.println(west.x + " " + west.z);
+		//System.out.println();
+		
+		//Rectangle northRect = new Rectangle(north.x, north.z, rectLength, rectLength);
+		//Rectangle southRect = new Rectangle(south.x, south.z, rectLength, rectLength);
+		//Rectangle eastRect = new Rectangle(east.x, east.z, rectLength, rectLength);
+		//Rectangle westRect = new Rectangle(west.x, west.z, rectLength, rectLength);
+		
+		Vector3 north0XY = player.calcTransformFromNodesTransform(new Matrix4().setToTranslation(-rectLength / 2, 0, player.getDepth() / 2))
+				.getTranslation(new Vector3());
+		//Vector3 north0X1Y = player.calcTransformFromNodesTransform(new Matrix4().setToTranslation(-rectLength / 2, 0, player.getDepth() / 2 + rectLength))
+				//.getTranslation(new Vector3());
+		//Vector3 north1X0Y = player.calcTransformFromNodesTransform(new Matrix4().setToTranslation(rectLength / 2, 0, player.getDepth() / 2))
+				//.getTranslation(new Vector3());
+		Vector3 north1XY = player.calcTransformFromNodesTransform(new Matrix4().setToTranslation(rectLength / 2, 0, player.getDepth() / 2 + rectLength))
+				.getTranslation(new Vector3());
+		
+		//Vector3 south0X1Y = player.calcTransformFromNodesTransform(new Matrix4().setToTranslation(-rectLength / 2, 0, -player.getDepth() / 2))
+				//.getTranslation(new Vector3());
+		Vector3 south0XY = player.calcTransformFromNodesTransform(new Matrix4().setToTranslation(-rectLength / 2, 0, -player.getDepth() / 2 - rectLength))
+				.getTranslation(new Vector3());
+		Vector3 south1XY = player.calcTransformFromNodesTransform(new Matrix4().setToTranslation(rectLength / 2, 0, -player.getDepth() / 2))
+				.getTranslation(new Vector3());
+		//Vector3 south1X0Y = player.calcTransformFromNodesTransform(new Matrix4().setToTranslation(rectLength / 2, 0, -player.getDepth() / 2 - rectLength))
+				//.getTranslation(new Vector3());
+		
+		Vector3 east0XY = player.calcTransformFromNodesTransform(new Matrix4().setToTranslation(player.getWidth() / 2, 0, -rectLength / 2))
+				.getTranslation(new Vector3());
+		//Vector3 east1X0Y = player.calcTransformFromNodesTransform(new Matrix4().setToTranslation(player.getWidth() / 2 + rectLength, 0, -rectLength / 2))
+				//.getTranslation(new Vector3());
+		//Vector3 east0X1Y = player.calcTransformFromNodesTransform(new Matrix4().setToTranslation(player.getWidth() / 2, 0, rectLength / 2))
+				//.getTranslation(new Vector3());
+		Vector3 east1XY = player.calcTransformFromNodesTransform(new Matrix4().setToTranslation(player.getWidth() / 2 + rectLength, 0, rectLength / 2))
+				.getTranslation(new Vector3());
+		
+		//Vector3 west1X0Y = player.calcTransformFromNodesTransform(new Matrix4().setToTranslation(-player.getWidth() / 2, 0, -rectLength / 2))
+				//.getTranslation(new Vector3());
+		Vector3 west0XY = player.calcTransformFromNodesTransform(new Matrix4().setToTranslation(-player.getWidth() / 2 - rectLength, 0, -rectLength / 2))
+				.getTranslation(new Vector3());
+		Vector3 west1XY = player.calcTransformFromNodesTransform(new Matrix4().setToTranslation(-player.getWidth() / 2, 0, rectLength / 2))
+				.getTranslation(new Vector3());
+		//Vector3 west0X1Y = player.calcTransformFromNodesTransform(new Matrix4().setToTranslation(-player.getWidth() / 2 - rectLength, 0, rectLength / 2))
+				//.getTranslation(new Vector3());
 		
 		
 		
 		for(Player p : tempOpp) {
 			Vector3 tempVec = p.getModelInstance().transform.getTranslation(new Vector3());
 			
-			if(northRect.contains(tempVec.x, tempVec.z)) {
-				//if(!sides.contains(0)) 
-					sides.add(0);
+			if(pointsCollision(north0XY.x, north0XY.z, north1XY.x, north1XY.z, tempVec.x, tempVec.z)) {
+				sides.add(0);
 			}
-			if(southRect.contains(tempVec.x, tempVec.z)) {
-				//if(!sides.contains(1)) 
-					sides.add(1);
+			if(pointsCollision(south0XY.x, south0XY.z, south1XY.x, south1XY.z, tempVec.x, tempVec.z)) {
+				sides.add(1);
 			}
-			if(eastRect.contains(tempVec.x, tempVec.z)) {
-				//if(!sides.contains(2)) 
-					sides.add(2);
+			if(pointsCollision(east0XY.x, east0XY.z, east1XY.x, east1XY.z, tempVec.x, tempVec.z)) {
+				sides.add(2);
 			}
-			if(westRect.contains(tempVec.x, tempVec.z)) {
-				//if(!sides.contains(3)) 
-					sides.add(3);
+			if(pointsCollision(west0XY.x, west0XY.z, west1XY.x, west1XY.z, tempVec.x, tempVec.z)) {
+				sides.add(3);
 			}
 		}
 		
 		return sides;
+	}
+	
+	protected boolean pointsCollision(float x11, float y11, float x12, float y12, float x21, float y21) {
+		return x11 <= x21 && x12 >= x21 && y11 <= y21 && y12 >= y21;
+	}
+	
+	protected Vector3 getShortestDistanceWVectors(Vector3 position, ArrayList<Vector3> positions) {
+		Vector3 tempTeamVec = positions.get(0);
+		Vector3 diff = position.sub(tempTeamVec);
+		for(int i = 1; i < positions.size(); i++) {
+			//Matrix4 tempTrans2 = position.get(i).getModelInstance().transform;
+			
+			Vector3 tempVec2 = positions.get(i);
+			
+			Vector3 diff2 = position.cpy().sub(tempVec2);
+			
+			if(diff2.x + diff2.z < diff.x + diff.z) {
+				tempTeamVec = tempVec2;
+				diff = diff2;
+			}
+		}
+		
+		return tempTeamVec;
 	}
 
 	protected Vector3 getShortestDistance(Vector3 position, ArrayList<Player> players) {

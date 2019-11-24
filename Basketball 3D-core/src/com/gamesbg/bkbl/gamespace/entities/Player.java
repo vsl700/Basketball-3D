@@ -33,7 +33,6 @@ import com.gamesbg.bkbl.gamespace.tools.CustomAnimation;
 import com.gamesbg.bkbl.gamespace.entities.players.Opponent;
 import com.gamesbg.bkbl.gamespace.entities.players.Teammate;
 import com.gamesbg.bkbl.gamespace.entities.players.ai.*;
-import com.gamesbg.bkbl.gamespace.objects.ObjectType;
 
 public abstract class Player extends Entity {
 
@@ -70,6 +69,8 @@ public abstract class Player extends Entity {
 	static final float scale7 = 0.315f;
 	static final float handPercentage = 0.4f;
 	
+	static final float poleScale = 3;
+	
 	static final float dribbleSpeed = 0.1f;
 	
 	boolean walking, running, jumping;
@@ -82,6 +83,7 @@ public abstract class Player extends Entity {
 	boolean leftHandBall, rightHandBall;
 	boolean leftHandInWorld, rightHandInWorld;
 	boolean downBody;
+	boolean northSurround, southSurround, eastSurround, westSurround;
 	
 	int shootingPower = 10;
 	int cycleTimeout;
@@ -808,33 +810,50 @@ public abstract class Player extends Entity {
 		collisionShapes.add(new btBoxShape(new Vector3(scale2 / 2, getHeight(), getDepth() / 2)));
 		matrixes.add(modelInstance.transform);
 		
-		collisionShapes.add(new btSphereShape(scale6 / 2));
+		btCollisionShape shoulderShape = new btSphereShape(scale6 / 2);
+		btCollisionShape armShape = new btBoxShape(armVec);
+		btCollisionShape elbowShape = new btSphereShape(scale3 / 2);
+		btCollisionShape handShape = new btBoxShape(handVec);
+		
+		collisionShapes.add(shoulderShape);
 		matrixes.add(modelInstance.getNode("shoulderL").globalTransform);
-		collisionShapes.add(new btBoxShape(armVec));
+		collisionShapes.add(armShape);
 		matrixes.add(modelInstance.getNode("arm1L").globalTransform);
-		collisionShapes.add(new btSphereShape(scale3 / 2));
+		collisionShapes.add(elbowShape);
 		matrixes.add(modelInstance.getNode("elbowL").globalTransform);
-		collisionShapes.add(new btBoxShape(armVec));
+		collisionShapes.add(armShape);
 		matrixes.add(modelInstance.getNode("arm2L").globalTransform);
-		collisionShapes.add(new btBoxShape(handVec));
+		collisionShapes.add(handShape);
 		matrixes.add(tempHandL);
 		
-		collisionShapes.add(new btSphereShape(scale6 / 2));
+		collisionShapes.add(shoulderShape);
 		matrixes.add(modelInstance.getNode("shoulderR").globalTransform);
-		collisionShapes.add(new btBoxShape(armVec));
+		collisionShapes.add(armShape);
 		matrixes.add(modelInstance.getNode("arm1R").globalTransform);
-		collisionShapes.add(new btSphereShape(scale3 / 2));
+		collisionShapes.add(elbowShape);
 		matrixes.add(modelInstance.getNode("elbowR").globalTransform);
-		collisionShapes.add(new btBoxShape(armVec));
+		collisionShapes.add(armShape);
 		matrixes.add(modelInstance.getNode("arm2R").globalTransform);
-		collisionShapes.add(new btBoxShape(handVec));
+		collisionShapes.add(handShape);
 		matrixes.add(tempHandR);
 		
 		invisCollShapes = new ArrayList<btCollisionShape>();
 		invisCollShapes.add(new btBoxShape(handVec));
-		matrixes.add(tempHandL);
 		invisCollShapes.add(new btBoxShape(handVec));
+		
+		matrixes.add(modelInstance.transform);
+		matrixes.add(tempHandL);
+		//invisCollShapes.add(handShape);
 		matrixes.add(tempHandR);
+		
+		Vector3 poleVec = new Vector3(poleScale, 10, poleScale);
+		//btCollisionShape poleShape = new btBoxShape(poleVec);
+		
+		invisCollShapes.add(new btBoxShape(poleVec));
+		invisCollShapes.add(new btBoxShape(poleVec));
+		invisCollShapes.add(new btBoxShape(poleVec));
+		invisCollShapes.add(new btBoxShape(poleVec));
+		invisCollShapes.add(new btBoxShape(new Vector3(scale2 / 2, getHeight(), getDepth() / 2)));
 		//invisCollShapes.add(new btBoxShape(new Vector3(scale2 / 2, getHeight() / 2, getDepth() / 2)));
 		//matrixes.add(matrixes.get(0));
 		//invisCollisionShape = new btBoxShape(new Vector3(getWidth(), 0.001f, getDepth()));
@@ -844,14 +863,50 @@ public abstract class Player extends Entity {
 	private void createCollisionObjects() {
 		collisionObjects = new ArrayList<btCollisionObject>();
 		collObjMap = new HashMap<String, btCollisionObject>();
+		manualSetTransformsObj = new ArrayList<btCollisionObject>();
 		
-		collisionObjects.add(new btCollisionObject());
-		collisionObjects.get(0).setCollisionShape(invisCollShapes.get(0));
-		collObjMap.put("handL", collisionObjects.get(0));
+		btCollisionObject bodyObj = new btCollisionObject();
+		bodyObj.setCollisionShape(invisCollShapes.get(6));
+		collObjMap.put("bodyObj", bodyObj);
+		collisionObjects.add(bodyObj);
 		
-		collisionObjects.add(new btCollisionObject());
-		collisionObjects.get(1).setCollisionShape(invisCollShapes.get(1));
-		collObjMap.put("handR", collisionObjects.get(1));
+		btCollisionObject handLObj = new btCollisionObject();
+		handLObj.setCollisionShape(invisCollShapes.get(0));
+		collObjMap.put("handL", handLObj);
+		collisionObjects.add(handLObj);
+		
+		btCollisionObject handRObj = new btCollisionObject();
+		handRObj.setCollisionShape(invisCollShapes.get(1));
+		collObjMap.put("handR", handRObj);
+		collisionObjects.add(handRObj);
+		
+		btCollisionObject poleNObj = new btCollisionObject();
+		poleNObj.setCollisionShape(invisCollShapes.get(2));
+		collObjMap.put("poleNObj", poleNObj);
+		collisionObjects.add(poleNObj);
+		manualSetTransformsObj.add(poleNObj);
+		poleNObj.setUserIndex(1);
+		
+		btCollisionObject poleSObj = new btCollisionObject();
+		poleSObj.setCollisionShape(invisCollShapes.get(3));
+		collObjMap.put("poleSObj", poleSObj);
+		collisionObjects.add(poleSObj);
+		manualSetTransformsObj.add(poleSObj);
+		poleSObj.setUserIndex(2);
+		
+		btCollisionObject poleEObj = new btCollisionObject();
+		poleEObj.setCollisionShape(invisCollShapes.get(4));
+		collObjMap.put("poleEObj", poleEObj);
+		collisionObjects.add(poleEObj);
+		manualSetTransformsObj.add(poleEObj);
+		poleEObj.setUserIndex(3);
+		
+		btCollisionObject poleWObj = new btCollisionObject();
+		poleWObj.setCollisionShape(invisCollShapes.get(5));
+		collObjMap.put("poleWObj", poleWObj);
+		collisionObjects.add(poleWObj);
+		manualSetTransformsObj.add(poleWObj);
+		poleWObj.setUserIndex(4);
 	}
 	
 	private void removeCollisionCheckOnInternals() {
@@ -893,6 +948,16 @@ public abstract class Player extends Entity {
 		bodiesMap.put("arm2R", bodies.get(i++));
 		bodiesMap.put("handR", bodies.get(i));
 		
+	}
+	
+	@Override
+	public void setCollisionTransform() {
+		super.setCollisionTransform();
+		
+		collObjMap.get("poleNObj").setWorldTransform(calcTransformFromNodesTransform(new Matrix4().set(new Vector3(-poleScale / 2, poleScale / 2, getDepth() / 2), new Quaternion())));
+		collObjMap.get("poleSObj").setWorldTransform(calcTransformFromNodesTransform(new Matrix4().translate(-poleScale / 2, poleScale / 2, -getDepth() / 2 - poleScale)));
+		collObjMap.get("poleEObj").setWorldTransform(calcTransformFromNodesTransform(new Matrix4().translate(getWidth() / 2, poleScale / 2, -poleScale / 2)));
+		collObjMap.get("poleWObj").setWorldTransform(calcTransformFromNodesTransform(new Matrix4().translate(-getWidth() / 2 - poleScale, poleScale / 2, -poleScale / 2)));
 	}
 	
 	/**
@@ -971,6 +1036,13 @@ public abstract class Player extends Entity {
 			} else if (ballColl)
 				catchBall(false);
 		}
+	}
+	
+	public void switchDribble() {
+		if(leftHoldingBall)
+			interactWithBallR();
+		else if(rightHoldingBall)
+			interactWithBallL();
 	}
 	
 	public void shootPowerScroll(float value) {
@@ -1478,9 +1550,13 @@ public abstract class Player extends Entity {
 	public void update(float delta) {
 		lockRotationAndRandomFloating(true);
 		
-		if(!holdingBall() && this instanceof Opponent) {
+		if(!holdingBall()) {
 			dribbleL = dribbleR = false;
 			leftHoldingBall = rightHoldingBall = false;
+		}
+		
+		else if(!leftHoldingBall && !rightHoldingBall && !isDribbling()) {
+			map.playerReleaseBall();
 		}
 		
 		if(!isMainPlayer())
@@ -1792,6 +1868,8 @@ public abstract class Player extends Entity {
 		super.update(delta);
 		
 		prevTrans = modelInstance.transform.cpy();
+		
+		System.out.println("Surround" + northSurround + ";" + southSurround + ";" + eastSurround + ";" + westSurround);
 	}
 
 	public Matrix4 getCamMatrix() {
@@ -1853,6 +1931,15 @@ public abstract class Player extends Entity {
 				//if(map.getObjectsMap().get(objOutside.getUserValue()).equals(ObjectType.TERRAIN.getId() + "Inv"))
 					//walking = running = false;
 			//}
+		}if(map.getObjectsMap().get(objOutside.getUserValue()).equals(EntityType.TEAMMATE + "Obj") || map.getObjectsMap().get(objOutside.getUserValue()).equals(EntityType.OPPONENT + "Obj")) {
+			if(objInside.equals(collObjMap.get("poleNObj")))
+				northSurround = true;
+			else if(objInside.equals(collObjMap.get("poleSObj")))
+				southSurround = true;
+			else if(objInside.equals(collObjMap.get("poleEObj")))
+				eastSurround = true;
+			else if(objInside.equals(collObjMap.get("poleWObj")))
+				westSurround = true;
 		}
 	}
 	
@@ -1870,6 +1957,22 @@ public abstract class Player extends Entity {
 		rightAimBall = false;
 		leftPointBall = false;
 		rightPointBall = false;
+		northSurround = false;
+		southSurround = false;
+		eastSurround = false;
+		westSurround = false;
+	}
+	
+	public Matrix4 getShoulderLTrans() {
+		return calcTransformFromNodesTransform(modelInstance.getNode("shoulderL").globalTransform);
+	}
+	
+	public Matrix4 getShoulderRTrans() {
+		return calcTransformFromNodesTransform(modelInstance.getNode("shoulderR").globalTransform);
+	}
+	
+	public HashMap<String, btRigidBody> getBodiesMap() {
+		return bodiesMap;
 	}
 	
 	public void setPlayerIndex(int playerIndex) {
@@ -1893,8 +1996,12 @@ public abstract class Player extends Entity {
 		return dribbleL || dribbleR;
 	}
 	
+	public boolean isAiming() {
+		return leftAimBall || rightAimBall;
+	}
+	
 	public boolean isShooting() {
-		return leftThrowBall || leftAimBall || rightThrowBall || rightAimBall;
+		return leftThrowBall || rightThrowBall;
 	}
 	
 	public boolean leftHolding() {

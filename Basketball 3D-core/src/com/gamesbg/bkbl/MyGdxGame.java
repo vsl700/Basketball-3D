@@ -126,7 +126,7 @@ public class MyGdxGame extends Game {
 		batch.begin();
 		//if(!beautifulBack)
 			//batch.draw(background, WIDTH / 2 - background.getWidth() / 2, HEIGHT / 2 - background.getHeight() / 2);
-		font.draw(batch, Gdx.graphics.getFramesPerSecond() + " fps; ALPHA v0.1", 0, 13);
+		font.draw(batch, Gdx.graphics.getFramesPerSecond() + " fps; SNAPSHOT v0.6", 0, 13);
 		batch.end();
 	}
 	
