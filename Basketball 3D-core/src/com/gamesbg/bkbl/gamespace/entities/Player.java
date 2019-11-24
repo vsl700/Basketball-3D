@@ -982,7 +982,7 @@ public abstract class Player extends Entity {
 	}
 	
 	private void catchBall(boolean left) {
-		if (!map.isBallInTeam() && !map.isBallInOpp()) {
+		if ((map.getCurrentPlayerHoldTeam() == -1 && map.getCurrentPlayerHoldOpp() == -1) || (map.getTeammateHolding() != null && map.getTeammateHolding().equals(this) || map.getOpponentHolding() != null && map.getOpponentHolding().equals(this)) || ((map.getTeammateHolding() != null && !map.getTeammateHolding().equals(this) && map.getTeammateHolding().isDribbling()) || (map.getOpponentHolding() != null && !map.getOpponentHolding().equals(this) && map.getOpponentHolding().isDribbling()))) {
 			if (left) {
 				leftHoldingBall = true;
 
@@ -1459,7 +1459,7 @@ public abstract class Player extends Entity {
 		Vector3 rotVec = targetVec.cpy().sub(thisVec).nor();
 		rotVec.y = 0;
 		//rotVec.scl(Gdx.graphics.getDeltaTime());
-		Quaternion tempQuat = new Quaternion().set(diffWalk, 180);
+		Quaternion tempQuat = new Quaternion().set(rotVec, 180);
 		tempQuat.setEulerAngles(tempQuat.getYaw(), 0, 0);
 		
 		turnY(tempQuat.getYaw() * Gdx.graphics.getDeltaTime());
@@ -1476,8 +1476,9 @@ public abstract class Player extends Entity {
 	public void update(float delta) {
 		lockRotationAndRandomFloating(true);
 		
-		if(!holdingBall() && this instanceof Teammate) {
+		if(!holdingBall()) {
 			dribbleL = dribbleR = false;
+			leftHoldingBall = rightHoldingBall = false;
 		}
 		
 		if(!isMainPlayer())
@@ -1845,7 +1846,7 @@ public abstract class Player extends Entity {
 			else if(objInside.equals(collObjMap.get("handR")))
 				rightHandBall = true;
 			
-			System.out.println(leftHandBall);
+			//System.out.println(leftHandBall);
 			//if(objInside.equals(getMainBody())) {
 				//if(map.getObjectsMap().get(objOutside.getUserValue()).equals(ObjectType.TERRAIN.getId() + "Inv"))
 					//walking = running = false;
@@ -1879,7 +1880,7 @@ public abstract class Player extends Entity {
 	
 	public boolean holdingBall() {
 		if(this instanceof Teammate) {
-			System.out.println(map.getTeammates().indexOf(this));
+			//System.out.println(map.getTeammates().indexOf(this));
 			if(map.getCurrentPlayerHoldTeam() > -1 && map.getTeammates().indexOf(this) == map.getCurrentPlayerHoldTeam()) {
 				//System.out.println("Team holding");
 				return true;
@@ -1894,7 +1895,7 @@ public abstract class Player extends Entity {
 		
 		//System.out.println(map.getCurrentPlayerHoldTeam());
 		//System.out.println("Not holding");
-		return leftHoldingBall || rightHoldingBall || dribbleL || dribbleR;
+		return dribbleL || dribbleR;
 	}
 	
 	public boolean isDribbling() {
@@ -1903,6 +1904,14 @@ public abstract class Player extends Entity {
 	
 	public boolean isShooting() {
 		return leftThrowBall || leftAimBall || rightThrowBall || rightAimBall;
+	}
+	
+	public boolean leftHolding() {
+		return leftHoldingBall;
+	}
+	
+	public boolean rightHolding() {
+		return rightHoldingBall;
 	}
 	
 	public boolean isMainPlayer() {

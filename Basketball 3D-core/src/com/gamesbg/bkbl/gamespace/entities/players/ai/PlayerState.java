@@ -42,10 +42,12 @@ public enum PlayerState implements State<Player> {
 				
 			} else if(sides.contains(0)) {
 				
-			}else if(sides.contains(2)) {//We don't need south (which is the back of the player)
-				
-			}else if(sides.contains(3)) {
-				
+			}if(sides.contains(2)) {//We don't need south (which is the back of the player)
+				if(player.rightHolding())
+					player.interactWithBallL();
+			}if(sides.contains(3)) {
+				if(player.leftHolding())
+					player.interactWithBallR();
 			} else if ((time += Gdx.graphics.getDeltaTime()) > 0.75f) {
 				player.interactWithBallL();
 
@@ -64,7 +66,7 @@ public enum PlayerState implements State<Player> {
 			
 			//System.out.println("Chasing");
 			
-			//player.interactWithBallL();
+			player.interactWithBallL();
 			player.roamAround(player.getMap().getBall().getModelInstance().transform, null, 0, 0, true);
 		}
 	},
@@ -178,18 +180,19 @@ public enum PlayerState implements State<Player> {
 	protected ArrayList<Integer> poleSurround(Player player, ArrayList<Player> tempOpp) {
 		ArrayList<Integer> sides = new ArrayList<Integer>();
 		
-		Vector3 playerVec = player.getModelInstance().transform.getTranslation(new Vector3());
-		
-		Vector3 north = playerVec.add(0, 0, 5);
-		Vector3 south = playerVec.add(0, 0, -5);
-		Vector3 east = playerVec.add(5, 0, 0);
-		Vector3 west = playerVec.add(-5, 0, 0);
+		//Vector3 playerVec = player.getModelInstance().transform.getTranslation(new Vector3());
+		Matrix4 playerTrans = player.getModelInstance().transform;
 		
 		final float rectLength = 5;
-		Rectangle northRect = new Rectangle(north.x - rectLength / 2, north.z - rectLength / 2, 5, 5);
-		Rectangle southRect = new Rectangle(south.x - rectLength / 2, south.z - rectLength / 2, 5, 5);
-		Rectangle eastRect = new Rectangle(east.x - rectLength / 2, east.z - rectLength / 2, 5, 5);
-		Rectangle westRect = new Rectangle(west.x - rectLength / 2, west.z - rectLength / 2, 5, 5);
+		Vector3 north = playerTrans.cpy().mul(new Matrix4().setToTranslation(-rectLength / 2, 0, player.getDepth() / 2)).getTranslation(new Vector3());
+		Vector3 south = playerTrans.cpy().mul(new Matrix4().setToTranslation(-rectLength / 2, 0, -player.getDepth() / 2 - rectLength)).getTranslation(new Vector3());
+		Vector3 east = playerTrans.cpy().mul(new Matrix4().setToTranslation(player.getWidth() / 2, 0, -rectLength / 2)).getTranslation(new Vector3());
+		Vector3 west = playerTrans.cpy().mul(new Matrix4().setToTranslation(-player.getWidth() / 2 - rectLength, 0, -rectLength / 2)).getTranslation(new Vector3());
+		
+		Rectangle northRect = new Rectangle(north.x, north.z, rectLength, rectLength);
+		Rectangle southRect = new Rectangle(south.x, south.z, rectLength, rectLength);
+		Rectangle eastRect = new Rectangle(east.x, east.z, rectLength, rectLength);
+		Rectangle westRect = new Rectangle(west.x, west.z, rectLength, rectLength);
 		
 		
 		
@@ -197,15 +200,20 @@ public enum PlayerState implements State<Player> {
 			Vector3 tempVec = p.getModelInstance().transform.getTranslation(new Vector3());
 			
 			if(northRect.contains(tempVec.x, tempVec.z)) {
-				if(!sides.contains(0)) sides.add(0);
+				//if(!sides.contains(0)) 
+					sides.add(0);
 			}
-			else if(southRect.contains(tempVec.x, tempVec.z)) {
-				if(!sides.contains(1)) sides.add(1);
-			}else if(eastRect.contains(tempVec.x, tempVec.z)) {
-				if(!sides.contains(2)) sides.add(2);
+			if(southRect.contains(tempVec.x, tempVec.z)) {
+				//if(!sides.contains(1)) 
+					sides.add(1);
 			}
-			else if(westRect.contains(tempVec.x, tempVec.z)) {
-				if(!sides.contains(3)) sides.add(3);
+			if(eastRect.contains(tempVec.x, tempVec.z)) {
+				//if(!sides.contains(2)) 
+					sides.add(2);
+			}
+			if(westRect.contains(tempVec.x, tempVec.z)) {
+				//if(!sides.contains(3)) 
+					sides.add(3);
 			}
 		}
 		
