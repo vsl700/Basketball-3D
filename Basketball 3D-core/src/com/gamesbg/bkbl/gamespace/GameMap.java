@@ -866,6 +866,7 @@ public class GameMap {
 	}
 	
 	public Player getTeammateHolding() {
+		if(currentPlayerHoldTeam > -1)
 		for(Player player : teammates)
 			if(player.holdingBall())
 				return player;
@@ -874,6 +875,7 @@ public class GameMap {
 	}
 	
 	public Player getOpponentHolding() {
+		if(currentPlayerHoldOpp > -1)
 		for(Player player : opponents)
 			if(player.holdingBall())
 				return player;
