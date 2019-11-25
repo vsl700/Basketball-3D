@@ -105,6 +105,8 @@ public class Terrain extends GameObject {
 			invisMotionStates.add(new MotionState());
 			invisMotionStates.get(i).transform = invisBodies.get(i).getWorldTransform();
 			invisBodies.get(i).setMotionState(invisMotionStates.get(i));
+			invisBodies.get(i).setFriction(1.0f);
+			invisBodies.get(i).setRestitution(0.1f);
 		}
 		
 		/*invisMotionStates.add(new GameMap.MotionState());

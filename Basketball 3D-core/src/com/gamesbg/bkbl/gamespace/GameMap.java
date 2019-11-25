@@ -63,16 +63,25 @@ public class GameMap {
 			//if(userValue0 == 23 || userValue1 == 23)
 				//System.out.println(userValue0 + " and " + userValue1);
 			//System.out.println(userValue0 + " and " + userValue1);
-			if(//objectsMap.get(userValue0).equals("teamNorth") || objectsMap.get(userValue0).equals("teamSouth") || objectsMap.get(userValue0).equals("teamEast") || objectsMap.get(userValue0).equals("teamWest") ||
-					//objectsMap.get(userValue1).equals("teamNorth") || objectsMap.get(userValue1).equals("teamSouth") || objectsMap.get(userValue1).equals("teamEast") || objectsMap.get(userValue1).equals("teamWest")||
-					objectsMap.get(userValue0).equals("oppNorth") || objectsMap.get(userValue0).equals("oppSouth") || objectsMap.get(userValue0).equals("oppEast") || objectsMap.get(userValue0).equals("oppWest") ||
-					objectsMap.get(userValue1).equals("oppNorth") || objectsMap.get(userValue1).equals("oppSouth") || objectsMap.get(userValue1).equals("oppEast") || objectsMap.get(userValue1).equals("teamWest"))
+			if(objectsMap.get(userValue0).equals("teamNorth") || objectsMap.get(userValue0).equals("teamSouth") || objectsMap.get(userValue0).equals("teamEast") || objectsMap.get(userValue0).equals("teamWest") ||
+					objectsMap.get(userValue1).equals("teamNorth") || objectsMap.get(userValue1).equals("teamSouth") || objectsMap.get(userValue1).equals("teamEast") || objectsMap.get(userValue1).equals("teamWest")
+					//|| objectsMap.get(userValue0).equals("oppNorth") || objectsMap.get(userValue0).equals("oppSouth") || objectsMap.get(userValue0).equals("oppEast") || objectsMap.get(userValue0).equals("oppWest") 
+					//|| objectsMap.get(userValue1).equals("oppNorth") || objectsMap.get(userValue1).equals("oppSouth") || objectsMap.get(userValue1).equals("oppEast") || objectsMap.get(userValue1).equals("teamWest")
+					)
 				System.out.println(objectsMap.get(userValue0) + ";" + objectsMap.get(userValue1));
-				
-			Entity temp0 = null, temp1 = null;
+			
+			
+			btCollisionObject tempCollObj0 = collObjsValsMap.get(userValue0), tempCollObj1 = collObjsValsMap.get(userValue1);
+			Entity temp0 = collObjsInEntityMap.get(tempCollObj0), temp1 = collObjsInEntityMap.get(tempCollObj1);
+			
+			if(temp0 != null) {
+				temp0.collisionOccured(tempCollObj0, tempCollObj1);
+			}
+			if(temp1 != null) {
+				temp1.collisionOccured(tempCollObj1, tempCollObj0);
+			}
 			//GameObject tempObj = null;
-			//FIXME I think there is a way to achieve the same thing only with one iteration. Think it again and try to shorten the operations. It would be great!
-			ArrayList<Player> temp = new ArrayList<Player>();
+			/*ArrayList<Player> temp = new ArrayList<Player>();
 			temp.addAll(teammates);
 			temp.addAll(opponents);
 			
@@ -172,6 +181,9 @@ public class GameMap {
     InputController inputs;
     
     HashMap<Integer, String> objectsMap;
+    HashMap<btCollisionObject, Entity> collObjsInEntityMap;
+    HashMap<btCollisionObject, GameObject> collObjsInObjectMap;
+    HashMap<Integer, btCollisionObject> collObjsValsMap;
     
     //Current game properties
     int currentPlayerHoldTeam, currentPlayerHoldOpp;
@@ -196,6 +208,9 @@ public class GameMap {
 		contactListener = new ObjectContactListener();
 		
 		objectsMap = new HashMap<Integer, String>();
+		collObjsInEntityMap = new HashMap<btCollisionObject, Entity>();
+		collObjsInObjectMap = new HashMap<btCollisionObject, GameObject>();
+		collObjsValsMap = new HashMap<Integer, btCollisionObject>();		
 		
 		terrain = ObjectType.createGameObject(ObjectType.TERRAIN.getId(), this, 0, 0, 0);
 		for(btRigidBody co : terrain.getBodies()) {
@@ -208,21 +223,25 @@ public class GameMap {
 			co.setActivationState(Collision.DISABLE_DEACTIVATION);
 			
 			objectsMap.put(index, ObjectType.TERRAIN.getId());
+			collObjsInObjectMap.put(co, terrain);
+			collObjsValsMap.put(index, co);
 			
 			index++;
 		}
 		
 		for(btRigidBody co : terrain.getInvisBodies()) {
 			co.setUserValue(index);
-			//co.setCollisionFlags(co.getCollisionFlags() | btCollisionObject.CollisionFlags.CF_CUSTOM_MATERIAL_CALLBACK);
+			co.setCollisionFlags(co.getCollisionFlags());
 			dynamicsWorld.addRigidBody(co, GROUND_FLAG, ALL_FLAG);
 			//System.out.println(co.getUserValue());
 			co.setContactCallbackFlag(GROUND_FLAG);
 			co.setContactCallbackFilter(ENTITY_FLAG);
 			////System.out.println(co.getUserValue());
-			//co.setActivationState(Collision.WANTS_DEACTIVATION);
+			co.setActivationState(Collision.DISABLE_DEACTIVATION);
 			
-			objectsMap.put(index, ObjectType.TERRAIN.getId() + "Inv");
+			objectsMap.put(index, ObjectType.TERRAIN.getId());
+			collObjsInObjectMap.put(co, terrain);
+			collObjsValsMap.put(index, co);
 			
 			index++;
 		}
@@ -237,6 +256,8 @@ public class GameMap {
 			co.setContactCallbackFilter(GROUND_FLAG);
 			
 			objectsMap.put(index, ObjectType.CAMERA.getId());
+			collObjsInObjectMap.put(co, camera);
+			collObjsValsMap.put(index, co);
 			
 			index++;
 		}
@@ -251,6 +272,8 @@ public class GameMap {
 			co.setContactCallbackFilter(ENTITY_FLAG);
 			
 			objectsMap.put(index, ObjectType.HOMEBASKET.getId());
+			collObjsInObjectMap.put(co, basket1);
+			collObjsValsMap.put(index, co);
 			
 			index++;
 		}
@@ -267,6 +290,8 @@ public class GameMap {
 			//System.out.println(co.getContactCallbackFilter());
 			//System.out.println(co.getUserValue());
 			objectsMap.put(index, ObjectType.HOMEBASKET.getId() + "Obj");
+			collObjsInObjectMap.put(co, basket1);
+			collObjsValsMap.put(index, co);
 			
 			index++;
 			//dynamicsWorld.addRigidBody(co);
@@ -283,6 +308,8 @@ public class GameMap {
 			co.setContactCallbackFilter(ENTITY_FLAG);
 			
 			objectsMap.put(index, ObjectType.AWAYBASKET.getId());
+			collObjsInObjectMap.put(co, basket2);
+			collObjsValsMap.put(index, co);
 			
 			index++;
 		}
@@ -296,6 +323,8 @@ public class GameMap {
 			co.setContactCallbackFilter(ENT_SPECIAL_FLAG);
 			////System.out.println(co.getUserValue());
 			objectsMap.put(index, ObjectType.AWAYBASKET.getId() + "Obj");
+			collObjsInObjectMap.put(co, basket2);
+			collObjsValsMap.put(index, co);
 			
 			index++;
 			//dynamicsWorld.addRigidBody(co);
@@ -320,6 +349,8 @@ public class GameMap {
 			//System.out.println(co.getContactCallbackFilter());
 			
 			objectsMap.put(index, EntityType.BALL.getId());
+			collObjsInEntityMap.put(co, ball);
+			collObjsValsMap.put(index, co);
 
 			index++;
 		}
@@ -336,6 +367,8 @@ public class GameMap {
 			//System.out.println(co.getContactCallbackFilter());
 			//System.out.println(co.getUserValue());
 			objectsMap.put(index, EntityType.BALL.getId() + "Obj");
+			collObjsInEntityMap.put(co, ball);
+			collObjsValsMap.put(index, co);
 			
 			index++;
 		}
@@ -368,6 +401,9 @@ public class GameMap {
 					else {
 						objectsMap.put(index2, EntityType.TEAMMATE.getId() + "Hand");
 					}
+					
+					collObjsInEntityMap.put(co, teammate);
+					collObjsValsMap.put(index2, co);
 					//co.setContactCallbackFlag(PLAYER_FLAG);
 					//co.setContactCallbackFilter(ALL_FLAG);
 				//}else {
@@ -389,28 +425,28 @@ public class GameMap {
 					//co.setContactCallbackFilter(ENT_SPECIAL_FLAG);
 					
 					////System.out.println(co.getUserValue());
-					if(co.getUserIndex() == 1) {
+					if(co.getUserIndex() == 10) {
 						dynamicsWorld.addCollisionObject(co, ENT_SPECIAL_FLAG, SPECIAL_FLAG);
 						co.setContactCallbackFlag(ENT_SPECIAL_FLAG);
 						co.setContactCallbackFilter(SPECIAL_FLAG);
 						
 						objectsMap.put(index2, EntityType.TEAMMATE.getId() + "North");
 					}
-					else if(co.getUserIndex() == 2) {
+					else if(co.getUserIndex() == 20) {
 						dynamicsWorld.addCollisionObject(co, ENT_SPECIAL_FLAG, SPECIAL_FLAG);
 						co.setContactCallbackFlag(ENT_SPECIAL_FLAG);
 						co.setContactCallbackFilter(SPECIAL_FLAG);
 					
 						objectsMap.put(index2, EntityType.TEAMMATE.getId() + "South");
 					}
-					else if(co.getUserIndex() == 3) {
+					else if(co.getUserIndex() == 30) {
 						dynamicsWorld.addCollisionObject(co, ENT_SPECIAL_FLAG, SPECIAL_FLAG);
 						co.setContactCallbackFlag(ENT_SPECIAL_FLAG);
 						co.setContactCallbackFilter(SPECIAL_FLAG);
 						
 						objectsMap.put(index2, EntityType.TEAMMATE.getId() + "East");
 					}
-					else if(co.getUserIndex() == 4) {
+					else if(co.getUserIndex() == 40) {
 						dynamicsWorld.addCollisionObject(co, ENT_SPECIAL_FLAG, SPECIAL_FLAG);
 						co.setContactCallbackFlag(ENT_SPECIAL_FLAG);
 						co.setContactCallbackFilter(SPECIAL_FLAG);
@@ -424,6 +460,9 @@ public class GameMap {
 						
 						objectsMap.put(index2, EntityType.TEAMMATE.getId() + "Obj");
 					}
+					
+					collObjsInEntityMap.put(co, teammate);
+					collObjsValsMap.put(index2, co);
 					//co.setContactCallbackFlag(PLAYER_FLAG);
 					//co.setContactCallbackFilter(ALL_FLAG);
 				//}else {
@@ -474,6 +513,9 @@ public class GameMap {
 					else {
 						objectsMap.put(index2, EntityType.OPPONENT.getId() + "Hand");
 					}
+					
+					collObjsInEntityMap.put(co, opponent);
+					collObjsValsMap.put(index2, co);
 					//co.setContactCallbackFlag(PLAYER_FLAG);
 					//co.setContactCallbackFilter(ALL_FLAG);
 				//}else {
@@ -493,28 +535,28 @@ public class GameMap {
 					
 					
 					////System.out.println(co.getUserValue());
-					if(co.getUserIndex() == 1) {
+					if(co.getUserIndex() == 10) {
 						dynamicsWorld.addCollisionObject(co, ENT_SPECIAL_FLAG, SPECIAL_FLAG);
 						co.setContactCallbackFlag(ENT_SPECIAL_FLAG);
 						co.setContactCallbackFilter(SPECIAL_FLAG);
 						
 						objectsMap.put(index2, EntityType.OPPONENT.getId() + "North");
 					}
-					else if(co.getUserIndex() == 2) {
+					else if(co.getUserIndex() == 20) {
 						dynamicsWorld.addCollisionObject(co, ENT_SPECIAL_FLAG, SPECIAL_FLAG);
 						co.setContactCallbackFlag(ENT_SPECIAL_FLAG);
 						co.setContactCallbackFilter(SPECIAL_FLAG);
 					
 						objectsMap.put(index2, EntityType.OPPONENT.getId() + "South");
 					}
-					else if(co.getUserIndex() == 3) {
+					else if(co.getUserIndex() == 30) {
 						dynamicsWorld.addCollisionObject(co, ENT_SPECIAL_FLAG, SPECIAL_FLAG);
 						co.setContactCallbackFlag(ENT_SPECIAL_FLAG);
 						co.setContactCallbackFilter(SPECIAL_FLAG);
 						
 						objectsMap.put(index2, EntityType.OPPONENT.getId() + "East");
 					}
-					else if(co.getUserIndex() == 4) {
+					else if(co.getUserIndex() == 40) {
 						dynamicsWorld.addCollisionObject(co, ENT_SPECIAL_FLAG, SPECIAL_FLAG);
 						co.setContactCallbackFlag(ENT_SPECIAL_FLAG);
 						co.setContactCallbackFilter(SPECIAL_FLAG);
@@ -529,6 +571,8 @@ public class GameMap {
 						objectsMap.put(index2, EntityType.OPPONENT.getId() + "Obj");
 					}
 				
+					collObjsInEntityMap.put(co, opponent);
+					collObjsValsMap.put(index2, co);
 					//co.setContactCallbackFlag(PLAYER_FLAG);
 					//co.setContactCallbackFilter(ALL_FLAG);
 				//}else {
@@ -595,7 +639,8 @@ public class GameMap {
 		camera.setWorldTransform(new Matrix4(mainPlayer.getModelInstance().transform).mul(mainPlayer.getCamMatrix()).mul(new Matrix4().setToTranslation(0, mainPlayer.getHeight(), -10)));
 		
 		float delta2 = Math.min(1f / 30f, delta);
-		dynamicsWorld.stepSimulation(delta2, 15, 1f / 60f);
+		for(int i = 0; i < 6; i++)
+			dynamicsWorld.stepSimulation(delta2/6, 15, 1f / 60f);
 		/*ball.getBody().getWorldTransform(ball.getModelInstance().transform);
 		for(Entity e : players) {
 			e.getBody().getWorldTransform(e.getModelInstance().transform);
@@ -686,24 +731,30 @@ public class GameMap {
 	private void disposePlayers() {
 		//if(teammates != null)
 		for(Player e : teammates) {
-			for(btRigidBody co : e.getBodies())
-			//dynamicsWorld.removeCollisionObject(co);
-			dynamicsWorld.removeRigidBody(co);
+			for(btRigidBody co : e.getBodies()) {
+				dynamicsWorld.removeRigidBody(co);
+				collObjsInEntityMap.remove(co);
+			}
 			
-			for(btCollisionObject co : e.getCollisionObjects())
+			for(btCollisionObject co : e.getCollisionObjects()) {
 				dynamicsWorld.removeCollisionObject(co);
+				collObjsInEntityMap.remove(co);
+			}
 			
 			e.dispose();
 		}
 		
 		//if(opponents != null)
 			for(Player e : opponents) {
-				for(btRigidBody co : e.getBodies())
-				//dynamicsWorld.removeCollisionObject(co);
-				dynamicsWorld.removeRigidBody(co);
+				for(btRigidBody co : e.getBodies()) {
+					dynamicsWorld.removeRigidBody(co);
+					collObjsInEntityMap.remove(co);
+				}
 				
-				for(btCollisionObject co : e.getCollisionObjects())
+				for(btCollisionObject co : e.getCollisionObjects()) {
 					dynamicsWorld.removeCollisionObject(co);
+					collObjsInEntityMap.remove(co);
+				}
 				
 				e.dispose();
 			}
@@ -876,7 +927,7 @@ public class GameMap {
 		return null;
 	}*/
 	
-	private btCollisionObject getCollObjByUserValueAndGameObj(GameObject e, int userValue) {
+	/*private btCollisionObject getCollObjByUserValueAndGameObj(GameObject e, int userValue) {
 		for(btCollisionObject obj : e.getBodies()) {
 			if(obj.getUserValue() == userValue) {
 				//System.out.println("Returned " + userValue);
@@ -912,7 +963,7 @@ public class GameMap {
 		}
 		
 		return null;
-	}
+	}*/
 	
 	public btDynamicsWorld getDynamicsWorld() {
 		return dynamicsWorld;

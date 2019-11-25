@@ -33,6 +33,7 @@ import com.gamesbg.bkbl.gamespace.tools.CustomAnimation;
 import com.gamesbg.bkbl.gamespace.entities.players.Opponent;
 import com.gamesbg.bkbl.gamespace.entities.players.Teammate;
 import com.gamesbg.bkbl.gamespace.entities.players.ai.*;
+import com.gamesbg.bkbl.gamespace.objects.ObjectType;
 
 public abstract class Player extends Entity {
 
@@ -69,7 +70,7 @@ public abstract class Player extends Entity {
 	static final float scale7 = 0.315f;
 	static final float handPercentage = 0.4f;
 	
-	static final float poleScale = 3;
+	static float poleScale;
 	
 	static final float dribbleSpeed = 0.1f;
 	
@@ -84,6 +85,7 @@ public abstract class Player extends Entity {
 	boolean leftHandInWorld, rightHandInWorld;
 	boolean downBody;
 	boolean northSurround, southSurround, eastSurround, westSurround;
+	boolean northObstacle, southObstacle, eastObstacle, westObstacle;
 	
 	int shootingPower = 10;
 	int cycleTimeout;
@@ -93,6 +95,8 @@ public abstract class Player extends Entity {
 	@Override
 	public void create(EntityType type, GameMap map, Vector3 pos) {
 		super.create(type, map, pos);
+		
+		poleScale = 2.5f;
 		
 		armLController = new AnimationController(modelInstance);
 		armRController = new AnimationController(modelInstance);
@@ -885,28 +889,28 @@ public abstract class Player extends Entity {
 		collObjMap.put("poleNObj", poleNObj);
 		collisionObjects.add(poleNObj);
 		manualSetTransformsObj.add(poleNObj);
-		poleNObj.setUserIndex(1);
+		poleNObj.setUserIndex(10);
 		
 		btCollisionObject poleSObj = new btCollisionObject();
 		poleSObj.setCollisionShape(invisCollShapes.get(3));
 		collObjMap.put("poleSObj", poleSObj);
 		collisionObjects.add(poleSObj);
 		manualSetTransformsObj.add(poleSObj);
-		poleSObj.setUserIndex(2);
+		poleSObj.setUserIndex(20);
 		
 		btCollisionObject poleEObj = new btCollisionObject();
 		poleEObj.setCollisionShape(invisCollShapes.get(4));
 		collObjMap.put("poleEObj", poleEObj);
 		collisionObjects.add(poleEObj);
 		manualSetTransformsObj.add(poleEObj);
-		poleEObj.setUserIndex(3);
+		poleEObj.setUserIndex(30);
 		
 		btCollisionObject poleWObj = new btCollisionObject();
 		poleWObj.setCollisionShape(invisCollShapes.get(5));
 		collObjMap.put("poleWObj", poleWObj);
 		collisionObjects.add(poleWObj);
 		manualSetTransformsObj.add(poleWObj);
-		poleWObj.setUserIndex(4);
+		poleWObj.setUserIndex(40);
 	}
 	
 	private void removeCollisionCheckOnInternals() {
@@ -955,9 +959,9 @@ public abstract class Player extends Entity {
 		super.setCollisionTransform();
 		
 		collObjMap.get("poleNObj").setWorldTransform(calcTransformFromNodesTransform(new Matrix4().set(new Vector3(-poleScale / 2, poleScale / 2, getDepth() / 2), new Quaternion())));
-		collObjMap.get("poleSObj").setWorldTransform(calcTransformFromNodesTransform(new Matrix4().translate(-poleScale / 2, poleScale / 2, -getDepth() / 2 - poleScale)));
-		collObjMap.get("poleEObj").setWorldTransform(calcTransformFromNodesTransform(new Matrix4().translate(getWidth() / 2, poleScale / 2, -poleScale / 2)));
-		collObjMap.get("poleWObj").setWorldTransform(calcTransformFromNodesTransform(new Matrix4().translate(-getWidth() / 2 - poleScale, poleScale / 2, -poleScale / 2)));
+		collObjMap.get("poleSObj").setWorldTransform(calcTransformFromNodesTransform(new Matrix4().set(new Vector3(-poleScale / 2, poleScale / 2, -getDepth() / 2 - poleScale), new Quaternion())));
+		collObjMap.get("poleEObj").setWorldTransform(calcTransformFromNodesTransform(new Matrix4().set(new Vector3(-getWidth() / 2 - poleScale, poleScale / 2, -poleScale / 2), new Quaternion())));
+		collObjMap.get("poleWObj").setWorldTransform(calcTransformFromNodesTransform(new Matrix4().set(new Vector3(getWidth() / 2, poleScale / 2, -poleScale / 2), new Quaternion())));
 	}
 	
 	/**
@@ -1391,6 +1395,7 @@ public abstract class Player extends Entity {
 						
 						
 						//Setting the ball's velocity
+						//float yVel = map.getBall().getMainBody().getLinearVelocity().y;
 						Vector3 tempVelVec = makeBallDribbleVelocity(left);
 						tempVelVec.y = map.getBall().getMainBody().getLinearVelocity().y;
 						
@@ -1492,7 +1497,22 @@ public abstract class Player extends Entity {
 		return target.cpy().sub(modelInstance.transform.getTranslation(new Vector3()));
 	}
 	
-	public Vector3 roamAround(Matrix4 target, Matrix4 block, float xDist, float zDist, boolean forceSprint) {
+	public void lookAt(Vector3 target) {
+		//target.scl(-180);
+		//Quaternion temp = new Quaternion().setFromCross(position.crs(Vector3.Z).nor(), direction);
+		//temp.setEulerAngles(temp.getYaw(), 0, 0);
+		//modelInstance.transform.set(modelInstance.transform.getTranslation(new Vector3()), temp);
+		
+		//turnY(direction.cpy().sub(position.nor().unrotate(new Matrix4().sett.setToRotation(new Quaternion().set(position, 180)))).x);
+		Matrix4 tempTrans = modelInstance.transform.cpy();
+		//modelInstance.transform.setToRotation(target, new Vector3()).translate(tempTrans.getTranslation(new Vector3()));
+		Quaternion tempQ = new Quaternion();//Try the opposite way of transforming quaternion to vector3 (flip the transform method)
+		modelInstance.transform.set(tempTrans.getTranslation(new Vector3()), tempQ);
+		
+		setCollisionTransform();
+	}
+	
+	public Vector3 roamAround(Matrix4 target, Matrix4 block, float xDist, float zDist, boolean forceSprint, boolean forceWalk) {
 		//The point's trans where the player should go to
 		Matrix4 temp = target.cpy().mul(new Matrix4().setToTranslation(xDist, 0, zDist));
 		
@@ -1513,7 +1533,7 @@ public abstract class Player extends Entity {
 		float xDiff = diffDist.x;
 		float zDiff = diffDist.z;
 		diffWalk.nor().scl(Gdx.graphics.getDeltaTime());
-		if(forceSprint || (Math.abs(xDiff) + Math.abs(zDiff) > xDist + zDist + 6))
+		if(!forceWalk && forceSprint || (Math.abs(xDiff) + Math.abs(zDiff) > xDist + zDist + 6))
 			run(diffWalk);
 		else if(Math.abs(xDiff) > Math.abs(xDist) + 0.5f || Math.abs(zDiff) > Math.abs(zDist) + 0.5f)
 			walk(diffWalk);
@@ -1531,12 +1551,12 @@ public abstract class Player extends Entity {
 		//thisVec.z = Math.abs(thisVec.z);
 		
 		Vector3 rotVec = targetVec.cpy().sub(thisVec).nor();
-		rotVec.y = 0;
+		//rotVec.y = 0;
 		//rotVec.scl(Gdx.graphics.getDeltaTime());
-		Quaternion tempQuat = new Quaternion().set(rotVec, 180);
-		tempQuat.setEulerAngles(tempQuat.getYaw(), 0, 0);
+		//Quaternion tempQuat = new Quaternion().set(rotVec, 180);
+		//tempQuat.setEulerAngles(tempQuat.getYaw(), 0, 0);
 		
-		turnY(tempQuat.getYaw() * Gdx.graphics.getDeltaTime());
+		lookAt(tempVec);
 		//tempQuat.x = 0; 
 		//tempQuat.z = 0;
 		// tempQuat.x = tempQuat.z = 0;
@@ -1869,7 +1889,8 @@ public abstract class Player extends Entity {
 		
 		prevTrans = modelInstance.transform.cpy();
 		
-		System.out.println("Surround" + northSurround + ";" + southSurround + ";" + eastSurround + ";" + westSurround);
+		if(this instanceof Opponent && (northSurround || southSurround || eastSurround || westSurround))
+			System.out.println("Surround" + northSurround + ";" + southSurround + ";" + eastSurround + ";" + westSurround);
 	}
 
 	public Matrix4 getCamMatrix() {
@@ -1919,7 +1940,9 @@ public abstract class Player extends Entity {
 	public void collisionOccured(btCollisionObject objInside, btCollisionObject objOutside) {
 		super.collisionOccured(objInside, objOutside);
 		
-		if(map.getObjectsMap().get(objOutside.getUserValue()).equals(EntityType.BALL.getId()) || map.getObjectsMap().get(objOutside.getUserValue()).equals(EntityType.BALL.getId() + "Obj")) {	
+		String outId = map.getObjectsMap().get(objOutside.getUserValue());
+		
+		if(outId.equals(EntityType.BALL.getId()) || outId.equals(EntityType.BALL.getId() + "Obj")) {	
 			ballColl = true;
 			if(objInside.equals(collObjMap.get("handL")))
 				leftHandBall = true;
@@ -1931,7 +1954,7 @@ public abstract class Player extends Entity {
 				//if(map.getObjectsMap().get(objOutside.getUserValue()).equals(ObjectType.TERRAIN.getId() + "Inv"))
 					//walking = running = false;
 			//}
-		}if(map.getObjectsMap().get(objOutside.getUserValue()).equals(EntityType.TEAMMATE + "Obj") || map.getObjectsMap().get(objOutside.getUserValue()).equals(EntityType.OPPONENT + "Obj")) {
+		}else if(outId.equals(EntityType.TEAMMATE.getId() + "Obj") || outId.equals(EntityType.OPPONENT.getId() + "Obj")) {
 			if(objInside.equals(collObjMap.get("poleNObj")))
 				northSurround = true;
 			else if(objInside.equals(collObjMap.get("poleSObj")))
@@ -1940,6 +1963,16 @@ public abstract class Player extends Entity {
 				eastSurround = true;
 			else if(objInside.equals(collObjMap.get("poleWObj")))
 				westSurround = true;
+		}
+		else if(outId.equals(ObjectType.HOMEBASKET.getId()) || outId.equals(ObjectType.AWAYBASKET.getId()) || objOutside instanceof btRigidBody && (outId.contains(EntityType.TEAMMATE.getId()) || outId.contains(EntityType.OPPONENT.getId()))){
+			if(objInside.equals(collObjMap.get("poleNObj")))
+				northObstacle = true;
+			else if(objInside.equals(collObjMap.get("poleSObj")))
+				southObstacle = true;
+			else if(objInside.equals(collObjMap.get("poleEObj")))
+				eastObstacle = true;
+			else if(objInside.equals(collObjMap.get("poleWObj")))
+				westObstacle = true;
 		}
 	}
 	
@@ -1961,6 +1994,10 @@ public abstract class Player extends Entity {
 		southSurround = false;
 		eastSurround = false;
 		westSurround = false;
+		northObstacle = false;
+		southObstacle = false;
+		eastObstacle = false;
+		westObstacle = false;
 	}
 	
 	public Matrix4 getShoulderLTrans() {
@@ -2012,6 +2049,38 @@ public abstract class Player extends Entity {
 		return rightHoldingBall;
 	}
 	
+	public boolean isNorthSurround() {
+		return northSurround;
+	}
+
+	public boolean isSouthSurround() {
+		return southSurround;
+	}
+
+	public boolean isEastSurround() {
+		return eastSurround;
+	}
+
+	public boolean isWestSurround() {
+		return westSurround;
+	}
+	
+	public boolean isNorthObstacle() {
+		return northObstacle;
+	}
+
+	public boolean isSouthObstacle() {
+		return southObstacle;
+	}
+	
+	public boolean isEastObstacle() {
+		return eastObstacle;
+	}
+	
+	public boolean isWestObstacle() {
+		return westObstacle;
+	}
+
 	public boolean isMainPlayer() {
 		return map.getMainPlayer().equals(this);
 	}
