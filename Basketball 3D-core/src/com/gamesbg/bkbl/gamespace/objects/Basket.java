@@ -246,7 +246,7 @@ public abstract class Basket extends GameObject {
 		
 		//Matrix4 temp = calcTransformFromNodesTransform(modelInstance.getNode("basket1").globalTransform);
 		//Matrix4 temp2 = new Matrix4().set(temp.cpy().getTranslation(new Vector3()).add(0, 0, -(tabCentW / 2 + bkHoldW / 2) * z / Math.abs(z)), temp.getRotation(new Quaternion()));
-		collisionObjects.get(0).setWorldTransform(calcTransformFromNodesTransform(modelInstance.getNode("basket1").globalTransform.trn(0, 0, -tabCentW / 2)));
+		collisionObjects.get(0).setWorldTransform(calcTransformFromNodesTransform(modelInstance.getNode("basket1").globalTransform.cpy().trn(0, 0, -tabCentW / 2)));
 		collisionObjects.get(1).setWorldTransform(calcTransformFromNodesTransform(new Matrix4().setToTranslation(0, 17 / 2, -17 / 2)));
 		
 	}
