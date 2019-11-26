@@ -282,14 +282,21 @@ public class GameMap {
 			co.setUserValue(index);
 			co.setCollisionFlags(co.getCollisionFlags() | btCollisionObject.CollisionFlags.CF_CUSTOM_MATERIAL_CALLBACK);
 			//System.out.println(co.getUserValue());
-			dynamicsWorld.addCollisionObject(co, SPECIAL_FLAG, ENT_SPECIAL_FLAG);
-			co.setContactCallbackFlag(SPECIAL_FLAG);
-			co.setContactCallbackFilter(ENT_SPECIAL_FLAG);
+			if(co.getUserIndex() == 2) {
+				dynamicsWorld.addCollisionObject(co, ENT_SPECIAL_FLAG, SPECIAL_FLAG);
+				co.setContactCallbackFlag(ENT_SPECIAL_FLAG);
+				co.setContactCallbackFilter(SPECIAL_FLAG);
+				objectsMap.put(index, ObjectType.HOMEBASKET.getId() + "Zone");
+			}else {
+				dynamicsWorld.addCollisionObject(co, SPECIAL_FLAG, ENT_SPECIAL_FLAG);
+				co.setContactCallbackFlag(SPECIAL_FLAG);
+				co.setContactCallbackFilter(ENT_SPECIAL_FLAG);
+				objectsMap.put(index, ObjectType.HOMEBASKET.getId() + "Obj");
+			}
 
 			//System.out.println(co.getContactCallbackFlag());
 			//System.out.println(co.getContactCallbackFilter());
 			//System.out.println(co.getUserValue());
-			objectsMap.put(index, ObjectType.HOMEBASKET.getId() + "Obj");
 			collObjsInObjectMap.put(co, basket1);
 			collObjsValsMap.put(index, co);
 			
@@ -318,11 +325,18 @@ public class GameMap {
 			co.setUserValue(index);
 			co.setCollisionFlags(co.getCollisionFlags() | btCollisionObject.CollisionFlags.CF_CUSTOM_MATERIAL_CALLBACK);
 			//System.out.println(co.getUserValue());
-			dynamicsWorld.addCollisionObject(co, SPECIAL_FLAG, ENT_SPECIAL_FLAG);
-			co.setContactCallbackFlag(SPECIAL_FLAG);
-			co.setContactCallbackFilter(ENT_SPECIAL_FLAG);
-			////System.out.println(co.getUserValue());
-			objectsMap.put(index, ObjectType.AWAYBASKET.getId() + "Obj");
+			if(co.getUserIndex() == 2) {
+				dynamicsWorld.addCollisionObject(co, ENT_SPECIAL_FLAG, SPECIAL_FLAG);
+				co.setContactCallbackFlag(ENT_SPECIAL_FLAG);
+				co.setContactCallbackFilter(SPECIAL_FLAG);
+				objectsMap.put(index, ObjectType.AWAYBASKET.getId() + "Zone");
+			}else {
+				dynamicsWorld.addCollisionObject(co, SPECIAL_FLAG, ENT_SPECIAL_FLAG);
+				co.setContactCallbackFlag(SPECIAL_FLAG);
+				co.setContactCallbackFilter(ENT_SPECIAL_FLAG);
+				objectsMap.put(index, ObjectType.AWAYBASKET.getId() + "Obj");
+			}
+			
 			collObjsInObjectMap.put(co, basket2);
 			collObjsValsMap.put(index, co);
 			
@@ -1017,6 +1031,14 @@ public class GameMap {
 	
 	public GameObject getTerrain() {
 		return terrain;
+	}
+	
+	public GameObject getHomeBasket() {
+		return basket1;
+	}
+	
+	public GameObject getAwayBasket() {
+		return basket2;
 	}
 	
 	public GameObject getCamera() {

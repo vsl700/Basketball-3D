@@ -10,10 +10,11 @@ import com.badlogic.gdx.math.Vector3;
 import com.gamesbg.bkbl.gamespace.entities.Player;
 import com.gamesbg.bkbl.gamespace.entities.players.Opponent;
 import com.gamesbg.bkbl.gamespace.entities.players.Teammate;
+import com.gamesbg.bkbl.gamespace.objects.GameObject;
 
 public enum PlayerState implements State<Player> {
 	BALL_IN_HAND() {
-		float time, aimingTime;
+		float time, aimingTime, shootTime, switchHandTime;
 
 		@Override
 		public void update(Player player) {
@@ -22,6 +23,29 @@ public enum PlayerState implements State<Player> {
 			if(!player.getStateMachine().isInState(BALL_IN_HAND) || player.isShooting())
 				return;
 
+			//Walking & running mechanism
+			GameObject basket;
+			if(player instanceof Teammate)
+				basket = player.getMap().getAwayBasket();
+			else basket = player.getMap().getHomeBasket();
+			
+			//We use this if just for the aim & shoot starter. The if below continues it.
+			if(player.isInAwayBasketZone() && aimingTime == 0) {
+				player.lookAt(basket.getMainTrans().getTranslation(new Vector3()));
+				
+				player.interactWithBallS();
+				aimingTime+= Gdx.graphics.getDeltaTime();
+				
+				return;
+			}
+			else {
+				player.roamAround(basket.getMainTrans(), null, 5, 5, false, false);
+				if (player.isEastObstacle()) {
+
+				}
+			}
+			
+			//Ball behavior mechanism
 			if (aimingTime > 0 && aimingTime < 1.25f) {
 				player.interactWithBallS();
 				aimingTime += Gdx.graphics.getDeltaTime();
@@ -30,16 +54,15 @@ public enum PlayerState implements State<Player> {
 				aimingTime = 0;
 				ballJustShot = true;
 				int sides = 0;
+				// We don't need south (which is the back of the player)
 				if (player.isNorthSurround())
-					sides++;
-				if (player.isSouthSurround())
 					sides++;
 				if (player.isEastSurround())
 					sides++;
 				if (player.isWestSurround())
 					sides++;
 
-				if (sides > 2) {
+				if (sides > 2 && player.getMap().getTeammates().size() > 1) {
 					ArrayList<Player> tempTeam;
 					if (player instanceof Teammate)
 						tempTeam = player.getMap().getTeammates();
@@ -50,28 +73,30 @@ public enum PlayerState implements State<Player> {
 
 					Vector3 tempTeamVec = getShortestDistance(playerVec, tempTeam).nor();
 
-					player.lookAt(tempTeamVec);
-
-					//player.interactWithBallS();
-					//aimingTime += Gdx.graphics.getDeltaTime();
-
+					if(shootTime > 2) {
+						player.lookAt(tempTeamVec);
+						
+						player.interactWithBallS();
+						aimingTime += Gdx.graphics.getDeltaTime();
+						shootTime = 0;
+					}
+					shootTime+= Gdx.graphics.getDeltaTime();
 				}
 
-				else /*if (player.isNorthSurround()) {
-					if (player.isEastSurround())
-						player.turnY(210 * Gdx.graphics.getDeltaTime());
-					else if (player.isWestSurround())
-						player.turnY(-210 * Gdx.graphics.getDeltaTime());
-				} else*/ if (player.isEastSurround()) {// We don't need south (which is the back of the player)
+				else if (player.isEastSurround()) {
 					player.turnY(210 * Gdx.graphics.getDeltaTime());
 					
-					if (player.rightHolding())
+					if (player.rightHolding() && switchHandTime > 0.75f) {
 						player.interactWithBallL();
+						switchHandTime = 0;
+					}
 				} else if (player.isWestSurround()) {
 					player.turnY(-210 * Gdx.graphics.getDeltaTime());
 					
-					if (player.leftHolding())
+					if (player.leftHolding() && switchHandTime > 0.75f) {
 						player.interactWithBallR();
+						switchHandTime = 0;
+					}
 				} else if (time > 0.75f) {
 					if (player.leftHolding())
 						player.interactWithBallL();
@@ -82,8 +107,13 @@ public enum PlayerState implements State<Player> {
 				}else
 					time += Gdx.graphics.getDeltaTime();
 			}
-
+			
+			switchHandTime+= Gdx.graphics.getDeltaTime();
+			
+			
+			
 		}
+		
 	},
 	
 	BALL_CHASING(){

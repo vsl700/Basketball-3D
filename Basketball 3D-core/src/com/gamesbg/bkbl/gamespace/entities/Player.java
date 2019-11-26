@@ -86,6 +86,7 @@ public abstract class Player extends Entity {
 	boolean downBody;
 	boolean northSurround, southSurround, eastSurround, westSurround;
 	boolean northObstacle, southObstacle, eastObstacle, westObstacle;
+	boolean inBasketZone;
 	
 	int shootingPower = 10;
 	int cycleTimeout;
@@ -958,10 +959,10 @@ public abstract class Player extends Entity {
 	public void setCollisionTransform() {
 		super.setCollisionTransform();
 		
-		collObjMap.get("poleNObj").setWorldTransform(calcTransformFromNodesTransform(new Matrix4().set(new Vector3(-poleScale / 2, poleScale / 2, getDepth() / 2), new Quaternion())));
-		collObjMap.get("poleSObj").setWorldTransform(calcTransformFromNodesTransform(new Matrix4().set(new Vector3(-poleScale / 2, poleScale / 2, -getDepth() / 2 - poleScale), new Quaternion())));
-		collObjMap.get("poleEObj").setWorldTransform(calcTransformFromNodesTransform(new Matrix4().set(new Vector3(-getWidth() / 2 - poleScale, poleScale / 2, -poleScale / 2), new Quaternion())));
-		collObjMap.get("poleWObj").setWorldTransform(calcTransformFromNodesTransform(new Matrix4().set(new Vector3(getWidth() / 2, poleScale / 2, -poleScale / 2), new Quaternion())));
+		collObjMap.get("poleNObj").setWorldTransform(calcTransformFromNodesTransform(new Matrix4().set(new Vector3(0, poleScale / 2, getDepth() / 2 + poleScale / 2), new Quaternion())));
+		collObjMap.get("poleSObj").setWorldTransform(calcTransformFromNodesTransform(new Matrix4().set(new Vector3(0, poleScale / 2, -getDepth() / 2 - poleScale / 2), new Quaternion())));
+		collObjMap.get("poleEObj").setWorldTransform(calcTransformFromNodesTransform(new Matrix4().set(new Vector3(-poleScale, poleScale / 2, 0), new Quaternion())));//W and E sizes are multiplied by 2
+		collObjMap.get("poleWObj").setWorldTransform(calcTransformFromNodesTransform(new Matrix4().set(new Vector3(poleScale, poleScale / 2, 0), new Quaternion())));
 	}
 	
 	/**
@@ -1498,16 +1499,15 @@ public abstract class Player extends Entity {
 	}
 	
 	public void lookAt(Vector3 target) {
-		//target.scl(-180);
-		//Quaternion temp = new Quaternion().setFromCross(position.crs(Vector3.Z).nor(), direction);
-		//temp.setEulerAngles(temp.getYaw(), 0, 0);
-		//modelInstance.transform.set(modelInstance.transform.getTranslation(new Vector3()), temp);
+		Vector3 thisVec = modelInstance.transform.getTranslation(new Vector3());
 		
-		//turnY(direction.cpy().sub(position.nor().unrotate(new Matrix4().sett.setToRotation(new Quaternion().set(position, 180)))).x);
-		Matrix4 tempTrans = modelInstance.transform.cpy();
-		//modelInstance.transform.setToRotation(target, new Vector3()).translate(tempTrans.getTranslation(new Vector3()));
-		Quaternion tempQ = new Quaternion();//Try the opposite way of transforming quaternion to vector3 (flip the transform method)
-		modelInstance.transform.set(tempTrans.getTranslation(new Vector3()), tempQ);
+		Vector3 rotVec = target.cpy().sub(thisVec).nor();
+		
+		Quaternion quat = new Quaternion();
+		modelInstance.transform.cpy().setToLookAt(rotVec, new Vector3(0, -1, 0)).getRotation(quat);
+		quat.setEulerAngles(quat.getYaw(), 0, 0);
+		
+		modelInstance.transform.set(thisVec, quat).rotate(0, 1, 0, 180);
 		
 		setCollisionTransform();
 	}
@@ -1546,40 +1546,17 @@ public abstract class Player extends Entity {
 		//targetVec.z = Math.abs(targetVec.z);
 		
 		Vector3 thisVec = modelInstance.transform.getTranslation(new Vector3());
-		Vector3 thisRot = modelInstance.transform.getRotation(new Quaternion()).transform(new Vector3());
 		//thisVec.x = Math.abs(thisVec.x);
 		//thisVec.y = Math.abs(thisVec.y);
 		//thisVec.z = Math.abs(thisVec.z);
 		
 		Vector3 rotVec = tempVec.cpy().sub(thisVec).nor();
-		//rotVec.y = 0;
-		//rotVec.scl(Gdx.graphics.getDeltaTime());
-		//Quaternion tempQuat = new Quaternion().set(rotVec, 180);
-		//tempQuat.setEulerAngles(tempQuat.getYaw(), 0, 0);
 		
-		//lookAt(tempVec);
-		
-		Matrix4 tempTr = modelInstance.transform.cpy().mul(new Matrix4().setToTranslation(tempVec));
-		
-		
-		//modelInstance.transform.set(thisVec, new Quaternion());
-		//Vector3 v = thisRot.sub(tempVec).nor().scl(180);
-		//System.out.println(v.x + ";" + v.z);
-		//float differ = v.x;
-		//turnY(differ);
-		//rotVec.scl(180);
-		//System.out.println(rotVec.x);
 		Quaternion quat = new Quaternion();
 		modelInstance.transform.cpy().setToLookAt(rotVec, new Vector3(0, -1, 0)).getRotation(quat);
 		quat.setEulerAngles(quat.getYaw(), 0, 0);
 		
 		modelInstance.transform.set(thisVec, quat).rotate(0, 1, 0, 180);
-		
-		//tempQuat.x = 0; 
-		//tempQuat.z = 0;
-		// tempQuat.x = tempQuat.z = 0;
-		//modelInstance.transform.set(modelInstance.transform.getTranslation(new Vector3()), tempQuat);
-		//modelInstance.transform.setToLookAt(thisVec, tempVec, new Vector3(0, 0, 1)).trn(thisVec).rotate(modelInstance.transform.getRotation(new Quaternion()));
 			
 		return diffWalk;
 	}
@@ -1991,6 +1968,8 @@ public abstract class Player extends Entity {
 				eastObstacle = true;
 			else if(objInside.equals(collObjMap.get("poleWObj")))
 				westObstacle = true;
+		}else if(this instanceof Opponent && outId.equals(ObjectType.HOMEBASKET.getId() + "Zone") || this instanceof Teammate && outId.equals(ObjectType.AWAYBASKET.getId() + "Zone")) {
+			inBasketZone = true;
 		}
 	}
 	
@@ -2016,6 +1995,7 @@ public abstract class Player extends Entity {
 		southObstacle = false;
 		eastObstacle = false;
 		westObstacle = false;
+		inBasketZone = false;
 	}
 	
 	public Matrix4 getShoulderLTrans() {
@@ -2059,6 +2039,10 @@ public abstract class Player extends Entity {
 		return leftThrowBall || rightThrowBall;
 	}
 	
+	public boolean isPointing() {
+		return leftPointBall || rightPointBall;
+	}
+	
 	public boolean leftHolding() {
 		return leftHoldingBall;
 	}
@@ -2097,6 +2081,10 @@ public abstract class Player extends Entity {
 	
 	public boolean isWestObstacle() {
 		return westObstacle;
+	}
+	
+	public boolean isInAwayBasketZone() {
+		return inBasketZone;
 	}
 
 	public boolean isMainPlayer() {

@@ -7,7 +7,6 @@ import com.badlogic.gdx.graphics.g3d.Model;
 import com.badlogic.gdx.graphics.g3d.ModelBatch;
 import com.badlogic.gdx.graphics.g3d.ModelInstance;
 import com.badlogic.gdx.math.Matrix4;
-import com.badlogic.gdx.math.Quaternion;
 import com.badlogic.gdx.math.Vector3;
 import com.badlogic.gdx.physics.bullet.collision.btCollisionObject;
 import com.badlogic.gdx.physics.bullet.collision.btCollisionShape;
@@ -39,7 +38,7 @@ public abstract class GameObject {
 	protected int mainBodyIndex;
 	
 	protected float x, y, z;
-	protected float rX, rY, rZ, rA;
+	//protected float rX, rY, rZ, rA;
 	
 	public void create(ObjectType type, GameMap map, float x, float y, float z) {
 		this.type = type;
@@ -134,7 +133,7 @@ public abstract class GameObject {
 	}
 	
 	protected Matrix4 calcTransformFromNodesTransform(Matrix4 nodeTrans) {
-		return new Matrix4().set(nodeTrans.cpy().setToTranslation(nodeTrans.getTranslation(new Vector3()).add(modelInstance.transform.getTranslation(new Vector3()))).getTranslation(new Vector3()), new Quaternion().setFromAxis(rX, rY, rZ, rA));
+		return modelInstance.transform.cpy().mul(nodeTrans);
 	}
 	
 	/*protected Matrix4 calcBodiesAndObjectsTransform(Matrix4 nodeTrans) {
@@ -228,12 +227,7 @@ public abstract class GameObject {
 	public void setRotation(float x, float y, float z, float angle) {
 		modelInstance.transform.rotate(x, y, z, angle);
 		
-		rX = x;
-		rY = y;
-		rZ = z;
-		rA = angle;
-		
-		setCollisions();
+		//setCollisions();
 		
 	}
 

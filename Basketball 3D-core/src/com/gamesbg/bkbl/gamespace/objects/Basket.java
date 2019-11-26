@@ -13,7 +13,6 @@ import com.badlogic.gdx.graphics.g3d.utils.ModelBuilder;
 import com.badlogic.gdx.graphics.g3d.utils.shapebuilders.BoxShapeBuilder;
 import com.badlogic.gdx.graphics.g3d.utils.shapebuilders.CylinderShapeBuilder;
 import com.badlogic.gdx.math.Matrix4;
-import com.badlogic.gdx.math.Quaternion;
 import com.badlogic.gdx.math.Vector3;
 import com.badlogic.gdx.physics.bullet.collision.btBoxShape;
 import com.badlogic.gdx.physics.bullet.collision.btCollisionObject;
@@ -154,6 +153,7 @@ public abstract class Basket extends GameObject {
 		visibleCollShapes.add(new btBoxShape(bk24));
 		
 		invisibleCollShapes.add(new btBoxShape(new Vector3(tabCentW / 2, bkHoldW / 2, tabCentW / 2)));
+		invisibleCollShapes.add(new btCylinderShape(new Vector3(17, standH / 2, 17)));
 		
 		/*collisionObjects.add(new btCollisionObject());
 		collisionObjects.get(0).setCollisionShape(collisionShapes.get(0));
@@ -185,12 +185,7 @@ public abstract class Basket extends GameObject {
 	}
 	
 	public void setRotation(float x, float y, float z, float angle) {
-		modelInstance.getNode("stand").rotation.setFromAxis(x, y, z, angle);
-		
-		rX = x;
-		rY = y;
-		rZ = z;
-		rA = angle;
+		super.setRotation(x, y, z, angle);
 		
 		recalcCollisionsTransform();
 		manuallyRecalcCollisions();
@@ -235,6 +230,8 @@ public abstract class Basket extends GameObject {
 			collisionObjects.add(new btCollisionObject());
 			collisionObjects.get(i).setCollisionShape(invisibleCollShapes.get(i));
 		}
+		
+		collisionObjects.get(1).setUserIndex(2);
 		manuallySetObjects();
 	}
 
@@ -247,9 +244,10 @@ public abstract class Basket extends GameObject {
 	protected void manuallySetObjects() {
 		modelInstance.calculateTransforms();
 		
-		Matrix4 temp = calcTransformFromNodesTransform(modelInstance.getNode("basket1").globalTransform);
-		Matrix4 temp2 = new Matrix4().set(temp.cpy().getTranslation(new Vector3()).add(0, 0, -(tabCentW / 2 + bkHoldW / 2) * z / Math.abs(z)), temp.getRotation(new Quaternion()));
-		collisionObjects.get(0).setWorldTransform(temp2);
+		//Matrix4 temp = calcTransformFromNodesTransform(modelInstance.getNode("basket1").globalTransform);
+		//Matrix4 temp2 = new Matrix4().set(temp.cpy().getTranslation(new Vector3()).add(0, 0, -(tabCentW / 2 + bkHoldW / 2) * z / Math.abs(z)), temp.getRotation(new Quaternion()));
+		collisionObjects.get(0).setWorldTransform(calcTransformFromNodesTransform(modelInstance.getNode("basket1").globalTransform.trn(0, 0, -tabCentW / 2)));
+		collisionObjects.get(1).setWorldTransform(calcTransformFromNodesTransform(new Matrix4().setToTranslation(0, 17 / 2, -17 / 2)));
 		
 	}
 
