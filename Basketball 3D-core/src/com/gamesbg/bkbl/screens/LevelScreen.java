@@ -73,6 +73,8 @@ public class LevelScreen implements Screen {
 	public void render(float delta) {
 		cam.update();
 		
+		game.renderLogo(batch, cam);
+		
 		numUpDown.render(batch, shape, cam);
 		textUpDown.render(batch, shape, cam);
 		play.render(batch, shape, cam);

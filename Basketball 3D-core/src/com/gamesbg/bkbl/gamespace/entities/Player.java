@@ -1546,17 +1546,35 @@ public abstract class Player extends Entity {
 		//targetVec.z = Math.abs(targetVec.z);
 		
 		Vector3 thisVec = modelInstance.transform.getTranslation(new Vector3());
+		Vector3 thisRot = modelInstance.transform.getRotation(new Quaternion()).transform(new Vector3());
 		//thisVec.x = Math.abs(thisVec.x);
 		//thisVec.y = Math.abs(thisVec.y);
 		//thisVec.z = Math.abs(thisVec.z);
 		
-		Vector3 rotVec = targetVec.cpy().sub(thisVec).nor();
+		Vector3 rotVec = tempVec.cpy().sub(thisVec).nor();
 		//rotVec.y = 0;
 		//rotVec.scl(Gdx.graphics.getDeltaTime());
 		//Quaternion tempQuat = new Quaternion().set(rotVec, 180);
 		//tempQuat.setEulerAngles(tempQuat.getYaw(), 0, 0);
 		
-		lookAt(tempVec);
+		//lookAt(tempVec);
+		
+		Matrix4 tempTr = modelInstance.transform.cpy().mul(new Matrix4().setToTranslation(tempVec));
+		
+		
+		//modelInstance.transform.set(thisVec, new Quaternion());
+		//Vector3 v = thisRot.sub(tempVec).nor().scl(180);
+		//System.out.println(v.x + ";" + v.z);
+		//float differ = v.x;
+		//turnY(differ);
+		//rotVec.scl(180);
+		//System.out.println(rotVec.x);
+		Quaternion quat = new Quaternion();
+		modelInstance.transform.cpy().setToLookAt(rotVec, new Vector3(0, -1, 0)).getRotation(quat);
+		quat.setEulerAngles(quat.getYaw(), 0, 0);
+		
+		modelInstance.transform.set(thisVec, quat).rotate(0, 1, 0, 180);
+		
 		//tempQuat.x = 0; 
 		//tempQuat.z = 0;
 		// tempQuat.x = tempQuat.z = 0;
@@ -1889,8 +1907,8 @@ public abstract class Player extends Entity {
 		
 		prevTrans = modelInstance.transform.cpy();
 		
-		if(this instanceof Opponent && (northSurround || southSurround || eastSurround || westSurround))
-			System.out.println("Surround" + northSurround + ";" + southSurround + ";" + eastSurround + ";" + westSurround);
+		//if(this instanceof Opponent && (northSurround || southSurround || eastSurround || westSurround))
+			//System.out.println("Surround" + northSurround + ";" + southSurround + ";" + eastSurround + ";" + westSurround);
 	}
 
 	public Matrix4 getCamMatrix() {

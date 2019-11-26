@@ -112,6 +112,8 @@ public class SettingsScreen implements Screen, UpDownListener {
 	public void render(float delta) {
 		cam.update();
 		
+		game.renderLogo(batch, cam);
+		
 		goBack.render(batch, shape, cam);
 		
 		beautifulGfx.render(batch, shape, cam);

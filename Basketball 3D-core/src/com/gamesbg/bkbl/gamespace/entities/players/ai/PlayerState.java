@@ -52,8 +52,8 @@ public enum PlayerState implements State<Player> {
 
 					player.lookAt(tempTeamVec);
 
-					player.interactWithBallS();
-					aimingTime += Gdx.graphics.getDeltaTime();
+					//player.interactWithBallS();
+					//aimingTime += Gdx.graphics.getDeltaTime();
 
 				}
 

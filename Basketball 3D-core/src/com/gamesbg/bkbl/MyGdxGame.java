@@ -29,7 +29,7 @@ public class MyGdxGame extends Game {
 	
 	GameMap map;
 	
-	Texture background;
+	Texture background, logo;
 	
 	public MainScreen main;
 	public LevelScreen level;
@@ -49,6 +49,8 @@ public class MyGdxGame extends Game {
 		font.getData().setScale(1);
 		
 		cam = new OrthographicCamera();
+		
+		logo = new Texture(Gdx.files.internal("application/bkbl_logo.png"));
 		
 		if(beautifulBack)
 			load3DGraphics();
@@ -141,6 +143,13 @@ public class MyGdxGame extends Game {
 	
 	public void setResolution(int width, int height) {}
 	
+	public void renderLogo(SpriteBatch batch, OrthographicCamera cam) {
+		batch.setProjectionMatrix(cam.combined);
+		batch.begin();
+		batch.draw(logo, cam.viewportWidth / 2 - logo.getWidth() / 2, cam.viewportHeight - logo.getHeight() - 20);
+		batch.end();
+	}
+	
 	/**
 	 * I needed a custom lookat method because the original one modifies the up vector of the camera which makes the camera to rotate the screen
 	 * 
@@ -173,6 +182,7 @@ public class MyGdxGame extends Game {
 	@Override
 	public void dispose () {
 		batch.dispose();
+		logo.dispose();
 		
 		if(map != null) {
 			mBatch.dispose();
