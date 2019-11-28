@@ -138,6 +138,7 @@ public abstract class Player extends Entity {
 		
 		//if(!isMainPlayer())
 			stateMachine = new DefaultStateMachine<Player, PlayerState>(this, PlayerState.IDLING);
+			stateMachine.changeState(PlayerState.IDLING);
 
 	}
 	
@@ -980,11 +981,10 @@ public abstract class Player extends Entity {
 	 * @param x - the x-axis
 	 */
 	public void turnX(float x) {
-		Matrix4 mainNodeTrans = camMatrix;
-		float pitch = mainNodeTrans.getRotation(new Quaternion()).getPitch();
+		float pitch = camMatrix.getRotation(new Quaternion()).getPitch();
 		
 		if(Math.abs(pitch + x) < 38)
-			mainNodeTrans.rotate(1, 0, 0, x);
+			camMatrix.rotate(1, 0, 0, x);
 	}
 	
 	public void walk(Vector3 dir) {
@@ -1503,11 +1503,20 @@ public abstract class Player extends Entity {
 		
 		Vector3 rotVec = target.cpy().sub(thisVec).nor();
 		
+		Matrix4 calcTrans = modelInstance.transform.cpy().setToLookAt(rotVec, new Vector3(0, -1, 0));
+		
 		Quaternion quat = new Quaternion();
-		modelInstance.transform.cpy().setToLookAt(rotVec, new Vector3(0, -1, 0)).getRotation(quat);
+		calcTrans.getRotation(quat);
 		quat.setEulerAngles(quat.getYaw(), 0, 0);
 		
 		modelInstance.transform.set(thisVec, quat).rotate(0, 1, 0, 180);
+		
+		Quaternion quat2 = new Quaternion();
+		calcTrans.getRotation(quat2);
+		quat2.setEulerAngles(0, quat2.getPitch(), 0);
+		
+		Vector3 camVec = camMatrix.getTranslation(new Vector3());
+		camMatrix.set(camVec, quat2);
 		
 		setCollisionTransform();
 	}

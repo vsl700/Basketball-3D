@@ -132,7 +132,7 @@ public abstract class GameObject {
 			else bodies.get(i).proceedToTransform(calcTransformFromNodesTransform(matrixes.get(i)));
 	}
 	
-	protected Matrix4 calcTransformFromNodesTransform(Matrix4 nodeTrans) {
+	public Matrix4 calcTransformFromNodesTransform(Matrix4 nodeTrans) {
 		return modelInstance.transform.cpy().mul(nodeTrans);
 	}
 	
