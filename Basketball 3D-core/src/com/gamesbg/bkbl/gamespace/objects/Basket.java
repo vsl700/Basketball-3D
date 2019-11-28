@@ -33,6 +33,7 @@ public abstract class Basket extends GameObject {
 	static final float tabCentD = 0.01f;
 	static final float bkHoldW = 0.08f;
 	static final float bkHoldD = 0.2f;
+	static final float basketZone = 6;
 	
 	protected abstract Color getColor();
 	
@@ -153,7 +154,7 @@ public abstract class Basket extends GameObject {
 		visibleCollShapes.add(new btBoxShape(bk24));
 		
 		invisibleCollShapes.add(new btBoxShape(new Vector3(tabCentW / 2, bkHoldW / 2, tabCentW / 2)));
-		invisibleCollShapes.add(new btCylinderShape(new Vector3(17, standH / 2, 17)));
+		invisibleCollShapes.add(new btCylinderShape(new Vector3(basketZone, standH / 2, basketZone)));
 		
 		/*collisionObjects.add(new btCollisionObject());
 		collisionObjects.get(0).setCollisionShape(collisionShapes.get(0));
@@ -247,7 +248,7 @@ public abstract class Basket extends GameObject {
 		//Matrix4 temp = calcTransformFromNodesTransform(modelInstance.getNode("basket1").globalTransform);
 		//Matrix4 temp2 = new Matrix4().set(temp.cpy().getTranslation(new Vector3()).add(0, 0, -(tabCentW / 2 + bkHoldW / 2) * z / Math.abs(z)), temp.getRotation(new Quaternion()));
 		collisionObjects.get(0).setWorldTransform(calcTransformFromNodesTransform(modelInstance.getNode("basket1").globalTransform.cpy().trn(0, 0, -tabCentW / 2)));
-		collisionObjects.get(1).setWorldTransform(calcTransformFromNodesTransform(new Matrix4().setToTranslation(0, 17 / 2, -17 / 2)));
+		collisionObjects.get(1).setWorldTransform(calcTransformFromNodesTransform(new Matrix4().setToTranslation(0, basketZone / 2, -basketZone / 2)));
 		
 	}
 

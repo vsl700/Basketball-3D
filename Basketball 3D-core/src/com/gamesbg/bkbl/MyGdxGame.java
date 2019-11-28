@@ -36,8 +36,8 @@ public class MyGdxGame extends Game {
 	public GameScreen game;
 	public SettingsScreen settings;
 	
-	public static int WIDTH = 848;
-	public static int HEIGHT = 480;
+	public final static int WIDTH = 848;
+	public final static int HEIGHT = 480;
 	
 	boolean beautifulBack = true;
 	
@@ -170,7 +170,7 @@ public class MyGdxGame extends Game {
 	
 	@Override
 	public void resize(int width, int height) {
-		cam.setToOrtho(false, WIDTH = width, HEIGHT = height);
+		cam.setToOrtho(false, width, height);
 		if(pCam != null) {
 			pCam.viewportWidth = width;
 			pCam.viewportHeight = height;

@@ -97,7 +97,7 @@ public abstract class Player extends Entity {
 	public void create(EntityType type, GameMap map, Vector3 pos) {
 		super.create(type, map, pos);
 		
-		poleScale = 2.5f;
+		poleScale = 2f;
 		
 		armLController = new AnimationController(modelInstance);
 		armRController = new AnimationController(modelInstance);
@@ -998,7 +998,7 @@ public abstract class Player extends Entity {
 	}
 	
 	public void run(Vector3 dir) {
-		if (!armLController.current.animation.id.equals("aimLArmL") && !armLController.current.animation.id.equals("throwLArmL")) {
+		if (!isAiming() && !isShooting()) {
 			dir.x *= MAX_RUNNING_VELOCITY;
 			dir.z *= MAX_RUNNING_VELOCITY;
 
@@ -1512,6 +1512,17 @@ public abstract class Player extends Entity {
 		setCollisionTransform();
 	}
 	
+	/**
+	 * Moves the player to the according to the given arguments using the "run" and "walk" commands.
+	 * 
+	 * @param target - the location which the player should follow
+	 * @param block
+	 * @param xDist - what distance on x-axis the player should keep from the target
+	 * @param zDist - what distance on z-axis the player should keep from the target
+	 * @param forceSprint - when true, the player will sprint to the target no matter how far away it is from it
+	 * @param forceWalk - when true, the player will only walk to the target no matter how far away it is from it
+	 * @return The calculated target point including the x and z distance. It is used to be put inside the lookAt method as it is NOT being called by this one.
+	 */
 	public Vector3 roamAround(Matrix4 target, Matrix4 block, float xDist, float zDist, boolean forceSprint, boolean forceWalk) {
 		//The point's trans where the player should go to
 		Matrix4 temp = target.cpy().mul(new Matrix4().setToTranslation(xDist, 0, zDist));
@@ -1533,7 +1544,7 @@ public abstract class Player extends Entity {
 		float xDiff = diffDist.x;
 		float zDiff = diffDist.z;
 		diffWalk.nor().scl(Gdx.graphics.getDeltaTime());
-		if(!forceWalk && forceSprint || (Math.abs(xDiff) + Math.abs(zDiff) > xDist + zDist + 6))
+		if(!forceWalk && (forceSprint || (Math.abs(xDiff) + Math.abs(zDiff) > xDist + zDist + 6)))
 			run(diffWalk);
 		else if(Math.abs(xDiff) > Math.abs(xDist) + 0.5f || Math.abs(zDiff) > Math.abs(zDist) + 0.5f)
 			walk(diffWalk);
@@ -1545,20 +1556,9 @@ public abstract class Player extends Entity {
 		//targetVec.y = Math.abs(targetVec.y);
 		//targetVec.z = Math.abs(targetVec.z);
 		
-		Vector3 thisVec = modelInstance.transform.getTranslation(new Vector3());
-		//thisVec.x = Math.abs(thisVec.x);
-		//thisVec.y = Math.abs(thisVec.y);
-		//thisVec.z = Math.abs(thisVec.z);
-		
-		Vector3 rotVec = tempVec.cpy().sub(thisVec).nor();
-		
-		Quaternion quat = new Quaternion();
-		modelInstance.transform.cpy().setToLookAt(rotVec, new Vector3(0, -1, 0)).getRotation(quat);
-		quat.setEulerAngles(quat.getYaw(), 0, 0);
-		
-		modelInstance.transform.set(thisVec, quat).rotate(0, 1, 0, 180);
+		//lookAt(tempVec);
 			
-		return diffWalk;
+		return tempVec;
 	}
 	
 	@Override
@@ -2061,6 +2061,19 @@ public abstract class Player extends Entity {
 
 	public boolean isEastSurround() {
 		return eastSurround;
+	}
+	
+	public boolean isSurrounded() {
+		int sides = 0;
+		
+		if(northSurround)
+			sides++;
+		if(eastSurround)
+			sides++;
+		if(westSurround)
+			sides++;
+		
+		return sides > 2;
 	}
 
 	public boolean isWestSurround() {

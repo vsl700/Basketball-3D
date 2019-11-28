@@ -1,6 +1,5 @@
 package com.gamesbg.bkbl.screens;
 
-//import java.awt.DisplayMode;
 import java.awt.GraphicsDevice;
 import java.awt.GraphicsEnvironment;
 import java.util.ArrayList;
@@ -17,7 +16,6 @@ import com.gamesbg.bkbl.gui.Button;
 import com.gamesbg.bkbl.gui.CheckButton;
 import com.gamesbg.bkbl.gui.Label;
 import com.gamesbg.bkbl.gui.NumUpDown;
-import com.gamesbg.bkbl.gui.TextUpDown;
 import com.gamesbg.bkbl.gui.UpDown;
 import com.gamesbg.bkbl.gui.UpDownListener;
 
@@ -36,8 +34,8 @@ public class SettingsScreen implements Screen, UpDownListener {
 	Button goBack;
 	CheckButton beautifulGfx, fullscreen;
 	NumUpDown fpsUpDown;
-	TextUpDown resUpDown;
-	Label fpsLabel, resLabel;
+	//TextUpDown resUpDown;
+	Label fpsLabel;
 	
 	//boolean checkForFSCN; //Check for fullscreen
 	
@@ -91,11 +89,11 @@ public class SettingsScreen implements Screen, UpDownListener {
 		fpsUpDown.setListener(this);
 		//fpsUpDown.setOption(60);
 		
-		resUpDown = new TextUpDown(font, font, Color.WHITE, Color.BROWN, new Color().set(0.8f, 0.4f, 0, 1), res, false);
-		resUpDown.setListener(this);
+		//resUpDown = new TextUpDown(font, font, Color.WHITE, Color.BROWN, new Color().set(0.8f, 0.4f, 0, 1), res, false);
+		//resUpDown.setListener(this);
 		
 		fpsLabel = new Label("THE MAXIMUM FRAMES PER SECOND", font, Color.BROWN, true);
-		resLabel = new Label("THE RESOLUTION OF THE WINDOW", font, Color.BROWN, true);
+		//resLabel = new Label("THE RESOLUTION OF THE WINDOW", font, Color.BROWN, true);
 		
 		beautifulGfx.setToggled(game.isBeautifulBack());
 		fullscreen.setToggled(Gdx.graphics.isFullscreen());
@@ -122,19 +120,25 @@ public class SettingsScreen implements Screen, UpDownListener {
 		fpsUpDown.render(batch, shape, cam);
 		fpsLabel.render(batch, shape, cam);
 		
-		resUpDown.render(batch, shape, cam);
-		resLabel.render(batch, shape, cam);
+		//resUpDown.render(batch, shape, cam);
+		//resLabel.render(batch, shape, cam);
 		
 		if(beautifulGfx.justTouched(cam))
 			game.setBeautifulBack(beautifulGfx.isToggled());
 		else if(goBack.justReleased(cam)) {
-			changeRes();
+			//changeRes();
+			
+			if (fullscreen.isToggled()) {
+				Gdx.graphics.setFullscreenMode(Gdx.graphics.getDisplayMode());
+			}else {
+				Gdx.graphics.setWindowedMode(MyGdxGame.WIDTH, MyGdxGame.HEIGHT);
+			}
 			
 			game.setScreen(game.main);
 		}
 	}
 	
-	private void changeRes() {
+	/*private void changeRes() {
 		int[] ress = getResFromString(resUpDown.getTextOption());
 		Gdx.graphics.setWindowedMode(ress[0], ress[1]);
 
@@ -142,9 +146,9 @@ public class SettingsScreen implements Screen, UpDownListener {
 			game.setResolution(ress[0], ress[1]);
 			Gdx.graphics.setFullscreenMode(Gdx.graphics.getDisplayMode());
 		}
-	}
+	}*/
 	
-	private int[] getResFromString(String s) {
+	/*private int[] getResFromString(String s) {
 		int[] ress = new int[2];
 		int temp = s.indexOf('x');
 		
@@ -155,7 +159,7 @@ public class SettingsScreen implements Screen, UpDownListener {
 		ress[1] = Integer.parseInt(tempS2);
 		
 		return ress;
-	}
+	}*/
 
 	@Override
 	public void resize(int width, int height) {
@@ -165,20 +169,21 @@ public class SettingsScreen implements Screen, UpDownListener {
 		goBack.setSize(game.pixelXByCurrentSize(223), game.pixelYByCurrentSize(30));
 		goBack.setPos(width / 2 - goBack.getWidth() / 2, 60);
 		
-		resUpDown.setSize(game.pixelXByCurrentSize(74), game.pixelYByCurrentSize(45));
-		resUpDown.setPos(width / 2 - resUpDown.getTotalWidth() / 2, height / 2 - resUpDown.getHeight() / 2);
+		//resUpDown.setSize(game.pixelXByCurrentSize(74), game.pixelYByCurrentSize(45));
+		//resUpDown.setPos(width / 2 - resUpDown.getTotalWidth() / 2, height / 2 - resUpDown.getHeight() / 2);
 		
 		fpsUpDown.setSize(game.pixelXByCurrentSize(74), game.pixelYByCurrentSize(45));
-		fpsUpDown.setPos(width / 2 - fpsUpDown.getTotalWidth() / 2, height / 2 - fpsUpDown.getHeight() / 2 - resUpDown.getHeight() * 3);
+		//fpsUpDown.setPos(width / 2 - fpsUpDown.getTotalWidth() / 2, height / 2 - fpsUpDown.getHeight() / 2 - resUpDown.getHeight() * 3);
+		fpsUpDown.setPos(width / 2 - fpsUpDown.getTotalWidth() / 2, height / 2 - fpsUpDown.getHeight() / 2);
 		
-		beautifulGfx.setPosAndSize(resUpDown.getX() + resUpDown.getTotalWidth() + 90, game.pixelYByCurrentSize(325), 40, 40);
+		beautifulGfx.setPosAndSize(fpsUpDown.getX() + fpsUpDown.getTotalWidth() + 90, game.pixelYByCurrentSize(325), 40, 40);
 		fullscreen.setSize(40, 40);
-		fullscreen.setPos(resUpDown.getX() - 230, game.pixelYByCurrentSize(325));
+		fullscreen.setPos(fpsUpDown.getX() - 230, game.pixelYByCurrentSize(325));
 		
 		fpsLabel.setPosAndSize(fpsUpDown.getX() + fpsUpDown.getTotalWidth() / 2 - 164 / 2, fpsUpDown.getY() + fpsUpDown.getHeight() + 10, 164);
-		resLabel.setPosAndSize(resUpDown.getX() + resUpDown.getTotalWidth() / 2 - 164 / 2, resUpDown.getY() + resUpDown.getHeight() + 10, 164);
+		//resLabel.setPosAndSize(resUpDown.getX() + resUpDown.getTotalWidth() / 2 - 164 / 2, resUpDown.getY() + resUpDown.getHeight() + 10, 164);
 		
-		resUpDown.setTextOption(width + "x" + height);
+		//resUpDown.setTextOption(width + "x" + height);
 	}
 
 	@Override
