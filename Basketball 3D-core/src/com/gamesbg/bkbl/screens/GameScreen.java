@@ -2,30 +2,43 @@ package com.gamesbg.bkbl.screens;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Screen;
+import com.badlogic.gdx.Input.Keys;
+import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.GL20;
+import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.PerspectiveCamera;
+import com.badlogic.gdx.graphics.g2d.BitmapFont;
+import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.g3d.Environment;
 import com.badlogic.gdx.graphics.g3d.ModelBatch;
 import com.badlogic.gdx.graphics.g3d.attributes.ColorAttribute;
 import com.badlogic.gdx.graphics.g3d.environment.DirectionalLight;
 import com.badlogic.gdx.graphics.g3d.environment.PointLight;
-import com.badlogic.gdx.graphics.g3d.utils.FirstPersonCameraController;
+import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 import com.badlogic.gdx.math.Matrix4;
 import com.badlogic.gdx.math.Vector3;
 import com.gamesbg.bkbl.MyGdxGame;
 import com.gamesbg.bkbl.gamespace.GameMap;
+import com.gamesbg.bkbl.gui.Label;
 
 public class GameScreen implements Screen {
 
 	ModelBatch mBatch;
 	Environment environment;
 	PerspectiveCamera pCam;
+	
+	SpriteBatch batch;
+	ShapeRenderer shape;
+	OrthographicCamera cam;
+	BitmapFont textFont, powFont;
 	// CameraInputController camController;
-	FirstPersonCameraController camController;
+	//FirstPersonCameraController camController;
 
 	GameMap map;
 
 	MyGdxGame game;
+	
+	Label homeScore, awayScore, timer, power, powerNum;
 	
 	int amount; //Player amount per team
 
@@ -52,7 +65,24 @@ public class GameScreen implements Screen {
 		pCam.far = 100;
 		pCam.near = 0.1f;
 		
-		camController = new FirstPersonCameraController(pCam);
+		cam = new OrthographicCamera();
+		
+		shape = new ShapeRenderer();
+		batch = new SpriteBatch();
+		
+		textFont = new BitmapFont();
+		textFont.getData().setScale(3);
+		
+		powFont = new BitmapFont();
+		powFont.getData().setScale(2);
+		
+		homeScore = new Label("0", textFont, Color.BLUE, true);
+		awayScore = new Label("0", textFont, Color.RED, true);
+		timer = new Label("Ready?", textFont, Color.ORANGE, true);
+		power = new Label("POWER", textFont, Color.RED, true);
+		powerNum = new Label("10", powFont, Color.WHITE, true);
+		
+		//camController = new FirstPersonCameraController(pCam);
 
 		// camController = new CameraInputController(pCam);
 		// System.out.println(Keys.toString(camController.translateButton));
@@ -94,12 +124,48 @@ public class GameScreen implements Screen {
 		mBatch.begin(pCam);
 		map.render(mBatch, environment);
 		mBatch.end();
+		
+		cam.update();
+		homeScore.render(batch, shape, cam);
+		awayScore.render(batch, shape, cam);
+		
+		
+		if (map.getTimer() >= 0) {
+			if((int) map.getTimer() == 0)
+				timer.setText("GO!");
+			else if (map.getTimer() <= 4)
+				timer.setText((int) map.getTimer() + "");
+			
+			timer.render(batch, shape, cam);
+		}
+		else {
+			int pow = map.getMainPlayer().getShootingPower();
+			
+			power.render(batch, shape, cam);
+			shape.begin(ShapeRenderer.ShapeType.Filled);
+			shape.setColor(Color.RED);
+			shape.rect(cam.viewportWidth / 2 - pow * 8 / 2, power.getY() - power.getHeight() / 2 - 30, pow * 8, 30);
+			shape.end();
+			
+			powerNum.setText(pow + "");
+			powerNum.render(batch, shape, cam);
+		}
+		
+		if(Gdx.input.isKeyJustPressed(Keys.ESCAPE))
+			game.setScreen(game.main);
 	}
 
 	@Override
 	public void resize(int width, int height) {
 		pCam.viewportWidth = width;
 		pCam.viewportHeight = height;
+		cam.setToOrtho(false, width, height);
+		
+		homeScore.setPosAndSize(30, height - 70, 10);
+		awayScore.setPosAndSize(width - 30, height - 70, 10);
+		timer.setPosAndSize(width / 2, height - 120, 10);
+		power.setPosAndSize(width / 2, height - 80, 10);
+		powerNum.setPosAndSize(width / 2, height - 120, 10);
 		//pCam.update();
 	}
 

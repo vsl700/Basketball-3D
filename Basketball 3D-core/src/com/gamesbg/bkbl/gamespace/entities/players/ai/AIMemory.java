@@ -1,11 +1,15 @@
 package com.gamesbg.bkbl.gamespace.entities.players.ai;
 
+import com.badlogic.gdx.math.Matrix4;
+import com.badlogic.gdx.math.Vector3;
+
 /**
  * This class is used to store the player's brain's data, or in other words, this is the memory component of each brain of a player.
  * @author User
  *
  */
 public class AIMemory {
+	
 	float dribbleTime, aimingTime, shootTime, switchHandTime;
 	float distDiff = 0, resetTime = 0;
 	

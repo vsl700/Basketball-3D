@@ -87,23 +87,7 @@ public abstract class Entity {
 		}
 	}
 	
-	public void update(float delta) {
-		/*if(collisionObjects != null)
-			for(btCollisionObject co : collisionObjects) {
-				co.setWorldTransform(body.getWorldTransform());
-				//System.out.println(co.getWorldTransform().getTranslation(new Vector3()).y);
-			}
-		
-		if(invisBodies != null)
-			for(btRigidBody co : invisBodies) {
-				co.setWorldTransform(body.getWorldTransform());
-				//System.out.println(co.getWorldTransform().getTranslation(new Vector3()).y);
-			}
-			*/
-		
-		//manuallySetCollTransform();
-		//grounded = false;
-	}
+	public abstract void update(float delta);
 	
 	public void render(ModelBatch mBatch, Environment e) {
 		mBatch.render(modelInstance, e);

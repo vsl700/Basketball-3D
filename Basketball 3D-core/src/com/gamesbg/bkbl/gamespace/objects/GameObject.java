@@ -224,6 +224,10 @@ public abstract class GameObject {
 		return collisionObjects;
 	}
 	
+	public ArrayList<Matrix4> getMatrixes() {
+		return matrixes;
+	}
+
 	public void setRotation(float x, float y, float z, float angle) {
 		modelInstance.transform.rotate(x, y, z, angle);
 		

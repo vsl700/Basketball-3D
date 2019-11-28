@@ -71,5 +71,21 @@ public abstract class GUI {
 		onResize();
 	}
 
+	public float getX() {
+		return x;
+	}
+
+	public float getY() {
+		return y;
+	}
+
+	public float getWidth() {
+		return width;
+	}
+
+	public float getHeight() {
+		return height;
+	}
+
 	protected abstract void onResize();
 }

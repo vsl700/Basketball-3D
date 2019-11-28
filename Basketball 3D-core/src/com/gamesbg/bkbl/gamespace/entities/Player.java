@@ -1227,6 +1227,30 @@ public abstract class Player extends Entity {
 		map.getBall().getMainBody().setLinearVelocity(tempVec);
 	}
 	
+	/**
+	 * Used by the AI
+	 * @param target
+	 */
+	public void throwBall(Vector3 target) {
+		Vector3 tempVec = target.cpy();
+		tempVec.x *= shootingPower;
+		tempVec.y *= shootingPower * 1.4f;
+		tempVec.z *= shootingPower;
+		
+		if(leftThrowBall) {
+			releaseBall(bodiesMap.get("handL").getWorldTransform().cpy());
+			
+			leftThrowBall = false;
+		}
+		else{
+			releaseBall(bodiesMap.get("handR").getWorldTransform().cpy());
+			
+			rightThrowBall = false;
+		}
+		
+		map.getBall().getMainBody().setLinearVelocity(tempVec);
+	}
+	
 	private void releaseBall(Matrix4 trans) {
 		map.getBall().getMainBody().setGravity(map.getDynamicsWorld().getGravity());
 		map.getBall().getMainBody().activate();
@@ -1581,6 +1605,7 @@ public abstract class Player extends Entity {
 		
 		else if(!leftHoldingBall && !rightHoldingBall && !isDribbling()) {
 			map.playerReleaseBall();
+			map.getBall().getMainBody().setGravity(map.getDynamicsWorld().getGravity());
 		}
 		
 		if(!isMainPlayer())
@@ -1639,7 +1664,8 @@ public abstract class Player extends Entity {
 
 					@Override
 					public void onEnd(AnimationDesc animation) {
-						throwBall();
+						if(isMainPlayer())
+							throwBall();
 
 						leftThrowBall = false;
 						leftHoldingBall = false;
@@ -1707,7 +1733,8 @@ public abstract class Player extends Entity {
 
 					@Override
 					public void onEnd(AnimationDesc animation) {
-						throwBall();
+						if(isMainPlayer())
+							throwBall();
 
 						rightThrowBall = false;
 						rightHoldingBall = false;
@@ -1889,8 +1916,6 @@ public abstract class Player extends Entity {
 		legRController.update(delta);
 		bodyController.update(delta);
 		
-		super.update(delta);
-		
 		prevTrans = modelInstance.transform.cpy();
 		
 		//if(this instanceof Opponent && (northSurround || southSurround || eastSurround || westSurround))
@@ -2027,6 +2052,10 @@ public abstract class Player extends Entity {
 		return playerIndex;
 	}
 	
+	public int getShootingPower() {
+		return shootingPower;
+	}
+	
 	public boolean holdingBall() {
 		
 		//System.out.println(map.getCurrentPlayerHoldTeam());
@@ -2107,6 +2136,10 @@ public abstract class Player extends Entity {
 	
 	public boolean isInAwayBasketZone() {
 		return inBasketZone;
+	}
+	
+	public boolean isBehindBasket() {
+		return Math.abs(modelInstance.transform.getTranslation(new Vector3()).z) - Math.abs(map.getHomeBasket().getModelInstance().transform.getTranslation(new Vector3()).z) >= -0.5f;
 	}
 
 	public boolean isMainPlayer() {

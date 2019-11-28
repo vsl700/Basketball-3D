@@ -191,7 +191,9 @@ public class GameMap {
     
     int teamScore, oppScore;
     
-    boolean gameRunning = true;//Whether or not the players can play
+    float startTimer;
+    
+    boolean gameRunning;//Whether or not the players can play
     
     
     int index = 0;
@@ -345,48 +347,7 @@ public class GameMap {
 			//dynamicsWorld.addRigidBody(co);
 		}
 		
-		ball = EntityType.createEntity(EntityType.BALL.getId(), this, new Vector3(0, 0, 0));
-		for (btRigidBody co : ball.getBodies()) {
-			co.setUserValue(index);
-			// ball.getBody().setCollisionFlags(ball.getBody().getCollisionFlags()
-			// | btCollisionObject.CollisionFlags.CF_CUSTOM_MATERIAL_CALLBACK);
-			co.setCollisionFlags(co.getCollisionFlags() | btCollisionObject.CollisionFlags.CF_CUSTOM_MATERIAL_CALLBACK);
-			//co.applyCentralForce(new Vector3(0, 550, 0));
-			//co.applyCentralForce(new Vector3());
-			//dynamicsWorld.addRigidBody(co);
-			//co.setActivationState(Collision.WANTS_DEACTIVATION);
-			//System.out.println(co.getUserValue());
-			dynamicsWorld.addRigidBody(co, ENTITY_FLAG, ALL_FLAG);
-			co.setContactCallbackFlag(ENTITY_FLAG);
-			co.setContactCallbackFilter(ALL_FLAG);
-			
-			//System.out.println(co.getContactCallbackFlag());
-			//System.out.println(co.getContactCallbackFilter());
-			
-			objectsMap.put(index, EntityType.BALL.getId());
-			collObjsInEntityMap.put(co, ball);
-			collObjsValsMap.put(index, co);
-
-			index++;
-		}
-		
-		for(btCollisionObject co : ball.getCollisionObjects()) {
-			co.setUserValue(index);
-			co.setCollisionFlags(co.getCollisionFlags() | btCollisionObject.CollisionFlags.CF_CUSTOM_MATERIAL_CALLBACK);
-			
-			dynamicsWorld.addCollisionObject(co, ENT_SPECIAL_FLAG, SPECIAL_FLAG);
-			co.setContactCallbackFlag(ENT_SPECIAL_FLAG);
-			co.setContactCallbackFilter(SPECIAL_FLAG);
-
-			//System.out.println(co.getContactCallbackFlag());
-			//System.out.println(co.getContactCallbackFilter());
-			//System.out.println(co.getUserValue());
-			objectsMap.put(index, EntityType.BALL.getId() + "Obj");
-			collObjsInEntityMap.put(co, ball);
-			collObjsValsMap.put(index, co);
-			
-			index++;
-		}
+		createBall();
 		
 		
 		teammates = new ArrayList<Player>(5);
@@ -395,7 +356,7 @@ public class GameMap {
 	
 	public void spawnPlayers(int count) {
 		int index2 = index;
-		int playerIndex = 0;
+		int playerIndex = 1;
 		
 		for(int i = 0; i < count; i++) {
 			Player teammate = EntityType.createPlayer(EntityType.TEAMMATE.getId(), this, new Vector3(spawnCoords[i][0], spawnCoords[i][1], spawnCoords[i][2]));
@@ -504,12 +465,11 @@ public class GameMap {
 			
 			teammates.add(teammate);
 			
-			//Skipping the main player
-			if(playerIndex > 0)
-				teammate.setPlayerIndex(playerIndex);
+			teammate.setPlayerIndex(playerIndex);
 			playerIndex++;
 		}
 		
+		playerIndex = 1;
 		for(int i = 0; i < count; i++) {
 			Player opponent = EntityType.createPlayer(EntityType.OPPONENT.getId(), this, new Vector3(spawnCoords[i][0], spawnCoords[i][1], -spawnCoords[i][2]));
 			//players.add(EntityType.createEntity("team", this, 0, 0, 0));
@@ -613,9 +573,8 @@ public class GameMap {
 			
 			opponents.add(opponent);
 			
-			//Skipping the main player
-			if(playerIndex > 0)
-				opponent.setPlayerIndex(playerIndex);
+			
+			opponent.setPlayerIndex(playerIndex);
 			playerIndex++;
 		}
 		
@@ -632,12 +591,63 @@ public class GameMap {
 			
 		
 		Gdx.input.setInputProcessor(inputs);
+		
+		startTimer = 6;
+	}
+	
+	private void createBall() {
+		ball = EntityType.createEntity(EntityType.BALL.getId(), this, new Vector3(0, 0, 0));
+		for (btRigidBody co : ball.getBodies()) {
+			co.setUserValue(index);
+			// ball.getBody().setCollisionFlags(ball.getBody().getCollisionFlags()
+			// | btCollisionObject.CollisionFlags.CF_CUSTOM_MATERIAL_CALLBACK);
+			co.setCollisionFlags(co.getCollisionFlags() | btCollisionObject.CollisionFlags.CF_CUSTOM_MATERIAL_CALLBACK);
+			//co.applyCentralForce(new Vector3(0, 550, 0));
+			//co.applyCentralForce(new Vector3());
+			//dynamicsWorld.addRigidBody(co);
+			//co.setActivationState(Collision.WANTS_DEACTIVATION);
+			//System.out.println(co.getUserValue());
+			dynamicsWorld.addRigidBody(co, ENTITY_FLAG, ALL_FLAG);
+			co.setContactCallbackFlag(ENTITY_FLAG);
+			co.setContactCallbackFilter(ALL_FLAG);
+			
+			//System.out.println(co.getContactCallbackFlag());
+			//System.out.println(co.getContactCallbackFilter());
+			
+			objectsMap.put(index, EntityType.BALL.getId());
+			collObjsInEntityMap.put(co, ball);
+			collObjsValsMap.put(index, co);
+
+			index++;
+		}
+		
+		for(btCollisionObject co : ball.getCollisionObjects()) {
+			co.setUserValue(index);
+			co.setCollisionFlags(co.getCollisionFlags() | btCollisionObject.CollisionFlags.CF_CUSTOM_MATERIAL_CALLBACK);
+			
+			dynamicsWorld.addCollisionObject(co, ENT_SPECIAL_FLAG, SPECIAL_FLAG);
+			co.setContactCallbackFlag(ENT_SPECIAL_FLAG);
+			co.setContactCallbackFilter(SPECIAL_FLAG);
+
+			//System.out.println(co.getContactCallbackFlag());
+			//System.out.println(co.getContactCallbackFilter());
+			//System.out.println(co.getUserValue());
+			objectsMap.put(index, EntityType.BALL.getId() + "Obj");
+			collObjsInEntityMap.put(co, ball);
+			collObjsValsMap.put(index, co);
+			
+			index++;
+		}
 	}
 	
 	public void clear() {
 		disposePlayers();
 		teammates.clear();
 		opponents.clear();
+		
+		createBall();
+		
+		gameRunning = false;
 	}
 	
 	public void update(float delta) {
@@ -666,8 +676,13 @@ public class GameMap {
 		//System.out.println(delta * 38 + " ; " + getMainPlayerRotation().getYaw());
 		//System.out.println(ball.getMainBody().checkCollideWith(terrain.getBodies().get(0)) + " from GameMap");
 		//collisionWorld.performDiscreteCollisionDetection();
-		
-		controlPlayer(delta);
+		if(gameRunning)
+			controlPlayer(delta);
+		else {
+			if(startTimer <= 0)
+				gameRunning = true;
+			else startTimer-= delta;
+		}
 		
 		ball.update(delta);
 		
@@ -1060,6 +1075,10 @@ public class GameMap {
 	
 	public int oppScore() {
 		return oppScore;
+	}
+	
+	public float getTimer() {
+		return startTimer;
 	}
 	
 	public boolean isGameRunning() {

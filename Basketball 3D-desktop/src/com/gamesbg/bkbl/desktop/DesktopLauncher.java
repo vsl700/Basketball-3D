@@ -7,15 +7,27 @@ import com.gamesbg.bkbl.MyGdxGame;
 
 public class DesktopLauncher {
 	public static void main (String[] arg) {
-		LwjglApplicationConfiguration config = new LwjglApplicationConfiguration();
-		new LwjglApplication(new MyGdxGame(), config);
+		final LwjglApplicationConfiguration config = new LwjglApplicationConfiguration();
+		new LwjglApplication(new MyGdxGame() {
+			
+			@Override
+			public void setForegroundFps(int fps) {
+				config.foregroundFPS = fps;
+			}
+			
+			@Override
+			public int getForegroundFps() {
+				return config.foregroundFPS;
+			}
+			
+		}, config);
 		
 		//config.useGL30 = false;
 		config.width = MyGdxGame.WIDTH;
 		config.height = MyGdxGame.HEIGHT;
 		config.title = "Basketball 3D";
 		config.vSyncEnabled = false;
-		config.samples = 4;
+		//config.samples = 4;
 		config.addIcon("application/icons/bkbl.png", FileType.Internal);
 		//LwjglApplicationConfiguration.disableAudio = true;
 		//config.resizable = false;
