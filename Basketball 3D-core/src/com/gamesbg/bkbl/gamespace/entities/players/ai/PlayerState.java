@@ -16,6 +16,8 @@ public enum PlayerState implements State<Player> {
 	BALL_IN_HAND() {
 		float distDiff = 0, resetTime = 0;
 		
+		boolean ballJustShot;
+		
 		
 		@Override
 		public void update(Player player) {
@@ -23,32 +25,6 @@ public enum PlayerState implements State<Player> {
 			
 			if(!player.getStateMachine().isInState(BALL_IN_HAND) || player.isShooting())
 				return;
-
-			//Walking & running mechanism
-			GameObject basket;
-			if(player instanceof Teammate)
-				basket = player.getMap().getAwayBasket();
-			else basket = player.getMap().getHomeBasket();
-			
-			//We use this if just for the aim & shoot starter. The if below continues it.
-			if(player.isInAwayBasketZone() && aimingTime == 0) {
-				player.lookAt(basket.getMainTrans().getTranslation(new Vector3()));
-				
-				player.interactWithBallS();
-				aimingTime+= Gdx.graphics.getDeltaTime();
-				
-				return;
-			}
-			
-			
-			if (player.isEastSurround() || player.isNorthSurround()) {
-				distDiff += 6 * Gdx.graphics.getDeltaTime();
-			}else if(resetTime > 0.25f)
-				distDiff = 0;
-			else resetTime+= Gdx.graphics.getDeltaTime();
-			
-			Vector3 dir = player.roamAround(basket.getMainTrans().cpy().trn(distDiff, 0, 0), null, 0, 5, false, aimingTime > 0);
-			player.lookAt(dir);
 			
 			//Ball behavior mechanism
 			if (aimingTime > 0 && aimingTime < 1.25f) {
@@ -98,22 +74,63 @@ public enum PlayerState implements State<Player> {
 						player.interactWithBallR();
 						switchHandTime = 0;
 					}
-				} else if (aimingTime == 0 && time > 0.75f) {
+				} else if (aimingTime == 0 && dribbleTime > 0.75f) {
 					if (player.leftHolding())
 						player.interactWithBallL();
 					else if (player.rightHolding())
 						player.interactWithBallR();
 
-					time = 0;
+					dribbleTime = 0;
 				}else
-					time += Gdx.graphics.getDeltaTime();
+					dribbleTime += Gdx.graphics.getDeltaTime();
 				}
 			}
 			
 			switchHandTime+= Gdx.graphics.getDeltaTime();
 			
+			//Walking & running mechanism
+			GameObject basket;
+			if(player instanceof Teammate)
+				basket = player.getMap().getAwayBasket();
+			else basket = player.getMap().getHomeBasket();
+			
+			//We use this if just for the aim & shoot starter. The if below continues it.
+			if(player.isInAwayBasketZone() && aimingTime == 0) {
+				player.lookAt(basket.getMainTrans().getTranslation(new Vector3()));
+				
+				player.interactWithBallS();
+				aimingTime+= Gdx.graphics.getDeltaTime();
+				
+				return;
+			}
 			
 			
+			if (player.isNorthSurround() && aimingTime == 0) {
+				if (player.isWestSurround())
+					distDiff -= 60 * Gdx.graphics.getDeltaTime();
+				else 
+					distDiff += 60 * Gdx.graphics.getDeltaTime();
+				
+			}
+			else if(resetTime > 0.25f) {
+				distDiff = 0;
+				resetTime = 0;
+			}
+			else resetTime+= Gdx.graphics.getDeltaTime();
+			
+			Vector3 dir = player.roamAround(basket.getMainTrans().cpy().trn(distDiff, 0, 0), null, 0, 5, false, aimingTime > 0 || player.isShooting());
+			player.lookAt(dir);
+			
+		}
+		
+		@Override
+		public void setSpecialBoolean(boolean b) {
+			ballJustShot = b;
+		}
+		
+		@Override
+		public boolean isSpecialBoolean() {
+			return ballJustShot;
 		}
 		
 	},
@@ -132,7 +149,7 @@ public enum PlayerState implements State<Player> {
 			
 			Vector3 tempHandVec = getShortestDistanceWVectors(ballVec, handVecs);
 			
-			if(!ballJustShot) {
+			if(!BALL_IN_HAND.isSpecialBoolean()) {
 				if (tempHandVec.idt(handVecs.get(0)))
 					player.interactWithBallL();
 				else if (tempHandVec.idt(handVecs.get(1)))
@@ -150,7 +167,7 @@ public enum PlayerState implements State<Player> {
 		public void update(Player player) {
 			super.update(player);
 			
-			ballJustShot = false;
+			BALL_IN_HAND.setSpecialBoolean(false);
 			
 			if(!player.getStateMachine().isInState(COOPERATIVE))
 				return;
@@ -205,7 +222,7 @@ public enum PlayerState implements State<Player> {
 		public void update(Player player) {
 			super.update(player);
 			
-			ballJustShot = false;
+			BALL_IN_HAND.setSpecialBoolean(false);
 		}
 	},
 	
@@ -214,13 +231,11 @@ public enum PlayerState implements State<Player> {
 		public void update(Player player) {
 			super.update(player);
 			
-			ballJustShot = false;
+			BALL_IN_HAND.setSpecialBoolean(false);
 		}
 	};
 
-	float time, aimingTime, shootTime, switchHandTime;
-	
-	boolean ballJustShot;
+	float dribbleTime, aimingTime, shootTime, switchHandTime;
 	
 	@Override
 	public void enter(Player entity) {
@@ -232,6 +247,14 @@ public enum PlayerState implements State<Player> {
 	public void exit(Player entity) {
 		
 		
+	}
+	
+	protected void setSpecialBoolean(boolean b) {
+		
+	}
+	
+	protected boolean isSpecialBoolean() {
+		return false;
 	}
 	
 	@Override
