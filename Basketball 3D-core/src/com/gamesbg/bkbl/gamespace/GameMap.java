@@ -52,25 +52,17 @@ public class GameMap {
 	class ObjectContactListener extends ContactListener{
 		@Override
 		public boolean onContactAdded (int userValue0, int partId0, int index0, int userValue1, int partId1, int index1) {
-			//players.get(userValue0).setCollision(true);
-			//players.get(userValue1).setCollision(true);
-			//if(((userValue0 == 11 || userValue0 == 19) && userValue1 == 21) || ((userValue1 == 11 || userValue1 == 19) && userValue0 == 21))
-				//System.out.println(userValue0 + " collided with " + userValue1);
-			//if((objectsMap.get(userValue0).equals("ballObj") && objectsMap.get(userValue1).equals("teamObj")) || (objectsMap.get(userValue1).equals("ballObj") && objectsMap.get(userValue0).equals("teamObj")))
-			//if(objectsMap.get(userValue0).equals("ball") || objectsMap.get(userValue0).equals("ballObj") || objectsMap.get(userValue1).equals("ball") || objectsMap.get(userValue1).equals("ballObj"))
-			//if(objectsMap.get(userValue0).equals("cam") || objectsMap.get(userValue1).equals("cam"))
-				//System.out.println(userValue0 + " (" + objectsMap.get(userValue0) + ")" + " with " + userValue1 + " (" + objectsMap.get(userValue1) + ")");
-			//if(userValue0 == 23 || userValue1 == 23)
-				//System.out.println(userValue0 + " and " + userValue1);
-			//System.out.println(userValue0 + " and " + userValue1);
-			//if(
-					//objectsMap.get(userValue0).equals("teamNorth") || objectsMap.get(userValue0).equals("teamSouth") || objectsMap.get(userValue0).equals("teamEast") || objectsMap.get(userValue0).equals("teamWest") ||
-					//objectsMap.get(userValue1).equals("teamNorth") || objectsMap.get(userValue1).equals("teamSouth") || objectsMap.get(userValue1).equals("teamEast") || objectsMap.get(userValue1).equals("teamWest")
-					//|| objectsMap.get(userValue0).equals("oppNorth") || objectsMap.get(userValue0).equals("oppSouth") || objectsMap.get(userValue0).equals("oppEast") || objectsMap.get(userValue0).equals("oppWest") 
-					//|| objectsMap.get(userValue1).equals("oppNorth") || objectsMap.get(userValue1).equals("oppSouth") || objectsMap.get(userValue1).equals("oppEast") || objectsMap.get(userValue1).equals("teamWest")
-					//)
-				//System.out.println(objectsMap.get(userValue0) + ";" + objectsMap.get(userValue1));
-			
+			if(
+			//objectsMap.get(userValue0).equals("teamNorth") || objectsMap.get(userValue0).equals("teamSouth") || objectsMap.get(userValue0).equals("teamEast") || objectsMap.get(userValue0).equals("teamWest") ||
+			//objectsMap.get(userValue1).equals("teamNorth") || objectsMap.get(userValue1).equals("teamSouth") || objectsMap.get(userValue1).equals("teamEast") || objectsMap.get(userValue1).equals("teamWest")
+					//|| 
+					(objectsMap.get(userValue0).equals("oppNorth") || objectsMap.get(userValue0).equals("oppSouth") || objectsMap.get(userValue0).equals("oppEast") || objectsMap.get(userValue0).equals("oppWest") 
+					) && objectsMap.get(userValue1).equals("team") || 
+					(
+							objectsMap.get(userValue1).equals("oppNorth") || objectsMap.get(userValue1).equals("oppSouth") || objectsMap.get(userValue1).equals("oppEast") || objectsMap.get(userValue1).equals("teamWest")
+					) && objectsMap.get(userValue0).equals("team")
+			)
+				System.out.println(objectsMap.get(userValue0) + ";" + objectsMap.get(userValue1));
 			
 			btCollisionObject tempCollObj0 = collObjsValsMap.get(userValue0), tempCollObj1 = collObjsValsMap.get(userValue1);
 			Entity temp0 = collObjsInEntityMap.get(tempCollObj0), temp1 = collObjsInEntityMap.get(tempCollObj1);
@@ -81,82 +73,6 @@ public class GameMap {
 			if(temp1 != null) {
 				temp1.collisionOccured(tempCollObj1, tempCollObj0);
 			}
-			//GameObject tempObj = null;
-			/*ArrayList<Player> temp = new ArrayList<Player>();
-			temp.addAll(teammates);
-			temp.addAll(opponents);
-			
-			btCollisionObject collObj0 = null, collObj1 = null;
-			collObj0 = getCollObjByUserValueAndEntity(ball, userValue0);
-			if(collObj0 == null) {
-				
-				for(Player p : temp) {
-					collObj0 = getCollObjByUserValueAndEntity(p, userValue0);
-					if(collObj0 != null) {
-						temp0 = p;
-						break;
-					}
-						
-				}
-			}
-			else temp0 = ball;
-			
-			collObj1 = getCollObjByUserValueAndEntity(ball, userValue1);
-			if(collObj1 == null) {
-				for(Player p : temp) {
-					collObj1 = getCollObjByUserValueAndEntity(p, userValue1);
-					if(collObj1 != null) {
-						temp1 = p;
-						break;
-					}
-				}
-			}
-			else temp1 = ball;
-			
-			if(collObj0 == null) {
-				collObj0 = getCollObjByUserValueAndGameObj(terrain, userValue0);
-				if(collObj0 == null) {
-					collObj0 = getCollObjByUserValueAndGameObj(basket1, userValue0);
-					if(collObj0 == null) {
-						getCollObjByUserValueAndGameObj(basket2, userValue0);
-						//tempObj = basket2;
-					}
-					//else tempObj = basket1;
-				}
-				
-				//else tempObj = terrain;
-			}
-			
-			else if(collObj1 == null) {
-				collObj1 = getCollObjByUserValueAndGameObj(terrain, userValue1);
-				if(collObj1 == null) {
-					collObj1 = getCollObjByUserValueAndGameObj(basket1, userValue1);
-					if(collObj1 == null) {
-						getCollObjByUserValueAndGameObj(basket2, userValue1);
-						//tempObj = basket2;
-					}
-					//else tempObj = basket1;
-				}
-				
-				//else tempObj = terrain;
-			}
-			
-			
-			//Entity temp0 = getCollidingEntity(collObj0, userValue0), temp1 = getCollidingEntity(collObj1, userValue1);
-			
-			if (collObj0 != null && collObj1 != null) {
-				if (temp0 != null)
-					temp0.collisionOccured(collObj0, collObj1);
-
-				if (temp1 != null)
-					temp1.collisionOccured(collObj1, collObj0);
-			}
-			
-			/*System.out.println(temp0);
-			System.out.println(temp1);*/
-			//System.out.println(collObj0);
-			//System.out.println(collObj1);
-			//System.out.println();
 			
 			return true;
 		}
@@ -236,10 +152,8 @@ public class GameMap {
 			co.setUserValue(index);
 			co.setCollisionFlags(co.getCollisionFlags());
 			dynamicsWorld.addRigidBody(co, GROUND_FLAG, ALL_FLAG);
-			//System.out.println(co.getUserValue());
 			co.setContactCallbackFlag(GROUND_FLAG);
 			co.setContactCallbackFilter(ENTITY_FLAG);
-			////System.out.println(co.getUserValue());
 			co.setActivationState(Collision.DISABLE_DEACTIVATION);
 			
 			objectsMap.put(index, ObjectType.TERRAIN.getId());
@@ -254,7 +168,6 @@ public class GameMap {
 			co.setUserValue(index);
 			co.setCollisionFlags(co.getCollisionFlags() | btCollisionObject.CollisionFlags.CF_CUSTOM_MATERIAL_CALLBACK);
 			dynamicsWorld.addRigidBody(co, CAMERA_FLAG, GROUND_FLAG);
-			//System.out.println(co.getUserValue());
 			co.setContactCallbackFlag(CAMERA_FLAG);
 			co.setContactCallbackFilter(GROUND_FLAG);
 			
@@ -268,9 +181,7 @@ public class GameMap {
 		basket1 = ObjectType.createGameObject(ObjectType.HOMEBASKET.getId(), this, 0.1f, 0, 27);
 		for(btRigidBody co : basket1.getBodies()) {
 			co.setUserValue(index);
-			//co.setCollisionFlags(co.getCollisionFlags() | btCollisionObject.CollisionFlags.CF_CUSTOM_MATERIAL_CALLBACK);
 			dynamicsWorld.addRigidBody(co, OBJECT_FLAG, ALL_FLAG);
-			//System.out.println(co.getUserValue());
 			co.setContactCallbackFlag(OBJECT_FLAG);
 			co.setContactCallbackFilter(ENTITY_FLAG);
 			
@@ -284,7 +195,6 @@ public class GameMap {
 		for(btCollisionObject co : basket1.getCollisionObjects()) {
 			co.setUserValue(index);
 			co.setCollisionFlags(co.getCollisionFlags() | btCollisionObject.CollisionFlags.CF_CUSTOM_MATERIAL_CALLBACK);
-			//System.out.println(co.getUserValue());
 			if(co.getUserIndex() == 2) {
 				dynamicsWorld.addCollisionObject(co, ENT_SPECIAL_FLAG, SPECIAL_FLAG);
 				co.setContactCallbackFlag(ENT_SPECIAL_FLAG);
@@ -296,23 +206,17 @@ public class GameMap {
 				co.setContactCallbackFilter(ENT_SPECIAL_FLAG);
 				objectsMap.put(index, ObjectType.HOMEBASKET.getId() + "Obj");
 			}
-
-			//System.out.println(co.getContactCallbackFlag());
-			//System.out.println(co.getContactCallbackFilter());
-			//System.out.println(co.getUserValue());
+			
 			collObjsInObjectMap.put(co, basket1);
 			collObjsValsMap.put(index, co);
 			
 			index++;
-			//dynamicsWorld.addRigidBody(co);
 		}
 		
 		basket2 = ObjectType.createGameObject(ObjectType.AWAYBASKET.getId(), this, 0.1f, 0, -27);
 		basket2.setRotation(0, 1, 0, 180);
 		for(btRigidBody co : basket2.getBodies()) {
 			co.setUserValue(index);
-			//co.setCollisionFlags(co.getCollisionFlags() | btCollisionObject.CollisionFlags.CF_CUSTOM_MATERIAL_CALLBACK);
-			//System.out.println(co.getUserValue());
 			dynamicsWorld.addRigidBody(co, OBJECT_FLAG, ALL_FLAG);
 			co.setContactCallbackFlag(OBJECT_FLAG);
 			co.setContactCallbackFilter(ENTITY_FLAG);
@@ -327,7 +231,6 @@ public class GameMap {
 		for(btCollisionObject co : basket2.getCollisionObjects()) {
 			co.setUserValue(index);
 			co.setCollisionFlags(co.getCollisionFlags() | btCollisionObject.CollisionFlags.CF_CUSTOM_MATERIAL_CALLBACK);
-			//System.out.println(co.getUserValue());
 			if(co.getUserIndex() == 2) {
 				dynamicsWorld.addCollisionObject(co, ENT_SPECIAL_FLAG, SPECIAL_FLAG);
 				co.setContactCallbackFlag(ENT_SPECIAL_FLAG);
@@ -344,7 +247,6 @@ public class GameMap {
 			collObjsValsMap.put(index, co);
 			
 			index++;
-			//dynamicsWorld.addRigidBody(co);
 		}
 		
 		createBall();
@@ -360,17 +262,13 @@ public class GameMap {
 		
 		for(int i = 0; i < count; i++) {
 			Player teammate = EntityType.createPlayer(EntityType.TEAMMATE.getId(), this, new Vector3(spawnCoords[i][0], spawnCoords[i][1], spawnCoords[i][2]));
-			//players.add(EntityType.createEntity("team", this, 0, 0, 0));
 			for (btRigidBody co : teammate.getBodies()) {
 				co.setUserValue(index2);
 				co.setCollisionFlags(co.getCollisionFlags() | btCollisionObject.CollisionFlags.CF_CUSTOM_MATERIAL_CALLBACK);
 				
-				//if(co.equals(opponent.getMainBody())) {
-				
 				dynamicsWorld.addRigidBody(co, ENTITY_FLAG, ALL_FLAG);
 				co.setContactCallbackFlag(ENTITY_FLAG);
 				co.setContactCallbackFilter(ALL_FLAG);
-					////System.out.println(co.getUserValue());
 					if(teammate.getMainBody().equals(co)) {
 						objectsMap.put(index2, EntityType.TEAMMATE.getId());
 					}
@@ -380,13 +278,6 @@ public class GameMap {
 					
 					collObjsInEntityMap.put(co, teammate);
 					collObjsValsMap.put(index2, co);
-					//co.setContactCallbackFlag(PLAYER_FLAG);
-					//co.setContactCallbackFilter(ALL_FLAG);
-				//}else {
-					//dynamicsWorld.addRigidBody(co, PART_FLAG, PLAYER_FLAG);
-					//co.setContactCallbackFlag(ENTITY_FLAG);
-					//co.setContactCallbackFilter(PLAYER_FLAG);
-				//}
 				
 				index2++;
 			}
@@ -395,12 +286,6 @@ public class GameMap {
 				co.setUserValue(index2);
 				co.setCollisionFlags(co.getCollisionFlags() | btCollisionObject.CollisionFlags.CF_CUSTOM_MATERIAL_CALLBACK);
 				
-				//if(co.equals(opponent.getMainBody())) {
-					//dynamicsWorld.addCollisionObject(co, SPECIAL_FLAG, ENT_SPECIAL_FLAG);
-					//co.setContactCallbackFlag(SPECIAL_FLAG);
-					//co.setContactCallbackFilter(ENT_SPECIAL_FLAG);
-					
-					////System.out.println(co.getUserValue());
 					if(co.getUserIndex() == 10) {
 						dynamicsWorld.addCollisionObject(co, ENT_SPECIAL_FLAG, ALL_FLAG);
 						co.setContactCallbackFlag(ENT_SPECIAL_FLAG);
@@ -439,29 +324,11 @@ public class GameMap {
 					
 					collObjsInEntityMap.put(co, teammate);
 					collObjsValsMap.put(index2, co);
-					//co.setContactCallbackFlag(PLAYER_FLAG);
-					//co.setContactCallbackFilter(ALL_FLAG);
-				//}else {
-					//dynamicsWorld.addRigidBody(co, PART_FLAG, PLAYER_FLAG);
-					//co.setContactCallbackFlag(ENTITY_FLAG);
-					//co.setContactCallbackFilter(PLAYER_FLAG);
-				//}
 				
 				index2++;
 			}
-			/*for(btRigidBody co : opponent.getInvisBodies()) {
-				co.setUserValue(index2);
-				co.setCollisionFlags(co.getCollisionFlags() | btCollisionObject.CollisionFlags.CF_CUSTOM_MATERIAL_CALLBACK);
-				//dynamicsWorld.addRigidBody(co);
-				co.setContactCallbackFlag(ENT_SPECIAL_FLAG);
-				co.setContactCallbackFilter(GROUND_FLAG);
-				
-				index2++;
-			}*/
+			
 			teammate.turnY(180);
-			/*for(int j = 0; j < opponent.getBodies().size(); j++)
-				for(int k = j + 1; k < opponent.getBodies().size(); k++)
-					opponent.getBodies().get(j).setIgnoreCollisionCheck(opponent.getBodies().get(k), true);*/
 			
 			teammates.add(teammate);
 			
@@ -472,16 +339,12 @@ public class GameMap {
 		playerIndex = 1;
 		for(int i = 0; i < count; i++) {
 			Player opponent = EntityType.createPlayer(EntityType.OPPONENT.getId(), this, new Vector3(spawnCoords[i][0], spawnCoords[i][1], -spawnCoords[i][2]));
-			//players.add(EntityType.createEntity("team", this, 0, 0, 0));
 			for (btRigidBody co : opponent.getBodies()) {
 				co.setUserValue(index2);
 				co.setCollisionFlags(co.getCollisionFlags() | btCollisionObject.CollisionFlags.CF_CUSTOM_MATERIAL_CALLBACK);
-				
-				//if(co.equals(opponent.getMainBody())) {
 				dynamicsWorld.addRigidBody(co, ENTITY_FLAG, ALL_FLAG);
 				co.setContactCallbackFlag(ENTITY_FLAG);
 				co.setContactCallbackFilter(ALL_FLAG);
-					////System.out.println(co.getUserValue());
 					if(opponent.getMainBody().equals(co)) {
 						objectsMap.put(index2, EntityType.OPPONENT.getId());
 					}
@@ -491,13 +354,6 @@ public class GameMap {
 					
 					collObjsInEntityMap.put(co, opponent);
 					collObjsValsMap.put(index2, co);
-					//co.setContactCallbackFlag(PLAYER_FLAG);
-					//co.setContactCallbackFilter(ALL_FLAG);
-				//}else {
-					//dynamicsWorld.addRigidBody(co, PART_FLAG, PLAYER_FLAG);
-					//co.setContactCallbackFlag(ENTITY_FLAG);
-					//co.setContactCallbackFilter(PLAYER_FLAG);
-				//}
 				
 				index2++;
 			}
@@ -505,11 +361,6 @@ public class GameMap {
 			for (btCollisionObject co : opponent.getCollisionObjects()) {
 				co.setUserValue(index2);
 				co.setCollisionFlags(co.getCollisionFlags() | btCollisionObject.CollisionFlags.CF_CUSTOM_MATERIAL_CALLBACK);
-				
-				//if(co.equals(opponent.getMainBody())) {
-					
-					
-					////System.out.println(co.getUserValue());
 					if(co.getUserIndex() == 10) {
 						dynamicsWorld.addCollisionObject(co, ENT_SPECIAL_FLAG, ALL_FLAG);
 						co.setContactCallbackFlag(ENT_SPECIAL_FLAG);
@@ -548,28 +399,9 @@ public class GameMap {
 				
 					collObjsInEntityMap.put(co, opponent);
 					collObjsValsMap.put(index2, co);
-					//co.setContactCallbackFlag(PLAYER_FLAG);
-					//co.setContactCallbackFilter(ALL_FLAG);
-				//}else {
-					//dynamicsWorld.addRigidBody(co, PART_FLAG, PLAYER_FLAG);
-					//co.setContactCallbackFlag(ENTITY_FLAG);
-					//co.setContactCallbackFilter(PLAYER_FLAG);
-				//}
 				
 				index2++;
 			}
-			/*for(btRigidBody co : opponent.getInvisBodies()) {
-				co.setUserValue(index2);
-				co.setCollisionFlags(co.getCollisionFlags() | btCollisionObject.CollisionFlags.CF_CUSTOM_MATERIAL_CALLBACK);
-				//dynamicsWorld.addRigidBody(co);
-				co.setContactCallbackFlag(ENT_SPECIAL_FLAG);
-				co.setContactCallbackFilter(GROUND_FLAG);
-				
-				index2++;
-			}*/
-			/*for(int j = 0; j < opponent.getBodies().size(); j++)
-				for(int k = j + 1; k < opponent.getBodies().size(); k++)
-					opponent.getBodies().get(j).setIgnoreCollisionCheck(opponent.getBodies().get(k), true);*/
 			
 			opponents.add(opponent);
 			
@@ -599,20 +431,11 @@ public class GameMap {
 		ball = EntityType.createEntity(EntityType.BALL.getId(), this, new Vector3(0, 0, 0));
 		for (btRigidBody co : ball.getBodies()) {
 			co.setUserValue(index);
-			// ball.getBody().setCollisionFlags(ball.getBody().getCollisionFlags()
-			// | btCollisionObject.CollisionFlags.CF_CUSTOM_MATERIAL_CALLBACK);
 			co.setCollisionFlags(co.getCollisionFlags() | btCollisionObject.CollisionFlags.CF_CUSTOM_MATERIAL_CALLBACK);
-			//co.applyCentralForce(new Vector3(0, 550, 0));
-			//co.applyCentralForce(new Vector3());
-			//dynamicsWorld.addRigidBody(co);
-			//co.setActivationState(Collision.WANTS_DEACTIVATION);
-			//System.out.println(co.getUserValue());
+			
 			dynamicsWorld.addRigidBody(co, ENTITY_FLAG, ALL_FLAG);
 			co.setContactCallbackFlag(ENTITY_FLAG);
 			co.setContactCallbackFilter(ALL_FLAG);
-			
-			//System.out.println(co.getContactCallbackFlag());
-			//System.out.println(co.getContactCallbackFilter());
 			
 			objectsMap.put(index, EntityType.BALL.getId());
 			collObjsInEntityMap.put(co, ball);
@@ -628,10 +451,6 @@ public class GameMap {
 			dynamicsWorld.addCollisionObject(co, ENT_SPECIAL_FLAG, SPECIAL_FLAG);
 			co.setContactCallbackFlag(ENT_SPECIAL_FLAG);
 			co.setContactCallbackFilter(SPECIAL_FLAG);
-
-			//System.out.println(co.getContactCallbackFlag());
-			//System.out.println(co.getContactCallbackFilter());
-			//System.out.println(co.getUserValue());
 			objectsMap.put(index, EntityType.BALL.getId() + "Obj");
 			collObjsInEntityMap.put(co, ball);
 			collObjsValsMap.put(index, co);
@@ -651,31 +470,12 @@ public class GameMap {
 	}
 	
 	public void update(float delta) {
-		/*for (int i = 0; i < players.size(); i++) 
-			for (int j = i + 1; j < players.size(); j++)
-				for (btCollisionObject c0 : players.get(i).getCollisionObject()) 
-					for(btCollisionObject c1 : players.get(j).getCollisionObject()) 
-						checkCollision(c0, c1);*/
-		
-		//if(!Gdx.input.isButtonPressed(Buttons.LEFT))
-		
-		//System.out.println("UPDATE");
 		
 		camera.setWorldTransform(new Matrix4(mainPlayer.getModelInstance().transform).mul(mainPlayer.getCamMatrix()).mul(new Matrix4().setToTranslation(0, mainPlayer.getHeight(), -10)));
 		
 		float delta2 = Math.min(1f / 30f, delta);
 		for(int i = 0; i < 6; i++)
 			dynamicsWorld.stepSimulation(delta2/6, 15, 1f / 60f);
-		/*ball.getBody().getWorldTransform(ball.getModelInstance().transform);
-		for(Entity e : players) {
-			e.getBody().getWorldTransform(e.getModelInstance().transform);
-		}*/
-		
-		//mainPlayer.turn(delta * -38);
-		
-		//System.out.println(delta * 38 + " ; " + getMainPlayerRotation().getYaw());
-		//System.out.println(ball.getMainBody().checkCollideWith(terrain.getBodies().get(0)) + " from GameMap");
-		//collisionWorld.performDiscreteCollisionDetection();
 		if(gameRunning)
 			controlPlayer(delta);
 		else {
@@ -716,12 +516,10 @@ public class GameMap {
 	}
 	
 	public void addRigidBody(btRigidBody body, int group, int mask) {
-		//System.out.println(body.getUserValue());
 		dynamicsWorld.addRigidBody(body, (short) group, (short) mask);
 	}
 	
 	public void removeRigidBody(btRigidBody body) {
-		//System.out.println(body.getUserValue());
 		dynamicsWorld.removeRigidBody(body);
 	}
 	
@@ -739,27 +537,16 @@ public class GameMap {
 		basket1.dispose();
 		basket2.dispose();
 		
-		//dispatcher.dispose();
-        //collisionConfig.dispose();
-        //collisionWorld.dispose();
-		//broadphase.dispose();
         dynamicsWorld.dispose();		
 		dynDispatcher.dispose();
         dynCollConfig.dispose();
         dynBroadphase.dispose();
         constraintSolver.dispose();
         
-        /*softDispatcher.dispose();
-        softCollConfig.dispose();
-        softBroadphase.dispose();
-        softConstSolver.dispose();
-        softWorld.dispose();*/
-        
         contactListener.dispose();
 	}
 	
 	private void disposePlayers() {
-		//if(teammates != null)
 		for(Player e : teammates) {
 			for(btRigidBody co : e.getBodies()) {
 				dynamicsWorld.removeRigidBody(co);
@@ -774,20 +561,19 @@ public class GameMap {
 			e.dispose();
 		}
 		
-		//if(opponents != null)
-			for(Player e : opponents) {
-				for(btRigidBody co : e.getBodies()) {
-					dynamicsWorld.removeRigidBody(co);
-					collObjsInEntityMap.remove(co);
-				}
-				
-				for(btCollisionObject co : e.getCollisionObjects()) {
-					dynamicsWorld.removeCollisionObject(co);
-					collObjsInEntityMap.remove(co);
-				}
-				
-				e.dispose();
+		for (Player e : opponents) {
+			for (btRigidBody co : e.getBodies()) {
+				dynamicsWorld.removeRigidBody(co);
+				collObjsInEntityMap.remove(co);
 			}
+
+			for (btCollisionObject co : e.getCollisionObjects()) {
+				dynamicsWorld.removeCollisionObject(co);
+				collObjsInEntityMap.remove(co);
+			}
+
+			e.dispose();
+		}
 	}
 	
 	public void setCameraTrans(Matrix4 trans) {
@@ -814,55 +600,22 @@ public class GameMap {
 		
 		float dirX = tempVec.x;
 		float dirZ = tempVec.z;
-
-		//System.out.println(dirX + " ; " + dirZ);
-		//System.out.print(dirX * delta * multiplier + "; " + dirZ * delta * multiplier + "; ");
 		
-		//if (Gdx.input.isKeyPressed(Keys.SHIFT_LEFT) && Gdx.input.isKeyPressed(Keys.W)) {
-			//if (Gdx.input.isKeyPressed(Keys.W))
-				// mainPlayer.getBody().setLinearVelocity(new Vector3(dirX * delta * multiplier, 0, dirZ * delta * multiplier));
-				//mainPlayer.run(new Vector3(dirX * delta, 0, dirZ * delta));
-			/*else if (Gdx.input.isKeyPressed(Keys.S))
-				// mainPlayer.getBody().setLinearVelocity(new Vector3(dirX * -delta * multiplier, 0, dirZ * -delta * multiplier));
-				mainPlayer.run(new Vector3(dirX * -delta, 0, dirZ * -delta));
-			// else mainPlayer.getBody().setLinearVelocity(new Vector3());
-
-			if (Gdx.input.isKeyPressed(Keys.A))
-				// mainPlayer.getBody().setLinearVelocity(new Vector3(dirZ * delta * multiplier, 0, dirX * -delta * multiplier));
-				mainPlayer.run(new Vector3(dirZ * delta, 0, dirX * -delta));
-			else if (Gdx.input.isKeyPressed(Keys.D))
-				// mainPlayer.getBody().setLinearVelocity(new Vector3(dirZ * -delta * multiplier, 0, dirX * delta * multiplier));
-				mainPlayer.run(new Vector3(dirZ * -delta, 0, dirX * delta));*/
-		//}
-		//else {
 		if(inputs.isSprintPressed()) {
 			if (inputs.isForwardPressed()) {
-				// mainPlayer.getBody().setLinearVelocity(new Vector3(dirX * delta * multiplier, 0, dirZ * delta * multiplier));
 				mainPlayer.run(new Vector3(dirX * delta, 0, dirZ * delta));
-				
-				/*if (Gdx.input.isKeyPressed(Keys.A))
-					// mainPlayer.getBody().setLinearVelocity(new Vector3(dirZ * delta * multiplier, 0, dirX * -delta * multiplier));
-					mainPlayer.run(new Vector3(dirZ * delta, 0, dirX * -delta));
-				else if (Gdx.input.isKeyPressed(Keys.D))
-					// mainPlayer.getBody().setLinearVelocity(new Vector3(dirZ * -delta * multiplier, 0, dirX * delta * multiplier));
-					mainPlayer.run(new Vector3(dirZ * -delta, 0, dirX * delta));*/
 			}
 		}
 		else {
 			if (inputs.isForwardPressed()) {
-				// mainPlayer.getBody().setLinearVelocity(new Vector3(dirX * delta * multiplier, 0, dirZ * delta * multiplier));
 				mainPlayer.walk(new Vector3(dirX * delta, 0, dirZ * delta));
 			}
 			else if (inputs.isBackwardPressed())
-				// mainPlayer.getBody().setLinearVelocity(new Vector3(dirX * -delta * multiplier, 0, dirZ * -delta * multiplier));
 				mainPlayer.walk(new Vector3(dirX * -delta, 0, dirZ * -delta));
-			// else mainPlayer.getBody().setLinearVelocity(new Vector3());
 
 			if (inputs.isStrLeftPressed())
-				// mainPlayer.getBody().setLinearVelocity(new Vector3(dirZ * delta * multiplier, 0, dirX * -delta * multiplier));
 				mainPlayer.walk(new Vector3(dirZ * delta, 0, dirX * -delta));
 			else if (inputs.isStrRightPressed())
-				// mainPlayer.getBody().setLinearVelocity(new Vector3(dirZ * -delta * multiplier, 0, dirX * delta * multiplier));
 				mainPlayer.walk(new Vector3(dirZ * -delta, 0, dirX * delta));
 		}
 		
@@ -879,19 +632,11 @@ public class GameMap {
 			mainPlayer.interactWithBallR();
 		}
 		
-		//if(Gdx.input.isKeyJustPressed(Keys.SPACE))
-			//mainPlayer.jump();
-		
-			//}
-		
 		float turnY = Gdx.input.getDeltaX(); //Around the Y-axis
 		float turnX = Gdx.input.getDeltaY(); //Around the X-axis
 		
 		if(Math.abs(turnY) < Gdx.graphics.getWidth() / 4) {
 			mainPlayer.turnY(turnY * delta * 9);
-			
-			//if(turnY != 0.f)
-				//System.out.println(Math.abs(turnY) + " ; " + Gdx.graphics.getWidth() / 4);
 		}
 		
 		if(Math.abs(turnX) < Gdx.graphics.getHeight() / 4) {
@@ -911,89 +656,9 @@ public class GameMap {
 			Gdx.input.setCursorPosition(Gdx.input.getX(), Gdx.graphics.getHeight() - substractor);
 		
 		inputs.update(mainPlayer.holdingBall());
-		//Gdx.input.setCursorPosition(0, 0);
-		//else mainPlayer.getBody().setLinearVelocity(new Vector3());
-		/*if (Gdx.input.isKeyPressed(Keys.W))
-			mainPlayer.getBody().applyCentralForce(new Vector3(dirX * delta + multiplier, 0, dirZ * delta + multiplier));
-		else if (Gdx.input.isKeyPressed(Keys.S))
-			mainPlayer.getBody().applyCentralForce(new Vector3(dirX * delta + multiplier, 0, dirZ * delta + multiplier));
-		else mainPlayer.getBody().applyCentralForce(new Vector3(0, 0, 0));
 		
-		if (Gdx.input.isKeyPressed(Keys.A))
-			mainPlayer.getBody().applyCentralForce(new Vector3(dirZ * delta + multiplier, 0, dirX * -delta + multiplier));
-		else if (Gdx.input.isKeyPressed(Keys.D))
-			mainPlayer.getBody().applyCentralForce(new Vector3(dirZ * -delta + multiplier, 0, dirX * delta + multiplier));
-		else mainPlayer.getBody().applyCentralForce(new Vector3(0, 0, 0));*/
-		
-		//float a = Gdx.input.getDeltaY();
-		//float b = Gdx.input.getDeltaX();
-
-		//mainPlayer.getBody().setAngularVelocity(new Vector3(-a, -b, 0));
-		
-		//playerM.rotate(new Vector3(0.1f, 0, 0), -a / 6);
-		//playerM.rotate(new Vector3(0, 0.1f, 0), -b / 6);
-		
-		//System.out.println(playerM.getTranslation(new Vector3()).x + "; " + playerM.getTranslation(new Vector3()).y + "; " + playerM.getTranslation(new Vector3()).z + "; " + delta);
-		
-		/*mainPlayer.getModelInstance().transform = playerM;
-		mainPlayer.getBody().setWorldTransform(playerM);*/
-		
-		//mainPlayer.moved(playerM);
 		
 	}
-	
-	/*private Entity getCollidingEntity(btCollisionObject collObj, int userValue) {
-		//collObj = getCollObjByUserValueAndEntity(ball, userValue);
-		if(getCollObjByUserValueAndEntity(ball, userValue) != null)
-			return ball;
-		else {
-			for(Entity e : players) {
-				//collObj = getCollObjByUserValueAndEntity(e, userValue);
-				if(getCollObjByUserValueAndEntity(e, userValue) != null)
-					return e;
-			}
-		}
-		
-		return null;
-	}*/
-	
-	/*private btCollisionObject getCollObjByUserValueAndGameObj(GameObject e, int userValue) {
-		for(btCollisionObject obj : e.getBodies()) {
-			if(obj.getUserValue() == userValue) {
-				//System.out.println("Returned " + userValue);
-				return obj;
-			}
-		}
-		
-		if(e.getCollisionObjects() != null)
-		for(btCollisionObject obj : e.getCollisionObjects()) {
-			if(obj.getUserValue() == userValue) {
-				//System.out.println("Returned " + userValue);
-				return obj;
-			}
-		}
-		
-		return null;
-	}
-	
-	private btCollisionObject getCollObjByUserValueAndEntity(Entity e, int userValue) {
-		for(btCollisionObject obj : e.getBodies()) {
-			if(obj.getUserValue() == userValue) {
-				//System.out.println("Returned " + userValue);
-				return obj;
-			}
-		}
-		
-		if(e.getCollisionObjects() != null)
-		for(btCollisionObject obj : e.getCollisionObjects()) {
-			if(obj.getUserValue() == userValue) {
-				//System.out.println("Returned " + userValue);
-				return obj;
-			}
-		}
-		
-		return null;
-	}*/
 	
 	public btDynamicsWorld getDynamicsWorld() {
 		return dynamicsWorld;

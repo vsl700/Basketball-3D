@@ -22,7 +22,6 @@ public class Terrain extends GameObject {
 
 	@Override
 	protected void createModels() {
-		// TODO Auto-generated method stub
 		ModelBuilder mb = new ModelBuilder();
 		
 		Texture court = new Texture(Gdx.files.internal("game/basketball_court.jpg"));
@@ -32,13 +31,6 @@ public class Terrain extends GameObject {
 		Material material = new Material(TextureAttribute.createDiffuse(court));
 		long attribs = VertexAttributes.Usage.Position | VertexAttributes.Usage.Normal | VertexAttributes.Usage.TextureCoordinates;
 		
-		/*mb.begin();
-		mb.node();
-		//ground.translation.set(0, -getHeight() / 2, 0);
-		BoxShapeBuilder.build(mb.part("ground", GL20.GL_TRIANGLES, attribs, material), getWidth(), getHeight(), getDepth());
-		
-		
-		model = mb.end();*/
 		model = mb.createBox(getWidth(), getHeight(), getDepth(), material, attribs);
 		model.manageDisposable(court);
 		
@@ -49,7 +41,7 @@ public class Terrain extends GameObject {
 
 	@Override
 	protected void createCollisionShapes() {
-		// TODO Auto-generated method stub
+		
 		visibleCollShapes.add(new btBoxShape(new Vector3(getWidth() * 2, getHeight() / 2, getDepth() * 2)));
 		
 		invisibleCollShapes.add(new btBoxShape(new Vector3(wallDepth, 10000, getDepth()*5)));
@@ -60,27 +52,25 @@ public class Terrain extends GameObject {
 
 	@Override
 	protected void specialFunction() {
-		// TODO Auto-generated method stub
+		
 
 	}
 
 	@Override
 	public float getWidth() {
-		// TODO Auto-generated method stub
+		
 		return 30;
 	}
 
 	@Override
 	public float getHeight() {
-		// TODO Auto-generated method stub
-		//System.out.println(model.nodes.get(0).scale.y);
+		
 		return 3f;
 	}
 
 	@Override
 	public float getDepth() {
-		// TODO Auto-generated method stub
-		//System.out.println(model.nodes.get(0).scale.z);
+		
 		return 60;
 	}
 
@@ -108,18 +98,6 @@ public class Terrain extends GameObject {
 			invisBodies.get(i).setFriction(1.0f);
 			invisBodies.get(i).setRestitution(0.1f);
 		}
-		
-		/*invisMotionStates.add(new GameMap.MotionState());
-		invisMotionStates.get(1).transform = new Matrix4().setToTranslation(x, y, z - getDepth() / 2 - wallDepth / 2);
-		invisBodies.get(1).setMotionState(invisMotionStates.get(1));
-		
-		invisMotionStates.add(new GameMap.MotionState());
-		invisMotionStates.get(2).transform = new Matrix4().setToTranslation(x + getWidth() / 2 + wallDepth / 2, y, z);
-		invisBodies.get(2).setMotionState(invisMotionStates.get(2));
-		
-		invisMotionStates.add(new GameMap.MotionState());
-		invisMotionStates.get(3).transform = new Matrix4().setToTranslation(x, y, z + getDepth() / 2 + wallDepth / 2);
-		invisBodies.get(3).setMotionState(invisMotionStates.get(3));*/
 	}
 
 	@Override

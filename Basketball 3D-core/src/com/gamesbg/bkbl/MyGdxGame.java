@@ -62,7 +62,6 @@ public class MyGdxGame extends Game {
 		level = new LevelScreen(this);
 		game = new GameScreen(this);
 		settings = new SettingsScreen(this);
-		//setScreen(settings);
 	}
 	
 	private void loadTexture() {
@@ -114,7 +113,6 @@ public class MyGdxGame extends Game {
 					if(background == null) loadTexture();
 					batch.draw(background, WIDTH / 2 - background.getWidth() / 2, HEIGHT / 2 - background.getHeight() / 2);
 				}
-				//System.out.println(WIDTH - background.getWidth());
 				batch.end();
 			}
 		}else {
@@ -126,8 +124,6 @@ public class MyGdxGame extends Game {
 		
 		batch.setProjectionMatrix(cam.combined);
 		batch.begin();
-		//if(!beautifulBack)
-			//batch.draw(background, WIDTH / 2 - background.getWidth() / 2, HEIGHT / 2 - background.getHeight() / 2);
 		font.draw(batch, Gdx.graphics.getFramesPerSecond() + " fps; ALPHA v0.1", 0, 13);
 		batch.end();
 	}

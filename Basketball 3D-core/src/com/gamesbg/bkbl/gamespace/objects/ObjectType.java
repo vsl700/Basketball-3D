@@ -41,7 +41,6 @@ public enum ObjectType {
 			entity.create(type, map, x, y, z);
 			return entity;
 		} catch (ReflectionException e) {
-			// TODO Auto-generated catch block
 			Gdx.app.error("Entity Loader", "Could not load entity of type " + type.id);
 			return null;
 		}

@@ -31,8 +31,6 @@ public class GameScreen implements Screen {
 	ShapeRenderer shape;
 	OrthographicCamera cam;
 	BitmapFont textFont, powFont;
-	// CameraInputController camController;
-	//FirstPersonCameraController camController;
 
 	GameMap map;
 
@@ -52,16 +50,9 @@ public class GameScreen implements Screen {
 		environment.add(new DirectionalLight().set(0.6f, 0.6f, 0.6f, 0, -10, 0));
 		environment.add(new PointLight().set(1, 1, 1, 0, 9, -15, 40));
 		environment.add(new PointLight().set(1, 1, 1, 0, 9, 15, 40));
-		//environment.add(new PointLight().set(1, 1, 1, 0, 9, 0, 40));
 
 		pCam = new PerspectiveCamera(40, Gdx.graphics.getWidth(), Gdx.graphics.getHeight());
 		pCam.position.set(3, 1, 0);
-		//pCam.up.x = 0;
-		//pCam.up.y = 0;
-		//pCam.up.z = 0;
-		//pCam.lookAt(new Vector3(0, 0.999f, 0));
-		//pCam.lookAt(0, 0, 0);
-		//pCam.rotate(-18f, 0, 0, 1);
 		pCam.far = 100;
 		pCam.near = 0.1f;
 		
@@ -81,29 +72,16 @@ public class GameScreen implements Screen {
 		timer = new Label("Ready?", textFont, Color.ORANGE, true);
 		power = new Label("POWER", textFont, Color.RED, true);
 		powerNum = new Label("10", powFont, Color.WHITE, true);
-		
-		//camController = new FirstPersonCameraController(pCam);
-
-		// camController = new CameraInputController(pCam);
-		// System.out.println(Keys.toString(camController.translateButton));
-
-		//map = game.getMap();
 	}
 
 	@Override
 	public void show() {
-		//The text panels use the setInputProcessor option so we need to set the controller as an Input Processor every time we start playing
-		
-		//Gdx.input.setInputProcessor(camController);
 		if(map == null)
 			game.load3DGraphics();
 		
 		map = game.getMap();
 		
 		map.spawnPlayers(amount);
-		
-		//Gdx.graphics.setCursor(null);
-		//map.setCameraTrans(pCam.combined);
 	}
 
 	@Override
@@ -111,13 +89,8 @@ public class GameScreen implements Screen {
 		Gdx.gl.glClearColor(0, 0.7f, 0.8f, 1);
 		Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT | GL20.GL_DEPTH_BUFFER_BIT);
 		
-		//if(Gdx.input.isButtonPressed(Buttons.LEFT))
-			//camController.update();
-		
 		map.update(delta);
-		//posTheCam();
 		map.getCamera().getMainTrans().getTranslation(pCam.position);
-		//map.getCamera().getMainTrans().getRotation(new Quaternion()).transform(pCam.direction);
 		game.customLookAt(pCam, new Matrix4(map.getMainPlayer().getModelInstance().transform).mul(new Matrix4().setToTranslation(0, map.getMainPlayer().getHeight(), 0)).getTranslation(new Vector3()));
 		pCam.update();
 

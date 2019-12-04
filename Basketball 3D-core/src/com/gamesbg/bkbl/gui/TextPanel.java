@@ -19,14 +19,10 @@ import com.badlogic.gdx.math.Vector3;
  */
 public class TextPanel extends Text implements InputProcessor {
 
-	//String text;
 	String prevText;
 	
 
 	long time;
-
-	//float r, g, b, a; // text color
-	//float x, y, width, height;
 	float textX, textY, textW, textH;
 	
 	float fR, fG, fB, fA; //Filling colors
@@ -36,7 +32,6 @@ public class TextPanel extends Text implements InputProcessor {
 	boolean active, cursor, locked;
 
 	public TextPanel(BitmapFont font, Color color, Color fillColor) {
-		//new TextPanel(font, color, fillColor, 0, 0);
 		this.font = font;
 
 		r = color.r;
@@ -167,18 +162,15 @@ public class TextPanel extends Text implements InputProcessor {
 			else {
 				prevText = text.toString();
 				textChangeListener.onTextChanged(text);
-				// textListener.onTextChanged(text);
 			}
 		}
 	}
 
 	boolean justTouched(OrthographicCamera cam) {
-		// for (int i = 0; i < 5; i++) {
 		Vector3 touchPos = new Vector3(Gdx.input.getX(), Gdx.input.getY(), 0);
 		cam.unproject(touchPos);
 
 		return Gdx.input.justTouched() && touchPos.x >= x && touchPos.x <= x + width && touchPos.y <= y + height && touchPos.y >= y;
-		// }
 	}
 
 	/**
@@ -197,7 +189,6 @@ public class TextPanel extends Text implements InputProcessor {
 	}
 	
 	public void setText(String text, boolean listen) {
-		//this.text = text;
 		
 		super.setText(text, listen);
 		prevText = text.toString();
@@ -210,7 +201,6 @@ public class TextPanel extends Text implements InputProcessor {
 	}
 
 	public void setText(String text) {
-		//this.text = text;
 		
 		super.setText(text);
 		prevText = text.toString();
@@ -223,10 +213,6 @@ public class TextPanel extends Text implements InputProcessor {
 	}
 	
 	public void setText(int num) {
-		/*this.text = Integer.toString(num);
-		prevText = text.toString();
-		
-		onResize();*/
 		setText(Integer.toString(num), false);
 	}
 
@@ -237,53 +223,6 @@ public class TextPanel extends Text implements InputProcessor {
 	public void setMax(int max) {
 		this.max = max;
 	}
-
-	/*public void setX(float x) {
-		this.x = x;
-		
-		onResize();
-	}
-
-	public void setY(float y) {
-		this.y = y;
-		
-		onResize();
-	}
-
-	public void setWidth(float width) {
-		this.width = width;
-		
-		onResize();
-	}
-
-	public void setHeight(float height) {
-		this.height = height;
-		
-		onResize();
-	}
-
-	public void setPos(float x, float y) {
-		this.x = x;
-		this.y = y;
-		
-		onResize();
-	}
-
-	public void setSize(float width, float height) {
-		this.width = width;
-		this.height = height;
-		
-		onResize();
-	}
-
-	public void setPosAndSize(float x, float y, float w, float h) {
-		this.x = x;
-		this.y = y;
-		width = w;
-		height = h;
-
-		onResize();
-	}*/
 	
 	public float getX() {
 		return x;

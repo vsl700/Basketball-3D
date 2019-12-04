@@ -14,7 +14,6 @@ public class Button extends GUI {
 	BitmapFont font;
 	
 	byte multitouch = 0;
-	//int type; // 0 - normal, 1 - toggle, 2 - radio
 	
 	
 	float r, g, b, a; // color variables
@@ -23,7 +22,6 @@ public class Button extends GUI {
 	boolean filled;
 
 	boolean touched;
-	//boolean toggled;
 	boolean touchable;
 
 	public Button(String text, BitmapFont font, Color color, boolean mark, boolean filled) {
@@ -67,16 +65,7 @@ public class Button extends GUI {
 
 		batch.setProjectionMatrix(cam.combined);
 		batch.begin();
-		font.draw(batch, text, x + width / 2 - font.getSpaceWidth() * 1.5f * text.length(), y + height / 2 + font.getLineHeight() / 3); // x
-																																		// +
-																																		// width
-																																		// -
-																																		// getSW
-																																		// *5
-																																		// (old
-																																		// one)
-
-		//font.draw(batch, text, textX, textY);
+		font.draw(batch, text, x + width / 2 - font.getSpaceWidth() * 1.5f * text.length(), y + height / 2 + font.getLineHeight() / 3);
 		
 		batch.end();
 	}
@@ -89,9 +78,7 @@ public class Button extends GUI {
 	}
 
 	public boolean isLocalTouched(OrthographicCamera cam) {
-		// if(type == 0)
 		if (touchable) {
-			// if(type == 0)
 			for (int i = 0; i < 5; i++) {
 				Vector3 touchPos = new Vector3(Gdx.input.getX(i), Gdx.input.getY(i), 0);
 				cam.unproject(touchPos);
@@ -100,61 +87,30 @@ public class Button extends GUI {
 				touched = Gdx.input.isTouched(i) && touchPos.x >= x && touchPos.x <= x + width && touchPos.y <= y + height && touchPos.y >= y;
 
 				if (touched) {
-					// touchable = false;
 					multitouch = (byte) i;
-					//if (type != 0 && !toggled)
-						//toggled = true;
 					return true;
 				}
-				// else if(type == 1){
-				// touchable = false;
-
-				// return toggled;
-				// }
 			}
-			// else
-			//if (type != 0)
-				//return toggled;
 		}
-		// else if(type == 1){
-		// if()
-		// }
 
 		return false;
 	}
 
 	public boolean isTouched(OrthographicCamera cam) {
-		// if(type == 0)
 		if (touchable) {
 			touchable = false;
-			// if(type == 0)
 			for (int i = 0; i < 5; i++) {
 				Vector3 touchPos = new Vector3(Gdx.input.getX(i), Gdx.input.getY(i), 0);
 				cam.unproject(touchPos);
 
 				touched = Gdx.input.isTouched(i) && touchPos.x >= x && touchPos.x <= x + width && touchPos.y <= y + height && touchPos.y >= y;
-				// if(!local)
-				// touchable = false;
 
 				if (touched) {
-					// touchable = false;
 					multitouch = (byte) i;
-					//if (type != 0 && !toggled)
-						///toggled = true;
 					return true;
 				}
-				// else if(type == 1){
-				// touchable = false;
-
-				// return toggled;
-				// }
 			}
-			//if (type != 0)
-				//return toggled;
 		}
-		// else if(type == 1){
-		// if()
-		// }
 
 		return false;
 	}
@@ -162,7 +118,6 @@ public class Button extends GUI {
 	public boolean justReleased(OrthographicCamera cam) {
 		Vector3 touchPos = new Vector3(Gdx.input.getX(multitouch), Gdx.input.getY(multitouch), 0);
 		cam.unproject(touchPos);
-		//FIXME There is a problem between touched and justReleased (or touch methods) (create wasTouched boolean and use it)
 		if (touched && !(Gdx.input.isTouched(multitouch) && touchPos.x >= x && touchPos.x <= x + width && touchPos.y <= y + height && touchPos.y >= y)) {
 			touched = false;
 			return true;
@@ -182,9 +137,6 @@ public class Button extends GUI {
 				if (touch) {
 					return true;
 				}
-
-				// if(touch)
-				// return touch;
 			}
 		}
 		return false;

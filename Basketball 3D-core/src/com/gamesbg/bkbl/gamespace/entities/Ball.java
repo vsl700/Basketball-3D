@@ -21,8 +21,6 @@ public class Ball extends Entity {
 	
 	public void create(EntityType type, GameMap map, Vector3 pos) {
 		super.create(type, map, pos);
-		//bodies.get(0).setDamping(-3, -3);
-		//createCollisions();
 	}
 	
 	protected void createModels(Vector3 pos) {
@@ -35,41 +33,16 @@ public class Ball extends Entity {
 		
 		Material material = new Material(TextureAttribute.createDiffuse(ballTexture));
 		
-		//mb.begin();
-		
-		//meshBuilder = mb.part("ball", GL20.GL_TRIANGLES, VertexAttributes.Usage.Position | VertexAttributes.Usage.Normal | VertexAttributes.Usage.TextureCoordinates, material);
-		
-		//SphereShapeBuilder.build(meshBuilder, 1, 1, 1, 25, 25);
-		
-		//mb.createSphere(1, 1, 1, 25, 25, material, VertexAttributes.Usage.Position | VertexAttributes.Usage.Normal | VertexAttributes.Usage.TextureCoordinates);
-		
-		//model = mb.end();
-		
 		model = mb.createSphere(1, 1, 1, 25, 25, material, VertexAttributes.Usage.Position | VertexAttributes.Usage.Normal | VertexAttributes.Usage.TextureCoordinates);
 		model.manageDisposable(ballTexture);
 		
 		modelInstance = new ModelInstance(model, pos.add(0, 0.5f, 0));
-		
-		//modelInstance.transform.setToTranslation(x, y, z);
 	}
-	
-	/*private void printBallTrans() {
-		Vector3 vec = new Vector3();
-		
-		collisionObjects.get(0).getWorldTransform().getTranslation(vec);
-		System.out.println("Ball Obj: " + vec.x + "; " + vec.y + "; " + vec.z);
-		
-		getMainBody().getWorldTransform().getTranslation(vec);
-		System.out.println("Ball Body: " + vec.x + "; " + vec.y + "; " + vec.z);
-	}*/
 	
 	@Override
 	public void update(float delta) {
 		manuallySetCollTransform();
-		//System.out.println(getMainBody().getWorldTransform());
 		getMainBody().getWorldTransform(); //For some reason I had to call this to make everything work :| (ball's modelInstance teleports into the main player's stomach)
-		//printBallTrans();
-		//System.out.println(grounded);
 	}
 
 	@Override
@@ -91,18 +64,11 @@ public class Ball extends Entity {
 		 */
 		invisCollShapes.add(new btSphereShape(0.15f)); 
 		matrixes.add(matrixes.get(0));
-		
-		//invisCollShapes.add(new btSphereShape(0.25f));
-		//matrixes.add(matrixes.get(0));
-		//matrixes.add(matrixes.get(0));
 	}
 	
 	@Override
 	public void setWorldTransform(Matrix4 trans) {
-		//modelInstance.transform.set(trans.val);
-		//getMainBody().proceedToTransform(modelInstance.transform);
 		getMainBody().setWorldTransform(trans);
-		//modelInstance.transform = getMainBody().getWorldTransform();
 		manuallySetCollTransform();
 	}
 	
@@ -111,57 +77,20 @@ public class Ball extends Entity {
 	 */
 	private void manuallySetCollTransform() {
 		collisionObjects.get(0).setWorldTransform(matrixes.get(1));
-		//collisionObjects.get(1).setWorldTransform(matrixes.get(2));
 	}
 	
 	@Override
 	protected void createCollisionObjectAndBodies() {
 		super.createCollisionObjectAndBodies();
-		
-		//getMainBody().setRestitution(50);
-		//getMainBody().setFriction(1);
-		/*softBodies = new ArrayList<btSoftBody>();
-		
-		MeshPart meshPart = modelInstance.nodes.get(0).parts.get(0).meshPart;
-		
-		btSoftBody softBody = new btSoftBody(map.getSoftWorld().getWorldInfo(), meshPart.mesh.getVerticesBuffer(), meshPart.mesh.getVertexSize(), meshPart.mesh.getVertexAttribute(Usage.Position).offset, meshPart.mesh.getVertexAttribute(Usage.Normal).offset, meshPart.mesh.getIndicesBuffer(), meshPart.offset, meshPart.size, BufferUtils.newShortBuffer(meshPart.size), 0);
-		softBody.setMass(0, 0);
-		com.badlogic.gdx.physics.bullet.softbody.btSoftBody.Material pm = softBody.appendMaterial();
-		pm.setKLST(0.2f);
-		pm.setFlags(0);
-		softBody.generateBendingConstraints(2, pm);
-		softBody.setConfig_piterations(1);
-		softBody.setConfig_kDF(0.2f);
-		softBody.randomizeConstraints();
-		softBody.setTotalMass(type.getMass());
-		
-		softBodies.add(softBody);*/
-		//softBodies.get(0).setCollisionShape(collisionShapes.get(0));
 		modelInstance.transform = getMainBody().getWorldTransform();
 		
 		collisionObjects = new ArrayList<btCollisionObject>();
 		
-		//invisConstructionInfo = new btRigidBody.btRigidBodyConstructionInfo(type.getMass(), null, collisionShape, localInertia);
-		//btCollisionObject temp = new btCollisionObject();
-		//temp.setCollisionShape(invisCollShapes.get(0));
-		//collisionObjects.add(temp);
 		collisionObjects.add(new btCollisionObject());
 		collisionObjects.get(0).setCollisionShape(invisCollShapes.get(0));
 		
-		//collisionObjects.get(0).setIgnoreCollisionCheck(getMainBody(), true);
-		
-		//for(btCollisionObject co : map.getCollObjectsOfAll())
-			//getMainBody().setIgnoreCollisionCheck(co, true);
-		
-		//collisionObjects.add(new btCollisionObject());
-		//collisionObjects.get(1).setCollisionShape(invisCollShapes.get(1));
-		
-		//collisionObjects.get(1).setIgnoreCollisionCheck(getMainBody(), true);
 		manuallySetCollTransform();
 		
-		/*motionState = new GameMap.MotionState();
-		motionState.transform = modelInstance.transform;
-		collisionObjects.get(0).setMotionState(motionState);*/
 	}
 
 	@Override

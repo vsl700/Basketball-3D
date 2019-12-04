@@ -10,7 +10,6 @@ import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 
 public class NumUpDown extends UpDown implements TextChangeListener {
 
-	/*Button down, up;*/
 	HashMap<Integer, String> exceptions;
 	TextPanel textPanel;
 
@@ -47,7 +46,6 @@ public class NumUpDown extends UpDown implements TextChangeListener {
 		super.render(batch, shape, cam);
 		
 		if (down.justReleased(cam)) {
-			//num = Integer.parseInt(textPanel.getText());
 			
 			if (num - diff >= min) {
 				num-= diff;
@@ -57,7 +55,6 @@ public class NumUpDown extends UpDown implements TextChangeListener {
 				sendSignalToListen();
 			}
 		} else if (up.justReleased(cam)) {
-			//num = Integer.parseInt(textPanel.getText());
 			
 			if (num + diff <= max) {
 				num+= diff;
@@ -72,8 +69,6 @@ public class NumUpDown extends UpDown implements TextChangeListener {
 	}
 
 	protected void onResize() {
-		/*down.setPosAndSize(x, y, 30, height);
-		up.setPosAndSize(x + width + 50, y, 30, height);*/
 		super.onResize();
 		textPanel.setPosAndSize(x + 40, y, width, height);
 	}

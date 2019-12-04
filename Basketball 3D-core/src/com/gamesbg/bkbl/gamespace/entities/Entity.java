@@ -45,9 +45,6 @@ public abstract class Entity {
 	public void create(EntityType type, GameMap map, Vector3 pos) {
 		this.type = type;
 		this.map = map;
-		//this.x = x;
-		//this.y = y;
-		//this.z = z;
 		
 		matrixes = new ArrayList<Matrix4>();
 		
@@ -56,9 +53,6 @@ public abstract class Entity {
 		motionStates = new ArrayList<MotionState>();
 		constructionInfos = new ArrayList<btRigidBody.btRigidBodyConstructionInfo>();
 		
-		//collObjIndexes = new ArrayList<Integer>();
-		
-		//localInertia = new Vector3();
 		createModels(pos);
 		modelInstance.calculateTransforms();
 		createCollisions();
@@ -66,10 +60,6 @@ public abstract class Entity {
 		setCollisionTransform();
 		
 		removeCollCheckOnInternals();
-		//body.setWorldTransform(modelInstance.transform);
-		//collisionConfig = new btDefaultCollisionConfiguration();
-        //dispatcher = new btCollisionDispatcher(collisionConfig);
-		//createCollisions();
 	}
 	
 	private void removeCollCheckOnInternals() {
@@ -130,23 +120,8 @@ public abstract class Entity {
 	public void collisionOccured(btCollisionObject objInside, btCollisionObject objOutside) {
 		if(map.getObjectsMap().get(objOutside.getUserValue()).equals(ObjectType.TERRAIN.getId())) {
 			grounded = true;
-			//if(type.getId().equals(EntityType.BALL.getId()))
-				//System.out.println("Grounded");
 		}
 	}
-	
-	/**
-	 * Used when the entity's transform is changed
-	 */
-	/*public void moved(Matrix4 newTrans) {
-		//modelInstance.transform = newTrans;
-		bodies.get(mainBodyIndex).getWorldTransform().set(newTrans.val);
-		//modelInstance.transform.set(newTrans.val);
-		//body.getWorldTransform(modelInstance.transform);
-		setCollisionTransform();
-		
-		//modelInstance.calculateTransforms();
-	}*/
 	
 	/**
 	 * The modelInstance does not calculate global transforms of nodes according to its own one so I had to create this method that does this thing
@@ -170,9 +145,6 @@ public abstract class Entity {
 			else collisionShapes.get(i).calculateLocalInertia(0, localInertia);
 			
 			motionStates.add(new MotionState());
-			/*if(i == mainBodyIndex)
-				motionStates.get(i).transform = modelInstance.transform;
-			else motionStates.get(i).transform = new Matrix4();*/
 			
 			if(i == mainBodyIndex)
 				motionStates.get(i).transform = matrixes.get(i);
@@ -187,17 +159,12 @@ public abstract class Entity {
 			bodies.add(new btRigidBody(constructionInfos.get(i)));
 		}
 		
-		//setCollisionTransform();
 	}
 	
 	public void setCollisionTransform() {
-		//body.setWorldTransform(modelInstance.transform);
-		//modelInstance.calculateTransforms();
-		//bodies.get(mainBodyIndex).proceedToTransform(modelInstance.transform);
 		
 		int j = 0;
 		
-		//if(bodies != null)
 		for(int i = 0; i < bodies.size(); i++) {
 			if (manualSetTransformsBody != null) {
 				if (!manualSetTransformsBody.contains(bodies.get(i))) {
@@ -245,8 +212,6 @@ public abstract class Entity {
 				}
 			}
 		
-		//if(type == EntityType.BALL)
-			//System.out.println("Ball Trans Updated");
 	}
 	
 	public void setWorldTransform(Matrix4 trans) {
@@ -289,14 +254,6 @@ public abstract class Entity {
 		return modelInstance;
 	}
 	
-	/*public ArrayList<btCollisionObject> getCollisionObject() {
-		return collisionObjects;
-	}*/
-	
-	/*public btRigidBody getBody() {
-		return body;
-	}*/
-	
 	public btRigidBody getMainBody() {
 		return bodies.get(mainBodyIndex);
 	}
@@ -326,43 +283,8 @@ public abstract class Entity {
 		
 		return tempObj;
 	}
-
-	/*public ArrayList<Integer> getCollObjIndexes(){
-		return collObjIndexes;
-	}*/
-	
-	/*public float getX() {
-		return x;
-	}
-
-	public float getY() {
-		return y;
-	}
-
-	public float getZ() {
-		return z;
-	}
-
-	public void setX(float x) {
-		this.x = x;
-		
-		setCollisionTransform();
-	}
-	
-	public void setY(float y) {
-		this.y = y;
-		
-		setCollisionTransform();
-	}
-	
-	public void setZ(float z) {
-		this.z = z;
-		
-		setCollisionTransform();
-	}*/
 	
 	public boolean isGrounded() {
-		//System.out.println(grounded);
 		return grounded;
 	}
 

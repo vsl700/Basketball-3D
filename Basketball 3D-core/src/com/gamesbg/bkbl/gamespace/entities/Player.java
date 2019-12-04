@@ -39,8 +39,6 @@ public abstract class Player extends Entity {
 
 	static final float MAX_WALKING_VELOCITY = 4;
 	static final float MAX_RUNNING_VELOCITY = 11;
-	//static final float JUMPING_VELOCITY = 15;
-	//static final float JUMPING_TIME = 1.5f;
 	
 	//The node which should be followed by the camera
 	//Node camNode;
@@ -104,7 +102,6 @@ public abstract class Player extends Entity {
 		legLController = new AnimationController(modelInstance);
 		legRController = new AnimationController(modelInstance);
 		bodyController = new AnimationController(modelInstance);
-		//controller.setAnimation("walk",-1);
 		armLController.setAnimation("stayArmL", -1, 1, new AnimationListener() {
 
 			@Override
@@ -136,7 +133,6 @@ public abstract class Player extends Entity {
 		stopLegsAnim();
 		stopBodyAnim();
 		
-		//if(!isMainPlayer())
 			stateMachine = new DefaultStateMachine<Player, PlayerState>(this, PlayerState.IDLING);
 			stateMachine.changeState(PlayerState.IDLING);
 
@@ -185,14 +181,8 @@ public abstract class Player extends Entity {
 		
 		custom.addAnimation("aimLArmR", 0.01f);
 		
-		//float tempX = 1, tempY = 1, tempA = 210;
 		custom.addNodeAnimation("shoulderR");
 		custom.addRotationsKeyFrame(new float[][]{{1, 0, 0, -140}, {0, 1, 0, 110}, {1, 0, 1, 70}}, 0);
-		//custom.addRotationsKeyFrame(new float[][]{{1, 0, 0, -90}, {0, 1, 0, 90}, {0, 0, 1, 30}}, 1);
-		//custom.addRotationKeyFrame(-2.5f, -3.5f, 0, 180, 0);
-		//custom.addRotationKeyFrame(-2.5f, -3.5f, 0, 180, 1);
-		//custom.addRotationKeyFrame(tempX, tempY, 0, tempA, 0);
-		//custom.addRotationKeyFrame(tempX, tempY, 0, tempA, 1);
 		
 		
 		custom.addAnimation("aimLBody", 0.01f);
@@ -239,18 +229,12 @@ public abstract class Player extends Entity {
 		
 		custom.addNodeAnimation("shoulderL");
 		custom.addRotationsKeyFrame(new float[][]{{0, 1, 0, -70}, {1, 0, 0, 40}, {1, 0, 1, 70}, {0, 1, 0, 90}}, 0);
-		//custom.addRotationsKeyFrame(new float[][]{{1, 0, 0, -140}, {0, 1, 0, -110}, {1, 0, 1, -70}}, 0.01f);
-		//custom.addRotationKeyFrame(0, 1, 0, 110, 0);
-		//custom.addRotationKeyFrame(1, 0, 0, 30, 0);
-		//custom.addRotationKeyFrame(0, 1, 0, 110, 1);
 		
 		
 		custom.addAnimation("aimRArmR", 0.01f);
 		
-		//float tempX = 1, tempY = 1, tempA = 210;
 		custom.addNodeAnimation("shoulderR");
 		custom.addRotationKeyFrame(0, 1.2f, 1.4f, -90, 0);
-		//custom.addRotationKeyFrame(1, 0, 0, 30, 0);
 		custom.addRotationKeyFrame(0, 1.2f, 1.4f, -90, 0.01f);
 		
 		custom.addNodeAnimation("elbowR");
@@ -383,82 +367,6 @@ public abstract class Player extends Entity {
 		custom.addRotationKeyFrame(1, 0, 0, -50, 0);
 		custom.addRotationKeyFrame(1, 0, 0, -80, dribbleSpeed);
 		
-		/*custom.addAnimation("jump", 1.5f);
-		
-		custom.addNodeAnimation("spine3");
-		custom.addRotationKeyFrame(0, 0, 0, 0, 0);
-		custom.addTranslationKeyFrame(0, 0, 0, 0);
-		custom.addRotationKeyFrame(1, 0, 0, 40, 0.2f);
-		custom.addTranslationKeyFrame(0, -0.67f, 0, 0.2f);
-		custom.addRotationKeyFrame(1, 0, 0, 0, 0.55f);
-		custom.addTranslationKeyFrame(0, 0, 0, 0.55f);
-		custom.addRotationKeyFrame(1, 0, 0, 0, 0.75f);
-		custom.addTranslationKeyFrame(0, 0, 0, 0.75f);
-		custom.addRotationKeyFrame(1, 0, 0, 40, 1.25f);
-		custom.addTranslationKeyFrame(0, -0.36f, 0, 1.25f);
-		custom.addRotationKeyFrame(1, 0, 0, 0, 1.5f);
-		custom.addTranslationKeyFrame(0, 0, 0, 1.5f);
-		
-		custom.addNodeAnimation("shoulderL");
-		custom.addRotationKeyFrame(0, 0, 0, 0, 0);
-		custom.addRotationKeyFrame(1, 0, 0, 30, 0.2f);
-		custom.addRotationKeyFrame(-1, 0, 0, 150, 0.75f);
-		custom.addRotationKeyFrame(1, 0, 0, 30, 1.25f);
-		custom.addRotationKeyFrame(0, 0, 0, 0, 1.5f);
-		
-		custom.addNodeAnimation("shoulderR");
-		custom.addRotationKeyFrame(0, 0, 0, 0, 0);
-		custom.addRotationKeyFrame(1, 0, 0, 30, 0.2f);
-		custom.addRotationKeyFrame(-1, 0, 0, 150, 0.75f);
-		custom.addRotationKeyFrame(1, 0, 0, 30, 1.25f);
-		custom.addRotationKeyFrame(0, 0, 0, 0, 1.5f);
-		
-		custom.addNodeAnimation("elbowL");
-		custom.addRotationKeyFrame(0, 0, 0, 0, 0);
-		custom.addRotationKeyFrame(-1, 0, 0, 40, 0.2f);
-		custom.addRotationKeyFrame(-1, 0, 0, 90, 0.75f);
-		custom.addRotationKeyFrame(-1, 0, 0, 90, 1.25f);
-		custom.addRotationKeyFrame(0, 0, 0, 0, 1.5f);
-		
-		custom.addNodeAnimation("elbowR");
-		custom.addRotationKeyFrame(0, 0, 0, 0, 0);
-		custom.addRotationKeyFrame(-1, 0, 0, 40, 0.2f);
-		custom.addRotationKeyFrame(-1, 0, 0, 90, 0.75f);
-		custom.addRotationKeyFrame(-1, 0, 0, 90, 1.25f);
-		custom.addRotationKeyFrame(0, 0, 0, 0, 1.5f);
-		
-		custom.addNodeAnimation("hipL");
-		custom.addRotationKeyFrame(0, 0, 0, 0, 0);
-		custom.addRotationKeyFrame(-1, 0, 0, 110, 0.2f);
-		custom.addRotationKeyFrame(0, 0, 0, 0, 0.55f);
-		custom.addRotationKeyFrame(0, 0, 0, 0, 0.75f);
-		custom.addRotationKeyFrame(-1, 0, 0, 80, 1.25f);
-		custom.addRotationKeyFrame(0, 0, 0, 0, 1.5f);
-		
-		custom.addNodeAnimation("hipR");
-		custom.addRotationKeyFrame(0, 0, 0, 0, 0);
-		custom.addRotationKeyFrame(-1, 0, 0, 110, 0.2f);
-		custom.addRotationKeyFrame(0, 0, 0, 0, 0.55f);
-		custom.addRotationKeyFrame(0, 0, 0, 0, 0.75f);
-		custom.addRotationKeyFrame(-1, 0, 0, 80, 1.25f);
-		custom.addRotationKeyFrame(0, 0, 0, 0, 1.5f);
-		
-		custom.addNodeAnimation("kneeL");
-		custom.addRotationKeyFrame(0, 0, 0, 0, 0);
-		custom.addRotationKeyFrame(1, 0, 0, 70, 0.2f);
-		custom.addRotationKeyFrame(0, 0, 0, 0, 0.55f);
-		custom.addRotationKeyFrame(0, 0, 0, 0, 0.75f);
-		custom.addRotationKeyFrame(1, 0, 0, 40, 1.25f);
-		custom.addRotationKeyFrame(0, 0, 0, 0, 1.5f);
-		
-		custom.addNodeAnimation("kneeR");
-		custom.addRotationKeyFrame(0, 0, 0, 0, 0);
-		custom.addRotationKeyFrame(1, 0, 0, 70, 0.2f);
-		custom.addRotationKeyFrame(0, 0, 0, 0, 0.55f);
-		custom.addRotationKeyFrame(0, 0, 0, 0, 0.75f);
-		custom.addRotationKeyFrame(1, 0, 0, 40, 1.25f);
-		custom.addRotationKeyFrame(0, 0, 0, 0, 1.5f);*/
-		
 		
 		custom.addAnimation("runBody", 0.75f);
 		
@@ -494,7 +402,6 @@ public abstract class Player extends Entity {
 		
 		custom.addNodeAnimation("hipL");
 		custom.addRotationKeyFrame(-1, 0, 0, 20, 0);
-		//custom.addRotationKeyFrame(1, 0, 0, 0, 0.15f);
 		custom.addRotationKeyFrame(1, 0, 0, 50, 0.15f);
 		custom.addRotationKeyFrame(-1, 0, 0, 90, 0.6f);
 		custom.addRotationKeyFrame(-1, 0, 0, 20, 0.75f);
@@ -511,7 +418,6 @@ public abstract class Player extends Entity {
 		custom.addRotationKeyFrame(-1, 0, 0, 20, 0);
 		custom.addRotationKeyFrame(-1, 0, 0, 90, 0.15f);
 		custom.addRotationKeyFrame(1, 0, 0, 50, 0.6f);
-		//custom.addRotationKeyFrame(1, 0, 0, 0, 0.6f);
 		custom.addRotationKeyFrame(-1, 0, 0, 20, 0.75f);
 		
 		custom.addNodeAnimation("kneeR");
@@ -524,9 +430,6 @@ public abstract class Player extends Entity {
 		custom.addAnimation("walkArmL", 1);
 		
 		custom.addNodeAnimation("shoulderL");
-		/*custom.addTranslationKeyFrame(1, 1, 1);
-		custom.addTranslationKeyFrame(2, 0, 2);
-		custom.addTranslationKeyFrame(3, 3, 3);*/
 		custom.addRotationKeyFrame(0, 0, 0, 0, 0);
 		custom.addRotationKeyFrame(0.5f, 0, 0, 30, 0.25f);
 		custom.addRotationKeyFrame(0, 0, 0, 50, 0.5f);
@@ -535,10 +438,8 @@ public abstract class Player extends Entity {
 		
 		custom.addNodeAnimation("elbowL");
 		custom.addRotationKeyFrame(0, 0, 0, 0, 0);
-		//custom.addRotationKeyFrame(0, 0, 0, 50, 0.75f);
 		custom.addRotationKeyFrame(0, 0, 0, 0, 0.5f);
 		custom.addRotationKeyFrame(-0.25f, 0, 0, 60, 0.75f);
-		//custom.addRotationKeyFrame(-0.25f, 0, 0, 50, 2.25f);
 		custom.addRotationKeyFrame(0, 0, 0, 60, 1);
 		
 		custom.addAnimation("walkArmR", 1);
@@ -599,49 +500,34 @@ public abstract class Player extends Entity {
 		ModelBuilder childMB = new ModelBuilder();
 		Material material = new Material(ColorAttribute.createDiffuse(getPlayerColor()));
 		
-		//Matrix4 temp = new Matrix4();
-		//matrixes.add(temp);
-		
-		//final float scale2 = 1;
-		
 		mb.begin();
 		childMB.begin();
 		
 		Node head = childMB.node();
 		head.id = "head";
-		//mb.part("sphere", GL20.GL_TRIANGLES, Usage.Position | Usage.Normal, new Material(ColorAttribute.createDiffuse(Color.GREEN))).sphere(1f, 1f, 1f, 10, 10);
-		//mb.createSphere(0.5f, 0.5f, 0.5f, 25, 25, new Material(ColorAttribute.createDiffuse(Color.RED)), VertexAttributes.Usage.Position|VertexAttributes.Usage.Normal);
-		//head.translation.set(x, y + scale5 + scale5 / 2 + 0.07f * 2 + scale5 / 2 + scale3 * 7 + scale1, z);
 		head.translation.set(0, scale1 / 2 + scale3 / 2 + 0.1f, 0);
 		SphereShapeBuilder.build(childMB.part(head.id, GL20.GL_TRIANGLES, VertexAttributes.Usage.Position | VertexAttributes.Usage.Normal, material), scale1, scale1, scale1, divisionU, divisionV);
-		//camNode = head;
 		camMatrix = head.globalTransform;
 		
 		Node spine1 = childMB.node();
 		spine1.id = "spine1";
-		//spine1.translation.set(x, y + scale5 + scale5 / 2 + 0.07f * 2 + scale5 / 2 + scale3 * 7, z);
 		spine1.translation.set(0, scale3 * 3.5f, 0);
-		//spine1.rotation.set(0, 0, 0, 0);
-		//mb.createSphere(1.5f, 0.15f, 0.23f, 25, 25, new Material(ColorAttribute.createDiffuse(Color.RED)), VertexAttributes.Usage.Position|VertexAttributes.Usage.Normal);
 		BoxShapeBuilder.build(childMB.part(spine1.id, GL20.GL_TRIANGLES, VertexAttributes.Usage.Position | VertexAttributes.Usage.Normal, material), scale2, scale3, scale4);
 		spine1.addChild(head);
 		
 		Node spine2 = childMB.node();
 		spine2.id = "spine2";
-		//spine2.translation.set(x, y + scale5 + scale5 / 2 + 0.07f * 2 + scale5 / 2 + scale3 * 4, z);
 		spine2.translation.set(0, scale3 * 3.5f, 0);
 		BoxShapeBuilder.build(childMB.part(spine2.id, GL20.GL_TRIANGLES, VertexAttributes.Usage.Position | VertexAttributes.Usage.Normal, material), scale2, scale3, scale4);
 		spine2.addChild(spine1);
 		
 		Node spine3 = mb.node();
 		spine3.id = "spine3";
-		//spine3.translation.set(0, scale5 + scale5 / 2 + 0.07f * 2 + scale5 / 2 + scale3, 0);
 		BoxShapeBuilder.build(mb.part(spine3.id, GL20.GL_TRIANGLES, VertexAttributes.Usage.Position | VertexAttributes.Usage.Normal, material), scale2, scale3, scale4);
 		spine3.addChild(spine2);
 		
 		Node shoulderL = childMB.node();
 		shoulderL.id = "shoulderL";
-		//shoulderL.translation.set(x + scale2 / 2 + scale3 / 2 + 0.09f, y + scale5 + scale5 / 2 + 0.07f * 2 + scale5 / 2 + scale3 * 7, z);
 		shoulderL.translation.set(scale2 / 2 + scale6 / 2, 0, 0);
 		SphereShapeBuilder.build(childMB.part(shoulderL.id, GL20.GL_TRIANGLES, VertexAttributes.Usage.Position | VertexAttributes.Usage.Normal, material), scale6, scale6, scale6, divisionU, divisionV);
 		spine1.addChild(shoulderL);
@@ -649,41 +535,29 @@ public abstract class Player extends Entity {
 		Node arm1L = childMB.node();
 		arm1L.id = "arm1L";
 		shoulderL.addChild(arm1L);
-		//arm1L.translation.set(x + scale2 / 2 + scale3 / 2 + 0.09f, y + scale5 + 0.07f * 2 + scale5 / 2 + scale3 * 7 + scale3 / 2, z);
 		arm1L.translation.set(0, -scale5 / 2, 0);
 		BoxShapeBuilder.build(childMB.part(arm1L.id, GL20.GL_TRIANGLES, VertexAttributes.Usage.Position | VertexAttributes.Usage.Normal, material), scale3, scale5, scale4);
 		
 		Node elbowL = childMB.node();
 		elbowL.id = "elbowL";
 		arm1L.addChild(elbowL);
-		//elbowL.translation.set(x + scale2 / 2 + scale3 / 2 + 0.09f, y + scale5 + 0.07f * 2 + scale3 * 7, z - scale3 * scale5);
 		elbowL.translation.set(0, -scale5 / 2 - scale3 / 2, -scale3 * scale5);
 		SphereShapeBuilder.build(childMB.part(elbowL.id, GL20.GL_TRIANGLES, VertexAttributes.Usage.Position | VertexAttributes.Usage.Normal, material), scale3, scale3, scale3, divisionU, divisionV);
-		
-		//float handPercentage = 0.4f;
 		
 		Node arm2L = childMB.node();
 		arm2L.id = "arm2L";
 		elbowL.addChild(arm2L);
-		//arm2L.translation.set(x + scale2 / 2 + scale3 / 2 + 0.09f, y + scale5 + 0.07f * 2 + scale3 * 4, z);
 		arm2L.translation.set(0, -scale5 * (1 - handPercentage) / 2 - scale3 / 2, scale3 * scale5);
 		BoxShapeBuilder.build(childMB.part(arm2L.id, GL20.GL_TRIANGLES, VertexAttributes.Usage.Position | VertexAttributes.Usage.Normal, material), scale3, scale5 * (1 - handPercentage), scale4);
 		
 		Node handL = childMB.node();
 		handL.id = "handL";
 		arm2L.addChild(handL);
-		//arm2L.translation.set(x + scale2 / 2 + scale3 / 2 + 0.09f, y + scale5 + 0.07f * 2 + scale3 * 4, z);
 		handL.translation.set(0, -scale5 / 2, 0);
 		BoxShapeBuilder.build(childMB.part(handL.id, GL20.GL_TRIANGLES, VertexAttributes.Usage.Position | VertexAttributes.Usage.Normal, material), scale3, scale5 * handPercentage, scale4);
 		
-		/*Node handL = mb.node();
-		handL.id = "handL";
-		handL.translation.set(x + 1.5f / 2 + scale3 / 2 + 0.09f, y + 0.75f + 0.07f * 2 + 0.15f * 4 - 0.75f / 2 - scale3, z);
-		BoxShapeBuilder.build(mb.part(handL.id, GL20.GL_TRIANGLES, VertexAttributes.Usage.Position | VertexAttributes.Usage.Normal, material), scale3, scale3, 0.23f);*/
-		
 		Node shoulderR = childMB.node();
 		shoulderR.id = "shoulderR";
-		//shoulderR.translation.set(x - scale2 / 2 - scale3 / 2 - 0.09f, y + scale5 + scale5 / 2 + 0.07f * 2 + scale5 / 2 + scale3 * 7, z);
 		shoulderR.translation.set(-scale2 / 2 - scale6 / 2, 0, 0);
 		SphereShapeBuilder.build(childMB.part(shoulderR.id, GL20.GL_TRIANGLES, VertexAttributes.Usage.Position | VertexAttributes.Usage.Normal, material), scale6, scale6, scale6, divisionU, divisionV);
 		spine1.addChild(shoulderR);
@@ -691,37 +565,29 @@ public abstract class Player extends Entity {
 		Node arm1R = childMB.node();
 		arm1R.id = "arm1R";
 		shoulderR.addChild(arm1R);
-		//arm1R.translation.set(x - scale2 / 2 - scale3 / 2 - 0.09f, y + scale5 + 0.07f * 2 + scale5 / 2 + scale3 * 7 + scale3 / 2, z);
 		arm1R.translation.set(0, -scale5 / 2, 0);
 		BoxShapeBuilder.build(childMB.part(arm1R.id, GL20.GL_TRIANGLES, VertexAttributes.Usage.Position | VertexAttributes.Usage.Normal, material), scale3, scale5, scale4);
 		
 		Node elbowR = childMB.node();
 		elbowR.id = "elbowR";
 		arm1R.addChild(elbowR);
-		//elbowR.translation.set(x - scale2 / 2 - scale3 / 2 - 0.09f, y + scale5 + 0.07f * 2 + scale3 * 7, z - scale3 * scale5);
 		elbowR.translation.set(0, -scale5 / 2 - scale3 / 2, -scale3 * scale5);
 		SphereShapeBuilder.build(childMB.part(elbowR.id, GL20.GL_TRIANGLES, VertexAttributes.Usage.Position | VertexAttributes.Usage.Normal, material), scale3, scale3, scale3, divisionU, divisionV);
 		
 		Node arm2R = childMB.node();
 		arm2R.id = "arm2R";
 		elbowR.addChild(arm2R);
-		//arm2R.translation.set(x - scale2 / 2 - scale3 / 2 - 0.09f, y + scale5 + 0.07f * 2 + scale3 * 4, z);
 		arm2R.translation.set(0, -scale5 * (1 - handPercentage) / 2 - scale3 / 2, scale3 * scale5);
 		BoxShapeBuilder.build(childMB.part(arm2R.id, GL20.GL_TRIANGLES, VertexAttributes.Usage.Position | VertexAttributes.Usage.Normal, material), scale3, scale5 * (1 - handPercentage), scale4);
 		
 		Node handR = childMB.node();
 		handR.id = "handR";
 		arm2R.addChild(handR);
-		//arm2L.translation.set(x + scale2 / 2 + scale3 / 2 + 0.09f, y + scale5 + 0.07f * 2 + scale3 * 4, z);
 		handR.translation.set(0, -scale5 / 2, 0);
 		BoxShapeBuilder.build(childMB.part(handR.id, GL20.GL_TRIANGLES, VertexAttributes.Usage.Position | VertexAttributes.Usage.Normal, material), scale3, scale5 * handPercentage, scale4);
-		/*Node handR = mb.node();
-		handR.id = "handR";
-		BoxShapeBuilder.build(mb.part(handR.id, GL20.GL_TRIANGLES, VertexAttributes.Usage.Position | VertexAttributes.Usage.Normal, material), scale3, scale3, scale3);*/
 		
 		Node hipL = childMB.node();
 		hipL.id = "hipL";
-		//hipL.translation.set(x + scale2 / 2 - scale3 / 2, y + scale5 + scale5 / 2 + 0.07f * 2 + scale5 / 2 + scale3, z);
 		hipL.translation.set(scale2 / 2 - scale3 / 2, 0, 0);
 		SphereShapeBuilder.build(childMB.part(hipL.id, GL20.GL_TRIANGLES, VertexAttributes.Usage.Position | VertexAttributes.Usage.Normal, material), scale7, scale7, scale7, divisionU, divisionV);
 		spine3.addChild(hipL);
@@ -729,28 +595,23 @@ public abstract class Player extends Entity {
 		Node leg1L = childMB.node();
 		leg1L.id = "leg1L";
 		hipL.addChild(leg1L);
-		//leg1L.translation.set(x + scale2 / 2 - scale3 / 2, y + scale5 + scale5 / 2 + 0.07f * 2, z);
 		leg1L.translation.set(0, -scale5 / 2 - scale7 / 3, 0);
 		BoxShapeBuilder.build(childMB.part(leg1L.id, GL20.GL_TRIANGLES, VertexAttributes.Usage.Position | VertexAttributes.Usage.Normal, material), scale3, scale5, scale4);
 		
 		Node kneeL = childMB.node();
 		kneeL.id = "kneeL";
 		leg1L.addChild(kneeL);
-		//kneeL.translation.set(x + scale2 / 2 - scale3 / 2, y + scale5 + scale3 / 2, z + scale3 * scale5);
 		kneeL.translation.set(0, -scale5 / 2 - scale3 / 2, scale3 * scale5);
 		SphereShapeBuilder.build(childMB.part(kneeL.id, GL20.GL_TRIANGLES, VertexAttributes.Usage.Position | VertexAttributes.Usage.Normal, material), scale3, scale3, scale3, divisionU, divisionV);
 		
 		Node leg2L = childMB.node();
 		leg2L.id = "leg2L";
 		kneeL.addChild(leg2L);
-		//leg2L.translation.set(x + scale2 / 2 - scale3 / 2, y + scale5 / 2, z);
 		leg2L.translation.set(0, -scale5 / 2 - scale3 / 2, -scale3 * scale5);
-		//leg2L.rotation.setFromAxis(0, 3, 0, 15);
 		BoxShapeBuilder.build(childMB.part(leg2L.id, GL20.GL_TRIANGLES, VertexAttributes.Usage.Position | VertexAttributes.Usage.Normal, material), scale3, scale5, scale4);
 		
 		Node hipR = childMB.node();
 		hipR.id = "hipR";
-		//hipR.translation.set(x - scale2 / 2 + scale3 / 2, y + scale5 + scale5 / 2 + 0.07f * 2 + scale5 / 2 + scale3, z);
 		hipR.translation.set(-scale2 / 2 + scale3 / 2, 0, 0);
 		SphereShapeBuilder.build(childMB.part(hipR.id, GL20.GL_TRIANGLES, VertexAttributes.Usage.Position | VertexAttributes.Usage.Normal, material), scale7, scale7, scale7, divisionU, divisionV);
 		spine3.addChild(hipR);
@@ -758,21 +619,18 @@ public abstract class Player extends Entity {
 		Node leg1R = childMB.node();
 		leg1R.id = "leg1R";
 		hipR.addChild(leg1R);
-		//leg1R.translation.set(x - scale2 / 2 + scale3 / 2, y + scale5 + scale5 / 2 + 0.07f * 2, z);
 		leg1R.translation.set(0, -scale5 / 2 - scale7 / 3, 0);
 		BoxShapeBuilder.build(childMB.part(leg1R.id, GL20.GL_TRIANGLES, VertexAttributes.Usage.Position | VertexAttributes.Usage.Normal, material), scale3, scale5, scale4);
 		
 		Node kneeR = childMB.node();
 		kneeR.id = "kneeR";
 		leg1R.addChild(kneeR);
-		//kneeR.translation.set(x - scale2 / 2 + scale3 / 2, y + scale5 + scale3 / 2, z + scale3 * scale5);
 		kneeR.translation.set(0, -scale5 / 2 - scale3 / 2, scale3 * scale5);
 		SphereShapeBuilder.build(childMB.part(kneeR.id, GL20.GL_TRIANGLES, VertexAttributes.Usage.Position | VertexAttributes.Usage.Normal, material), scale3, scale3, scale3, divisionU, divisionV);
 		
 		Node leg2R = childMB.node();
 		leg2R.id = "leg2R";
 		kneeR.addChild(leg2R);
-		//leg2R.translation.set(x - scale2 / 2 + scale3 / 2, y + scale5 / 2, z);
 		leg2R.translation.set(0, -scale5 / 2 - scale3 / 2, -scale3 * scale5);
 		BoxShapeBuilder.build(childMB.part(leg2R.id, GL20.GL_TRIANGLES, VertexAttributes.Usage.Position | VertexAttributes.Usage.Normal, material), scale3, scale5, scale4);
 		
@@ -781,28 +639,6 @@ public abstract class Player extends Entity {
 		
 		animateModels();
 		modelInstance = new ModelInstance(model, pos);
-		//temp = modelInstance.transform;
-		//modelInstance.calculateTransforms();
-		//modelInstance = new ModelInstance(model);
-		
-		/*Animation animation = new Animation();
-		animation.id = "testAnim";
-		animation.duration = 2;
-		
-		NodeAnimation nodeAnim = new NodeAnimation();
-		
-		nodeAnim.node = model.getNode("arm1L");
-		nodeAnim.translation = new Array<NodeKeyframe<Vector3>>();
-		nodeAnim.translation.add(new NodeKeyframe<Vector3>(0, new Vector3(1, 1, 1)));
-		nodeAnim.translation.add(new NodeKeyframe<Vector3>(1, new Vector3(2, 0, 2)));
-		nodeAnim.translation.add(new NodeKeyframe<Vector3>(2, new Vector3(3, 3, 3)));
-		
-		animation.nodeAnimations.add(nodeAnim);
-		
-		model.animations.add(animation);*/
-		
-		
-		//custom.addRotationKeyFrame(-1, 0, 0, 45, 4);
 	}
 	
 	@Override
@@ -849,21 +685,15 @@ public abstract class Player extends Entity {
 		
 		matrixes.add(modelInstance.transform);
 		matrixes.add(tempHandL);
-		//invisCollShapes.add(handShape);
 		matrixes.add(tempHandR);
 		
 		Vector3 poleVec = new Vector3(poleScale, 10, poleScale);
-		//btCollisionShape poleShape = new btBoxShape(poleVec);
 		
 		invisCollShapes.add(new btBoxShape(poleVec));
 		invisCollShapes.add(new btBoxShape(poleVec));
 		invisCollShapes.add(new btBoxShape(poleVec));
 		invisCollShapes.add(new btBoxShape(poleVec));
 		invisCollShapes.add(new btBoxShape(new Vector3(scale2 / 2, getHeight(), getDepth() / 2)));
-		//invisCollShapes.add(new btBoxShape(new Vector3(scale2 / 2, getHeight() / 2, getDepth() / 2)));
-		//matrixes.add(matrixes.get(0));
-		//invisCollisionShape = new btBoxShape(new Vector3(getWidth(), 0.001f, getDepth()));
-		//System.out.println(getWidth() + "; " + getHeight() + "; " + getDepth());
 	}
 	
 	private void createCollisionObjects() {
@@ -1171,17 +1001,6 @@ public abstract class Player extends Entity {
 			animateArmL(id);
 		else animateArmR(id);
 	}
-	
-	/*/**
-	 * A shortcut to the animating methods
-	 * @param id - the primary name of the animation (extensions like "ArmL", "LegR", etc. will be added automatically by the original methods)
-	 * @param left - whether the animation should be applied to the left leg or the right leg
-	 */
-	/*private void animateLeg(String id, boolean left) {
-		if(left)
-			animateLegL(id);
-		else animateLegR(id);
-	}*/
 	
 	private void animateArmL(String id) {
 		armLController.setAnimation(id + "ArmL", -1);
@@ -1510,7 +1329,7 @@ public abstract class Player extends Entity {
 		
 		modelInstance.calculateTransforms();
 		
-		setCollisionTransform();
+		//setCollisionTransform();
 	}
 	
 	/**
@@ -1542,7 +1361,7 @@ public abstract class Player extends Entity {
 		Vector3 camVec = camMatrix.getTranslation(new Vector3());
 		camMatrix.set(camVec, quat2);
 		
-		setCollisionTransform();
+		//setCollisionTransform();
 	}
 	
 	/**
@@ -1581,17 +1400,8 @@ public abstract class Player extends Entity {
 			run(diffWalk);
 		else if(Math.abs(xDiff) > Math.abs(xDist) + 0.5f || Math.abs(zDiff) > Math.abs(zDist) + 0.5f)
 			walk(diffWalk);
-		
-		
-		
-		// The new rotation of the player
-		//targetVec.x = Math.abs(targetVec.x);
-		//targetVec.y = Math.abs(targetVec.y);
-		//targetVec.z = Math.abs(targetVec.z);
-		
-		//lookAt(tempVec);
 			
-		return tempVec;
+		return targetVec;
 	}
 	
 	@Override
@@ -2007,6 +1817,8 @@ public abstract class Player extends Entity {
 		}
 	}
 	
+	
+	//All the commands and indicators should be cleared.
 	@Override
 	public void onCycleEnd() {
 		super.onCycleEnd();
@@ -2060,7 +1872,7 @@ public abstract class Player extends Entity {
 		
 		//System.out.println(map.getCurrentPlayerHoldTeam());
 		//System.out.println("Not holding");
-		return (dribbleL || dribbleR) || 
+		return //(dribbleL || dribbleR) || 
 				((this instanceof Teammate && map.getTeammates().indexOf(this) == map.getCurrentPlayerHoldTeam()) || 
 						(this instanceof Opponent && map.getOpponents().indexOf(this) == map.getCurrentPlayerHoldOpp()));
 	}

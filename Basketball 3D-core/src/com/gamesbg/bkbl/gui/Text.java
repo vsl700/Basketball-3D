@@ -4,8 +4,6 @@ import com.badlogic.gdx.graphics.g2d.BitmapFont;
 
 public abstract class Text extends GUI {
 	
-	//protected TextListener textListener;
-	
 	TextChangeListener textChangeListener;
 	
 	protected BitmapFont font;
@@ -13,7 +11,6 @@ public abstract class Text extends GUI {
 	protected String text;
 	
 	protected float r, g, b, a;
-	//protected float x, y, width, height;
 	
 	protected boolean containsDiffFromLetter(String text) {
 		for(int i = 0; i < text.length(); i++) {

@@ -14,8 +14,6 @@ public class TextUpDown extends UpDown {
 	
 	ArrayList<String> options;
 	
-	//int index;
-	
 	public TextUpDown(BitmapFont btnFont, BitmapFont textFont, Color color, Color fillColor, Color textFillColor, ArrayList<String> options, boolean textShorten) {
 		this.options = options;
 		
@@ -26,7 +24,6 @@ public class TextUpDown extends UpDown {
 
 	@Override
 	public void render(SpriteBatch batch, ShapeRenderer shape, OrthographicCamera cam) {
-		// TODO Auto-generated method stub
 		super.render(batch, shape, cam);
 		
 		if(down.justReleased(cam) && num > 0) {

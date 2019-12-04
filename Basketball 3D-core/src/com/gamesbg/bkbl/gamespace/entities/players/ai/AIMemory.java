@@ -1,6 +1,5 @@
 package com.gamesbg.bkbl.gamespace.entities.players.ai;
 
-import com.badlogic.gdx.math.Matrix4;
 import com.badlogic.gdx.math.Vector3;
 
 /**
@@ -10,10 +9,26 @@ import com.badlogic.gdx.math.Vector3;
  */
 public class AIMemory {
 	
+	Vector3 shootVec;
+	
 	float dribbleTime, aimingTime, shootTime, switchHandTime;
-	float distDiff = 0, resetTime = 0;
+	float distDiff, resetTime;
 	
 	boolean ballJustShot;
+	
+	public AIMemory() {
+		shootTime = 20;
+	}
+
+	public Vector3 getShootVec() {
+		return shootVec;
+	}
+
+
+	public void setShootVec(Vector3 shootVec) {
+		this.shootVec = shootVec;
+	}
+
 
 	public float getDribbleTime() {
 		return dribbleTime;

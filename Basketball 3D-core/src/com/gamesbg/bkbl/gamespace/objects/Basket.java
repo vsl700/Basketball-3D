@@ -55,70 +55,60 @@ public abstract class Basket extends GameObject {
 		stand.id = "stand";
 		CylinderShapeBuilder.build(mb.part(stand.id, GL20.GL_TRIANGLES, VertexAttributes.Usage.Position | VertexAttributes.Usage.Normal, material), standW, standH, standD, divisions);
 		stand.translation.set(0, standH / 2, 0);
-		//matrixes.add(stand);
 		
 		Node tab = childMB.node();
 		tab.id = "tab";
 		stand.addChild(tab);
 		BoxShapeBuilder.build(childMB.part(tab.id, GL20.GL_TRIANGLES, VertexAttributes.Usage.Position | VertexAttributes.Usage.Normal, material), tabW, tabH, tabD);
 		tab.translation.set(0, standH / 2, -standD / 2 - tabD / 2);
-		//matrixes.add(tab);
 		
 		Node basketHold = childMB.node();
 		basketHold.id = "basketHold";
 		tab.addChild(basketHold);
 		BoxShapeBuilder.build(childMB.part(basketHold.id, GL20.GL_TRIANGLES, VertexAttributes.Usage.Position | VertexAttributes.Usage.Normal, material), bkHoldW, bkHoldW, bkHoldD);
 		basketHold.translation.set(0, -tabH / 2 + bkHoldW / 2, -tabD / 2 - bkHoldD / 2);
-		//matrixes.add(basketHold);
 		
 		Node basket1 = childMB.node();
 		basket1.id = "basket1";
 		basketHold.addChild(basket1);
 		BoxShapeBuilder.build(childMB.part(basket1.id, GL20.GL_TRIANGLES, VertexAttributes.Usage.Position | VertexAttributes.Usage.Normal, material), tabCentW, bkHoldW, bkHoldW);
 		basket1.translation.set(0, 0, -bkHoldD / 2 + bkHoldW / 2);
-		//matrixes.add(basket1);
 		
 		Node basket2 = childMB.node();
 		basket2.id = "basket2";
 		basket1.addChild(basket2);
 		BoxShapeBuilder.build(childMB.part(basket2.id, GL20.GL_TRIANGLES, VertexAttributes.Usage.Position | VertexAttributes.Usage.Normal, material), bkHoldW, bkHoldW, tabCentW);
 		basket2.translation.set(-tabCentW / 2 + bkHoldW / 2, 0, -tabCentW / 2);
-		//matrixes.add(basket2);
 		
 		Node basket3 = childMB.node();
 		basket3.id = "basket3";
 		basket1.addChild(basket3);
 		BoxShapeBuilder.build(childMB.part(basket3.id, GL20.GL_TRIANGLES, VertexAttributes.Usage.Position | VertexAttributes.Usage.Normal, material), tabCentW, bkHoldW, bkHoldW);
 		basket3.translation.set(0, 0, -tabCentW + bkHoldW / 2);
-		//matrixes.add(basket3);
 		
 		Node basket4 = childMB.node();
 		basket4.id = "basket4";
 		basket1.addChild(basket4);
 		BoxShapeBuilder.build(childMB.part(basket4.id, GL20.GL_TRIANGLES, VertexAttributes.Usage.Position | VertexAttributes.Usage.Normal, material), bkHoldW, bkHoldW, tabCentW);
 		basket4.translation.set(tabCentW / 2 - bkHoldW / 2, 0, -tabCentW / 2);
-		//matrixes.add(basket4);
 		
 		Node tabCenter1 = childMB.node();
 		tabCenter1.id = "tabCent1";
 		tab.addChild(tabCenter1);
 		BoxShapeBuilder.build(childMB.part(tabCenter1.id, GL20.GL_TRIANGLES, VertexAttributes.Usage.Position | VertexAttributes.Usage.Normal, centerMaterial), tabCentW, tabCentH, tabCentD);
 		tabCenter1.translation.set(0, -tabH / 2 + tabCentH1, -tabD / 2 - tabCentD / 2);
-		//matrixes.add(tabCenter1);
 		
 		Node tabCenter2 = childMB.node();
 		tabCenter2.id = "tabCent2";
 		tabCenter1.addChild(tabCenter2);
 		BoxShapeBuilder.build(childMB.part(tabCenter2.id, GL20.GL_TRIANGLES, VertexAttributes.Usage.Position | VertexAttributes.Usage.Normal, centerMaterial), tabCentH, tabCentH1, tabCentD);
 		tabCenter2.translation.set(-tabCentW / 2 + tabCentH / 2, -tabCentH1 / 2, 0);
-		//matrixes.add(tabCenter2);
 		
 		Node tabCenter3 = childMB.node();
 		tabCenter3.id = "tabCent3";
 		tabCenter1.addChild(tabCenter3);
 		BoxShapeBuilder.build(childMB.part(tabCenter3.id, GL20.GL_TRIANGLES, VertexAttributes.Usage.Position | VertexAttributes.Usage.Normal, centerMaterial), tabCentH, tabCentH1, tabCentD);
 		tabCenter3.translation.set(tabCentW / 2 - tabCentH / 2, -tabCentH1 / 2, 0);
-		//matrixes.add(tabCenter3);
 		
 		childMB.end();
 		model = mb.end();
@@ -136,7 +126,6 @@ public abstract class Basket extends GameObject {
 		matrixes.add(modelInstance.getNode(tabCenter1.id).globalTransform);
 		matrixes.add(modelInstance.getNode(tabCenter2.id).globalTransform);
 		matrixes.add(modelInstance.getNode(tabCenter3.id).globalTransform);
-		//modelInstance.calculateTransforms();
 	}
 
 	@Override
@@ -155,34 +144,6 @@ public abstract class Basket extends GameObject {
 		
 		invisibleCollShapes.add(new btBoxShape(new Vector3(tabCentW / 2, bkHoldW / 2, tabCentW / 2)));
 		invisibleCollShapes.add(new btCylinderShape(new Vector3(basketZone, standH / 2, basketZone)));
-		
-		/*collisionObjects.add(new btCollisionObject());
-		collisionObjects.get(0).setCollisionShape(collisionShapes.get(0));
-		collisionObjects.get(0).setWorldTransform(modelInstance.getNode("stand").globalTransform);
-		
-		collisionObjects.add(new btCollisionObject());
-		collisionObjects.get(1).setCollisionShape(collisionShapes.get(1));
-		collisionObjects.get(1).setWorldTransform(modelInstance.getNode("tab").globalTransform);
-		
-		collisionObjects.add(new btCollisionObject());
-		collisionObjects.get(2).setCollisionShape(collisionShapes.get(2));
-		collisionObjects.get(2).setWorldTransform(modelInstance.getNode("basketHold").globalTransform);
-		
-		collisionObjects.add(new btCollisionObject());
-		collisionObjects.get(3).setCollisionShape(collisionShapes.get(3));
-		collisionObjects.get(3).setWorldTransform(modelInstance.getNode("basket1").globalTransform);
-		
-		collisionObjects.add(new btCollisionObject());
-		collisionObjects.get(4).setCollisionShape(collisionShapes.get(4));
-		collisionObjects.get(4).setWorldTransform(modelInstance.getNode("basket2").globalTransform);
-		
-		collisionObjects.add(new btCollisionObject());
-		collisionObjects.get(5).setCollisionShape(collisionShapes.get(5));
-		collisionObjects.get(5).setWorldTransform(modelInstance.getNode("basket3").globalTransform);
-		
-		collisionObjects.add(new btCollisionObject());
-		collisionObjects.get(6).setCollisionShape(collisionShapes.get(6));
-		collisionObjects.get(6).setWorldTransform(modelInstance.getNode("basket4").globalTransform);*/
 	}
 	
 	public void setRotation(float x, float y, float z, float angle) {
@@ -245,8 +206,6 @@ public abstract class Basket extends GameObject {
 	protected void manuallySetObjects() {
 		modelInstance.calculateTransforms();
 		
-		//Matrix4 temp = calcTransformFromNodesTransform(modelInstance.getNode("basket1").globalTransform);
-		//Matrix4 temp2 = new Matrix4().set(temp.cpy().getTranslation(new Vector3()).add(0, 0, -(tabCentW / 2 + bkHoldW / 2) * z / Math.abs(z)), temp.getRotation(new Quaternion()));
 		collisionObjects.get(0).setWorldTransform(calcTransformFromNodesTransform(modelInstance.getNode("basket1").globalTransform.cpy().trn(0, 0, -tabCentW / 2)));
 		collisionObjects.get(1).setWorldTransform(calcTransformFromNodesTransform(new Matrix4().setToTranslation(0, basketZone / 2, -basketZone / 2)));
 		

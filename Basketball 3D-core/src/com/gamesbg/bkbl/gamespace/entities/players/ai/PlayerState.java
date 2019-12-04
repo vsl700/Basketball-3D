@@ -16,6 +16,15 @@ import com.gamesbg.bkbl.gamespace.objects.GameObject;
 public enum PlayerState implements State<Player> {
 	BALL_IN_HAND() {
 		
+		private void performShooting(Player player, Vector3 tempAimVec) {
+			AIMemory mem = memory.get(player);
+			
+			mem.setShootVec(tempAimVec.nor());
+			player.lookAt(tempAimVec);
+			player.interactWithBallS();
+			mem.setAimingTime(mem.getAimingTime() + Gdx.graphics.getDeltaTime());
+		}
+		
 		@Override
 		public void update(Player player) {
 			super.update(player);
@@ -25,48 +34,41 @@ public enum PlayerState implements State<Player> {
 			if(!player.getStateMachine().isInState(BALL_IN_HAND) || mem.isBallJustShot())
 				return;
 			
-			
-			
 			GameObject basket;
 			if(player instanceof Teammate)
 				basket = player.getMap().getAwayBasket();
 			else basket = player.getMap().getHomeBasket();
 			
 			//Ball behavior mechanism
-			if (mem.getAimingTime() > 0 && mem.getAimingTime() < 1.25f) {
-				System.out.println("Shoot1");
-				player.interactWithBallS();
-				mem.setAimingTime(mem.getAimingTime() + Gdx.graphics.getDeltaTime());
+			if (mem.getAimingTime() > 0 && mem.getAimingTime() <= 1.25f) {
+				performShooting(player, mem.getShootVec());
 			} else {
-				if(mem.getAimingTime() >= 1.25f) {
+				if(mem.getAimingTime() > 1.25f) {
+					mem.setShootTime(0);
+					mem.setAimingTime(0);
+					player.throwBall(mem.getShootVec());
+					mem.setBallJustShot(true);
 					return;
 				}
 				
-				if (player.isSurrounded() && player.getMap().getTeammates().size() > 1) {
-					Vector3 tempAimVec = new Vector3().setToRandomDirection();
+				if (player.isSurrounded() && player.getMap().getTeammates().size() > 1 || player.isInAwayBasketZone()) {
 					Vector3 playerVec = player.getModelInstance().transform.getTranslation(new Vector3());
+					Vector3 tempAimVec = playerVec.cpy().sub(new Vector3());
 					
-					if (player.isInAwayBasketZone()) {
-						if(player.isBehindBasket())
-							tempAimVec = new Vector3(); 
-						else tempAimVec = basket.getModelInstance().transform.getTranslation(new Vector3());
-					} else if(mem.getShootTime() > 20) {
+					if(!player.isBehindBasket())
+						tempAimVec = basket.calcTransformFromNodesTransform(basket.getMatrixes().get(3)).getTranslation(new Vector3());
+					else if(mem.getShootTime() > 20 || !player.isInAwayBasketZone()) {
 						ArrayList<Player> tempTeam;
 						if (player instanceof Teammate)
 							tempTeam = player.getMap().getTeammates();
 						else
 							tempTeam = player.getMap().getOpponents();
 
-						tempAimVec = getShortestDistance(playerVec, tempTeam).nor();
+						tempAimVec = getShortestDistance(playerVec, tempTeam);
 					}
 					
 					
-					player.lookAt(tempAimVec);
-					System.out.println("Shoot2");
-					player.interactWithBallS();
-					mem.setBallJustShot(true);
-					mem.setAimingTime(mem.getAimingTime() + Gdx.graphics.getDeltaTime());
-					
+					performShooting(player, tempAimVec);
 					
 				}
 
@@ -102,20 +104,8 @@ public enum PlayerState implements State<Player> {
 			mem.setSwitchHandTime(mem.getSwitchHandTime() + Gdx.graphics.getDeltaTime());
 			
 			//Walking & running mechanism
-			//We use this if just for the aim & shoot starter. The if below continues it.
-			if(player.isInAwayBasketZone() && mem.getAimingTime() == 0) {
-				Vector3 tempAimVec = basket.calcTransformFromNodesTransform(basket.getMatrixes().get(3)).getTranslation(new Vector3());
-				
-				player.lookAt(tempAimVec);
-				System.out.println("Shoot3");
-				player.interactWithBallS();
-				mem.setBallJustShot(true);
-				mem.setAimingTime(mem.getAimingTime() + Gdx.graphics.getDeltaTime());
-				
-				return;
-			}
 			
-			
+			//Setting the distances from the target (when a player gets in front of this player)
 			if (player.isNorthSurround()) {
 				if (player.isWestSurround())
 					mem.setDistDiff(mem.getDistDiff() - 60 * Gdx.graphics.getDeltaTime());
@@ -128,6 +118,8 @@ public enum PlayerState implements State<Player> {
 				mem.setResetTime(0);
 			}
 			
+			System.out.println("Shoot time:" + mem.getShootTime());
+			System.out.println("Aiming time:" + mem.getAimingTime());
 			
 			Vector3 dir = player.roamAround(basket.getMainTrans().cpy().trn(mem.getDistDiff(), 0, 0), null, 0, 5, false, mem.getAimingTime() > 0 || player.isShooting());
 			player.lookAt(dir.sub(mem.getDistDiff(), 0, 0));
@@ -137,18 +129,8 @@ public enum PlayerState implements State<Player> {
 		@Override
 		public void exit(Player player) {
 			//memory.get(player).setBallJustShot(true);
-			memory.get(player).setShootTime(0);
-			memory.get(player).setAimingTime(0);
-		}
-		
-		@Override
-		public void setSpecialBoolean(boolean b, Player player) {
-			memory.get(player).setBallJustShot(b);
-		}
-		
-		@Override
-		public boolean isSpecialBoolean(Player player) {
-			return memory.get(player).isBallJustShot();
+			//memory.get(player).setShootTime(0);
+			//memory.get(player).setAimingTime(0);
 		}
 		
 	},
@@ -167,11 +149,11 @@ public enum PlayerState implements State<Player> {
 			
 			Vector3 tempHandVec = getShortestDistanceWVectors(ballVec, handVecs);
 			
-			if(!BALL_IN_HAND.isSpecialBoolean(player)) {
+			if(!memory.get(player).isBallJustShot() || player.getMap().getTeammates().size() == 1) {
 				if (player.isNorthSurround()) {
 					if (player.isWestSurround())
 						mem.setDistDiff(mem.getDistDiff() - 60 * Gdx.graphics.getDeltaTime());
-					else 
+					else if(player.isEastSurround()) 
 						mem.setDistDiff(mem.getDistDiff() + 60 * Gdx.graphics.getDeltaTime());
 					
 				}
@@ -195,7 +177,7 @@ public enum PlayerState implements State<Player> {
 	COOPERATIVE(){
 		@Override
 		public void enter(Player player) {
-			BALL_IN_HAND.setSpecialBoolean(false, player);
+			memory.get(player).setBallJustShot(false);
 		}
 		
 		@Override
@@ -259,7 +241,7 @@ public enum PlayerState implements State<Player> {
 	PLAYER_SURROUND(){
 		@Override
 		public void enter(Player player) {
-			BALL_IN_HAND.setSpecialBoolean(false, player);
+			memory.get(player).setBallJustShot(false);
 		}
 		
 		@Override
@@ -276,28 +258,30 @@ public enum PlayerState implements State<Player> {
 			
 			Matrix4 chasedTrans = chased.getModelInstance().transform.cpy();
 			
+			Matrix4 ballTrans = chased.getMap().getBall().getModelInstance().transform.cpy();
+			
 			Vector3 chasedVec = new Vector3();
 			chasedTrans.getTranslation(chasedVec);
 			
 			Vector3 result;
 			if(player.getMap().getTeammates().size() == 1)
-				result = player.roamAround(chasedTrans, null, 3, 1, false, false);
+				result = player.roamAround(ballTrans, null, 3, 1, false, false);
 			else switch(player.getPlayerIndex()) {
 			case 1:
-				result = player.roamAround(chasedTrans, null, 0, 3, false, false);
+				result = player.roamAround(ballTrans, null, 0, 3, false, false);
 				break;
 			case 3:
-				result = player.roamAround(chasedTrans, null, -1, 3, false, false);
+				result = player.roamAround(ballTrans, null, -1, 3, false, false);
 				break;
 			case 5:
-				result = player.roamAround(chasedTrans, null, -3, 1, false, false);
+				result = player.roamAround(ballTrans, null, -3, 1, false, false);
 				break;
 				
 			case 2:
-				result = player.roamAround(chasedTrans, null, 2, 3, false, false);
+				result = player.roamAround(ballTrans, null, 1, 3, false, false);
 				break;
 			case 4: 
-				result = player.roamAround(chasedTrans, null, 3, 1, false, false);
+				result = player.roamAround(ballTrans, null, 3, 1, false, false);
 				break;
 				default: 
 					result = new Vector3();
@@ -332,7 +316,7 @@ public enum PlayerState implements State<Player> {
 			if(!memory.containsKey(player))
 				memory.put(player, new AIMemory());
 			
-			BALL_IN_HAND.setSpecialBoolean(false, player);
+			memory.get(player).setBallJustShot(false);
 		}
 		
 		@Override
@@ -357,15 +341,13 @@ public enum PlayerState implements State<Player> {
 		
 	}
 	
-	protected void setSpecialBoolean(boolean b, Player player) {}
-	
-	protected boolean isSpecialBoolean(Player player) { return false; }
-	
+	//Automated state refresh
 	@Override
 	public void update(Player player) {
 		AIMemory mem = memory.get(player);
 		
 		mem.setShootTime(mem.getShootTime() + Gdx.graphics.getDeltaTime());
+		System.out.println(mem.getShootTime());
 		mem.setResetTime(mem.getResetTime() + Gdx.graphics.getDeltaTime());
 		
 		if(player.getMap().isGameRunning()) {
@@ -394,10 +376,13 @@ public enum PlayerState implements State<Player> {
 		return false;
 	}
 	
-	protected boolean pointsCollision(float x11, float y11, float x12, float y12, float x21, float y21) {
-		return x11 <= x21 && x12 >= x21 && y11 <= y21 && y12 >= y21;
-	}
 	
+	/**
+	 * 
+	 * @param position
+	 * @param positions
+	 * @return the vector which on the shortest distance of all other positions from the given position
+	 */
 	protected Vector3 getShortestDistanceWVectors(Vector3 position, ArrayList<Vector3> positions) {
 		Vector3 tempVec = positions.get(0);
 		float dist = position.dst(tempVec);

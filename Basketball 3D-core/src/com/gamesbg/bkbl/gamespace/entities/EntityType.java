@@ -48,7 +48,6 @@ public enum EntityType {
 			player.create(type, map, pos);
 			return player;
 		} catch (ReflectionException e) {
-			// TODO Auto-generated catch block
 			Gdx.app.error("Entity Loader", "Could not load entity of type " + type.id);
 			return null;
 		}
@@ -62,7 +61,6 @@ public enum EntityType {
 			entity.create(type, map, pos);
 			return entity;
 		} catch (ReflectionException e) {
-			// TODO Auto-generated catch block
 			Gdx.app.error("Entity Loader", "Could not load entity of type " + type.id);
 			return null;
 		}

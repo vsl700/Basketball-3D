@@ -11,11 +11,8 @@ public abstract class UpDown extends GUI {
 	UpDownListener listener;
 	
 	protected Button down, up;
-	//protected Text textPanel;
 	
 	protected int num;
-	
-	//protected float x, y, width, height;
 	
 	protected void create(BitmapFont font, Color color) {
 		down = new Button("<", font, color, true, true);
@@ -30,13 +27,11 @@ public abstract class UpDown extends GUI {
 	public void render(SpriteBatch batch, ShapeRenderer shape, OrthographicCamera cam) {
 		down.render(batch, shape, cam);
 		up.render(batch, shape, cam);
-		//textPanel.render();
 	}
 	
 	protected void onResize() {
 		down.setPosAndSize(x, y, 30, height);
 		up.setPosAndSize(x + width + 50, y, 30, height);
-		//textPanel.setPosAndSize(x + 40, y, width, height);
 	}
 	
 	protected void sendSignalToListen() {

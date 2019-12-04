@@ -7,18 +7,12 @@ import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 
 public class Label extends Text {
-
-	// String text;
-
-	// float r, g, b, a; // text color
-	// float x, y, width;
 	
 	float fR, fG, fB, fA;
 
 	boolean multiline, textShorten;
 
 	public Label(String text, BitmapFont font, Color color, boolean multiline) {
-		//new Label(text, font, fillColor, multiline);
 		this.text = text;
 		this.font = font;
 		this.multiline = multiline;
@@ -27,13 +21,9 @@ public class Label extends Text {
 		g = color.g;
 		b = color.b;
 		a = color.a;
-		
-		//new Label(text, font, batch, color, cam, multiline);
-		//this.shape = shape;
 	}
 	
 	public Label(String text, BitmapFont font, Color color, Color fillColor, boolean textShorten) {
-		//new Label(text, font, fillColor, multiline);
 		this.text = text;
 		this.font = font;
 		this.textShorten = textShorten;
@@ -47,9 +37,6 @@ public class Label extends Text {
 		fG = fillColor.g;
 		fB = fillColor.b;
 		fA = fillColor.a;
-		
-		//new Label(text, font, batch, color, cam, multiline);
-		//this.shape = shape;
 	}
 	
 	private void renderShapes(ShapeRenderer shape, OrthographicCamera cam) {
@@ -80,9 +67,6 @@ public class Label extends Text {
 
 		batch.setProjectionMatrix(cam.combined);
 		batch.begin();
-
-		// font.draw(batch, ":", x, y); //Borders
-		// font.draw(batch, ":", x + width, y);
 
 		if (multiline) {
 			String[] rows = text.split("\n");
@@ -125,8 +109,6 @@ public class Label extends Text {
 	protected void onResize() {
 		StringBuilder sb = new StringBuilder();
 
-		// String[] words = text.split(" ");
-		//FIXME Try to use textX,Y,W,H variables in here with the abstract class
 		float textW = 0;
 
 		for (int i = 0; i < text.length(); i++) {

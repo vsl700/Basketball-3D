@@ -17,10 +17,6 @@ public class InputController implements InputProcessor {
 	boolean sprintPressed;
 	boolean shootPressed;
 	boolean dribbleLPressed, dribbleRPressed;
-	
-	//boolean dribbleLBtnPressed, dribbleRBtnPressed;
-	
-	//boolean updateDribbleL, updateDribbleR;
 	/**
 	 * Resets the scroll amount and the dribble (and ball pointing) buttons indicators
 	 * @param resetDribble - whether to reset the ball dribble indicators

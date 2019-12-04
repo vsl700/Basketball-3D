@@ -95,12 +95,8 @@ public class LevelScreen implements Screen {
 	public void resize(int width, int height) {
 		cam.setToOrtho(false, width, height);
 		
-		//textFont.getData().setScale(width * height / 921600 + 1);
-		//btnFont.getData().setScale(width * height / 921600);
-		
 		play.setPosAndSize(game.pixelXByCurrentSize(149), game.pixelYByCurrentSize(150), game.pixelXByCurrentSize(223), game.pixelYByCurrentSize(30));
 		back.setPosAndSize(game.pixelXByCurrentSize(893), game.pixelYByCurrentSize(150), game.pixelXByCurrentSize(223), game.pixelYByCurrentSize(30));
-		//numUpDown.setPosAndSize(game.pixelXByCurrentSize(558), game.pixelYByCurrentSize(225), game.pixelXByCurrentSize(74), game.pixelYByCurrentSize(45));
 		numUpDown.setSize(game.pixelXByCurrentSize(74), game.pixelYByCurrentSize(45));
 		numUpDown.setPos(back.getX() - 90, game.pixelYByCurrentSize(325));
 		textUpDown.setSize(game.pixelXByCurrentSize(104), game.pixelYByCurrentSize(45));
