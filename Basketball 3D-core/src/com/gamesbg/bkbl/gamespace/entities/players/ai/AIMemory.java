@@ -11,6 +11,7 @@ public class AIMemory {
 	
 	Vector3 shootVec;
 	
+	//Just some player AI's properties, or in other words, imitating some strategy
 	float dribbleTime, aimingTime, shootTime, switchHandTime;
 	float distDiff, resetTime;
 	

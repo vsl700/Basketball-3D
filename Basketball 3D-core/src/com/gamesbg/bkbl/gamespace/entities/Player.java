@@ -4,9 +4,9 @@ import java.util.ArrayList;
 import java.util.HashMap;
 
 import com.badlogic.gdx.Gdx;
-import com.badlogic.gdx.ai.btree.BehaviorTree;
-import com.badlogic.gdx.ai.fsm.DefaultStateMachine;
-import com.badlogic.gdx.ai.fsm.StateMachine;
+import com.badlogic.gdx.ai.steer.Proximity;
+import com.badlogic.gdx.ai.steer.Steerable;
+import com.badlogic.gdx.ai.steer.SteeringAcceleration;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.VertexAttributes;
@@ -35,13 +35,12 @@ import com.gamesbg.bkbl.gamespace.entities.players.Teammate;
 import com.gamesbg.bkbl.gamespace.entities.players.ai.*;
 import com.gamesbg.bkbl.gamespace.objects.ObjectType;
 
-public abstract class Player extends Entity {
+public abstract class Player extends Entity implements Steerable<Vector3>, Proximity<Vector3> {
 
 	static final float MAX_WALKING_VELOCITY = 4;
 	static final float MAX_RUNNING_VELOCITY = 11;
-	
+	static final float dribbleSpeed = 0.1f;
 	//The node which should be followed by the camera
-	//Node camNode;
 	Matrix4 camMatrix;
 	
 	//Collision objects maps for reaching an object just by calling its mostly used name
@@ -56,9 +55,10 @@ public abstract class Player extends Entity {
 	AnimationController bodyController;
 	
 	//AI
-	BehaviorTree<Player> bTree;
-	StateMachine<Player, PlayerState> stateMachine;
+	Brain brain;
+	static final SteeringAcceleration<Vector3> steering = new SteeringAcceleration<Vector3>(new Vector3()); //Not sure where exactly that should be - in the Brain class or in the Player one
 	
+	//Scaling properties
 	static final float scale1 = 0.5f;
 	static final float scale2 = 1;
 	static final float scale3 = 0.15f;
@@ -67,11 +67,9 @@ public abstract class Player extends Entity {
 	static final float scale6 = 0.35f;
 	static final float scale7 = 0.315f;
 	static final float handPercentage = 0.4f;
-	
 	static float poleScale;
-	
-	static final float dribbleSpeed = 0.1f;
-	
+
+	//Player's mechanics
 	boolean walking, running, jumping;
 	boolean leftHoldingBall, rightHoldingBall;
 	boolean leftAimBall, rightAimBall;
@@ -102,39 +100,18 @@ public abstract class Player extends Entity {
 		legLController = new AnimationController(modelInstance);
 		legRController = new AnimationController(modelInstance);
 		bodyController = new AnimationController(modelInstance);
-		armLController.setAnimation("stayArmL", -1, 1, new AnimationListener() {
-
-			@Override
-			public void onEnd(AnimationDesc animation) {
-				
-			}
-
-			@Override
-			public void onLoop(AnimationDesc animation) {
-				
-			}
-			
-		});
 		
-		armRController.setAnimation("stayArmR", -1, 1, new AnimationListener() {
-
-			@Override
-			public void onEnd(AnimationDesc animation) {
-				
-			}
-
-			@Override
-			public void onLoop(AnimationDesc animation) {
-				
-			}
-			
-		});
+		//Prepare the primary animations state of the player (staying on one place without moving) 
+		animateArmL("stay");
+		animateArmR("stay");
 		
 		stopLegsAnim();
 		stopBodyAnim();
 		
-			stateMachine = new DefaultStateMachine<Player, PlayerState>(this, PlayerState.IDLING);
-			stateMachine.changeState(PlayerState.IDLING);
+		brain = new Brain(this);
+		
+			//stateMachine = new DefaultStateMachine<Player, PlayerState>(this, PlayerState.IDLING);
+			//stateMachine.changeState(PlayerState.IDLING);
 
 	}
 	
@@ -787,8 +764,8 @@ public abstract class Player extends Entity {
 	}
 	
 	@Override
-	public void setCollisionTransform() {
-		super.setCollisionTransform();
+	public void setCollisionTransform(boolean updateMain) {
+		super.setCollisionTransform(updateMain);
 		
 		collObjMap.get("poleNObj").setWorldTransform(calcTransformFromNodesTransform(new Matrix4().set(new Vector3(0, poleScale / 2, getDepth() / 2 + poleScale / 2), new Quaternion())));
 		collObjMap.get("poleSObj").setWorldTransform(calcTransformFromNodesTransform(new Matrix4().set(new Vector3(0, poleScale / 2, -getDepth() / 2 - poleScale / 2), new Quaternion())));
@@ -803,7 +780,7 @@ public abstract class Player extends Entity {
 	public void turnY(float y) {
 		modelInstance.transform.rotate(0, 1, 0, y);
 		
-		setCollisionTransform();
+		setCollisionTransform(true);
 	}
 	
 	/**
@@ -822,7 +799,7 @@ public abstract class Player extends Entity {
 		dir.z *= MAX_WALKING_VELOCITY;
 		
 		modelInstance.transform.trn(dir);
-		setCollisionTransform();
+		setCollisionTransform(true);
 		
 		walking = true;
 	}
@@ -833,7 +810,7 @@ public abstract class Player extends Entity {
 			dir.z *= MAX_RUNNING_VELOCITY;
 
 			modelInstance.transform.trn(dir);
-			setCollisionTransform();
+			setCollisionTransform(true);
 
 			running = true;
 		}
@@ -1073,7 +1050,7 @@ public abstract class Player extends Entity {
 	private void releaseBall(Matrix4 trans) {
 		map.getBall().getMainBody().setGravity(map.getDynamicsWorld().getGravity());
 		map.getBall().getMainBody().activate();
-		map.getBall().setCollisionTransform();
+		map.getBall().setCollisionTransform(true);
 		map.getBall().setWorldTransform(trans);
 		
 		leftHoldingBall = rightHoldingBall = false;
@@ -1419,7 +1396,7 @@ public abstract class Player extends Entity {
 		}
 		
 		if(!isMainPlayer())
-			stateMachine.update();
+			brain.update();
 		
 		String prevIdArmL = armLController.current.animation.id;
 		String prevIdArmR = armLController.current.animation.id;
@@ -1731,15 +1708,52 @@ public abstract class Player extends Entity {
 		//if(this instanceof Opponent && (northSurround || southSurround || eastSurround || westSurround))
 			//System.out.println("Surround" + northSurround + ";" + southSurround + ";" + eastSurround + ";" + westSurround);
 	}
+	
+	@Override
+	public Vector3 getLinearVelocity() {
+		// TODO Auto-generated method stub
+		return getMainBody().getLinearVelocity();
+	}
+
+	@Override
+	public float getAngularVelocity() {
+		// TODO Auto-generated method stub
+		return getMainBody().getAngularVelocity().y;
+	}
+
+	@Override
+	public float getBoundingRadius() {
+		// TODO Auto-generated method stub
+		return Math.max(getWidth(), getDepth());
+	}
+
+	@Override
+	public Steerable<Vector3> getOwner() {
+		// TODO Auto-generated method stub
+		return this;
+	}
+
+	@Override
+	public int findNeighbors (ProximityCallback<Vector3> callback) {
+		int count = 0;
+		for(Player p : map.getTeammates())
+			if(callback.reportNeighbor(p))
+				count++;
+		
+		for(Player p : map.getOpponents())
+			if(callback.reportNeighbor(p))
+				count++;
+		
+		return count;
+	}
 
 	public Matrix4 getCamMatrix() {
 		return camMatrix;
 	}
 	
-	public StateMachine<Player, PlayerState> getStateMachine() {
-		return stateMachine;
+	public Brain getBrain() {
+		return brain;
 	}
-	
 
 	@Override
 	public float getWidth() {
@@ -1772,7 +1786,7 @@ public abstract class Player extends Entity {
 		temp.z = 0;
 		modelInstTrans.set(tempVec, temp);
 		
-		setCollisionTransform();
+		setCollisionTransform(true);
 	}
 	
 	@Override

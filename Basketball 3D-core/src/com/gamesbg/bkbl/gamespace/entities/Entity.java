@@ -57,7 +57,7 @@ public abstract class Entity {
 		modelInstance.calculateTransforms();
 		createCollisions();
 		createCollisionObjectAndBodies();
-		setCollisionTransform();
+		setCollisionTransform(true);
 		
 		removeCollCheckOnInternals();
 	}
@@ -161,20 +161,20 @@ public abstract class Entity {
 		
 	}
 	
-	public void setCollisionTransform() {
+	public void setCollisionTransform(boolean updateMain) {
 		
 		int j = 0;
 		
 		for(int i = 0; i < bodies.size(); i++) {
 			if (manualSetTransformsBody != null) {
 				if (!manualSetTransformsBody.contains(bodies.get(i))) {
-					if (j == mainBodyIndex)
+					if (j == mainBodyIndex && updateMain)
 						bodies.get(i).proceedToTransform(matrixes.get(j));
 					else
 						bodies.get(i).setWorldTransform((calcTransformFromNodesTransform(matrixes.get(j))));
 				}
 			} else {
-				if (j == mainBodyIndex)
+				if (j == mainBodyIndex && updateMain)
 					bodies.get(i).proceedToTransform(matrixes.get(j));
 				else
 					bodies.get(i).setWorldTransform((calcTransformFromNodesTransform(matrixes.get(j))));
@@ -216,7 +216,7 @@ public abstract class Entity {
 	
 	public void setWorldTransform(Matrix4 trans) {
 		matrixes.get(mainBodyIndex).set(trans);
-		setCollisionTransform();
+		setCollisionTransform(true);
 	}
 	
 	/**
@@ -225,7 +225,7 @@ public abstract class Entity {
 	 */
 	public void setCopyTransform(Matrix4 trans) {
 		matrixes.get(mainBodyIndex).set(trans.val);
-		setCollisionTransform();
+		setCollisionTransform(true);
 	}
 	
 	private boolean isTimeoutOver() {

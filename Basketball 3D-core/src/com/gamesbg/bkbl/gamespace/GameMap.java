@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 
 import com.badlogic.gdx.Gdx;
+import com.badlogic.gdx.ai.GdxAI;
 import com.badlogic.gdx.graphics.g3d.Environment;
 import com.badlogic.gdx.graphics.g3d.ModelBatch;
 import com.badlogic.gdx.math.Matrix4;
@@ -483,6 +484,8 @@ public class GameMap {
 				gameRunning = true;
 			else startTimer-= delta;
 		}
+		
+		GdxAI.getTimepiece().update(Gdx.graphics.getDeltaTime());
 		
 		ball.update(delta);
 		

@@ -1,15 +1,12 @@
 package com.gamesbg.bkbl.gamespace.entities.players.ai;
 
 import java.util.ArrayList;
-import java.util.HashMap;
-
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.ai.fsm.State;
 import com.badlogic.gdx.ai.msg.Telegram;
 import com.badlogic.gdx.math.Matrix4;
 import com.badlogic.gdx.math.Vector3;
 import com.gamesbg.bkbl.gamespace.entities.Player;
-import com.gamesbg.bkbl.gamespace.entities.players.Opponent;
 import com.gamesbg.bkbl.gamespace.entities.players.Teammate;
 import com.gamesbg.bkbl.gamespace.objects.GameObject;
 
@@ -17,7 +14,7 @@ public enum PlayerState implements State<Player> {
 	BALL_IN_HAND() {
 		
 		private void performShooting(Player player, Vector3 tempAimVec) {
-			AIMemory mem = memory.get(player);
+			AIMemory mem = player.getBrain().getMemory();
 			
 			mem.setShootVec(tempAimVec.nor());
 			player.lookAt(tempAimVec);
@@ -27,12 +24,8 @@ public enum PlayerState implements State<Player> {
 		
 		@Override
 		public void update(Player player) {
-			super.update(player);
 			
-			AIMemory mem = memory.get(player);
-			
-			if(!player.getStateMachine().isInState(BALL_IN_HAND) || mem.isBallJustShot())
-				return;
+			AIMemory mem = player.getBrain().getMemory();
 			
 			GameObject basket;
 			if(player instanceof Teammate)
@@ -138,9 +131,8 @@ public enum PlayerState implements State<Player> {
 	BALL_CHASING(){
 		@Override
 		public void update(Player player) {
-			super.update(player);
 			
-			AIMemory mem = memory.get(player);
+			AIMemory mem = player.getBrain().getMemory();
 			
 			Vector3 ballVec = player.getMap().getBall().getModelInstance().transform.getTranslation(new Vector3());
 			ArrayList<Vector3> handVecs = new ArrayList<Vector3>();
@@ -149,7 +141,7 @@ public enum PlayerState implements State<Player> {
 			
 			Vector3 tempHandVec = getShortestDistanceWVectors(ballVec, handVecs);
 			
-			if(!memory.get(player).isBallJustShot() || player.getMap().getTeammates().size() == 1) {
+			if(!mem.isBallJustShot() || player.getMap().getTeammates().size() == 1) {
 				if (player.isNorthSurround()) {
 					if (player.isWestSurround())
 						mem.setDistDiff(mem.getDistDiff() - 60 * Gdx.graphics.getDeltaTime());
@@ -177,16 +169,11 @@ public enum PlayerState implements State<Player> {
 	COOPERATIVE(){
 		@Override
 		public void enter(Player player) {
-			memory.get(player).setBallJustShot(false);
+			player.getBrain().getMemory().setBallJustShot(false);
 		}
 		
 		@Override
 		public void update(Player player) {
-			super.update(player);
-			
-			if(!player.getStateMachine().isInState(COOPERATIVE))
-				return;
-			
 			Player tempPlayer;
 			Matrix4 tempPlayerTrans;
 			if(player instanceof Teammate)
@@ -241,16 +228,11 @@ public enum PlayerState implements State<Player> {
 	PLAYER_SURROUND(){
 		@Override
 		public void enter(Player player) {
-			memory.get(player).setBallJustShot(false);
+			player.getBrain().getMemory().setBallJustShot(false);
 		}
 		
 		@Override
 		public void update(Player player) {
-			super.update(player);
-			
-			if(!player.getStateMachine().isInState(PLAYER_SURROUND))
-				return;
-			
 			Player chased;
 			if(player instanceof Teammate)
 				chased = player.getMap().getOpponentHolding();
@@ -310,24 +292,14 @@ public enum PlayerState implements State<Player> {
 		
 		@Override
 		public void enter(Player player) {
-			if(memory == null)
-				memory = new HashMap<Player, AIMemory>();
-			
-			if(!memory.containsKey(player))
-				memory.put(player, new AIMemory());
-			
-			memory.get(player).setBallJustShot(false);
+			player.getBrain().getMemory().setBallJustShot(false);
 		}
 		
 		@Override
-		public void update(Player player) {
-			super.update(player);
-		}
+		public void update(Player player) {}
 	};
 
 	//float dribbleTime, aimingTime, shootTime, switchHandTime;
-	
-	static HashMap<Player, AIMemory> memory;
 	
 	@Override
 	public void enter(Player entity) {
@@ -339,35 +311,6 @@ public enum PlayerState implements State<Player> {
 	public void exit(Player entity) {
 		
 		
-	}
-	
-	//Automated state refresh
-	@Override
-	public void update(Player player) {
-		AIMemory mem = memory.get(player);
-		
-		mem.setShootTime(mem.getShootTime() + Gdx.graphics.getDeltaTime());
-		System.out.println(mem.getShootTime());
-		mem.setResetTime(mem.getResetTime() + Gdx.graphics.getDeltaTime());
-		
-		if(player.getMap().isGameRunning()) {
-			if(player.holdingBall())
-				player.getStateMachine().changeState(BALL_IN_HAND);
-			
-			else {
-				
-				if(player instanceof Teammate && player.getMap().isBallInTeam() || player instanceof Opponent && player.getMap().isBallInOpp()) 
-				player.getStateMachine().changeState(COOPERATIVE);
-			
-			else if(player instanceof Teammate && player.getMap().isBallInOpp() || player instanceof Opponent && player.getMap().isBallInTeam())
-				player.getStateMachine().changeState(PLAYER_SURROUND);
-			
-			else 
-				player.getStateMachine().changeState(BALL_CHASING);
-			}
-			
-		}else 
-			player.getStateMachine().changeState(IDLING);
 	}
 
 	@Override
