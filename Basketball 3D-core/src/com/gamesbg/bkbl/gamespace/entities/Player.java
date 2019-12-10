@@ -4,9 +4,9 @@ import java.util.ArrayList;
 import java.util.HashMap;
 
 import com.badlogic.gdx.Gdx;
-import com.badlogic.gdx.ai.steer.Proximity;
 import com.badlogic.gdx.ai.steer.Steerable;
 import com.badlogic.gdx.ai.steer.SteeringAcceleration;
+import com.badlogic.gdx.ai.utils.Location;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.VertexAttributes;
@@ -35,7 +35,7 @@ import com.gamesbg.bkbl.gamespace.entities.players.Teammate;
 import com.gamesbg.bkbl.gamespace.entities.players.ai.*;
 import com.gamesbg.bkbl.gamespace.objects.ObjectType;
 
-public abstract class Player extends Entity implements Steerable<Vector3>, Proximity<Vector3> {
+public abstract class Player extends Entity {
 
 	static final float MAX_WALKING_VELOCITY = 4;
 	static final float MAX_RUNNING_VELOCITY = 11;
@@ -56,7 +56,7 @@ public abstract class Player extends Entity implements Steerable<Vector3>, Proxi
 	
 	//AI
 	Brain brain;
-	static final SteeringAcceleration<Vector3> steering = new SteeringAcceleration<Vector3>(new Vector3()); //Not sure where exactly that should be - in the Brain class or in the Player one
+	public static final SteeringAcceleration<Vector3> steering = new SteeringAcceleration<Vector3>(new Vector3()); //Not sure where exactly that should be - in the Brain class or in the Player one
 	
 	//Scaling properties
 	static final float scale1 = 0.5f;
@@ -797,6 +797,7 @@ public abstract class Player extends Entity implements Steerable<Vector3>, Proxi
 	public void walk(Vector3 dir) {
 		dir.x *= MAX_WALKING_VELOCITY;
 		dir.z *= MAX_WALKING_VELOCITY;
+		dir.y = 0;
 		
 		modelInstance.transform.trn(dir);
 		setCollisionTransform(true);
@@ -808,6 +809,7 @@ public abstract class Player extends Entity implements Steerable<Vector3>, Proxi
 		if (!isAiming() && !isShooting()) {
 			dir.x *= MAX_RUNNING_VELOCITY;
 			dir.z *= MAX_RUNNING_VELOCITY;
+			dir.y = 0;
 
 			modelInstance.transform.trn(dir);
 			setCollisionTransform(true);
@@ -1395,8 +1397,17 @@ public abstract class Player extends Entity implements Steerable<Vector3>, Proxi
 			map.getBall().getMainBody().setGravity(map.getDynamicsWorld().getGravity());
 		}
 		
-		if(!isMainPlayer())
+		if(!isMainPlayer()) {
+			steering.setZero();
 			brain.update();
+			
+			Vector3 tempLinear = steering.linear;
+			float tempAng = steering.angular;
+			
+			System.out.println(tempLinear.x + " ; " + tempLinear.y + " ; " + tempLinear.z);
+			if(!tempLinear.isZero())
+				walk(tempLinear);
+		}
 		
 		String prevIdArmL = armLController.current.animation.id;
 		String prevIdArmR = armLController.current.animation.id;
@@ -1707,44 +1718,6 @@ public abstract class Player extends Entity implements Steerable<Vector3>, Proxi
 		
 		//if(this instanceof Opponent && (northSurround || southSurround || eastSurround || westSurround))
 			//System.out.println("Surround" + northSurround + ";" + southSurround + ";" + eastSurround + ";" + westSurround);
-	}
-	
-	@Override
-	public Vector3 getLinearVelocity() {
-		// TODO Auto-generated method stub
-		return getMainBody().getLinearVelocity();
-	}
-
-	@Override
-	public float getAngularVelocity() {
-		// TODO Auto-generated method stub
-		return getMainBody().getAngularVelocity().y;
-	}
-
-	@Override
-	public float getBoundingRadius() {
-		// TODO Auto-generated method stub
-		return Math.max(getWidth(), getDepth());
-	}
-
-	@Override
-	public Steerable<Vector3> getOwner() {
-		// TODO Auto-generated method stub
-		return this;
-	}
-
-	@Override
-	public int findNeighbors (ProximityCallback<Vector3> callback) {
-		int count = 0;
-		for(Player p : map.getTeammates())
-			if(callback.reportNeighbor(p))
-				count++;
-		
-		for(Player p : map.getOpponents())
-			if(callback.reportNeighbor(p))
-				count++;
-		
-		return count;
 	}
 
 	public Matrix4 getCamMatrix() {

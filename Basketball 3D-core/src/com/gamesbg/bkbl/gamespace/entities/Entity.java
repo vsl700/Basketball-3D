@@ -2,11 +2,16 @@ package com.gamesbg.bkbl.gamespace.entities;
 
 import java.util.ArrayList;
 
+import com.badlogic.gdx.Gdx;
+import com.badlogic.gdx.ai.steer.Proximity;
+import com.badlogic.gdx.ai.steer.Steerable;
+import com.badlogic.gdx.ai.utils.Location;
 import com.badlogic.gdx.graphics.g3d.Environment;
 import com.badlogic.gdx.graphics.g3d.Model;
 import com.badlogic.gdx.graphics.g3d.ModelBatch;
 import com.badlogic.gdx.graphics.g3d.ModelInstance;
 import com.badlogic.gdx.math.Matrix4;
+import com.badlogic.gdx.math.Quaternion;
 import com.badlogic.gdx.math.Vector3;
 import com.badlogic.gdx.physics.bullet.collision.btCollisionObject;
 import com.badlogic.gdx.physics.bullet.collision.btCollisionShape;
@@ -15,7 +20,7 @@ import com.gamesbg.bkbl.gamespace.GameMap;
 import com.gamesbg.bkbl.gamespace.MotionState;
 import com.gamesbg.bkbl.gamespace.objects.ObjectType;
 
-public abstract class Entity {
+public abstract class Entity implements Proximity<Vector3>, Steerable<Vector3> {
 	
 	protected EntityType type;
 	protected GameMap map;
@@ -236,6 +241,158 @@ public abstract class Entity {
 			timeout++;
 			return false;
 		}
+	}
+
+	@Override
+	public Vector3 getLinearVelocity() {
+		
+		return getMainBody().getLinearVelocity();
+	}
+
+	@Override
+	public float getAngularVelocity() {
+		
+		return getMainBody().getAngularVelocity().y;
+	}
+
+	@Override
+	public float getBoundingRadius() {
+		
+		return Math.max(getWidth(), getDepth());
+	}
+
+	@Override
+	public Steerable<Vector3> getOwner() {
+		
+		return this;
+	}
+
+	@Override
+	public int findNeighbors (ProximityCallback<Vector3> callback) {
+		int count = 0;
+		for(Player p : map.getTeammates())
+			if(callback.reportNeighbor(p))
+				count++;
+		
+		for(Player p : map.getOpponents())
+			if(callback.reportNeighbor(p))
+				count++;
+		
+		return count;
+	}
+
+	@Override
+	public Vector3 getPosition() {
+		
+		return modelInstance.transform.getTranslation(new Vector3());
+	}
+
+	@Override
+	public float getOrientation() {
+		
+		return modelInstance.transform.getRotation(new Quaternion()).getYaw();
+	}
+
+	@Override
+	public void setOrientation(float orientation) {
+		
+		
+	}
+
+	@Override
+	public float vectorToAngle(Vector3 vector) {
+		return (float)Math.atan2(-vector.x, vector.z);
+	}
+
+	@Override
+	public Vector3 angleToVector(Vector3 outVector, float angle) {
+		outVector.x = -(float)Math.sin(angle);
+		outVector.z = (float)Math.cos(angle);
+		return outVector;
+	}
+
+	@Override
+	public Location<Vector3> newLocation() {
+		
+		return null;
+	}
+
+	@Override
+	public float getZeroLinearSpeedThreshold() {
+		
+		return 0;
+	}
+
+	@Override
+	public void setZeroLinearSpeedThreshold(float value) {
+		
+		
+	}
+
+	@Override
+	public float getMaxLinearSpeed() {
+		
+		return 1;
+	}
+
+	@Override
+	public void setMaxLinearSpeed(float maxLinearSpeed) {
+		
+		
+	}
+
+	@Override
+	public float getMaxLinearAcceleration() {
+		
+		return Gdx.graphics.getDeltaTime() * 2;
+	}
+
+	@Override
+	public void setMaxLinearAcceleration(float maxLinearAcceleration) {
+		
+		
+	}
+
+	@Override
+	public float getMaxAngularSpeed() {
+		
+		return 1;
+	}
+
+	@Override
+	public void setMaxAngularSpeed(float maxAngularSpeed) {
+		
+		
+	}
+
+	@Override
+	public float getMaxAngularAcceleration() {
+		
+		return 1;
+	}
+
+	@Override
+	public void setMaxAngularAcceleration(float maxAngularAcceleration) {
+		
+		
+	}
+
+	@Override
+	public void setOwner(Steerable<Vector3> owner) {
+		
+		
+	}
+
+	@Override
+	public boolean isTagged() {
+		
+		return false;
+	}
+
+	@Override
+	public void setTagged(boolean tagged) {
+		
+		
 	}
 	
 	public EntityType getType() {

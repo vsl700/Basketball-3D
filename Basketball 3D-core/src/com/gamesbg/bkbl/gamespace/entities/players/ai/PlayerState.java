@@ -141,8 +141,15 @@ public enum PlayerState implements State<Player> {
 			
 			Vector3 tempHandVec = getShortestDistanceWVectors(ballVec, handVecs);
 			
+			player.getBrain().pursue.calculateSteering(Player.steering);
+			//player.getBrain().collAvoid.calculateSteering(Player.steering);
+			//player.getBrain().lookAt.setTarget(player.getMap().getBall());
+			//player.getBrain().lookAt.calculateSteering(Player.steering);
+			
+			player.lookAt(ballVec);
+			
 			if(!mem.isBallJustShot() || player.getMap().getTeammates().size() == 1) {
-				if (player.isNorthSurround()) {
+				/*if (player.isNorthSurround()) {
 					if (player.isWestSurround())
 						mem.setDistDiff(mem.getDistDiff() - 60 * Gdx.graphics.getDeltaTime());
 					else if(player.isEastSurround()) 
@@ -154,15 +161,17 @@ public enum PlayerState implements State<Player> {
 					mem.setResetTime(0);
 				}
 				
-				if (tempHandVec.idt(handVecs.get(0)))
-					player.interactWithBallL();
-				else if (tempHandVec.idt(handVecs.get(1)))
-					player.interactWithBallR();
+				player.lookAt(player.roamAround(player.getMap().getBall().getModelInstance().transform.cpy().trn(mem.getDistDiff(), 0, 0), null, 0, 0, true, false));*/
 				
-				player.lookAt(player.roamAround(player.getMap().getBall().getModelInstance().transform.cpy().trn(mem.getDistDiff(), 0, 0), null, 0, 0, true, false));
+				
+				
+				//if (tempHandVec.idt(handVecs.get(0)))
+					//player.interactWithBallL();
+				//else if (tempHandVec.idt(handVecs.get(1)))
+					//player.interactWithBallR();
 			}
-			else
-				player.lookAt(player.roamAround(player.getMap().getBall().getModelInstance().transform, null, 0, 0, false, true));
+			/*else
+				player.lookAt(player.roamAround(player.getMap().getBall().getModelInstance().transform, null, 0, 0, false, true));*/
 		}
 	},
 	

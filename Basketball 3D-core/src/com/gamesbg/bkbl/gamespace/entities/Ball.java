@@ -120,7 +120,6 @@ public class Ball extends Entity {
 			getMainBody().setLinearFactor(new Vector3());
 		}
 	}
-
 	
 	
 }

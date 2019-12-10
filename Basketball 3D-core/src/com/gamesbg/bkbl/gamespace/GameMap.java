@@ -25,6 +25,7 @@ import com.badlogic.gdx.physics.bullet.dynamics.btDiscreteDynamicsWorld;
 import com.badlogic.gdx.physics.bullet.dynamics.btDynamicsWorld;
 import com.badlogic.gdx.physics.bullet.dynamics.btRigidBody;
 import com.badlogic.gdx.physics.bullet.dynamics.btSequentialImpulseConstraintSolver;
+import com.gamesbg.bkbl.gamespace.entities.Ball;
 import com.gamesbg.bkbl.gamespace.entities.Entity;
 import com.gamesbg.bkbl.gamespace.entities.EntityType;
 import com.gamesbg.bkbl.gamespace.entities.Player;
@@ -425,7 +426,7 @@ public class GameMap {
 		
 		Gdx.input.setInputProcessor(inputs);
 		
-		startTimer = 6;
+		startTimer = 0;//6
 	}
 	
 	private void createBall() {
@@ -709,8 +710,8 @@ public class GameMap {
 		return mainPlayer.getMainBody().getWorldTransform().getRotation(new Quaternion());
 	}
 	
-	public Entity getBall() {
-		return ball;
+	public Ball getBall() {
+		return (Ball) ball;
 	}
 	
 	public GameObject getTerrain() {
