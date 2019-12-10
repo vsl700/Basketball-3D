@@ -1,7 +1,7 @@
 package com.gamesbg.bkbl.gamespace.entities.players.ai;
 
 import com.badlogic.gdx.Gdx;
-import com.badlogic.gdx.math.Vector3;
+import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.ai.fsm.DefaultStateMachine;
 import com.badlogic.gdx.ai.fsm.StateMachine;
 import com.badlogic.gdx.ai.steer.behaviors.CollisionAvoidance;
@@ -33,12 +33,12 @@ public class Brain {
 	Player user;
 	
 	//Some player behaviors
-	Seek<Vector3> pursue;
-	LookWhereYouAreGoing<Vector3> lookAt;
-	CollisionAvoidance<Vector3> collAvoid; //For players and basket stands
-	RaycastObstacleAvoidance<Vector3> obstAvoid; //For invisible terrain walls
+	Seek<Vector2> pursue;
+	LookWhereYouAreGoing<Vector2> lookAt;
+	CollisionAvoidance<Vector2> collAvoid; //For players and basket stands
+	RaycastObstacleAvoidance<Vector2> obstAvoid; //For invisible terrain walls
 	
-	RayConfiguration<Vector3> rayConfig;
+	RayConfiguration<Vector2> rayConfig;
 	
 	public Brain(Player user) {
 		this.user = user;
@@ -46,12 +46,12 @@ public class Brain {
 		stateMachine = new DefaultStateMachine<Player, PlayerState>(user, PlayerState.IDLING);
 		memory = new AIMemory();
 		
-		pursue = new Seek<Vector3>(user, user.getMap().getBall());
-		lookAt = new LookWhereYouAreGoing<Vector3>(user);
-		collAvoid = new CollisionAvoidance<Vector3>(user, user);
+		pursue = new Seek<Vector2>(user, user.getMap().getBall());
+		lookAt = new LookWhereYouAreGoing<Vector2>(user);
+		collAvoid = new CollisionAvoidance<Vector2>(user, user);
 		
-		rayConfig = new ParallelSideRayConfiguration<Vector3>(user, 3, 0.5f);
-		obstAvoid = new RaycastObstacleAvoidance<Vector3>(user, rayConfig);
+		rayConfig = new ParallelSideRayConfiguration<Vector2>(user, 3, 0.5f);
+		obstAvoid = new RaycastObstacleAvoidance<Vector2>(user, rayConfig);
 	}
 	
 	public void update() {
@@ -96,19 +96,19 @@ public class Brain {
 		return memory;
 	}
 
-	public Seek<Vector3> getPursue() {
+	public Seek<Vector2> getPursue() {
 		return pursue;
 	}
 
-	public LookWhereYouAreGoing<Vector3> getLookAt() {
+	public LookWhereYouAreGoing<Vector2> getLookAt() {
 		return lookAt;
 	}
 
-	public CollisionAvoidance<Vector3> getCollAvoid() {
+	public CollisionAvoidance<Vector2> getCollAvoid() {
 		return collAvoid;
 	}
 
-	public RaycastObstacleAvoidance<Vector3> getObstAvoid() {
+	public RaycastObstacleAvoidance<Vector2> getObstAvoid() {
 		return obstAvoid;
 	}
 	

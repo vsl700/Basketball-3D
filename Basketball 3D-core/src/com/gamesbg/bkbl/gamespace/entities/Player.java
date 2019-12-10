@@ -22,6 +22,7 @@ import com.badlogic.gdx.graphics.g3d.utils.shapebuilders.BoxShapeBuilder;
 import com.badlogic.gdx.graphics.g3d.utils.shapebuilders.SphereShapeBuilder;
 import com.badlogic.gdx.math.Matrix4;
 import com.badlogic.gdx.math.Quaternion;
+import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.math.Vector3;
 import com.badlogic.gdx.physics.bullet.collision.btBoxShape;
 import com.badlogic.gdx.physics.bullet.collision.btCollisionObject;
@@ -56,7 +57,7 @@ public abstract class Player extends Entity {
 	
 	//AI
 	Brain brain;
-	public static final SteeringAcceleration<Vector3> steering = new SteeringAcceleration<Vector3>(new Vector3()); //Not sure where exactly that should be - in the Brain class or in the Player one
+	public static final SteeringAcceleration<Vector2> steering = new SteeringAcceleration<Vector2>(new Vector2()); //Not sure where exactly that should be - in the Brain class or in the Player one
 	
 	//Scaling properties
 	static final float scale1 = 0.5f;
@@ -1401,12 +1402,12 @@ public abstract class Player extends Entity {
 			steering.setZero();
 			brain.update();
 			
-			Vector3 tempLinear = steering.linear;
+			Vector2 tempLinear = steering.linear;
 			float tempAng = steering.angular;
 			
-			System.out.println(tempLinear.x + " ; " + tempLinear.y + " ; " + tempLinear.z);
+			System.out.println(tempLinear.x + " ; " + tempLinear.y);
 			if(!tempLinear.isZero())
-				walk(tempLinear);
+				walk(new Vector3(tempLinear.x, 0, tempLinear.y));
 		}
 		
 		String prevIdArmL = armLController.current.animation.id;

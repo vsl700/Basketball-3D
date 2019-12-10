@@ -142,6 +142,7 @@ public enum PlayerState implements State<Player> {
 			Vector3 tempHandVec = getShortestDistanceWVectors(ballVec, handVecs);
 			
 			player.getBrain().pursue.calculateSteering(Player.steering);
+			player.getBrain().obstAvoid.calculateSteering(Player.steering);
 			//player.getBrain().collAvoid.calculateSteering(Player.steering);
 			//player.getBrain().lookAt.setTarget(player.getMap().getBall());
 			//player.getBrain().lookAt.calculateSteering(Player.steering);

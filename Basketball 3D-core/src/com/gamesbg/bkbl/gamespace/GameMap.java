@@ -5,10 +5,13 @@ import java.util.HashMap;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.ai.GdxAI;
+import com.badlogic.gdx.ai.utils.Ray;
+import com.badlogic.gdx.ai.utils.RaycastCollisionDetector;
 import com.badlogic.gdx.graphics.g3d.Environment;
 import com.badlogic.gdx.graphics.g3d.ModelBatch;
 import com.badlogic.gdx.math.Matrix4;
 import com.badlogic.gdx.math.Quaternion;
+import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.math.Vector3;
 import com.badlogic.gdx.physics.bullet.Bullet;
 import com.badlogic.gdx.physics.bullet.collision.Collision;
@@ -33,7 +36,7 @@ import com.gamesbg.bkbl.gamespace.objects.GameObject;
 import com.gamesbg.bkbl.gamespace.objects.ObjectType;
 import com.gamesbg.bkbl.gamespace.tools.InputController;
 
-public class GameMap {
+public class GameMap implements RaycastCollisionDetector<Vector2> {
 	
 	final static float[][] spawnCoords = {{0, 0.1f, 4},
 										  {5, 0.1f, 2},
@@ -832,6 +835,18 @@ public class GameMap {
 				tempObj.addAll(player.getCollisionObjects());
 		
 		return tempObj;
+	}
+
+	@Override
+	public boolean collides(Ray<Vector2> ray) {
+		// TODO Auto-generated method stub
+		return false;
+	}
+
+	@Override
+	public boolean findCollision(com.badlogic.gdx.ai.utils.Collision<Vector2> outputCollision, Ray<Vector2> inputRay) {
+		// TODO Auto-generated method stub
+		return false;
 	}
 	
 }
