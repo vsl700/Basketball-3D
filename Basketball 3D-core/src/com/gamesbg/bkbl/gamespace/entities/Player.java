@@ -4,9 +4,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 
 import com.badlogic.gdx.Gdx;
-import com.badlogic.gdx.ai.steer.Steerable;
 import com.badlogic.gdx.ai.steer.SteeringAcceleration;
-import com.badlogic.gdx.ai.utils.Location;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.VertexAttributes;
@@ -43,6 +41,9 @@ public abstract class Player extends Entity {
 	static final float dribbleSpeed = 0.1f;
 	//The node which should be followed by the camera
 	Matrix4 camMatrix;
+	
+	//The recent player's movement (or linear acceleration in this mechanic)
+	Vector3 moveVec = new Vector3();
 	
 	//Collision objects maps for reaching an object just by calling its mostly used name
 	HashMap<String, btRigidBody> bodiesMap;
@@ -796,6 +797,11 @@ public abstract class Player extends Entity {
 	}
 	
 	public void walk(Vector3 dir) {
+		if(running && !isAiming() && !isShooting()) {
+			run(dir);
+			return;
+		}
+		
 		dir.x *= MAX_WALKING_VELOCITY;
 		dir.z *= MAX_WALKING_VELOCITY;
 		dir.y = 0;
@@ -804,6 +810,9 @@ public abstract class Player extends Entity {
 		setCollisionTransform(true);
 		
 		walking = true;
+		
+		if(isMainPlayer())
+			moveVec = dir;
 	}
 	
 	public void run(Vector3 dir) {
@@ -816,6 +825,9 @@ public abstract class Player extends Entity {
 			setCollisionTransform(true);
 
 			running = true;
+			
+			if(isMainPlayer())
+				moveVec = dir;
 		}
 		else walk(dir);
 	}
@@ -1388,6 +1400,9 @@ public abstract class Player extends Entity {
 	public void update(float delta) {
 		lockRotationAndRandomFloating(true);
 		
+		if(!isMainPlayer())
+			moveVec.setZero();
+		
 		if(!holdingBall()) {
 			dribbleL = dribbleR = false;
 			leftHoldingBall = rightHoldingBall = false;
@@ -1402,16 +1417,19 @@ public abstract class Player extends Entity {
 			steering.setZero();
 			brain.update();
 			
-			Vector2 tempLinear = steering.linear;
-			float tempAng = steering.angular;
+			//Vector3 tempVec = moveVec.add(new Vector3(steering.linear.cpy().x, 0, steering.linear.cpy().y)).scl(0.5f);
+			//float tempAng = steering.angular;
 			
-			System.out.println(tempLinear.x + " ; " + tempLinear.y);
-			if(!tempLinear.isZero())
-				walk(new Vector3(tempLinear.x, 0, tempLinear.y));
+			
+			//System.out.println(tempVec.x + " ; " + tempVec.z);
+			if(!moveVec.isZero())
+				walk(moveVec);
+			
+			System.out.println(getWidth() * getDepth());
 		}
 		
 		String prevIdArmL = armLController.current.animation.id;
-		String prevIdArmR = armLController.current.animation.id;
+		String prevIdArmR = armRController.current.animation.id;
 		
 		//if(Math.abs(getMainBody().getLinearVelocity().x) < 0.0008f && Math.abs(getMainBody().getLinearVelocity().z) < 0.0008f) {
 			//walking = running = false;
@@ -1720,9 +1738,28 @@ public abstract class Player extends Entity {
 		//if(this instanceof Opponent && (northSurround || southSurround || eastSurround || westSurround))
 			//System.out.println("Surround" + northSurround + ";" + southSurround + ";" + eastSurround + ";" + westSurround);
 	}
+	
+	@Override
+	public Vector2 getLinearVelocity() {
+		Vector2 tempVec = new Vector2(moveVec.x, moveVec.z);
+		
+		return tempVec;
+	}
 
 	public Matrix4 getCamMatrix() {
 		return camMatrix;
+	}
+	
+	public void setMoveVector(Vector3 move) {
+		moveVec = move;
+	}
+	
+	public Vector3 getMoveVector() {
+		return moveVec;
+	}
+	
+	public void setRunning() {
+		running = true;
 	}
 	
 	public Brain getBrain() {

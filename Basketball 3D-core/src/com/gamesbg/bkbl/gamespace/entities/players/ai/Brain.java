@@ -4,11 +4,11 @@ import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.ai.fsm.DefaultStateMachine;
 import com.badlogic.gdx.ai.fsm.StateMachine;
+import com.badlogic.gdx.ai.steer.behaviors.Arrive;
 import com.badlogic.gdx.ai.steer.behaviors.CollisionAvoidance;
 import com.badlogic.gdx.ai.steer.behaviors.LookWhereYouAreGoing;
-import com.badlogic.gdx.ai.steer.behaviors.Pursue;
 import com.badlogic.gdx.ai.steer.behaviors.RaycastObstacleAvoidance;
-import com.badlogic.gdx.ai.steer.behaviors.Seek;
+import com.badlogic.gdx.ai.steer.limiters.LinearAccelerationLimiter;
 import com.badlogic.gdx.ai.steer.utils.RayConfiguration;
 import com.badlogic.gdx.ai.steer.utils.rays.ParallelSideRayConfiguration;
 import com.gamesbg.bkbl.gamespace.entities.Player;
@@ -33,7 +33,7 @@ public class Brain {
 	Player user;
 	
 	//Some player behaviors
-	Seek<Vector2> pursue;
+	Arrive<Vector2> pursue;
 	LookWhereYouAreGoing<Vector2> lookAt;
 	CollisionAvoidance<Vector2> collAvoid; //For players and basket stands
 	RaycastObstacleAvoidance<Vector2> obstAvoid; //For invisible terrain walls
@@ -46,7 +46,9 @@ public class Brain {
 		stateMachine = new DefaultStateMachine<Player, PlayerState>(user, PlayerState.IDLING);
 		memory = new AIMemory();
 		
-		pursue = new Seek<Vector2>(user, user.getMap().getBall());
+		pursue = new Arrive<Vector2>(user, user.getMap().getBall());
+		pursue.setArrivalTolerance(0.1f);
+		user.setMaxLinearAcceleration(1);
 		lookAt = new LookWhereYouAreGoing<Vector2>(user);
 		collAvoid = new CollisionAvoidance<Vector2>(user, user);
 		
@@ -96,7 +98,7 @@ public class Brain {
 		return memory;
 	}
 
-	public Seek<Vector2> getPursue() {
+	public Arrive<Vector2> getPursue() {
 		return pursue;
 	}
 

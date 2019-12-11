@@ -141,13 +141,15 @@ public enum PlayerState implements State<Player> {
 			
 			Vector3 tempHandVec = getShortestDistanceWVectors(ballVec, handVecs);
 			
-			player.getBrain().pursue.calculateSteering(Player.steering);
-			player.getBrain().obstAvoid.calculateSteering(Player.steering);
-			//player.getBrain().collAvoid.calculateSteering(Player.steering);
+			
 			//player.getBrain().lookAt.setTarget(player.getMap().getBall());
 			//player.getBrain().lookAt.calculateSteering(Player.steering);
 			
 			player.lookAt(ballVec);
+			
+			player.getBrain().pursue.calculateSteering(Player.steering);
+			//System.out.println(Player.steering.linear.cpy().x);
+			player.setMoveVector(new Vector3(Player.steering.linear.cpy().x, 0, Player.steering.linear.cpy().y));
 			
 			if(!mem.isBallJustShot() || player.getMap().getTeammates().size() == 1) {
 				/*if (player.isNorthSurround()) {
@@ -163,16 +165,25 @@ public enum PlayerState implements State<Player> {
 				}
 				
 				player.lookAt(player.roamAround(player.getMap().getBall().getModelInstance().transform.cpy().trn(mem.getDistDiff(), 0, 0), null, 0, 0, true, false));*/
+				player.getBrain().pursue.setArrivalTolerance(0);
 				
+				//player.getBrain().obstAvoid.calculateSteering(Player.steering);
+				player.getBrain().collAvoid.calculateSteering(Player.steering);
+				player.getMoveVector().add(new Vector3(Player.steering.linear.cpy().x, 0, Player.steering.linear.cpy().y));
 				
+				player.getMoveVector().nor().scl(Gdx.graphics.getDeltaTime());
+				player.setRunning();
 				
-				//if (tempHandVec.idt(handVecs.get(0)))
-					//player.interactWithBallL();
-				//else if (tempHandVec.idt(handVecs.get(1)))
-					//player.interactWithBallR();
+				if (tempHandVec.idt(handVecs.get(0)))
+					player.interactWithBallL();
+				else if (tempHandVec.idt(handVecs.get(1)))
+					player.interactWithBallR();
 			}
-			/*else
-				player.lookAt(player.roamAround(player.getMap().getBall().getModelInstance().transform, null, 0, 0, false, true));*/
+			else {
+				//player.lookAt(player.roamAround(player.getMap().getBall().getModelInstance().transform, null, 0, 0, false, true));
+				
+				player.getBrain().pursue.setArrivalTolerance(1);
+			}
 		}
 	},
 	

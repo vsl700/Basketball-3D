@@ -2,19 +2,27 @@ package com.gamesbg.bkbl.gamespace.objects;
 
 import java.util.ArrayList;
 
+import com.badlogic.gdx.Gdx;
+import com.badlogic.gdx.ai.steer.Proximity;
+import com.badlogic.gdx.ai.steer.Steerable;
+import com.badlogic.gdx.ai.steer.Proximity.ProximityCallback;
+import com.badlogic.gdx.ai.utils.Location;
 import com.badlogic.gdx.graphics.g3d.Environment;
 import com.badlogic.gdx.graphics.g3d.Model;
 import com.badlogic.gdx.graphics.g3d.ModelBatch;
 import com.badlogic.gdx.graphics.g3d.ModelInstance;
 import com.badlogic.gdx.math.Matrix4;
+import com.badlogic.gdx.math.Quaternion;
+import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.math.Vector3;
 import com.badlogic.gdx.physics.bullet.collision.btCollisionObject;
 import com.badlogic.gdx.physics.bullet.collision.btCollisionShape;
 import com.badlogic.gdx.physics.bullet.dynamics.btRigidBody;
 import com.gamesbg.bkbl.gamespace.GameMap;
 import com.gamesbg.bkbl.gamespace.MotionState;
+import com.gamesbg.bkbl.gamespace.entities.Player;
 
-public abstract class GameObject {
+public abstract class GameObject implements Steerable<Vector2>, Proximity<Vector2> {
 
 	protected ObjectType type;
 	protected GameMap map;
@@ -190,6 +198,158 @@ public abstract class GameObject {
 		mainTrans = trans;
 		
 		//setBodies();
+	}
+	
+	@Override
+	public Vector2 getLinearVelocity() {
+		Vector3 tempVel = getMainBody().getLinearVelocity();
+		Vector2 tempVec = new Vector2(tempVel.x, tempVel.z);
+		
+		return tempVec;
+	}
+
+	@Override
+	public float getAngularVelocity() {
+		
+		return getMainBody().getAngularVelocity().y;
+	}
+
+	@Override
+	public float getBoundingRadius() {
+		
+		return Math.max(getWidth(), getDepth()) * 1.5f;
+	}
+
+	@Override
+	public Steerable<Vector2> getOwner() {
+		
+		return this;
+	}
+
+	@Override
+	public int findNeighbors (ProximityCallback<Vector2> callback) {
+		
+		return 0;
+	}
+
+	@Override
+	public Vector2 getPosition() {
+		Vector3 tempPos = modelInstance.transform.getTranslation(new Vector3());
+		Vector2 tempVec = new Vector2(tempPos.x, tempPos.z);
+		
+		return tempVec;
+	}
+
+	@Override
+	public float getOrientation() {
+		
+		return modelInstance.transform.getRotation(new Quaternion()).getYaw();
+	}
+
+	@Override
+	public void setOrientation(float orientation) {
+		
+		
+	}
+
+	@Override
+	public float vectorToAngle(Vector2 vector) {
+		return (float)Math.atan2(-vector.x, vector.y);
+	}
+
+	@Override
+	public Vector2 angleToVector(Vector2 outVector, float angle) {
+		outVector.x = -(float)Math.sin(angle);
+		outVector.y = (float)Math.cos(angle);
+		return outVector;
+	}
+
+	@Override
+	public Location<Vector2> newLocation() {
+		
+		return null;
+	}
+
+	@Override
+	public float getZeroLinearSpeedThreshold() {
+		
+		return 0;
+	}
+
+	@Override
+	public void setZeroLinearSpeedThreshold(float value) {
+		
+		
+	}
+
+	@Override
+	public float getMaxLinearSpeed() {
+		
+		return 1;
+	}
+
+	@Override
+	public void setMaxLinearSpeed(float maxLinearSpeed) {
+		
+		
+	}
+
+	@Override
+	public float getMaxLinearAcceleration() {
+		
+		return Gdx.graphics.getDeltaTime() * 2;
+	}
+
+	@Override
+	public void setMaxLinearAcceleration(float maxLinearAcceleration) {
+		
+		
+	}
+
+	@Override
+	public float getMaxAngularSpeed() {
+		
+		return 1;
+	}
+
+	@Override
+	public void setMaxAngularSpeed(float maxAngularSpeed) {
+		
+		
+	}
+
+	@Override
+	public float getMaxAngularAcceleration() {
+		
+		return 1;
+	}
+
+	@Override
+	public void setMaxAngularAcceleration(float maxAngularAcceleration) {
+		
+		
+	}
+
+	@Override
+	public void setOwner(Steerable<Vector2> owner) {
+		
+		
+	}
+
+	@Override
+	public boolean isTagged() {
+		
+		return false;
+	}
+
+	@Override
+	public void setTagged(boolean tagged) {
+		
+		
+	}
+	
+	public btRigidBody getMainBody() {
+		return bodies.get(mainBodyIndex);
 	}
 	
 	public ObjectType getType() {

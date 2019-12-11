@@ -274,12 +274,15 @@ public abstract class Entity implements Proximity<Vector2>, Steerable<Vector2> {
 	public int findNeighbors (ProximityCallback<Vector2> callback) {
 		int count = 0;
 		for(Player p : map.getTeammates())
-			if(callback.reportNeighbor(p))
+			if(!p.equals(this) && callback.reportNeighbor(p))
 				count++;
 		
 		for(Player p : map.getOpponents())
-			if(callback.reportNeighbor(p))
+			if(!p.equals(this) && callback.reportNeighbor(p))
 				count++;
+		
+		if(callback.reportNeighbor(map.getHomeBasket()) || callback.reportNeighbor(map.getAwayBasket()))
+			count++;
 		
 		return count;
 	}
