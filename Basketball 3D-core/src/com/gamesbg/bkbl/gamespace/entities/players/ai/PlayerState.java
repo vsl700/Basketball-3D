@@ -149,7 +149,7 @@ public enum PlayerState implements State<Player> {
 			
 			player.getBrain().pursue.calculateSteering(Player.steering);
 			//System.out.println(Player.steering.linear.cpy().x);
-			player.setMoveVector(new Vector3(Player.steering.linear.cpy().x, 0, Player.steering.linear.cpy().y));
+			player.setMoveVector(new Vector3(Player.steering.linear.cpy()));
 			
 			if(!mem.isBallJustShot() || player.getMap().getTeammates().size() == 1) {
 				/*if (player.isNorthSurround()) {
@@ -169,7 +169,7 @@ public enum PlayerState implements State<Player> {
 				
 				//player.getBrain().obstAvoid.calculateSteering(Player.steering);
 				player.getBrain().collAvoid.calculateSteering(Player.steering);
-				player.getMoveVector().add(new Vector3(Player.steering.linear.cpy().x, 0, Player.steering.linear.cpy().y));
+				player.getMoveVector().add(new Vector3(Player.steering.linear.cpy()));
 				
 				player.getMoveVector().nor().scl(Gdx.graphics.getDeltaTime());
 				player.setRunning();

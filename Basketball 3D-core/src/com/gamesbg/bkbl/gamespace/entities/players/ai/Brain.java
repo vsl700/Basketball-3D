@@ -1,14 +1,13 @@
 package com.gamesbg.bkbl.gamespace.entities.players.ai;
 
 import com.badlogic.gdx.Gdx;
-import com.badlogic.gdx.math.Vector2;
+import com.badlogic.gdx.math.Vector3;
 import com.badlogic.gdx.ai.fsm.DefaultStateMachine;
 import com.badlogic.gdx.ai.fsm.StateMachine;
 import com.badlogic.gdx.ai.steer.behaviors.Arrive;
 import com.badlogic.gdx.ai.steer.behaviors.CollisionAvoidance;
 import com.badlogic.gdx.ai.steer.behaviors.LookWhereYouAreGoing;
 import com.badlogic.gdx.ai.steer.behaviors.RaycastObstacleAvoidance;
-import com.badlogic.gdx.ai.steer.limiters.LinearAccelerationLimiter;
 import com.badlogic.gdx.ai.steer.utils.RayConfiguration;
 import com.badlogic.gdx.ai.steer.utils.rays.ParallelSideRayConfiguration;
 import com.gamesbg.bkbl.gamespace.entities.Player;
@@ -33,12 +32,12 @@ public class Brain {
 	Player user;
 	
 	//Some player behaviors
-	Arrive<Vector2> pursue;
-	LookWhereYouAreGoing<Vector2> lookAt;
-	CollisionAvoidance<Vector2> collAvoid; //For players and basket stands
-	RaycastObstacleAvoidance<Vector2> obstAvoid; //For invisible terrain walls
+	Arrive<Vector3> pursue;
+	LookWhereYouAreGoing<Vector3> lookAt;
+	CollisionAvoidance<Vector3> collAvoid; //For players and basket stands
+	RaycastObstacleAvoidance<Vector3> obstAvoid; //For invisible terrain walls
 	
-	RayConfiguration<Vector2> rayConfig;
+	RayConfiguration<Vector3> rayConfig;
 	
 	public Brain(Player user) {
 		this.user = user;
@@ -46,14 +45,14 @@ public class Brain {
 		stateMachine = new DefaultStateMachine<Player, PlayerState>(user, PlayerState.IDLING);
 		memory = new AIMemory();
 		
-		pursue = new Arrive<Vector2>(user, user.getMap().getBall());
+		pursue = new Arrive<Vector3>(user, user.getMap().getBall());
 		pursue.setArrivalTolerance(0.1f);
 		user.setMaxLinearAcceleration(1);
-		lookAt = new LookWhereYouAreGoing<Vector2>(user);
-		collAvoid = new CollisionAvoidance<Vector2>(user, user);
+		lookAt = new LookWhereYouAreGoing<Vector3>(user);
+		collAvoid = new CollisionAvoidance<Vector3>(user, user);
 		
-		rayConfig = new ParallelSideRayConfiguration<Vector2>(user, 3, 0.5f);
-		obstAvoid = new RaycastObstacleAvoidance<Vector2>(user, rayConfig);
+		rayConfig = new ParallelSideRayConfiguration<Vector3>(user, 3, 0.5f);
+		obstAvoid = new RaycastObstacleAvoidance<Vector3>(user, rayConfig);
 	}
 	
 	public void update() {
@@ -98,19 +97,19 @@ public class Brain {
 		return memory;
 	}
 
-	public Arrive<Vector2> getPursue() {
+	public Arrive<Vector3> getPursue() {
 		return pursue;
 	}
 
-	public LookWhereYouAreGoing<Vector2> getLookAt() {
+	public LookWhereYouAreGoing<Vector3> getLookAt() {
 		return lookAt;
 	}
 
-	public CollisionAvoidance<Vector2> getCollAvoid() {
+	public CollisionAvoidance<Vector3> getCollAvoid() {
 		return collAvoid;
 	}
 
-	public RaycastObstacleAvoidance<Vector2> getObstAvoid() {
+	public RaycastObstacleAvoidance<Vector3> getObstAvoid() {
 		return obstAvoid;
 	}
 	

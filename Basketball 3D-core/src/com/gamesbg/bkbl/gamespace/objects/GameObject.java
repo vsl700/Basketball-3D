@@ -5,7 +5,6 @@ import java.util.ArrayList;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.ai.steer.Proximity;
 import com.badlogic.gdx.ai.steer.Steerable;
-import com.badlogic.gdx.ai.steer.Proximity.ProximityCallback;
 import com.badlogic.gdx.ai.utils.Location;
 import com.badlogic.gdx.graphics.g3d.Environment;
 import com.badlogic.gdx.graphics.g3d.Model;
@@ -13,16 +12,14 @@ import com.badlogic.gdx.graphics.g3d.ModelBatch;
 import com.badlogic.gdx.graphics.g3d.ModelInstance;
 import com.badlogic.gdx.math.Matrix4;
 import com.badlogic.gdx.math.Quaternion;
-import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.math.Vector3;
 import com.badlogic.gdx.physics.bullet.collision.btCollisionObject;
 import com.badlogic.gdx.physics.bullet.collision.btCollisionShape;
 import com.badlogic.gdx.physics.bullet.dynamics.btRigidBody;
 import com.gamesbg.bkbl.gamespace.GameMap;
 import com.gamesbg.bkbl.gamespace.MotionState;
-import com.gamesbg.bkbl.gamespace.entities.Player;
 
-public abstract class GameObject implements Steerable<Vector2>, Proximity<Vector2> {
+public abstract class GameObject implements Steerable<Vector3>, Proximity<Vector3> {
 
 	protected ObjectType type;
 	protected GameMap map;
@@ -201,11 +198,8 @@ public abstract class GameObject implements Steerable<Vector2>, Proximity<Vector
 	}
 	
 	@Override
-	public Vector2 getLinearVelocity() {
-		Vector3 tempVel = getMainBody().getLinearVelocity();
-		Vector2 tempVec = new Vector2(tempVel.x, tempVel.z);
-		
-		return tempVec;
+	public Vector3 getLinearVelocity() {
+		return getMainBody().getLinearVelocity();
 	}
 
 	@Override
@@ -221,23 +215,20 @@ public abstract class GameObject implements Steerable<Vector2>, Proximity<Vector
 	}
 
 	@Override
-	public Steerable<Vector2> getOwner() {
+	public Steerable<Vector3> getOwner() {
 		
 		return this;
 	}
 
 	@Override
-	public int findNeighbors (ProximityCallback<Vector2> callback) {
+	public int findNeighbors (ProximityCallback<Vector3> callback) {
 		
 		return 0;
 	}
 
 	@Override
-	public Vector2 getPosition() {
-		Vector3 tempPos = modelInstance.transform.getTranslation(new Vector3());
-		Vector2 tempVec = new Vector2(tempPos.x, tempPos.z);
-		
-		return tempVec;
+	public Vector3 getPosition() {
+		return modelInstance.transform.getTranslation(new Vector3());
 	}
 
 	@Override
@@ -253,19 +244,19 @@ public abstract class GameObject implements Steerable<Vector2>, Proximity<Vector
 	}
 
 	@Override
-	public float vectorToAngle(Vector2 vector) {
-		return (float)Math.atan2(-vector.x, vector.y);
+	public float vectorToAngle(Vector3 vector) {
+		return (float)Math.atan2(-vector.x, vector.z);
 	}
 
 	@Override
-	public Vector2 angleToVector(Vector2 outVector, float angle) {
+	public Vector3 angleToVector(Vector3 outVector, float angle) {
 		outVector.x = -(float)Math.sin(angle);
-		outVector.y = (float)Math.cos(angle);
+		outVector.z = (float)Math.cos(angle);
 		return outVector;
 	}
 
 	@Override
-	public Location<Vector2> newLocation() {
+	public Location<Vector3> newLocation() {
 		
 		return null;
 	}
@@ -331,7 +322,7 @@ public abstract class GameObject implements Steerable<Vector2>, Proximity<Vector
 	}
 
 	@Override
-	public void setOwner(Steerable<Vector2> owner) {
+	public void setOwner(Steerable<Vector3> owner) {
 		
 		
 	}

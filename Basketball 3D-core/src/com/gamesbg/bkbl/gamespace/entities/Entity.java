@@ -12,7 +12,6 @@ import com.badlogic.gdx.graphics.g3d.ModelBatch;
 import com.badlogic.gdx.graphics.g3d.ModelInstance;
 import com.badlogic.gdx.math.Matrix4;
 import com.badlogic.gdx.math.Quaternion;
-import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.math.Vector3;
 import com.badlogic.gdx.physics.bullet.collision.btCollisionObject;
 import com.badlogic.gdx.physics.bullet.collision.btCollisionShape;
@@ -21,7 +20,7 @@ import com.gamesbg.bkbl.gamespace.GameMap;
 import com.gamesbg.bkbl.gamespace.MotionState;
 import com.gamesbg.bkbl.gamespace.objects.ObjectType;
 
-public abstract class Entity implements Proximity<Vector2>, Steerable<Vector2> {
+public abstract class Entity implements Proximity<Vector3>, Steerable<Vector3> {
 	
 	protected EntityType type;
 	protected GameMap map;
@@ -245,11 +244,8 @@ public abstract class Entity implements Proximity<Vector2>, Steerable<Vector2> {
 	}
 
 	@Override
-	public Vector2 getLinearVelocity() {
-		Vector3 tempVel = getMainBody().getLinearVelocity();
-		Vector2 tempVec = new Vector2(tempVel.x, tempVel.z);
-		
-		return tempVec;
+	public Vector3 getLinearVelocity() {
+		return getMainBody().getLinearVelocity();
 	}
 
 	@Override
@@ -265,13 +261,13 @@ public abstract class Entity implements Proximity<Vector2>, Steerable<Vector2> {
 	}
 
 	@Override
-	public Steerable<Vector2> getOwner() {
+	public Steerable<Vector3> getOwner() {
 		
 		return this;
 	}
 
 	@Override
-	public int findNeighbors (ProximityCallback<Vector2> callback) {
+	public int findNeighbors (ProximityCallback<Vector3> callback) {
 		int count = 0;
 		for(Player p : map.getTeammates())
 			if(!p.equals(this) && callback.reportNeighbor(p))
@@ -288,11 +284,8 @@ public abstract class Entity implements Proximity<Vector2>, Steerable<Vector2> {
 	}
 
 	@Override
-	public Vector2 getPosition() {
-		Vector3 tempPos = modelInstance.transform.getTranslation(new Vector3());
-		Vector2 tempVec = new Vector2(tempPos.x, tempPos.z);
-		
-		return tempVec;
+	public Vector3 getPosition() {
+		return modelInstance.transform.getTranslation(new Vector3());
 	}
 
 	@Override
@@ -308,19 +301,19 @@ public abstract class Entity implements Proximity<Vector2>, Steerable<Vector2> {
 	}
 
 	@Override
-	public float vectorToAngle(Vector2 vector) {
-		return (float)Math.atan2(-vector.x, vector.y);
+	public float vectorToAngle(Vector3 vector) {
+		return (float)Math.atan2(-vector.x, vector.z);
 	}
 
 	@Override
-	public Vector2 angleToVector(Vector2 outVector, float angle) {
+	public Vector3 angleToVector(Vector3 outVector, float angle) {
 		outVector.x = -(float)Math.sin(angle);
-		outVector.y = (float)Math.cos(angle);
+		outVector.z = (float)Math.cos(angle);
 		return outVector;
 	}
 
 	@Override
-	public Location<Vector2> newLocation() {
+	public Location<Vector3> newLocation() {
 		
 		return null;
 	}
@@ -386,7 +379,7 @@ public abstract class Entity implements Proximity<Vector2>, Steerable<Vector2> {
 	}
 
 	@Override
-	public void setOwner(Steerable<Vector2> owner) {
+	public void setOwner(Steerable<Vector3> owner) {
 		
 		
 	}
