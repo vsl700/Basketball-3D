@@ -8,6 +8,7 @@ import com.badlogic.gdx.ai.steer.behaviors.Arrive;
 import com.badlogic.gdx.ai.steer.behaviors.CollisionAvoidance;
 import com.badlogic.gdx.ai.steer.behaviors.LookWhereYouAreGoing;
 import com.badlogic.gdx.ai.steer.behaviors.RaycastObstacleAvoidance;
+import com.badlogic.gdx.ai.steer.behaviors.Separation;
 import com.badlogic.gdx.ai.steer.utils.RayConfiguration;
 import com.badlogic.gdx.ai.steer.utils.rays.ParallelSideRayConfiguration;
 import com.gamesbg.bkbl.gamespace.entities.Player;
@@ -35,6 +36,7 @@ public class Brain {
 	Arrive<Vector3> pursue;
 	LookWhereYouAreGoing<Vector3> lookAt;
 	CollisionAvoidance<Vector3> collAvoid; //For players and basket stands
+	Separation<Vector3> separate; //Keep it for player surroundings
 	RaycastObstacleAvoidance<Vector3> obstAvoid; //For invisible terrain walls
 	
 	RayConfiguration<Vector3> rayConfig;
@@ -50,6 +52,7 @@ public class Brain {
 		user.setMaxLinearAcceleration(1);
 		lookAt = new LookWhereYouAreGoing<Vector3>(user);
 		collAvoid = new CollisionAvoidance<Vector3>(user, user);
+		separate = new Separation<Vector3>(user, user);
 		
 		rayConfig = new ParallelSideRayConfiguration<Vector3>(user, 3, 0.5f);
 		obstAvoid = new RaycastObstacleAvoidance<Vector3>(user, rayConfig);
@@ -63,27 +66,27 @@ public class Brain {
 		//The state switcher
 		if(user.getMap().isGameRunning()) {
 			//If the current player is holding the ball
-			if(user.holdingBall())
-				stateMachine.changeState(PlayerState.BALL_IN_HAND);
+			if(user.holdingBall()) {
+				if(!stateMachine.isInState(PlayerState.BALL_IN_HAND)) stateMachine.changeState(PlayerState.BALL_IN_HAND);
 			
-			else {
+			}else {
 				
 				//If a teammate of the current player (either a teammate or an opponent to the main player) is holding the ball
-				if(user instanceof Teammate && user.getMap().isBallInTeam() || user instanceof Opponent && user.getMap().isBallInOpp())
-					stateMachine.changeState(PlayerState.COOPERATIVE);
-				
+				if(user instanceof Teammate && user.getMap().isBallInTeam() || user instanceof Opponent && user.getMap().isBallInOpp()) {
+					if(!stateMachine.isInState(PlayerState.COOPERATIVE)) stateMachine.changeState(PlayerState.COOPERATIVE);
+				}
 				//If an opponent of the current player (either a teammate or an opponent to the main player) is holding the ball
-				else if(user instanceof Teammate && user.getMap().isBallInOpp() || user instanceof Opponent && user.getMap().isBallInTeam())
-					stateMachine.changeState(PlayerState.PLAYER_SURROUND);
-			
+				else if(user instanceof Teammate && user.getMap().isBallInOpp() || user instanceof Opponent && user.getMap().isBallInTeam()) {
+					if(!stateMachine.isInState(PlayerState.PLAYER_SURROUND)) stateMachine.changeState(PlayerState.PLAYER_SURROUND);
+				}
 				//If nobody is holding the ball
 				else 
-					stateMachine.changeState(PlayerState.BALL_CHASING);
+					if(!stateMachine.isInState(PlayerState.BALL_CHASING)) stateMachine.changeState(PlayerState.BALL_CHASING);
 			}
 		}
 		//If the game is actually not running (the startup timer is still counting or a game rule has been broken), just go to idling mode
-		else 
-			stateMachine.changeState(PlayerState.IDLING);
+		else
+			if(!stateMachine.isInState(PlayerState.IDLING)) stateMachine.changeState(PlayerState.IDLING);
 		
 		//Regular state updating
 		stateMachine.update();
@@ -107,6 +110,10 @@ public class Brain {
 
 	public CollisionAvoidance<Vector3> getCollAvoid() {
 		return collAvoid;
+	}
+
+	public Separation<Vector3> getSeparate() {
+		return separate;
 	}
 
 	public RaycastObstacleAvoidance<Vector3> getObstAvoid() {

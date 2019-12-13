@@ -2,7 +2,6 @@ package com.gamesbg.bkbl.gamespace.entities;
 
 import java.util.ArrayList;
 
-import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.ai.steer.Proximity;
 import com.badlogic.gdx.ai.steer.Steerable;
 import com.badlogic.gdx.ai.utils.Location;
@@ -42,6 +41,9 @@ public abstract class Entity implements Proximity<Vector3>, Steerable<Vector3> {
 	
 	protected int mainBodyIndex;
 	
+	protected float maxLinAccel;
+	protected float boundRadius;
+	
 	protected boolean grounded; //We need this because of the ball, which should be caught even if it collides with other parts of the body only when it's on ground!
 	
 	float timeout;
@@ -65,6 +67,8 @@ public abstract class Entity implements Proximity<Vector3>, Steerable<Vector3> {
 		setCollisionTransform(true);
 		
 		removeCollCheckOnInternals();
+		
+		boundRadius = Math.max(getWidth(), getDepth());
 	}
 	
 	private void removeCollCheckOnInternals() {
@@ -257,7 +261,7 @@ public abstract class Entity implements Proximity<Vector3>, Steerable<Vector3> {
 	@Override
 	public float getBoundingRadius() {
 		
-		return Math.max(getWidth(), getDepth());
+		return boundRadius;
 	}
 
 	@Override
@@ -345,13 +349,13 @@ public abstract class Entity implements Proximity<Vector3>, Steerable<Vector3> {
 	@Override
 	public float getMaxLinearAcceleration() {
 		
-		return Gdx.graphics.getDeltaTime() * 2;
+		return maxLinAccel;
 	}
 
 	@Override
 	public void setMaxLinearAcceleration(float maxLinearAcceleration) {
 		
-		
+		maxLinAccel = maxLinearAcceleration;
 	}
 
 	@Override

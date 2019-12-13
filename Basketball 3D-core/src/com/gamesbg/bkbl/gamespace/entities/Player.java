@@ -1742,6 +1742,17 @@ public abstract class Player extends Entity {
 	public Vector3 getLinearVelocity() {
 		return moveVec;
 	}
+	
+	@Override
+	public int findNeighbors(ProximityCallback<Vector3> callback) {
+		if(callback.equals(brain.getSeparate())) {
+			if(callback.reportNeighbor(map.getBall()))
+				return 1;
+			else return 0;
+		}
+		
+		return super.findNeighbors(callback);
+	}
 
 	public Matrix4 getCamMatrix() {
 		return camMatrix;

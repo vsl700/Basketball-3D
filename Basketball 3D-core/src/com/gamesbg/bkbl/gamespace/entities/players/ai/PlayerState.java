@@ -38,8 +38,8 @@ public enum PlayerState implements State<Player> {
 			} else {
 				if(mem.getAimingTime() > 1.25f) {
 					mem.setShootTime(0);
-					mem.setAimingTime(0);
-					player.throwBall(mem.getShootVec());
+					
+					//player.throwBall(mem.getShootVec());
 					mem.setBallJustShot(true);
 					return;
 				}
@@ -124,6 +124,7 @@ public enum PlayerState implements State<Player> {
 			//memory.get(player).setBallJustShot(true);
 			//memory.get(player).setShootTime(0);
 			//memory.get(player).setAimingTime(0);
+			player.getBrain().getMemory().setAimingTime(0);
 		}
 		
 	},
@@ -147,31 +148,19 @@ public enum PlayerState implements State<Player> {
 			
 			player.lookAt(ballVec);
 			
-			player.getBrain().pursue.calculateSteering(Player.steering);
-			//System.out.println(Player.steering.linear.cpy().x);
-			player.setMoveVector(new Vector3(Player.steering.linear.cpy()));
+			
 			
 			if(!mem.isBallJustShot() || player.getMap().getTeammates().size() == 1) {
-				/*if (player.isNorthSurround()) {
-					if (player.isWestSurround())
-						mem.setDistDiff(mem.getDistDiff() - 60 * Gdx.graphics.getDeltaTime());
-					else if(player.isEastSurround()) 
-						mem.setDistDiff(mem.getDistDiff() + 60 * Gdx.graphics.getDeltaTime());
-					
-				}
-				else if(mem.getResetTime() > 0.25f) {
-					mem.setDistDiff(0);
-					mem.setResetTime(0);
-				}
-				
-				player.lookAt(player.roamAround(player.getMap().getBall().getModelInstance().transform.cpy().trn(mem.getDistDiff(), 0, 0), null, 0, 0, true, false));*/
 				player.getBrain().pursue.setArrivalTolerance(0);
+				
+				player.getBrain().pursue.calculateSteering(Player.steering);
+				//System.out.println(Player.steering.linear.cpy().x);
+				player.setMoveVector(Player.steering.linear.cpy());
 				
 				//player.getBrain().obstAvoid.calculateSteering(Player.steering);
 				player.getBrain().collAvoid.calculateSteering(Player.steering);
-				player.getMoveVector().add(new Vector3(Player.steering.linear.cpy()));
+				player.getMoveVector().add(Player.steering.linear);
 				
-				player.getMoveVector().nor().scl(Gdx.graphics.getDeltaTime());
 				player.setRunning();
 				
 				if (tempHandVec.idt(handVecs.get(0)))
@@ -180,10 +169,18 @@ public enum PlayerState implements State<Player> {
 					player.interactWithBallR();
 			}
 			else {
-				//player.lookAt(player.roamAround(player.getMap().getBall().getModelInstance().transform, null, 0, 0, false, true));
-				
 				player.getBrain().pursue.setArrivalTolerance(1);
+				
+				player.getBrain().pursue.calculateSteering(Player.steering);
+				//System.out.println(Player.steering.linear.cpy().x);
+				player.setMoveVector(Player.steering.linear.cpy().scl(0.1f));
+				
+				player.getBrain().getSeparate().calculateSteering(Player.steering);
+				player.getMoveVector().add(Player.steering.linear);
+				//player.setMoveVector(Player.steering.linear.cpy());
 			}
+			
+			player.getMoveVector().nor().scl(Gdx.graphics.getDeltaTime());
 		}
 	},
 	
