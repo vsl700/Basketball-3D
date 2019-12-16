@@ -42,7 +42,7 @@ public abstract class Player extends Entity {
 	Matrix4 camMatrix;
 	
 	//The recent player's movement (or linear acceleration in this mechanic)
-	Vector3 moveVec = new Vector3();
+	private Vector3 moveVec = new Vector3();
 	
 	//Collision objects maps for reaching an object just by calling its mostly used name
 	HashMap<String, btRigidBody> bodiesMap;
@@ -1337,6 +1337,7 @@ public abstract class Player extends Entity {
 		
 		Vector3 rotVec = target.cpy().sub(thisVec).nor();
 		
+		//Calculated lookAt transform
 		Matrix4 calcTrans = modelInstance.transform.cpy().setToLookAt(rotVec, new Vector3(0, -1, 0));
 		
 		Quaternion quat = new Quaternion();
