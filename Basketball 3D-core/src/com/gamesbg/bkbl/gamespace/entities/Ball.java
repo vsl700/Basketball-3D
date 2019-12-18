@@ -110,8 +110,11 @@ public class Ball extends Entity {
 		return model.nodes.get(0).scale.z;
 	}
 	
-	public void addListener() {
+	@Override
+	public void onCycleEnd() {
+		super.onCycleEnd();
 		
+		modelInstance.transform = getMainBody().getWorldTransform();
 	}
 
 	@Override

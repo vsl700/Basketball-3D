@@ -10,6 +10,8 @@ public class InputController implements InputProcessor {
 	static final int sprint = Keys.SHIFT_LEFT;
 	static final int shoot = Keys.CONTROL_LEFT;
 	static final int dribbleL = Buttons.LEFT, dribbleR = Buttons.RIGHT;
+	static final int altDribbleL = Keys.J, altDribbleR = Keys.L;
+	static final int altScrollUp = Keys.E, altScrollDown = Keys.Q;
 	
 	int scroll = 0;
 	
@@ -17,6 +19,7 @@ public class InputController implements InputProcessor {
 	boolean sprintPressed;
 	boolean shootPressed;
 	boolean dribbleLPressed, dribbleRPressed;
+	boolean scrollUpPressed, scrollDownPressed;
 	/**
 	 * Resets the scroll amount and the dribble (and ball pointing) buttons indicators
 	 * @param resetDribble - whether to reset the ball dribble indicators
@@ -27,7 +30,11 @@ public class InputController implements InputProcessor {
 			dribbleRPressed = false;
 		}
 		
-		scroll = 0;
+		if(scrollUpPressed)
+			scroll = 1;
+		else if(scrollDownPressed)
+			scroll = -1;
+		else scroll = 0;
 	}
 	
 	public boolean isForwardPressed() {
@@ -62,7 +69,7 @@ public class InputController implements InputProcessor {
 		return dribbleRPressed;
 	}
 
-	public int GetScroll() {
+	public int getScroll() {
 		return scroll;
 	}
 	
@@ -86,6 +93,18 @@ public class InputController implements InputProcessor {
 			break;
 		case shoot:
 			shootPressed = true;
+			break;
+		case altDribbleL:
+			dribbleLPressed = true;
+			break;
+		case altDribbleR:
+			dribbleRPressed = true;
+			break;
+		case altScrollUp:
+			scrollUpPressed = true;
+			break;
+		case altScrollDown:
+			scrollDownPressed = true;
 			break;
 		}
 		return false;
@@ -111,6 +130,18 @@ public class InputController implements InputProcessor {
 			break;
 		case shoot:
 			shootPressed = false;
+			break;
+		case altDribbleL:
+			dribbleLPressed = false;
+			break;
+		case altDribbleR:
+			dribbleRPressed = false;
+			break;
+		case altScrollUp:
+			scrollUpPressed = false;
+			break;
+		case altScrollDown:
+			scrollDownPressed = false;
 			break;
 		}
 		return false;
@@ -162,7 +193,7 @@ public class InputController implements InputProcessor {
 
 	@Override
 	public boolean scrolled(int amount) {
-		scroll += amount;
+		scroll -= amount;
 		return false;
 	}
 

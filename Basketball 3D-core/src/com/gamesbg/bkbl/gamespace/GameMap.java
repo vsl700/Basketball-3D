@@ -429,7 +429,7 @@ public class GameMap implements RaycastCollisionDetector<Vector2> {
 		
 		Gdx.input.setInputProcessor(inputs);
 		
-		startTimer = 0;//6
+		startTimer = -1;//6
 	}
 	
 	private void createBall() {
@@ -608,10 +608,19 @@ public class GameMap implements RaycastCollisionDetector<Vector2> {
 		float dirX = tempVec.x;
 		float dirZ = tempVec.z;
 		
+		float turnY = Gdx.input.getDeltaX(); //Around the Y-axis
+		float turnX = Gdx.input.getDeltaY(); //Around the X-axis
+		
 		if(inputs.isSprintPressed()) {
 			if (inputs.isForwardPressed()) {
 				mainPlayer.run(new Vector3(dirX * delta, 0, dirZ * delta));
 			}
+			
+			if(inputs.isStrLeftPressed())
+				mainPlayer.turnY(delta * 90);
+			
+			if(inputs.isStrRightPressed())
+				mainPlayer.turnY(-delta * 90);
 		}
 		else {
 			if (inputs.isForwardPressed()) {
@@ -626,7 +635,7 @@ public class GameMap implements RaycastCollisionDetector<Vector2> {
 				mainPlayer.walk(new Vector3(dirZ * -delta, 0, dirX * delta));
 		}
 		
-		mainPlayer.shootPowerScroll(-inputs.GetScroll());
+		mainPlayer.shootPowerScroll(inputs.getScroll());
 		
 		if(inputs.isShootPressed()) {
 			mainPlayer.interactWithBallS();
@@ -639,8 +648,7 @@ public class GameMap implements RaycastCollisionDetector<Vector2> {
 			mainPlayer.interactWithBallR();
 		}
 		
-		float turnY = Gdx.input.getDeltaX(); //Around the Y-axis
-		float turnX = Gdx.input.getDeltaY(); //Around the X-axis
+		
 		
 		if(Math.abs(turnY) < Gdx.graphics.getWidth() / 4) {
 			mainPlayer.turnY(turnY * delta * 9);
