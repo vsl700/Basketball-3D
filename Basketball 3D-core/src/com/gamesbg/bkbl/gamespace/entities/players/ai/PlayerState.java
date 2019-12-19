@@ -6,6 +6,7 @@ import com.badlogic.gdx.ai.fsm.State;
 import com.badlogic.gdx.ai.msg.Telegram;
 import com.badlogic.gdx.math.Matrix4;
 import com.badlogic.gdx.math.Vector3;
+import com.gamesbg.bkbl.gamespace.entities.Ball;
 import com.gamesbg.bkbl.gamespace.entities.Player;
 import com.gamesbg.bkbl.gamespace.entities.players.Teammate;
 import com.gamesbg.bkbl.gamespace.objects.GameObject;
@@ -16,8 +17,16 @@ public enum PlayerState implements State<Player> {
 		private void performShooting(Player player, Vector3 tempAimVec) {
 			AIMemory mem = player.getBrain().getMemory();
 
-			mem.setShootVec(tempAimVec.nor());
+			mem.setShootVec(tempAimVec);
 			player.lookAt(tempAimVec);
+			player.interactWithBallS();
+			mem.setAimingTime(mem.getAimingTime() + Gdx.graphics.getDeltaTime());
+		}
+		
+		private void performShooting(Player player) {
+			AIMemory mem = player.getBrain().getMemory();
+			System.out.println(mem.getShootVec());
+			player.lookAt(mem.getShootVec());
 			player.interactWithBallS();
 			mem.setAimingTime(mem.getAimingTime() + Gdx.graphics.getDeltaTime());
 		}
@@ -35,11 +44,11 @@ public enum PlayerState implements State<Player> {
 
 			// Ball behavior mechanism
 			if (mem.getAimingTime() > 0 && mem.getAimingTime() <= 1.25f) {
-				performShooting(player, mem.getShootVec());
+				performShooting(player);
 			} else {
 				if (mem.getAimingTime() > 1.25f) {
 					mem.setShootTime(0);
-
+					mem.setCatchTime(0);
 					// player.throwBall(mem.getShootVec());
 					mem.setBallJustShot(true);
 					return;
@@ -135,7 +144,9 @@ public enum PlayerState implements State<Player> {
 
 			AIMemory mem = player.getBrain().getMemory();
 
-			Vector3 ballVec = player.getMap().getBall().getModelInstance().transform.getTranslation(new Vector3());
+			Ball tempBall = player.getMap().getBall();
+			
+			Vector3 ballVec = tempBall.getModelInstance().transform.getTranslation(new Vector3());
 			ArrayList<Vector3> handVecs = new ArrayList<Vector3>();
 			handVecs.add(player.getShoulderLTrans().getTranslation(new Vector3()));
 			handVecs.add(player.getShoulderRTrans().getTranslation(new Vector3()));
@@ -149,7 +160,7 @@ public enum PlayerState implements State<Player> {
 
 			//If the following player hadn't just thrown the ball or the amount of players per team is 1 (if the fight is 1v1 the player will be always chasing the ball and try to catch it)
 			if (!mem.isBallJustShot() || player.getMap().getTeammates().size() == 1) {
-				player.getBrain().pursue.setArrivalTolerance(0);
+				//player.getBrain().pursue.setArrivalTolerance(0.1f);
 
 				player.getBrain().pursue.calculateSteering(Player.steering);
 				// System.out.println(Player.steering.linear.cpy().x);
@@ -158,15 +169,20 @@ public enum PlayerState implements State<Player> {
 				// player.getBrain().obstAvoid.calculateSteering(Player.steering);
 				player.getBrain().collAvoid.calculateSteering(Player.steering);
 				player.getMoveVector().add(Player.steering.linear);
+				
+				//player.getBrain().getSeparate().calculateSteering(Player.steering);
+				//player.getMoveVector().add(Player.steering.linear.cpy());
 
 				//RUUUN! GO CATCH THAT BALL!
-				System.out.println(player.getMoveVector().x + " ; " + player.getMoveVector().y + " ; " + player.getMoveVector().z);
+				//System.out.println(player.getMoveVector().x + " ; " + player.getMoveVector().y + " ; " + player.getMoveVector().z);
 				player.setRunning();
-
-				if (tempHandVec.idt(handVecs.get(0)))
-					player.interactWithBallL();
-				else if (tempHandVec.idt(handVecs.get(1)))
-					player.interactWithBallR();
+				
+				if (mem.getCatchTime() >= 0.5f) {
+					if (tempHandVec.idt(handVecs.get(0)))
+						player.interactWithBallL();
+					else
+						player.interactWithBallR();
+				}
 			} else {
 				player.getBrain().pursue.setArrivalTolerance(1);
 
@@ -181,6 +197,8 @@ public enum PlayerState implements State<Player> {
 			}
 
 			player.getMoveVector().nor().scl(Gdx.graphics.getDeltaTime());
+			
+			mem.setCatchTime(mem.getCatchTime() + Gdx.graphics.getDeltaTime());
 		}
 	},
 

@@ -36,7 +36,7 @@ public class Brain {
 	Arrive<Vector3> pursue;
 	LookWhereYouAreGoing<Vector3> lookAt;
 	CollisionAvoidance<Vector3> collAvoid; //For players and basket stands
-	Separation<Vector3> separate; //Keep it for player surroundings
+	Separation<Vector3> separate; //For player surroundings and ball distance keeping
 	RaycastObstacleAvoidance<Vector3> obstAvoid; //For invisible terrain walls
 	
 	RayConfiguration<Vector3> rayConfig;
@@ -48,7 +48,7 @@ public class Brain {
 		memory = new AIMemory();
 		
 		pursue = new Arrive<Vector3>(user, user.getMap().getBall());
-		pursue.setArrivalTolerance(0.1f);
+		//pursue.setArrivalTolerance(0.1f);
 		user.setMaxLinearAcceleration(1);
 		lookAt = new LookWhereYouAreGoing<Vector3>(user);
 		collAvoid = new CollisionAvoidance<Vector3>(user, user);

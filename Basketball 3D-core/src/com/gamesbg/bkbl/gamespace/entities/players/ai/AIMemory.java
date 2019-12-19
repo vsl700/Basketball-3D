@@ -12,7 +12,7 @@ public class AIMemory {
 	Vector3 shootVec;
 	
 	//Just some player AI's properties, or in other words, imitating some strategy
-	float dribbleTime, aimingTime, shootTime, switchHandTime;
+	float dribbleTime, aimingTime, shootTime, switchHandTime, catchTime;
 	float distDiff, resetTime;
 	
 	boolean ballJustShot;
@@ -61,6 +61,14 @@ public class AIMemory {
 
 	public void setSwitchHandTime(float switchHandTime) {
 		this.switchHandTime = switchHandTime;
+	}
+
+	public float getCatchTime() {
+		return catchTime;
+	}
+
+	public void setCatchTime(float catchTime) {
+		this.catchTime = catchTime;
 	}
 
 	public float getDistDiff() {

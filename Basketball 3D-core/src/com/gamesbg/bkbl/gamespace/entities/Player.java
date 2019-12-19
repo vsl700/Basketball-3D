@@ -1418,14 +1418,19 @@ public abstract class Player extends Entity {
 		if(!isMainPlayer()) {
 			steering.setZero();
 			brain.update();
-			
+			moveVec.y = 0;
 			//Vector3 tempVec = moveVec.add(new Vector3(steering.linear.cpy().x, 0, steering.linear.cpy().y)).scl(0.5f);
 			//float tempAng = steering.angular;
 			
 			
-			//System.out.println(moveVec.x + " ; " + moveVec.y + " ; " + moveVec.z);
-			if(!moveVec.isZero())
+			System.out.println(moveVec.x + " ; " + moveVec.y + " ; " + moveVec.z);
+			float len = Math.abs(moveVec.x) + Math.abs(moveVec.z);
+			System.out.println(len);
+			//if(len >= 0.01f)
 				walk(moveVec);
+			//else {
+				//running = false;
+			//}
 			
 			//System.out.println(getWidth() * getDepth());
 		}

@@ -22,7 +22,7 @@ public class Ball extends Entity {
 	public void create(EntityType type, GameMap map, Vector3 pos) {
 		super.create(type, map, pos);
 		
-		boundRadius = 1;
+		boundRadius = 0.5f;
 	}
 	
 	protected void createModels(Vector3 pos) {
