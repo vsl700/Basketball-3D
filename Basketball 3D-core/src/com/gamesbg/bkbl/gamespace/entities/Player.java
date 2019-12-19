@@ -737,6 +737,8 @@ public abstract class Player extends Entity {
 	protected void createCollisionObjectAndBodies() {
 		super.createCollisionObjectAndBodies();
 		
+		//modelInstance.transform = getMainBody().getWorldTransform();
+		
 		leftHandInWorld = true;
 		rightHandInWorld = true;
 		
@@ -1421,7 +1423,7 @@ public abstract class Player extends Entity {
 			//float tempAng = steering.angular;
 			
 			
-			System.out.println(moveVec.x + " ; " + moveVec.y + " ; " + moveVec.z);
+			//System.out.println(moveVec.x + " ; " + moveVec.y + " ; " + moveVec.z);
 			if(!moveVec.isZero())
 				walk(moveVec);
 			

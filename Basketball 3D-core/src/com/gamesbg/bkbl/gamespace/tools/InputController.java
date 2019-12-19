@@ -1,6 +1,7 @@
 package com.gamesbg.bkbl.gamespace.tools;
 
 import com.badlogic.gdx.InputProcessor;
+import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input.Buttons;
 import com.badlogic.gdx.Input.Keys;
 
@@ -14,12 +15,14 @@ public class InputController implements InputProcessor {
 	static final int altScrollUp = Keys.E, altScrollDown = Keys.Q;
 	
 	int scroll = 0;
+	float timeout;
 	
 	boolean forwardPressed, backwardPressed, strRightPressed, strLeftPressed;
 	boolean sprintPressed;
 	boolean shootPressed;
 	boolean dribbleLPressed, dribbleRPressed;
 	boolean scrollUpPressed, scrollDownPressed;
+	
 	/**
 	 * Resets the scroll amount and the dribble (and ball pointing) buttons indicators
 	 * @param resetDribble - whether to reset the ball dribble indicators
@@ -30,11 +33,24 @@ public class InputController implements InputProcessor {
 			dribbleRPressed = false;
 		}
 		
-		if(scrollUpPressed)
-			scroll = 1;
-		else if(scrollDownPressed)
-			scroll = -1;
-		else scroll = 0;
+		scroll = 0;
+		
+		if(scrollUpPressed || scrollDownPressed)
+			timeout -= Gdx.graphics.getDeltaTime();
+		else {
+			return;
+		}
+		
+		if (timeout <= 0) {
+			if (scrollUpPressed) {
+				scroll = 1;
+				timeout = .1f;
+			} else if (scrollDownPressed) {
+				scroll = -1;
+				timeout = .1f;
+			}
+			else timeout = 0;
+		}
 	}
 	
 	public boolean isForwardPressed() {

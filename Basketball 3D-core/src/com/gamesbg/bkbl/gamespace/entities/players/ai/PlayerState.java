@@ -160,6 +160,7 @@ public enum PlayerState implements State<Player> {
 				player.getMoveVector().add(Player.steering.linear);
 
 				//RUUUN! GO CATCH THAT BALL!
+				System.out.println(player.getMoveVector().x + " ; " + player.getMoveVector().y + " ; " + player.getMoveVector().z);
 				player.setRunning();
 
 				if (tempHandVec.idt(handVecs.get(0)))
