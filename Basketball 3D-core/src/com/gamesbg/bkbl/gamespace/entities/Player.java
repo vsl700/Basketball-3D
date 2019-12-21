@@ -86,7 +86,7 @@ public abstract class Player extends Entity {
 	boolean northObstacle, southObstacle, eastObstacle, westObstacle;
 	boolean inBasketZone;
 	
-	int shootingPower = 10;
+	int shootingPower = 17;
 	int cycleTimeout;
 	
 	int playerIndex;
@@ -1350,8 +1350,10 @@ public abstract class Player extends Entity {
 		
 		modelInstance.transform.set(thisVec, quat).rotate(0, 1, 0, 180);
 		
+		Matrix4 camTrans = modelInstance.transform.cpy().setToLookAt(rotVec, new Vector3(1, 0, 0));
+		
 		Quaternion quat2 = new Quaternion();
-		calcTrans.getRotation(quat2);
+		camTrans.getRotation(quat2);
 		quat2.setEulerAngles(0, quat2.getPitch(), 0);
 		
 		Vector3 camVec = camMatrix.getTranslation(new Vector3());
@@ -1491,8 +1493,7 @@ public abstract class Player extends Entity {
 
 					@Override
 					public void onEnd(AnimationDesc animation) {
-						if(isMainPlayer())
-							throwBall();
+						throwBall();
 
 						leftThrowBall = false;
 						leftHoldingBall = false;
@@ -1560,8 +1561,7 @@ public abstract class Player extends Entity {
 
 					@Override
 					public void onEnd(AnimationDesc animation) {
-						if(isMainPlayer())
-							throwBall();
+						throwBall();
 
 						rightThrowBall = false;
 						rightHoldingBall = false;

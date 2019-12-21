@@ -11,7 +11,6 @@ import com.badlogic.gdx.graphics.g3d.Environment;
 import com.badlogic.gdx.graphics.g3d.ModelBatch;
 import com.badlogic.gdx.math.Matrix4;
 import com.badlogic.gdx.math.Quaternion;
-import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.math.Vector3;
 import com.badlogic.gdx.physics.bullet.Bullet;
 import com.badlogic.gdx.physics.bullet.collision.Collision;
@@ -36,7 +35,7 @@ import com.gamesbg.bkbl.gamespace.objects.GameObject;
 import com.gamesbg.bkbl.gamespace.objects.ObjectType;
 import com.gamesbg.bkbl.gamespace.tools.InputController;
 
-public class GameMap implements RaycastCollisionDetector<Vector2> {
+public class GameMap implements RaycastCollisionDetector<Vector3> {
 	
 	final static float[][] spawnCoords = {{0, 0.1f, 4},
 										  {5, 0.1f, 2},
@@ -846,13 +845,13 @@ public class GameMap implements RaycastCollisionDetector<Vector2> {
 	}
 
 	@Override
-	public boolean collides(Ray<Vector2> ray) {
+	public boolean collides(Ray<Vector3> ray) {
 		// TODO Auto-generated method stub
 		return false;
 	}
 
 	@Override
-	public boolean findCollision(com.badlogic.gdx.ai.utils.Collision<Vector2> outputCollision, Ray<Vector2> inputRay) {
+	public boolean findCollision(com.badlogic.gdx.ai.utils.Collision<Vector3> outputCollision, Ray<Vector3> inputRay) {
 		// TODO Auto-generated method stub
 		return false;
 	}

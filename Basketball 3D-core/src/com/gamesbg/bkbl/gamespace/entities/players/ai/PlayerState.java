@@ -25,7 +25,7 @@ public enum PlayerState implements State<Player> {
 		
 		private void performShooting(Player player) {
 			AIMemory mem = player.getBrain().getMemory();
-			System.out.println(mem.getShootVec());
+			
 			player.lookAt(mem.getShootVec());
 			player.interactWithBallS();
 			mem.setAimingTime(mem.getAimingTime() + Gdx.graphics.getDeltaTime());
@@ -47,6 +47,7 @@ public enum PlayerState implements State<Player> {
 				performShooting(player);
 			} else {
 				if (mem.getAimingTime() > 1.25f) {
+					System.out.println(mem.getShootVec());
 					mem.setShootTime(0);
 					mem.setCatchTime(0);
 					// player.throwBall(mem.getShootVec());
@@ -158,12 +159,11 @@ public enum PlayerState implements State<Player> {
 			if(!player.isShooting())
 				player.lookAt(ballVec);
 
-			//If the following player hadn't just thrown the ball or the amount of players per team is 1 (if the fight is 1v1 the player will be always chasing the ball and try to catch it)
+			//If the following player hadn't just thrown the ball or the amount of players per team is 1 (if the fight is 1v1 the player will be always chasing the ball and trying to catch it)
 			if (!mem.isBallJustShot() || player.getMap().getTeammates().size() == 1) {
 				player.getBrain().pursue.setArrivalTolerance(0);
 
 				player.getBrain().pursue.calculateSteering(Player.steering);
-				// System.out.println(Player.steering.linear.cpy().x);
 				player.setMoveVector(Player.steering.linear.cpy());
 
 				// player.getBrain().obstAvoid.calculateSteering(Player.steering);
@@ -177,14 +177,12 @@ public enum PlayerState implements State<Player> {
 					player.getMoveVector().add(Player.steering.linear.cpy().scl(2.5f));
 				}
 				
-				Vector3 tempAvg = player.getPrevMoveVec().cpy().add(player.getMoveVector()).scl(0.5f);
+				Vector3 tempAvg = player.getPrevMoveVec().cpy().add(player.getMoveVector()).scl(0.5f); //Just to increase measurement accuracy (average of previous movement and current movement vec)
 				
-				//RUUUN! GO CATCH THAT BALL!
 				//System.out.println(tempAvg.x + " ; " + tempAvg.y + " ; " + tempAvg.z);
-				if(Math.abs(tempAvg.x) + Math.abs(tempAvg.z) > 1.5f || Math.abs(tempBall.getLinearVelocity().x) + Math.abs(tempBall.getLinearVelocity().z) > 0.1f)
-					player.setRunning();
-				
-				if (tempHandVec.idt(handVecs.get(0)))
+				if(Math.abs(tempAvg.x) + Math.abs(tempAvg.z) > 1.5f || Math.abs(tempBall.getLinearVelocity().x) + Math.abs(tempBall.getLinearVelocity().z) > 3.5f)
+					player.setRunning(); //RUUUN! GO CATCH THAT BALL!
+				else if (tempHandVec.idt(handVecs.get(0)))
 					player.interactWithBallL();
 				else
 					player.interactWithBallR();
