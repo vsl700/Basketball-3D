@@ -122,7 +122,7 @@ public enum PlayerState implements State<Player> {
 			System.out.println("Shoot time:" + mem.getShootTime());
 			System.out.println("Aiming time:" + mem.getAimingTime());
 
-			Vector3 dir = player.roamAround(basket.getMainTrans().cpy().trn(mem.getDistDiff(), 0, 0), null, 0, 5, false, mem.getAimingTime() > 0 || player.isShooting() || true);
+			Vector3 dir = player.roamAround(basket.getMainTrans().cpy().trn(mem.getDistDiff(), 0, 0), null, 0, 5, false, mem.getAimingTime() > 0 || player.isShooting());
 			if(mem.getAimingTime() == 0)
 				player.lookAt(dir.sub(mem.getDistDiff(), 0, 0));
 
@@ -160,29 +160,34 @@ public enum PlayerState implements State<Player> {
 
 			//If the following player hadn't just thrown the ball or the amount of players per team is 1 (if the fight is 1v1 the player will be always chasing the ball and try to catch it)
 			if (!mem.isBallJustShot() || player.getMap().getTeammates().size() == 1) {
-				//player.getBrain().pursue.setArrivalTolerance(0.1f);
+				player.getBrain().pursue.setArrivalTolerance(0);
 
 				player.getBrain().pursue.calculateSteering(Player.steering);
 				// System.out.println(Player.steering.linear.cpy().x);
 				player.setMoveVector(Player.steering.linear.cpy());
 
 				// player.getBrain().obstAvoid.calculateSteering(Player.steering);
-				player.getBrain().collAvoid.calculateSteering(Player.steering);
-				player.getMoveVector().add(Player.steering.linear);
-				
-				//player.getBrain().getSeparate().calculateSteering(Player.steering);
-				//player.getMoveVector().add(Player.steering.linear.cpy());
-
-				//RUUUN! GO CATCH THAT BALL!
-				//System.out.println(player.getMoveVector().x + " ; " + player.getMoveVector().y + " ; " + player.getMoveVector().z);
-				player.setRunning();
-				
-				if (mem.getCatchTime() >= 0.5f) {
-					if (tempHandVec.idt(handVecs.get(0)))
-						player.interactWithBallL();
-					else
-						player.interactWithBallR();
+				if(player.getMap().getTeammates().size() > 1) {
+					player.getBrain().collAvoid.calculateSteering(Player.steering);
+					player.getMoveVector().add(Player.steering.linear.cpy().scl(0.9f));
 				}
+				
+				if(player.getMap().getBall().getPosition().y > player.getHeight()) {
+					player.getBrain().getBallSeparate().calculateSteering(Player.steering);
+					player.getMoveVector().add(Player.steering.linear.cpy().scl(2.5f));
+				}
+				
+				Vector3 tempAvg = player.getPrevMoveVec().cpy().add(player.getMoveVector()).scl(0.5f);
+				
+				//RUUUN! GO CATCH THAT BALL!
+				//System.out.println(tempAvg.x + " ; " + tempAvg.y + " ; " + tempAvg.z);
+				if(Math.abs(tempAvg.x) + Math.abs(tempAvg.z) > 1.5f || Math.abs(tempBall.getLinearVelocity().x) + Math.abs(tempBall.getLinearVelocity().z) > 0.1f)
+					player.setRunning();
+				
+				if (tempHandVec.idt(handVecs.get(0)))
+					player.interactWithBallL();
+				else
+					player.interactWithBallR();
 			} else {
 				player.getBrain().pursue.setArrivalTolerance(1);
 
@@ -191,12 +196,10 @@ public enum PlayerState implements State<Player> {
 				player.setMoveVector(Player.steering.linear.cpy().scl(0.1f));
 
 				//We still have to chase the ball, but we have to do it slowly and also we have to keep some distance so that other players can catch it
-				player.getBrain().getSeparate().calculateSteering(Player.steering);
+				player.getBrain().getBallSeparate().calculateSteering(Player.steering);
 				player.getMoveVector().add(Player.steering.linear);
 				// player.setMoveVector(Player.steering.linear.cpy());
 			}
-
-			player.getMoveVector().nor().scl(Gdx.graphics.getDeltaTime());
 			
 			mem.setCatchTime(mem.getCatchTime() + Gdx.graphics.getDeltaTime());
 		}

@@ -43,6 +43,7 @@ public abstract class Player extends Entity {
 	
 	//The recent player's movement (or linear acceleration in this mechanic)
 	private Vector3 moveVec = new Vector3();
+	private Vector3 prevMoveVec = new Vector3(); //Average move speed
 	
 	//Collision objects maps for reaching an object just by calling its mostly used name
 	HashMap<String, btRigidBody> bodiesMap;
@@ -882,6 +883,7 @@ public abstract class Player extends Entity {
 	}
 	
 	private void catchBall(boolean left) {
+		if(isAbleToCatch() || isDribbling())
 		if ((map.getCurrentPlayerHoldTeam() == -1 && map.getCurrentPlayerHoldOpp() == -1) || 
 				(map.getTeammateHolding() != null && map.getTeammateHolding().equals(this) || map.getOpponentHolding() != null && map.getOpponentHolding().equals(this)) || 
 				((map.getTeammateHolding() != null && !map.getTeammateHolding().equals(this) && map.getTeammateHolding().isDribbling()) || (map.getOpponentHolding() != null && !map.getOpponentHolding().equals(this) && map.getOpponentHolding().isDribbling()))) {
@@ -1421,11 +1423,12 @@ public abstract class Player extends Entity {
 			moveVec.y = 0;
 			//Vector3 tempVec = moveVec.add(new Vector3(steering.linear.cpy().x, 0, steering.linear.cpy().y)).scl(0.5f);
 			//float tempAng = steering.angular;
+			prevMoveVec.set(moveVec);
 			
-			
-			System.out.println(moveVec.x + " ; " + moveVec.y + " ; " + moveVec.z);
-			float len = Math.abs(moveVec.x) + Math.abs(moveVec.z);
-			System.out.println(len);
+			moveVec.nor().scl(Gdx.graphics.getDeltaTime());
+			//System.out.println(moveVec.x + " ; " + moveVec.y + " ; " + moveVec.z);
+			//float len = Math.abs(moveVec.x) + Math.abs(moveVec.z);
+			//System.out.println(len);
 			//if(len >= 0.01f)
 				walk(moveVec);
 			//else {
@@ -1753,7 +1756,7 @@ public abstract class Player extends Entity {
 	
 	@Override
 	public int findNeighbors(ProximityCallback<Vector3> callback) {
-		if(callback.equals(brain.getSeparate())) {
+		if(callback.equals(brain.getBallSeparate())) {
 			if(callback.reportNeighbor(map.getBall()))
 				return 1;
 			else return 0;
@@ -1772,6 +1775,10 @@ public abstract class Player extends Entity {
 	
 	public Vector3 getMoveVector() {
 		return moveVec;
+	}
+	
+	public Vector3 getPrevMoveVec() {
+		return prevMoveVec;
 	}
 	
 	public void setRunning() {
@@ -1907,6 +1914,10 @@ public abstract class Player extends Entity {
 	
 	public int getShootingPower() {
 		return shootingPower;
+	}
+	
+	public boolean isAbleToCatch() {
+		return leftHandInWorld && rightHandInWorld;
 	}
 	
 	public boolean holdingBall() {

@@ -68,7 +68,7 @@ public abstract class Entity implements Proximity<Vector3>, Steerable<Vector3> {
 		
 		removeCollCheckOnInternals();
 		
-		boundRadius = Math.max(getWidth(), getDepth());
+		boundRadius = Math.max(getWidth() / 2, getDepth() / 2);
 	}
 	
 	private void removeCollCheckOnInternals() {
@@ -289,7 +289,7 @@ public abstract class Entity implements Proximity<Vector3>, Steerable<Vector3> {
 
 	@Override
 	public Vector3 getPosition() {
-		return modelInstance.transform.getTranslation(new Vector3()).scl(1, 0, 1);
+		return modelInstance.transform.getTranslation(new Vector3()).scl(1, 1, 1);
 	}
 
 	@Override
