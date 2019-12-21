@@ -4,6 +4,7 @@ import com.badlogic.gdx.math.Vector3;
 
 /**
  * This class is used to store the player's brain's data, or in other words, this is the memory component of each brain of a player.
+ * The values inside this class are ONLY used by the AI. That's why they exist here and not in the Player class.
  * @author User
  *
  */
@@ -11,7 +12,6 @@ public class AIMemory {
 	
 	Vector3 shootVec;
 	
-	//Just some player AI's properties, or in other words, imitating some strategy
 	float dribbleTime, aimingTime, shootTime, switchHandTime, catchTime;
 	float distDiff, resetTime;
 	
