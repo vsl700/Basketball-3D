@@ -15,14 +15,16 @@ import com.badlogic.gdx.physics.bullet.collision.btCollisionObject;
 import com.badlogic.gdx.physics.bullet.collision.btCollisionShape;
 import com.badlogic.gdx.physics.bullet.collision.btSphereShape;
 import com.gamesbg.bkbl.gamespace.GameMap;
-import com.gamesbg.bkbl.gamespace.objects.ObjectType;
 
 public class Ball extends Entity {
+	
+	ArrayList<Player> neighborPlayers;
 	
 	public void create(EntityType type, GameMap map, Vector3 pos) {
 		super.create(type, map, pos);
 		
 		boundRadius = 0.5f;
+		neighborPlayers = new ArrayList<Player>();
 	}
 	
 	protected void createModels(Vector3 pos) {
@@ -116,16 +118,26 @@ public class Ball extends Entity {
 	public void onCycleEnd() {
 		super.onCycleEnd();
 		
-		modelInstance.transform.set(getMainBody().getWorldTransform());
+		//modelInstance.transform.set(getMainBody().getWorldTransform());
+	}
+	
+	@Override
+	public int findNeighbors(ProximityCallback<Vector3> callback) {
+		neighborPlayers.clear();
+		
+		for(Player p : map.getTeammates())
+			if(callback.reportNeighbor(p))
+				neighborPlayers.add(p);
+		
+		for(Player p : map.getOpponents())
+			if(callback.reportNeighbor(p))
+				neighborPlayers.add(p);
+		
+		return neighborPlayers.size() + 1;
 	}
 
-	@Override
-	public void collisionOccured(btCollisionObject objInside, btCollisionObject objOutside) {
-		super.collisionOccured(objInside, objOutside);
-		
-		if(map.getObjectsMap().get(objOutside.getUserValue()).equals(ObjectType.TERRAIN.getId() + "Inv")) {
-			getMainBody().setLinearFactor(new Vector3());
-		}
+	public ArrayList<Player> getNeighborPlayers() {
+		return neighborPlayers;
 	}
 	
 	

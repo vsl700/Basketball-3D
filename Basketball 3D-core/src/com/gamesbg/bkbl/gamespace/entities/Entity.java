@@ -263,6 +263,10 @@ public abstract class Entity implements Proximity<Vector3>, Steerable<Vector3> {
 		
 		return boundRadius;
 	}
+	
+	public void setBoundingRadius(float bound) {
+		boundRadius = bound;
+	}
 
 	@Override
 	public Steerable<Vector3> getOwner() {
@@ -295,13 +299,15 @@ public abstract class Entity implements Proximity<Vector3>, Steerable<Vector3> {
 	@Override
 	public float getOrientation() {
 		
-		return modelInstance.transform.getRotation(new Quaternion()).getYaw();
+		return modelInstance.transform.getRotation(new Quaternion()).getYawRad();
 	}
 
 	@Override
 	public void setOrientation(float orientation) {
 		
+		modelInstance.transform.set(getPosition(), new Quaternion().setEulerAnglesRad(orientation, 0, 0));
 		
+		setCollisionTransform(true);
 	}
 
 	@Override

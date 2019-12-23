@@ -86,7 +86,7 @@ public abstract class Player extends Entity {
 	boolean northObstacle, southObstacle, eastObstacle, westObstacle;
 	boolean inBasketZone;
 	
-	int shootingPower = 17;
+	int shootingPower = 10;
 	int cycleTimeout;
 	
 	int playerIndex;
@@ -799,6 +799,9 @@ public abstract class Player extends Entity {
 	}
 	
 	public void walk(Vector3 dir) {
+		if(dir.isZero(0.0001f))
+			return;
+		
 		if(running && !isAiming() && !isShooting()) {
 			run(dir);
 			return;
@@ -1422,7 +1425,6 @@ public abstract class Player extends Entity {
 		if(!isMainPlayer()) {
 			steering.setZero();
 			brain.update();
-			moveVec.y = 0;
 			//Vector3 tempVec = moveVec.add(new Vector3(steering.linear.cpy().x, 0, steering.linear.cpy().y)).scl(0.5f);
 			//float tempAng = steering.angular;
 			prevMoveVec.set(moveVec);
@@ -1798,6 +1800,10 @@ public abstract class Player extends Entity {
 	public float getHeight() {
 		return model.getNode("head").translation.y + scale1 - model.getNode("leg2L").translation.y + scale5 / 2;
 	}
+	
+	public float getArmHeight() {
+		return scale6 / 2 + 2 * scale5 + scale3;
+	}
 
 	@Override
 	public float getDepth() {
@@ -1910,6 +1916,10 @@ public abstract class Player extends Entity {
 	
 	public int getPlayerIndex() {
 		return playerIndex;
+	}
+	
+	public void setShootingPower(int shoot) {
+		shootingPower = Math.min(Math.max(10, shoot), 20); //Needs to be between 10 and 20.
 	}
 	
 	public int getShootingPower() {

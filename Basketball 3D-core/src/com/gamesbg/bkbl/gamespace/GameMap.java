@@ -424,7 +424,9 @@ public class GameMap implements RaycastCollisionDetector<Vector3> {
 				bo.setIgnoreCollisionCheck(co, true);
 			
 		}
-			
+		
+		//There is a separate function in player AI which should separate the player enough from the ball so that he can catch it
+		//ball.setBoundingRadius(ball.getBoundingRadius() + mainPlayer.getWidth() / 2); 
 		
 		Gdx.input.setInputProcessor(inputs);
 		

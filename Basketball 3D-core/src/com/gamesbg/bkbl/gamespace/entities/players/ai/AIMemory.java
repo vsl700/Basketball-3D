@@ -10,7 +10,8 @@ import com.badlogic.gdx.math.Vector3;
  */
 public class AIMemory {
 	
-	Vector3 shootVec;
+	//The targetVec represents the position of the target, while shootVec represents the point where the player has to shoot so that he can hit the target with the ball
+	Vector3 shootVec, targetVec;
 	
 	float dribbleTime, aimingTime, shootTime, switchHandTime, catchTime;
 	float distDiff, resetTime;
@@ -30,6 +31,13 @@ public class AIMemory {
 		this.shootVec = shootVec;
 	}
 
+	public Vector3 getTargetVec() {
+		return targetVec;
+	}
+
+	public void setTargetVec(Vector3 targetVec) {
+		this.targetVec = targetVec;
+	}
 
 	public float getDribbleTime() {
 		return dribbleTime;

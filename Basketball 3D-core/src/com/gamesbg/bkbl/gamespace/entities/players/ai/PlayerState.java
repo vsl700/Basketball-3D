@@ -17,7 +17,7 @@ public enum PlayerState implements State<Player> {
 		private void performShooting(Player player, Vector3 tempAimVec) {
 			AIMemory mem = player.getBrain().getMemory();
 
-			mem.setShootVec(tempAimVec);
+			mem.setTargetVec(tempAimVec);
 			player.lookAt(tempAimVec);
 			player.interactWithBallS();
 			mem.setAimingTime(mem.getAimingTime() + Gdx.graphics.getDeltaTime());
@@ -29,6 +29,28 @@ public enum PlayerState implements State<Player> {
 			player.lookAt(mem.getShootVec());
 			player.interactWithBallS();
 			mem.setAimingTime(mem.getAimingTime() + Gdx.graphics.getDeltaTime());
+		}
+		
+		/**
+		 * Calculates shooting vector according to the location of the player, shooting target
+		 * and distance between the player and the target. It also modifies player's shooting 
+		 * power.
+		 * 
+		 * @param player - the shooting player
+		 * @param targetVec - the target of the player
+		 * @return
+		 */
+		private Vector3 calculateShootVector(Player player, Vector3 targetVec) {
+			Vector3 distVec = targetVec.cpy().sub(player.getPosition());
+			
+			float xzDist = distVec.cpy().scl(1, 0, 1).len(); //Calculate only xz distance. That's what we multiplied y by 0 for.
+			float yDist = distVec.cpy().scl(0, 1, 0).len(); //Calculate only y distance. That's what we multiplied x and z by 0 for.
+			
+			Vector3 returnVec = targetVec.cpy().add(0, xzDist / 2 + yDist, 0).scl(0.5f, 1, 0.5f);
+			System.out.println(targetVec);
+			//Modify player shootPower
+			
+			return returnVec;
 		}
 
 		@Override
@@ -43,18 +65,21 @@ public enum PlayerState implements State<Player> {
 				basket = player.getMap().getHomeBasket();
 
 			// Ball behavior mechanism
-			if (mem.getAimingTime() > 0 && mem.getAimingTime() <= 1.25f) {
-				performShooting(player);
-			} else {
-				if (mem.getAimingTime() > 1.25f) {
-					System.out.println(mem.getShootVec());
+			if (mem.getAimingTime() > 0) {
+				mem.setShootVec(calculateShootVector(player, mem.getTargetVec())); //As the player can move even while shooting, we update shootVec every time
+				
+				if(mem.getAimingTime() <= 1.25f) {
+					performShooting(player);
+				}
+				else if (mem.getAimingTime() > 1.25f) {
+					//System.out.println(mem.getShootVec());
 					mem.setShootTime(0);
 					mem.setCatchTime(0);
 					// player.throwBall(mem.getShootVec());
 					mem.setBallJustShot(true);
 					return;
 				}
-
+			} else {
 				if (/*player.isSurrounded() && player.getMap().getTeammates().size() > 1 || */player.isInAwayBasketZone()) {
 					Vector3 playerVec = player.getModelInstance().transform.getTranslation(new Vector3());
 					Vector3 tempAimVec = playerVec.cpy().sub(new Vector3());
@@ -70,7 +95,7 @@ public enum PlayerState implements State<Player> {
 
 						tempAimVec = getShortestDistance(playerVec, tempTeam);
 					}
-
+					
 					performShooting(player, tempAimVec);
 
 				}
@@ -156,47 +181,64 @@ public enum PlayerState implements State<Player> {
 
 			// player.getBrain().lookAt.setTarget(player.getMap().getBall());
 			// player.getBrain().lookAt.calculateSteering(Player.steering);
-			if(!player.isShooting())
-				player.lookAt(ballVec);
+			
 
 			//If the following player hadn't just thrown the ball or the amount of players per team is 1 (if the fight is 1v1 the player will be always chasing the ball and trying to catch it)
 			if (!mem.isBallJustShot() || player.getMap().getTeammates().size() == 1) {
-				player.getBrain().pursue.setArrivalTolerance(0);
+				player.getBrain().getPursue().setArrivalTolerance(0.1f);
 
-				player.getBrain().pursue.calculateSteering(Player.steering);
-				player.setMoveVector(Player.steering.linear.cpy());
-
+				player.getBrain().getPursue().calculateSteering(Player.steering);
+				
 				// player.getBrain().obstAvoid.calculateSteering(Player.steering);
 				if(player.getMap().getTeammates().size() > 1) {
-					player.getBrain().collAvoid.calculateSteering(Player.steering);
-					player.getMoveVector().add(Player.steering.linear.cpy().scl(0.9f));
+					player.getBrain().getCollAvoid().calculateSteering(Player.steering);
+					//player.getMoveVector().add(Player.steering.linear.cpy().scl(0.9f));
 				}
 				
 				if(player.getMap().getBall().getPosition().y > player.getHeight()) {
-					player.getBrain().getBallSeparate().calculateSteering(Player.steering);
-					player.getMoveVector().add(Player.steering.linear.cpy().scl(2.5f));
+					//player.getBrain().getBallSeparate().calculateSteering(Player.steering);
+					//player.getMoveVector().nor().add(Player.steering.linear.cpy().scl(2.5f));
 				}
+				
+				player.setMoveVector(Player.steering.linear.cpy());
 				
 				Vector3 tempAvg = player.getPrevMoveVec().cpy().add(player.getMoveVector()).scl(0.5f); //Just to increase measurement accuracy (average of previous movement and current movement vec)
 				
 				//System.out.println(tempAvg.x + " ; " + tempAvg.y + " ; " + tempAvg.z);
-				if(Math.abs(tempAvg.x) + Math.abs(tempAvg.z) > 1.5f || Math.abs(tempBall.getLinearVelocity().x) + Math.abs(tempBall.getLinearVelocity().z) > 3.5f)
+				if(Math.abs(tempAvg.x) + Math.abs(tempAvg.z) > 1.5f)//Simplify those if-statements
 					player.setRunning(); //RUUUN! GO CATCH THAT BALL!
+				else if (Math.abs(tempBall.getLinearVelocity().x) + Math.abs(tempBall.getLinearVelocity().z) > 3.5f) {
+					player.setRunning();
+					
+					if (tempHandVec.idt(handVecs.get(0)))
+						player.interactWithBallL();
+					else
+						player.interactWithBallR();
+				}
 				else if (tempHandVec.idt(handVecs.get(0)))
 					player.interactWithBallL();
 				else
 					player.interactWithBallR();
 			} else {
-				player.getBrain().pursue.setArrivalTolerance(1);
+				player.getBrain().getPursue().setArrivalTolerance(8);
 
-				player.getBrain().pursue.calculateSteering(Player.steering);
+				player.getBrain().getPursue().calculateSteering(Player.steering);
 				// System.out.println(Player.steering.linear.cpy().x);
-				player.setMoveVector(Player.steering.linear.cpy().scl(0.1f));
+				player.setMoveVector(Player.steering.linear.cpy());
 
 				//We still have to chase the ball, but we have to do it slowly and also we have to keep some distance so that other players can catch it
-				player.getBrain().getBallSeparate().calculateSteering(Player.steering);
-				player.getMoveVector().add(Player.steering.linear);
-				// player.setMoveVector(Player.steering.linear.cpy());
+				//player.getBrain().getBallSeparate().calculateSteering(Player.steering);
+				//player.getMoveVector().add(Player.steering.linear.cpy().scl(1.6f));
+				//player.setMoveVector(Player.steering.linear.cpy());
+			}
+			
+			if(!player.isShooting()) {
+				//Player.steering.linear.set(player.getMoveVector());
+				//player.getBrain().getLookAt().calculateSteering(Player.steering);
+				
+				//player.lookAt(player.angleToVector(new Vector3(), Player.steering.angular));
+				
+				player.lookAt(ballVec);
 			}
 			
 			mem.setCatchTime(mem.getCatchTime() + Gdx.graphics.getDeltaTime());
