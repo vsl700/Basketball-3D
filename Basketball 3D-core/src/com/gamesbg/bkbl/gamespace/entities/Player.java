@@ -617,7 +617,7 @@ public abstract class Player extends Entity {
 		model = mb.end();
 		
 		animateModels();
-		modelInstance = new ModelInstance(model, pos);
+		modelInstance = new ModelInstance(model, pos.add(0, getHeight(), 0));
 	}
 	
 	@Override
@@ -739,6 +739,8 @@ public abstract class Player extends Entity {
 		super.createCollisionObjectAndBodies();
 		
 		//modelInstance.transform = getMainBody().getWorldTransform();
+		//getMainBody().setLinearFactor(new Vector3(1, 0, 1));
+		//getMainBody().setAngularFactor(new Vector3(0, 1, 0));
 		
 		leftHandInWorld = true;
 		rightHandInWorld = true;
@@ -764,6 +766,18 @@ public abstract class Player extends Entity {
 		bodiesMap.put("elbowR", bodies.get(i++));
 		bodiesMap.put("arm2R", bodies.get(i++));
 		bodiesMap.put("handR", bodies.get(i));
+		
+		bodiesMap.get("shoulderL").setDeactivationTime(1);
+		bodiesMap.get("arm1L").setDeactivationTime(1);
+		bodiesMap.get("elbowL").setDeactivationTime(1);
+		bodiesMap.get("arm2L").setDeactivationTime(1);
+		bodiesMap.get("handL").setDeactivationTime(1);
+		
+		bodiesMap.get("shoulderR").setDeactivationTime(1);
+		bodiesMap.get("arm1R").setDeactivationTime(1);
+		bodiesMap.get("elbowR").setDeactivationTime(1);
+		bodiesMap.get("arm2R").setDeactivationTime(1);
+		bodiesMap.get("handR").setDeactivationTime(1);
 		
 	}
 	
@@ -913,19 +927,43 @@ public abstract class Player extends Entity {
 	
 	private void enableHandDynColl(boolean left) {
 		if(left) {
-			map.addRigidBody(bodiesMap.get("shoulderL"), bodiesMap.get("shoulderL").getContactCallbackFlag(), bodiesMap.get("shoulderL").getContactCallbackFilter());
+			/*map.addRigidBody(bodiesMap.get("shoulderL"), bodiesMap.get("shoulderL").getContactCallbackFlag(), bodiesMap.get("shoulderL").getContactCallbackFilter());
 			map.addRigidBody(bodiesMap.get("arm1L"), bodiesMap.get("arm1L").getContactCallbackFlag(), bodiesMap.get("arm1L").getContactCallbackFilter());
 			map.addRigidBody(bodiesMap.get("elbowL"), bodiesMap.get("elbowL").getContactCallbackFlag(), bodiesMap.get("elbowL").getContactCallbackFilter());
 			map.addRigidBody(bodiesMap.get("arm2L"), bodiesMap.get("arm2L").getContactCallbackFlag(), bodiesMap.get("arm2L").getContactCallbackFilter());
-			map.addRigidBody(bodiesMap.get("handL"), bodiesMap.get("handL").getContactCallbackFlag(), bodiesMap.get("handL").getContactCallbackFilter());
+			map.addRigidBody(bodiesMap.get("handL"), bodiesMap.get("handL").getContactCallbackFlag(), bodiesMap.get("handL").getContactCallbackFilter());*/
+			
+			bodiesMap.get("shoulderL").setIgnoreCollisionCheck(map.getBall().getMainBody(), false);
+			bodiesMap.get("arm1L").setIgnoreCollisionCheck(map.getBall().getMainBody(), false);
+			bodiesMap.get("elbowL").setIgnoreCollisionCheck(map.getBall().getMainBody(), false);
+			bodiesMap.get("arm2L").setIgnoreCollisionCheck(map.getBall().getMainBody(), false);
+			bodiesMap.get("handL").setIgnoreCollisionCheck(map.getBall().getMainBody(), false);
+			
+			/*bodiesMap.get("shoulderL").activate(true);
+			bodiesMap.get("arm1L").activate(true);
+			bodiesMap.get("elbowL").activate(true);
+			bodiesMap.get("arm2L").activate(true);
+			bodiesMap.get("handL").activate(true);*/
 			
 			leftHandInWorld = true;
 		}else {
-			map.addRigidBody(bodiesMap.get("shoulderR"), bodiesMap.get("shoulderR").getContactCallbackFlag(), bodiesMap.get("shoulderR").getContactCallbackFilter());
+			/*map.addRigidBody(bodiesMap.get("shoulderR"), bodiesMap.get("shoulderR").getContactCallbackFlag(), bodiesMap.get("shoulderR").getContactCallbackFilter());
 			map.addRigidBody(bodiesMap.get("arm1R"), bodiesMap.get("arm1R").getContactCallbackFlag(), bodiesMap.get("arm1R").getContactCallbackFilter());
 			map.addRigidBody(bodiesMap.get("elbowR"), bodiesMap.get("elbowR").getContactCallbackFlag(), bodiesMap.get("elbowR").getContactCallbackFilter());
 			map.addRigidBody(bodiesMap.get("arm2R"), bodiesMap.get("arm2R").getContactCallbackFlag(), bodiesMap.get("arm2R").getContactCallbackFilter());
-			map.addRigidBody(bodiesMap.get("handR"), bodiesMap.get("handR").getContactCallbackFlag(), bodiesMap.get("handR").getContactCallbackFilter());
+			map.addRigidBody(bodiesMap.get("handR"), bodiesMap.get("handR").getContactCallbackFlag(), bodiesMap.get("handR").getContactCallbackFilter());*/
+			
+			bodiesMap.get("shoulderR").setIgnoreCollisionCheck(map.getBall().getMainBody(), false);
+			bodiesMap.get("arm1R").setIgnoreCollisionCheck(map.getBall().getMainBody(), false);
+			bodiesMap.get("elbowR").setIgnoreCollisionCheck(map.getBall().getMainBody(), false);
+			bodiesMap.get("arm2R").setIgnoreCollisionCheck(map.getBall().getMainBody(), false);
+			bodiesMap.get("handR").setIgnoreCollisionCheck(map.getBall().getMainBody(), false);
+			
+			/*bodiesMap.get("shoulderR").activate(true);
+			bodiesMap.get("arm1R").activate(true);
+			bodiesMap.get("elbowR").activate(true);
+			bodiesMap.get("arm2R").activate(true);
+			bodiesMap.get("handR").activate(true);*/
 			
 			rightHandInWorld = true;
 		}
@@ -937,19 +975,43 @@ public abstract class Player extends Entity {
 	 */
 	private void disableHandDynColl(boolean left) {
 		if(left) {
-			map.removeRigidBody(bodiesMap.get("shoulderL"));
+			/*map.removeRigidBody(bodiesMap.get("shoulderL"));
 			map.removeRigidBody(bodiesMap.get("arm1L"));
 			map.removeRigidBody(bodiesMap.get("elbowL"));
 			map.removeRigidBody(bodiesMap.get("arm2L"));
-			map.removeRigidBody(bodiesMap.get("handL"));
+			map.removeRigidBody(bodiesMap.get("handL"));*/
+			
+			bodiesMap.get("shoulderL").setIgnoreCollisionCheck(map.getBall().getMainBody(), true);
+			bodiesMap.get("arm1L").setIgnoreCollisionCheck(map.getBall().getMainBody(), true);
+			bodiesMap.get("elbowL").setIgnoreCollisionCheck(map.getBall().getMainBody(), true);
+			bodiesMap.get("arm2L").setIgnoreCollisionCheck(map.getBall().getMainBody(), true);
+			bodiesMap.get("handL").setIgnoreCollisionCheck(map.getBall().getMainBody(), true);
+			
+			/*bodiesMap.get("shoulderL").updateDeactivation(1);
+			bodiesMap.get("arm1L").updateDeactivation(1);
+			bodiesMap.get("elbowL").updateDeactivation(1);
+			bodiesMap.get("arm2L").updateDeactivation(1);
+			bodiesMap.get("handL").updateDeactivation(1);*/
 			
 			leftHandInWorld = false;
 		}else {
-			map.removeRigidBody(bodiesMap.get("shoulderR"));
+			/*map.removeRigidBody(bodiesMap.get("shoulderR"));
 			map.removeRigidBody(bodiesMap.get("arm1R"));
 			map.removeRigidBody(bodiesMap.get("elbowR"));
 			map.removeRigidBody(bodiesMap.get("arm2R"));
-			map.removeRigidBody(bodiesMap.get("handR"));
+			map.removeRigidBody(bodiesMap.get("handR"));*/
+			
+			bodiesMap.get("shoulderR").setIgnoreCollisionCheck(map.getBall().getMainBody(), true);
+			bodiesMap.get("arm1R").setIgnoreCollisionCheck(map.getBall().getMainBody(), true);
+			bodiesMap.get("elbowR").setIgnoreCollisionCheck(map.getBall().getMainBody(), true);
+			bodiesMap.get("arm2R").setIgnoreCollisionCheck(map.getBall().getMainBody(), true);
+			bodiesMap.get("handR").setIgnoreCollisionCheck(map.getBall().getMainBody(), true);
+			
+			/*bodiesMap.get("shoulderR").updateDeactivation(1);
+			bodiesMap.get("arm1R").updateDeactivation(1);
+			bodiesMap.get("elbowR").updateDeactivation(1);
+			bodiesMap.get("arm2R").updateDeactivation(1);
+			bodiesMap.get("handR").updateDeactivation(1);*/
 			
 			rightHandInWorld = false;
 		}
@@ -1407,8 +1469,6 @@ public abstract class Player extends Entity {
 	
 	@Override
 	public void update(float delta) {
-		lockRotationAndRandomFloating(true);
-		
 		if(!isMainPlayer())
 			moveVec.setZero();
 		
@@ -1441,6 +1501,8 @@ public abstract class Player extends Entity {
 			
 			//System.out.println(getWidth() * getDepth());
 		}
+		
+		lockRotationAndRandomFloating(true);
 		
 		String prevIdArmL = armLController.current.animation.id;
 		String prevIdArmR = armRController.current.animation.id;
