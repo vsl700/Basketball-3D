@@ -5,6 +5,7 @@ import com.badlogic.gdx.math.Vector3;
 import com.badlogic.gdx.ai.fsm.DefaultStateMachine;
 import com.badlogic.gdx.ai.fsm.StateMachine;
 import com.badlogic.gdx.ai.steer.behaviors.Arrive;
+import com.badlogic.gdx.ai.steer.behaviors.BlendedSteering;
 import com.badlogic.gdx.ai.steer.behaviors.CollisionAvoidance;
 import com.badlogic.gdx.ai.steer.behaviors.LookWhereYouAreGoing;
 import com.badlogic.gdx.ai.steer.behaviors.RaycastObstacleAvoidance;
@@ -38,6 +39,7 @@ public class Brain {
 	CollisionAvoidance<Vector3> collAvoid; //For players and basket stands
 	Separation<Vector3> ballSeparate; //For player surroundings and ball distance keeping
 	RaycastObstacleAvoidance<Vector3> obstAvoid; //For invisible terrain walls
+	BlendedSteering<Vector3> multiSteer;
 	
 	RayConfiguration<Vector3> rayConfig;
 	
@@ -57,6 +59,11 @@ public class Brain {
 		
 		rayConfig = new ParallelSideRayConfiguration<Vector3>(user, 3, 0.5f);
 		obstAvoid = new RaycastObstacleAvoidance<Vector3>(user, rayConfig);
+		
+		multiSteer = new BlendedSteering<Vector3>(user);
+		multiSteer.add(collAvoid, 0.25f);
+		multiSteer.add(ballSeparate, 0.25f);
+		multiSteer.add(pursue, 0.5f);
 	}
 	
 	public void update() {
@@ -119,6 +126,10 @@ public class Brain {
 
 	public RaycastObstacleAvoidance<Vector3> getObstAvoid() {
 		return obstAvoid;
+	}
+
+	public BlendedSteering<Vector3> getMultiSteer() {
+		return multiSteer;
 	}
 	
 }

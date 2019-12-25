@@ -187,20 +187,26 @@ public enum PlayerState implements State<Player> {
 			if (!mem.isBallJustShot() || player.getMap().getTeammates().size() == 1) {
 				player.getBrain().getPursue().setArrivalTolerance(0.1f);
 
-				player.getBrain().getPursue().calculateSteering(Player.steering);
+				//player.getBrain().getPursue().calculateSteering(Player.steering);
+				
 				
 				// player.getBrain().obstAvoid.calculateSteering(Player.steering);
 				if(player.getMap().getTeammates().size() > 1) {
-					player.getBrain().getCollAvoid().calculateSteering(Player.steering);
+					//player.getBrain().getCollAvoid().calculateSteering(Player.steering);
+					player.getBrain().getCollAvoid().setEnabled(true);
 					//player.getMoveVector().add(Player.steering.linear.cpy().scl(0.9f));
 				}
+				else player.getBrain().getCollAvoid().setEnabled(false);
 				
 				if(player.getMap().getBall().getPosition().y > player.getHeight()) {
+					player.getBrain().getBallSeparate().setEnabled(true);
 					//player.getBrain().getBallSeparate().calculateSteering(Player.steering);
 					//player.getMoveVector().nor().add(Player.steering.linear.cpy().scl(2.5f));
-				}
+				}else player.getBrain().getBallSeparate().setEnabled(false);
 				
-				player.setMoveVector(Player.steering.linear.cpy());
+				player.getBrain().getMultiSteer().calculateSteering(Player.steering);
+				
+				player.getMoveVector().set(Player.steering.linear);
 				
 				Vector3 tempAvg = player.getPrevMoveVec().cpy().add(player.getMoveVector()).scl(0.5f); //Just to increase measurement accuracy (average of previous movement and current movement vec)
 				
@@ -224,7 +230,7 @@ public enum PlayerState implements State<Player> {
 
 				player.getBrain().getPursue().calculateSteering(Player.steering);
 				// System.out.println(Player.steering.linear.cpy().x);
-				player.setMoveVector(Player.steering.linear.cpy());
+				player.getMoveVector().set(Player.steering.linear);
 
 				//We still have to chase the ball, but we have to do it slowly and also we have to keep some distance so that other players can catch it
 				//player.getBrain().getBallSeparate().calculateSteering(Player.steering);
