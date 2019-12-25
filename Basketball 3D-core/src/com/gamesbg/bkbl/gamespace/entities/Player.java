@@ -799,7 +799,7 @@ public abstract class Player extends Entity {
 	}
 	
 	public void walk(Vector3 dir) {
-		if(dir.isZero(0.0001f))
+		if(dir.isZero(0.000035f))
 			return;
 		
 		if(running && !isAiming() && !isShooting()) {
