@@ -47,6 +47,8 @@ public enum PlayerState implements State<Player> {
 			float yDist = distVec.cpy().scl(0, 1, 0).len(); //Calculate only y distance. That's what we multiplied x and z by 0 for.
 			
 			Vector3 returnVec = targetVec.cpy().add(0, xzDist / 2 + yDist, 0).scl(0.5f, 1, 0.5f);
+			
+			System.out.print(player.getPosition());
 			System.out.println(targetVec);
 			//Modify player shootPower
 			
