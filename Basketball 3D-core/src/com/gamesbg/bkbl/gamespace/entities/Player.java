@@ -1086,8 +1086,10 @@ public abstract class Player extends Entity {
 		Quaternion dir = modelInstance.transform.getRotation(new Quaternion());
 		Vector3 tempVec = new Vector3(0, 0, 1);
 		tempVec.rotate(dir.getYaw(), 0, 1, 0);
-
+		
+		
 		tempVec.y = (-camMatrix.getRotation(new Quaternion()).getPitch() / 100) * 2;
+		
 		tempVec.x *= shootingPower;
 		tempVec.y *= shootingPower * 1.4f;
 		tempVec.z *= shootingPower;
@@ -1404,10 +1406,10 @@ public abstract class Player extends Entity {
 	public void lookAt(Vector3 target) {
 		Vector3 thisVec = modelInstance.transform.getTranslation(new Vector3());
 		
-		Vector3 rotVec = target.cpy().sub(thisVec).nor();
+		Vector3 rotVec = target.cpy().sub(thisVec);
 		
 		//Calculated lookAt transform
-		Matrix4 calcTrans = modelInstance.transform.cpy().setToLookAt(rotVec, new Vector3(0, -1, 0));
+		Matrix4 calcTrans = new Matrix4().setToLookAt(rotVec, new Vector3(0, -1, 0));
 		
 		Quaternion quat = new Quaternion();
 		calcTrans.getRotation(quat);
@@ -1415,14 +1417,21 @@ public abstract class Player extends Entity {
 		
 		modelInstance.transform.set(thisVec, quat).rotate(0, 1, 0, 180);
 		
-		Matrix4 camTrans = modelInstance.transform.cpy().setToLookAt(rotVec, new Vector3(1, 0, 0));
+		//Matrix4 camTrans = new Matrix4().setToLookAt(rotVec, new Vector3(0, -1, 0));
 		
 		Quaternion quat2 = new Quaternion();
-		camTrans.getRotation(quat2);
-		quat2.setEulerAngles(0, quat2.getPitch(), 0);
+		calcTrans.getRotation(quat2);
+		float degrees;
+		if(quat2.getPitch() > 38)
+			degrees = 38;
+		else if(quat2.getPitch() < -38)
+			degrees = -38;
+		else degrees = quat2.getPitch();
+		
+		quat2.setEulerAngles(0, degrees, 0);
 		
 		Vector3 camVec = camMatrix.getTranslation(new Vector3());
-		camMatrix.set(camVec, quat2);
+		camMatrix.set(camVec, quat2).rotate(1, 0, 0, 180);
 		
 		//setCollisionTransform();
 	}

@@ -26,7 +26,7 @@ public enum PlayerState implements State<Player> {
 		private void performShooting(Player player) {
 			AIMemory mem = player.getBrain().getMemory();
 			
-			player.lookAt(mem.getShootVec());
+			player.lookAt(mem.getShootVec());//When the calculation starts being correct turn shoot vec into target vec!!!
 			player.interactWithBallS();
 			mem.setAimingTime(mem.getAimingTime() + Gdx.graphics.getDeltaTime());
 		}
@@ -41,15 +41,17 @@ public enum PlayerState implements State<Player> {
 		 * @return
 		 */
 		private Vector3 calculateShootVector(Player player, Vector3 targetVec) {
-			Vector3 distVec = targetVec.cpy().sub(player.getPosition());
+			Vector3 distVec = targetVec.cpy().sub(player.getPosition()); //Distance between the target and the player
 			
 			float xzDist = distVec.cpy().scl(1, 0, 1).len(); //Calculate only xz distance. That's what we multiplied y by 0 for.
 			float yDist = distVec.cpy().scl(0, 1, 0).len(); //Calculate only y distance. That's what we multiplied x and z by 0 for.
 			
-			Vector3 returnVec = targetVec.cpy().add(0, xzDist / 2 + yDist, 0).scl(0.5f, 1, 0.5f);
+			Vector3 returnVec = targetVec.cpy().add(0, xzDist / 2 + yDist, 0);
 			
+			System.out.println(xzDist + "; " + yDist);
 			System.out.print(player.getPosition());
-			System.out.println(targetVec);
+			System.out.print(targetVec);
+			System.out.println(returnVec);
 			//Modify player shootPower
 			
 			return returnVec;
@@ -147,8 +149,8 @@ public enum PlayerState implements State<Player> {
 				mem.setResetTime(0);
 			}
 
-			System.out.println("Shoot time:" + mem.getShootTime());
-			System.out.println("Aiming time:" + mem.getAimingTime());
+			//System.out.println("Shoot time:" + mem.getShootTime());
+			//System.out.println("Aiming time:" + mem.getAimingTime());
 
 			Vector3 dir = player.roamAround(basket.getMainTrans().cpy().trn(mem.getDistDiff(), 0, 0), null, 0, 5, false, mem.getAimingTime() > 0 || player.isShooting());
 			if(mem.getAimingTime() == 0)
@@ -213,20 +215,16 @@ public enum PlayerState implements State<Player> {
 				Vector3 tempAvg = player.getPrevMoveVec().cpy().add(player.getMoveVector()).scl(0.5f); //Just to increase measurement accuracy (average of previous movement and current movement vec)
 				
 				//System.out.println(tempAvg.x + " ; " + tempAvg.y + " ; " + tempAvg.z);
-				if(Math.abs(tempAvg.x) + Math.abs(tempAvg.z) > 1.5f)//Simplify those if-statements
+				if(Math.abs(tempAvg.x) + Math.abs(tempAvg.z) > 1.5f || Math.abs(tempBall.getLinearVelocity().x) + Math.abs(tempBall.getLinearVelocity().z) > 3.5f)
 					player.setRunning(); //RUUUN! GO CATCH THAT BALL!
-				else if (Math.abs(tempBall.getLinearVelocity().x) + Math.abs(tempBall.getLinearVelocity().z) > 3.5f) {
-					player.setRunning();
-					
+				
+				
+				if (mem.getCatchTime() > 0.5f) {
 					if (tempHandVec.idt(handVecs.get(0)))
 						player.interactWithBallL();
 					else
 						player.interactWithBallR();
 				}
-				else if (tempHandVec.idt(handVecs.get(0)))
-					player.interactWithBallL();
-				else
-					player.interactWithBallR();
 			} else {
 				player.getBrain().getPursue().setArrivalTolerance(8);
 
