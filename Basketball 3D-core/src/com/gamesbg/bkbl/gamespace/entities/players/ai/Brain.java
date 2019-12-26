@@ -61,9 +61,9 @@ public class Brain {
 		obstAvoid = new RaycastObstacleAvoidance<Vector3>(user, rayConfig);
 		
 		multiSteer = new BlendedSteering<Vector3>(user);
-		multiSteer.add(collAvoid, 0.25f);
-		multiSteer.add(ballSeparate, 0.25f);
-		multiSteer.add(pursue, 0.5f);
+		multiSteer.add(collAvoid, 0.5f);
+		multiSteer.add(ballSeparate, 0.5f);
+		multiSteer.add(pursue, 1);
 	}
 	
 	public void update() {

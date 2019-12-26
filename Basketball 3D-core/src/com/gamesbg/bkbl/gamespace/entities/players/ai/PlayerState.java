@@ -13,6 +13,8 @@ import com.gamesbg.bkbl.gamespace.objects.GameObject;
 
 public enum PlayerState implements State<Player> {
 	BALL_IN_HAND() {
+		
+		GameObject basket;
 
 		private void performShooting(Player player, Vector3 tempAimVec) {
 			AIMemory mem = player.getBrain().getMemory();
@@ -57,6 +59,17 @@ public enum PlayerState implements State<Player> {
 			return returnVec;
 		}
 
+		@Override
+		public void enter(Player player) {
+			if(player instanceof Teammate)
+				basket = player.getMap().getAwayBasket();
+			else basket = player.getMap().getHomeBasket();
+			
+			player.getBrain().getPursue().setTarget(basket);
+			
+			player.getBrain().getBallSeparate().setEnabled(false);
+		}
+		
 		@Override
 		public void update(Player player) {
 
@@ -135,10 +148,18 @@ public enum PlayerState implements State<Player> {
 			mem.setSwitchHandTime(mem.getSwitchHandTime() + Gdx.graphics.getDeltaTime());
 
 			// Walking & running mechanism
+			
+			player.getBrain().getMultiSteer().calculateSteering(Player.steering);
+			player.getMoveVector().set(Player.steering.linear);
+			
+			player.setRunning();
+			
+			if(mem.getAimingTime() == 0)
+				player.lookAt(basket.getPosition());
 
 			// Setting the distances from the target (when a player gets in
 			// front of this player)
-			if (player.isNorthSurround()) {
+			/*if (player.isNorthSurround()) {
 				if (player.isWestSurround())
 					mem.setDistDiff(mem.getDistDiff() - 60 * Gdx.graphics.getDeltaTime());
 				else
@@ -154,7 +175,7 @@ public enum PlayerState implements State<Player> {
 
 			Vector3 dir = player.roamAround(basket.getMainTrans().cpy().trn(mem.getDistDiff(), 0, 0), null, 0, 5, false, mem.getAimingTime() > 0 || player.isShooting());
 			if(mem.getAimingTime() == 0)
-				player.lookAt(dir.sub(mem.getDistDiff(), 0, 0));
+				player.lookAt(dir.sub(mem.getDistDiff(), 0, 0));*/
 
 		}
 
@@ -164,11 +185,27 @@ public enum PlayerState implements State<Player> {
 			// memory.get(player).setShootTime(0);
 			// memory.get(player).setAimingTime(0);
 			player.getBrain().getMemory().setAimingTime(0);
+			
+			player.getBrain().getBallSeparate().setEnabled(true);
 		}
 
 	},
 
 	BALL_CHASING() {
+		
+		@Override
+		public void enter(Player player) {
+			player.getBrain().getPursue().setTarget(player.getMap().getBall());
+		}
+		
+		@Override
+		public void exit(Player player) {
+			// memory.get(player).setBallJustShot(true);
+			// memory.get(player).setShootTime(0);
+			// memory.get(player).setAimingTime(0);
+			player.getBrain().getMemory().setBallJustShot(false);
+		}
+		
 		@Override
 		public void update(Player player) {
 
@@ -238,14 +275,14 @@ public enum PlayerState implements State<Player> {
 				//player.setMoveVector(Player.steering.linear.cpy());
 			}
 			
-			if(!player.isShooting()) {
+			if(player.isShooting()) {
 				//Player.steering.linear.set(player.getMoveVector());
 				//player.getBrain().getLookAt().calculateSteering(Player.steering);
 				
 				//player.lookAt(player.angleToVector(new Vector3(), Player.steering.angular));
-				
+				player.lookAt(mem.getShootVec());//Just in case the mechanics drop it and the player accidentally looks at the ball instead of the target while shooting
+			}else
 				player.lookAt(ballVec);
-			}
 			
 			mem.setCatchTime(mem.getCatchTime() + Gdx.graphics.getDeltaTime());
 		}
@@ -254,7 +291,7 @@ public enum PlayerState implements State<Player> {
 	COOPERATIVE() {
 		@Override
 		public void enter(Player player) {
-			player.getBrain().getMemory().setBallJustShot(false);
+			
 		}
 
 		@Override
@@ -316,7 +353,7 @@ public enum PlayerState implements State<Player> {
 	PLAYER_SURROUND() {
 		@Override
 		public void enter(Player player) {
-			player.getBrain().getMemory().setBallJustShot(false);
+			
 		}
 
 		@Override
@@ -382,7 +419,7 @@ public enum PlayerState implements State<Player> {
 
 		@Override
 		public void enter(Player player) {
-			player.getBrain().getMemory().setBallJustShot(false);
+			
 		}
 
 		@Override
