@@ -87,7 +87,9 @@ public abstract class Player extends Entity {
 	boolean inBasketZone;
 	
 	int shootingPower = 10;
-	int cycleTimeout;
+	//int cycleTimeout;
+	
+	float time;
 	
 	int playerIndex;
 	
@@ -1271,7 +1273,7 @@ public abstract class Player extends Entity {
 						dribbleL = false;
 						dribbleR = false;
 						readyBall = false;
-						cycleTimeout = 0;
+						time = 0;
 					}
 
 				} else {
@@ -1321,16 +1323,16 @@ public abstract class Player extends Entity {
 						map.getBall().setWorldTransform(new Matrix4().set(new Vector3(tempHandVec.x, tempBallVec.y, tempHandVec.z), map.getBall().getMainBody().getWorldTransform().getRotation(new Quaternion())));
 					}
 					//System.out.println(map.getBall().getMainBody().getLinearVelocity().y);
-					if(cycleTimeout * delta > 0.85f) {
+					if(time > 0.85f) {
 						dribbleL = false;
 						dribbleR = false;
 						readyBall = false;
-						cycleTimeout = 0;
+						time = 0;
 					}
-					else if (!readyBall && cycleTimeout * delta > 0.15f) {
+					else if (!readyBall && time > 0.15f) {
 						readyBall = true;
 					} else {
-						cycleTimeout++;
+						time += delta;
 					}
 				}
 			}
@@ -1657,29 +1659,29 @@ public abstract class Player extends Entity {
 		
 		else if (!ballColl) {
 			if (!leftHandInWorld) {
-				if (cycleTimeout > 5) {
+				if (time > 0.5f) {
 					enableHandDynColl(true);
 					enableUpperBodyDynColl();
 					
-					cycleTimeout = 0;
+					time = 0;
 				}
 				else
-					cycleTimeout++;
+					time+= delta;
 			}
 
 			else if (!rightHandInWorld) {
-				if (cycleTimeout > 5) {
+				if (time > 0.5f) {
 					enableHandDynColl(false);
 					enableUpperBodyDynColl();
 					
-					cycleTimeout = 0;
+					time = 0;
 				}
 				else
-					cycleTimeout++;
+					time+= delta;
 			}
 		}
 		else if(!leftHandInWorld || !rightHandInWorld)
-			cycleTimeout = 0;
+			time = 0;
 		
 		
 		if(leftPointBall)
