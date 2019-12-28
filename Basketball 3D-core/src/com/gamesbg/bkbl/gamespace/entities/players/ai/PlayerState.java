@@ -13,8 +13,6 @@ import com.gamesbg.bkbl.gamespace.objects.GameObject;
 
 public enum PlayerState implements State<Player> {
 	BALL_IN_HAND() {
-		
-		GameObject basket;
 
 		private void performShooting(Player player, Vector3 tempAimVec) {
 			AIMemory mem = player.getBrain().getMemory();
@@ -61,13 +59,7 @@ public enum PlayerState implements State<Player> {
 
 		@Override
 		public void enter(Player player) {
-			if(player instanceof Teammate)
-				basket = player.getMap().getAwayBasket();
-			else basket = player.getMap().getHomeBasket();
 			
-			player.getBrain().getPursue().setTarget(basket);
-			
-			player.getBrain().getBallSeparate().setEnabled(false);
 		}
 		
 		@Override
@@ -75,11 +67,7 @@ public enum PlayerState implements State<Player> {
 
 			AIMemory mem = player.getBrain().getMemory();
 
-			GameObject basket;
-			if (player instanceof Teammate)
-				basket = player.getMap().getAwayBasket();
-			else
-				basket = player.getMap().getHomeBasket();
+			GameObject basket = player.getTargetBasket();
 
 			// Ball behavior mechanism
 			if (mem.getAimingTime() > 0) {
@@ -122,18 +110,18 @@ public enum PlayerState implements State<Player> {
 					if (player.isEastSurround()) {
 						player.turnY(210 * Gdx.graphics.getDeltaTime());
 
-						if (mem.getAimingTime() == 0 && player.rightHolding() && mem.getSwitchHandTime() > 0.5f) {
+						if (player.rightHolding() && mem.getSwitchHandTime() > 0.5f) {
 							player.interactWithBallL();
 							mem.setSwitchHandTime(0);
 						}
 					} else if (player.isWestSurround()) {
 						player.turnY(-210 * Gdx.graphics.getDeltaTime());
 
-						if (mem.getAimingTime() == 0 && player.leftHolding() && mem.getSwitchHandTime() > 0.5f) {
+						if (player.leftHolding() && mem.getSwitchHandTime() > 0.5f) {
 							player.interactWithBallR();
 							mem.setSwitchHandTime(0);
 						}
-					} else if (mem.getAimingTime() == 0 && mem.getDribbleTime() > 0.75f) {
+					} else if (mem.getDribbleTime() > 0.75f) {
 						if (player.leftHolding())
 							player.interactWithBallL();
 						else if (player.rightHolding())
@@ -148,8 +136,11 @@ public enum PlayerState implements State<Player> {
 			mem.setSwitchHandTime(mem.getSwitchHandTime() + Gdx.graphics.getDeltaTime());
 
 			// Walking & running mechanism
+			if(player.isBehindBasket()) {
+				
+			}
 			
-			player.getBrain().getMultiSteer().calculateSteering(Player.steering);
+			player.getBrain().getMSBallInHand().calculateSteering(Player.steering);
 			player.getMoveVector().set(Player.steering.linear);
 			
 			player.setRunning();
@@ -195,7 +186,7 @@ public enum PlayerState implements State<Player> {
 		
 		@Override
 		public void enter(Player player) {
-			player.getBrain().getPursue().setTarget(player.getMap().getBall());
+			
 		}
 		
 		@Override
@@ -245,7 +236,7 @@ public enum PlayerState implements State<Player> {
 					//player.getMoveVector().nor().add(Player.steering.linear.cpy().scl(2.5f));
 				}else player.getBrain().getBallSeparate().setEnabled(false);
 				
-				player.getBrain().getMultiSteer().calculateSteering(Player.steering);
+				player.getBrain().getMSBallChase().calculateSteering(Player.steering);
 				
 				player.getMoveVector().set(Player.steering.linear);
 				
@@ -296,14 +287,14 @@ public enum PlayerState implements State<Player> {
 
 		@Override
 		public void update(Player player) {
-			Player tempPlayer;
+			Player holdingPlayer;
 			Matrix4 tempPlayerTrans;
 			if (player instanceof Teammate)
-				tempPlayer = player.getMap().getTeammateHolding();
+				holdingPlayer = player.getMap().getTeammateHolding();
 			else
-				tempPlayer = player.getMap().getOpponentHolding();
+				holdingPlayer = player.getMap().getOpponentHolding();
 
-			tempPlayerTrans = tempPlayer.getModelInstance().transform.cpy();
+			tempPlayerTrans = holdingPlayer.getModelInstance().transform.cpy();
 
 			Vector3 playerVec = player.getModelInstance().transform.getTranslation(new Vector3());
 
@@ -323,7 +314,7 @@ public enum PlayerState implements State<Player> {
 
 			switch (player.getPlayerIndex()) {
 			case 1:
-				if (player.getMap().getTeammates().size() == 2 && (tempPlayer.isAiming() || tempPlayer.isShooting()))
+				if (player.getMap().getTeammates().size() == 2 && (holdingPlayer.isAiming() || holdingPlayer.isShooting()))
 					dir = player.roamAround(tempPlayerTrans, blockTrans, 8, 8, false, false);
 				else
 					dir = player.roamAround(tempPlayerTrans, blockTrans, 3, -1, false, false);

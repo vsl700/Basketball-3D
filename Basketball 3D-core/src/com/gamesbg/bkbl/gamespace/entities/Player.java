@@ -31,6 +31,7 @@ import com.gamesbg.bkbl.gamespace.tools.CustomAnimation;
 import com.gamesbg.bkbl.gamespace.entities.players.Opponent;
 import com.gamesbg.bkbl.gamespace.entities.players.Teammate;
 import com.gamesbg.bkbl.gamespace.entities.players.ai.*;
+import com.gamesbg.bkbl.gamespace.objects.GameObject;
 import com.gamesbg.bkbl.gamespace.objects.ObjectType;
 
 public abstract class Player extends Entity {
@@ -113,6 +114,7 @@ public abstract class Player extends Entity {
 		stopBodyAnim();
 		
 		brain = new Brain(this);
+		
 		
 			//stateMachine = new DefaultStateMachine<Player, PlayerState>(this, PlayerState.IDLING);
 			//stateMachine.changeState(PlayerState.IDLING);
@@ -1500,7 +1502,7 @@ public abstract class Player extends Entity {
 			//float tempAng = steering.angular;
 			prevMoveVec.set(moveVec);
 			
-			moveVec.nor().scl(Gdx.graphics.getDeltaTime());
+			moveVec.nor().scl(Gdx.graphics.getDeltaTime()).y = 0;
 			//System.out.println(moveVec.x + " ; " + moveVec.y + " ; " + moveVec.z);
 			//float len = Math.abs(moveVec.x) + Math.abs(moveVec.z);
 			//System.out.println(len);
@@ -1835,6 +1837,10 @@ public abstract class Player extends Entity {
 			if(callback.reportNeighbor(map.getBall()))
 				return 1;
 			else return 0;
+		}else if(callback.equals(brain.getBasketSeparate())) {
+			if(callback.reportNeighbor(getTargetBasket()))
+				return 1;
+			else return 0;
 		}
 		
 		return super.findNeighbors(callback);
@@ -1855,6 +1861,11 @@ public abstract class Player extends Entity {
 	public Vector3 getPrevMoveVec() {
 		return prevMoveVec;
 	}
+	
+	/**
+	 * A player from one team should return the basket of the other team as a target
+	 */
+	public abstract GameObject getTargetBasket();
 	
 	public void setRunning() {
 		running = true;

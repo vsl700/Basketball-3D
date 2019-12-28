@@ -31,8 +31,11 @@ import com.gamesbg.bkbl.gamespace.entities.Ball;
 import com.gamesbg.bkbl.gamespace.entities.Entity;
 import com.gamesbg.bkbl.gamespace.entities.EntityType;
 import com.gamesbg.bkbl.gamespace.entities.Player;
+import com.gamesbg.bkbl.gamespace.objects.Basket;
+import com.gamesbg.bkbl.gamespace.objects.Camera;
 import com.gamesbg.bkbl.gamespace.objects.GameObject;
 import com.gamesbg.bkbl.gamespace.objects.ObjectType;
+import com.gamesbg.bkbl.gamespace.objects.Terrain;
 import com.gamesbg.bkbl.gamespace.tools.InputController;
 
 public class GameMap implements RaycastCollisionDetector<Vector3> {
@@ -86,10 +89,11 @@ public class GameMap implements RaycastCollisionDetector<Vector3> {
 	ArrayList<Player> teammates;
 	ArrayList<Player> opponents;
 	Player mainPlayer;
-	Entity ball;
+	Ball ball;
 	
-	GameObject terrain, basket1, basket2;
-	GameObject camera;
+	Terrain terrain;
+	Basket basket1, basket2;
+	Camera camera;
 	
 	btCollisionConfiguration dynCollConfig;
     btDispatcher dynDispatcher;
@@ -135,7 +139,7 @@ public class GameMap implements RaycastCollisionDetector<Vector3> {
 		collObjsInObjectMap = new HashMap<btCollisionObject, GameObject>();
 		collObjsValsMap = new HashMap<Integer, btCollisionObject>();		
 		
-		terrain = ObjectType.createGameObject(ObjectType.TERRAIN.getId(), this, 0, 0, 0);
+		terrain = (Terrain) ObjectType.createGameObject(ObjectType.TERRAIN.getId(), this, 0, 0, 0);
 		for(btRigidBody co : terrain.getBodies()) {
 			co.setUserValue(index);
 			
@@ -167,7 +171,7 @@ public class GameMap implements RaycastCollisionDetector<Vector3> {
 			index++;
 		}
 		
-		camera = ObjectType.createGameObject(ObjectType.CAMERA.getId(), this, 0, 0, 0);
+		camera = (Camera) ObjectType.createGameObject(ObjectType.CAMERA.getId(), this, 0, 0, 0);
 		for(btRigidBody co : camera.getBodies()) {
 			co.setUserValue(index);
 			co.setCollisionFlags(co.getCollisionFlags() | btCollisionObject.CollisionFlags.CF_CUSTOM_MATERIAL_CALLBACK);
@@ -182,7 +186,7 @@ public class GameMap implements RaycastCollisionDetector<Vector3> {
 			index++;
 		}
 			
-		basket1 = ObjectType.createGameObject(ObjectType.HOMEBASKET.getId(), this, 0.1f, 0, 27);
+		basket1 = (Basket) ObjectType.createGameObject(ObjectType.HOMEBASKET.getId(), this, 0.1f, 0, 27);
 		for(btRigidBody co : basket1.getBodies()) {
 			co.setUserValue(index);
 			dynamicsWorld.addRigidBody(co, OBJECT_FLAG, ALL_FLAG);
@@ -217,7 +221,7 @@ public class GameMap implements RaycastCollisionDetector<Vector3> {
 			index++;
 		}
 		
-		basket2 = ObjectType.createGameObject(ObjectType.AWAYBASKET.getId(), this, 0.1f, 0, -27);
+		basket2 = (Basket) ObjectType.createGameObject(ObjectType.AWAYBASKET.getId(), this, 0.1f, 0, -27);
 		basket2.setRotation(0, 1, 0, 180);
 		for(btRigidBody co : basket2.getBodies()) {
 			co.setUserValue(index);
@@ -434,7 +438,7 @@ public class GameMap implements RaycastCollisionDetector<Vector3> {
 	}
 	
 	private void createBall() {
-		ball = EntityType.createEntity(EntityType.BALL.getId(), this, new Vector3(0, 0, 0));
+		ball = (Ball) EntityType.createEntity(EntityType.BALL.getId(), this, new Vector3(0, 0, 0));
 		for (btRigidBody co : ball.getBodies()) {
 			co.setUserValue(index);
 			co.setCollisionFlags(co.getCollisionFlags() | btCollisionObject.CollisionFlags.CF_CUSTOM_MATERIAL_CALLBACK);
@@ -723,22 +727,22 @@ public class GameMap implements RaycastCollisionDetector<Vector3> {
 	}
 	
 	public Ball getBall() {
-		return (Ball) ball;
+		return ball;
 	}
 	
-	public GameObject getTerrain() {
+	public Terrain getTerrain() {
 		return terrain;
 	}
 	
-	public GameObject getHomeBasket() {
+	public Basket getHomeBasket() {
 		return basket1;
 	}
 	
-	public GameObject getAwayBasket() {
+	public Basket getAwayBasket() {
 		return basket2;
 	}
 	
-	public GameObject getCamera() {
+	public Camera getCamera() {
 		return camera;
 	}
 	
@@ -848,13 +852,13 @@ public class GameMap implements RaycastCollisionDetector<Vector3> {
 
 	@Override
 	public boolean collides(Ray<Vector3> ray) {
-		// TODO Auto-generated method stub
+		
 		return false;
 	}
 
 	@Override
 	public boolean findCollision(com.badlogic.gdx.ai.utils.Collision<Vector3> outputCollision, Ray<Vector3> inputRay) {
-		// TODO Auto-generated method stub
+		
 		return false;
 	}
 	
