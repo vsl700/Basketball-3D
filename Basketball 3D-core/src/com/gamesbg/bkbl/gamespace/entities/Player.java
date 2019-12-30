@@ -113,6 +113,7 @@ public abstract class Player extends Entity {
 		stopLegsAnim();
 		stopBodyAnim();
 		
+		//if(!isMainPlayer())
 		brain = new Brain(this);
 		
 		

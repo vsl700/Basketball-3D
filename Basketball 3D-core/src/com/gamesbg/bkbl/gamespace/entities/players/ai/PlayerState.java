@@ -8,6 +8,7 @@ import com.badlogic.gdx.math.Matrix4;
 import com.badlogic.gdx.math.Vector3;
 import com.gamesbg.bkbl.gamespace.entities.Ball;
 import com.gamesbg.bkbl.gamespace.entities.Player;
+import com.gamesbg.bkbl.gamespace.entities.players.Opponent;
 import com.gamesbg.bkbl.gamespace.entities.players.Teammate;
 import com.gamesbg.bkbl.gamespace.objects.GameObject;
 
@@ -184,9 +185,16 @@ public enum PlayerState implements State<Player> {
 
 	BALL_CHASING() {
 		
+		//To prevent from crowds when the AI tries to catch the ball we will choose only one player from a team to be catching the ball
+		Player teamBallCatcher, oppBallCatcher;
+		
 		@Override
 		public void enter(Player player) {
-			
+			if(teamBallCatcher == null && !player.getBrain().getMemory().isBallJustShot() && player instanceof Teammate) {
+				teamBallCatcher = player;
+			}else if(oppBallCatcher == null && !player.getBrain().getMemory().isBallJustShot() && player instanceof Opponent) {
+				oppBallCatcher = player;
+			}
 		}
 		
 		@Override
@@ -195,6 +203,10 @@ public enum PlayerState implements State<Player> {
 			// memory.get(player).setShootTime(0);
 			// memory.get(player).setAimingTime(0);
 			player.getBrain().getMemory().setBallJustShot(false);
+			player.getBrain().getBallSeparate().setEnabled(true);//Reset
+			player.getBrain().getCollAvoid().setEnabled(true);
+			
+			teamBallCatcher = oppBallCatcher = null;
 		}
 		
 		@Override
@@ -216,7 +228,7 @@ public enum PlayerState implements State<Player> {
 			
 
 			//If the following player hadn't just thrown the ball or the amount of players per team is 1 (if the fight is 1v1 the player will be always chasing the ball and trying to catch it)
-			if (!mem.isBallJustShot() || player.getMap().getTeammates().size() == 1) {
+			if (player.equals(teamBallCatcher) || player.equals(oppBallCatcher)) {
 				player.getBrain().getPursue().setArrivalTolerance(0.1f);
 
 				//player.getBrain().getPursue().calculateSteering(Player.steering);
@@ -240,21 +252,21 @@ public enum PlayerState implements State<Player> {
 				
 				player.getMoveVector().set(Player.steering.linear);
 				
-				Vector3 tempAvg = player.getPrevMoveVec().cpy().add(player.getMoveVector()).scl(0.5f); //Just to increase measurement accuracy (average of previous movement and current movement vec)
+				//Vector3 tempAvg = player.getPrevMoveVec().cpy().add(player.getMoveVector()).scl(0.5f); //Just to increase measurement accuracy (average of previous movement and current movement vec)
 				
 				//System.out.println(tempAvg.x + " ; " + tempAvg.y + " ; " + tempAvg.z);
-				if(Math.abs(tempAvg.x) + Math.abs(tempAvg.z) > 1.5f || Math.abs(tempBall.getLinearVelocity().x) + Math.abs(tempBall.getLinearVelocity().z) > 3.5f)
+				//if(Math.abs(tempAvg.x) + Math.abs(tempAvg.z) > 1.5f || Math.abs(tempBall.getLinearVelocity().x) + Math.abs(tempBall.getLinearVelocity().z) > 3.5f)
 					player.setRunning(); //RUUUN! GO CATCH THAT BALL!
 				
 				
-				if (mem.getCatchTime() > 0.5f) {
+				//if (mem.getCatchTime() > 0.5f) {
 					if (tempHandVec.idt(handVecs.get(0)))
 						player.interactWithBallL();
 					else
 						player.interactWithBallR();
-				}
+				//}
 			} else {
-				player.getBrain().getPursue().setArrivalTolerance(8);
+				player.getBrain().getPursue().setArrivalTolerance(4);
 
 				player.getBrain().getPursue().calculateSteering(Player.steering);
 				// System.out.println(Player.steering.linear.cpy().x);
@@ -309,14 +321,17 @@ public enum PlayerState implements State<Player> {
 
 			Ball tempBall = player.getMap().getBall();
 
+			if(player.getPosition().dst(tempBall.getPosition()) > 6)
+				player.setRunning();
+			
 			//Matrix4 blockTrans = new Matrix4();
-			if(player.getPlayerIndex() == 1 || player.getPlayerIndex() == 2 || holdingPlayer.isAiming() || holdingPlayer.isShooting()) {
+			if(player.getPlayerIndex() == 1 || player.getPlayerIndex() == 2 || ((holdingPlayer.isAiming() || holdingPlayer.isShooting()) && !player.isInAwayBasketZone())) {
 				if (mem.getBlockPlayer() == null) {
 					Player targetToBlock = getClosestPlayer(tempBall.getPosition(), tempOpp, ignored);
 					mem.setBlockPlayer(targetToBlock);
 					ignored.add(targetToBlock);
 
-					brain.getInterpose().setEnabled(false);
+					brain.getInterpose().setEnabled(true);
 					brain.getInterpose().setAgentA(tempBall);
 					brain.getInterpose().setAgentB(targetToBlock);
 					
@@ -541,9 +556,18 @@ public enum PlayerState implements State<Player> {
 	 * @return The player which is closest to the given position
 	 */
 	protected Player getClosestPlayer(Vector3 position, ArrayList<Player> players, ArrayList<Player> ignored) {
-		Player tempPlayer = players.get(0);
+		int count = 0;
+		Player tempPlayer = null;
+		for(int i = 0; i < players.size(); i++) {
+			if(ignored.contains(players.get(i))) //They can't be all players ignored, there's always someone left free
+				continue;
+			
+			tempPlayer = players.get(i);
+			count = i;
+		}
+		
 		float dist = position.dst2(tempPlayer.getPosition());
-		for (int i = 1; i < players.size(); i++) {
+		for (int i = count; i < players.size(); i++) {
 			Player tempPlayer2 = players.get(i);
 			if(ignored.contains(tempPlayer2))
 				continue;

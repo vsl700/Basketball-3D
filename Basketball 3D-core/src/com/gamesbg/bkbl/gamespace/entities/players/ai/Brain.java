@@ -71,14 +71,14 @@ public class Brain {
 		obstAvoid = new RaycastObstacleAvoidance<Vector3>(user, rayConfig, user.getMap());
 		
 		mSBallChase = new BlendedSteering<Vector3>(user);
-		mSBallChase.add(collAvoid, 0.5f);
-		mSBallChase.add(ballSeparate, 0.5f);
-		mSBallChase.add(pursue, 1);
+		mSBallChase.add(collAvoid, 0.8f);
+		mSBallChase.add(ballSeparate, 1f);
+		mSBallChase.add(pursue, 1.2f);
 		
 		mSBallInHand = new BlendedSteering<Vector3>(user);
-		mSBallInHand.add(collAvoid, 1.3f);
+		mSBallInHand.add(collAvoid, 0.7f);
 		mSBallInHand.add(basketSeparate, 0.6f);
-		mSBallInHand.add(pursueBallInHand, 1);
+		mSBallInHand.add(pursueBallInHand, 1.3f);
 		
 		mSCoop = new BlendedSteering<Vector3>(user);
 		mSCoop.add(collAvoid, 1.3f);
