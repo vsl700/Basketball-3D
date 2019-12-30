@@ -7,6 +7,7 @@ import com.badlogic.gdx.ai.fsm.StateMachine;
 import com.badlogic.gdx.ai.steer.behaviors.Arrive;
 import com.badlogic.gdx.ai.steer.behaviors.BlendedSteering;
 import com.badlogic.gdx.ai.steer.behaviors.CollisionAvoidance;
+import com.badlogic.gdx.ai.steer.behaviors.Interpose;
 import com.badlogic.gdx.ai.steer.behaviors.LookWhereYouAreGoing;
 import com.badlogic.gdx.ai.steer.behaviors.RaycastObstacleAvoidance;
 import com.badlogic.gdx.ai.steer.behaviors.Separation;
@@ -40,9 +41,10 @@ public class Brain {
 	Arrive<Vector3> pursue, pursueBallInHand, customPursue;
 	LookWhereYouAreGoing<Vector3> lookAt;
 	CollisionAvoidance<Vector3> collAvoid; //For players and basket stands
+	Interpose<Vector3> interpose; //For blocking opponents from getting close to the player holding the ball in co-op state
 	Separation<Vector3> ballSeparate, basketSeparate; //For player and basket surroundings and ball distance keeping
 	RaycastObstacleAvoidance<Vector3> obstAvoid; //For invisible terrain walls
-	BlendedSteering<Vector3> mSBallChase, mSBallInHand;
+	BlendedSteering<Vector3> mSBallChase, mSBallInHand, mSCoop;
 	
 	RayConfiguration<Vector3> rayConfig;
 	
@@ -61,7 +63,8 @@ public class Brain {
 		user.setMaxLinearAcceleration(1);
 		lookAt = new LookWhereYouAreGoing<Vector3>(user);
 		collAvoid = new CollisionAvoidance<Vector3>(user, user);
-		ballSeparate = new Separation<Vector3>(user, user);
+		interpose = new Interpose<Vector3>(user, null, null);
+		ballSeparate = new Separation<Vector3>(user, user); //The differences between those two behaviors are in the overrided findNeighbors void in the Player class
 		basketSeparate = new Separation<Vector3>(user, user);
 		
 		rayConfig = new ParallelSideRayConfiguration<Vector3>(user, 3, 0.5f);
@@ -76,6 +79,12 @@ public class Brain {
 		mSBallInHand.add(collAvoid, 1.3f);
 		mSBallInHand.add(basketSeparate, 0.6f);
 		mSBallInHand.add(pursueBallInHand, 1);
+		
+		mSCoop = new BlendedSteering<Vector3>(user);
+		mSCoop.add(collAvoid, 1.3f);
+		mSCoop.add(pursue, 1);
+		mSCoop.add(interpose, 1.2f);
+		mSCoop.add(ballSeparate, 0.5f);
 	}
 	
 	public void update() {
@@ -138,6 +147,22 @@ public class Brain {
 
 	public CollisionAvoidance<Vector3> getCollAvoid() {
 		return collAvoid;
+	}
+
+	public CustomSteerable getCustomTarget() {
+		return customTarget;
+	}
+
+	public void setCustomTarget(CustomSteerable customTarget) {
+		this.customTarget = customTarget;
+	}
+
+	public Interpose<Vector3> getInterpose() {
+		return interpose;
+	}
+
+	public BlendedSteering<Vector3> getMSCoop() {
+		return mSCoop;
 	}
 
 	public Separation<Vector3> getBallSeparate() {

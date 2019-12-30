@@ -287,28 +287,55 @@ public enum PlayerState implements State<Player> {
 
 		@Override
 		public void update(Player player) {
+			Brain brain = player.getBrain();
+			AIMemory mem = brain.getMemory();
+			
 			Player holdingPlayer;
-			Matrix4 tempPlayerTrans;
-			if (player instanceof Teammate)
-				holdingPlayer = player.getMap().getTeammateHolding();
-			else
-				holdingPlayer = player.getMap().getOpponentHolding();
-
-			tempPlayerTrans = holdingPlayer.getModelInstance().transform.cpy();
-
-			Vector3 playerVec = player.getModelInstance().transform.getTranslation(new Vector3());
-
 			ArrayList<Player> tempOpp;
-			if (player instanceof Teammate)
+			//ArrayList<Player> tempTeam;
+			//Matrix4 tempPlayerTrans;
+			if (player instanceof Teammate) {
+				holdingPlayer = player.getMap().getTeammateHolding();
 				tempOpp = player.getMap().getOpponents();
-			else
+				//tempTeam = player.getMap().getTeammates();
+			}else {
+				holdingPlayer = player.getMap().getOpponentHolding();
 				tempOpp = player.getMap().getTeammates();
+				//tempTeam = player.getMap().getOpponents();
+			}
+			//tempPlayerTrans = holdingPlayer.getModelInstance().transform.cpy();
 
-			Matrix4 blockTrans = new Matrix4();
+			//Vector3 playerVec = player.getModelInstance().transform.getTranslation(new Vector3());
 
-			Vector3 tempVec = getShortestDistance(playerVec, tempOpp);
+			Ball tempBall = player.getMap().getBall();
 
-			blockTrans.setToTranslation(tempVec);
+			//Matrix4 blockTrans = new Matrix4();
+			if(player.getPlayerIndex() == 1 || player.getPlayerIndex() == 2 || holdingPlayer.isAiming() || holdingPlayer.isShooting()) {
+				if (mem.getBlockPlayer() == null) {
+					Player targetToBlock = getClosestPlayer(tempBall.getPosition(), tempOpp, ignored);
+					mem.setBlockPlayer(targetToBlock);
+					ignored.add(targetToBlock);
+
+					brain.getInterpose().setEnabled(false);
+					brain.getInterpose().setAgentA(tempBall);
+					brain.getInterpose().setAgentB(targetToBlock);
+					
+					player.lookAt(targetToBlock.getPosition());
+				}else player.lookAt(holdingPlayer.getPosition());
+			}else {
+				player.lookAt(holdingPlayer.getPosition());
+				brain.getInterpose().setEnabled(false);
+			}
+			/*else if(mem.getBlockPlayer() != null) {
+					ignored.remove(mem.getBlockPlayer());
+					mem.setBlockPlayer(null);
+			}*/
+			brain.getMSCoop().calculateSteering(Player.steering);
+			player.getMoveVector().set(Player.steering.linear);
+			
+			//Vector3 tempVec = getShortestDistance(player.getPosition(), tempOpp);
+
+			/*blockTrans.setToTranslation(tempVec);
 
 			Vector3 dir;
 
@@ -337,7 +364,13 @@ public enum PlayerState implements State<Player> {
 				break;
 			}
 
-			player.lookAt(dir);
+			player.lookAt(dir);*/
+		}
+		
+		@Override
+		public void exit(Player player) {
+			ignored.remove(player.getBrain().getMemory().getBlockPlayer());
+			player.getBrain().getMemory().setBlockPlayer(null);
 		}
 	},
 
@@ -420,6 +453,8 @@ public enum PlayerState implements State<Player> {
 
 	// float dribbleTime, aimingTime, shootTime, switchHandTime;
 
+	ArrayList<Player> ignored = new ArrayList<Player>();
+	
 	@Override
 	public void enter(Player entity) {
 
@@ -435,6 +470,22 @@ public enum PlayerState implements State<Player> {
 
 		return false;
 	}
+	
+	/*protected boolean ignorePlayer(Player player) {
+		for (Player p : player.getMap().getTeammates()) {
+			Player tempP = p.getBrain().getMemory().getBlockPlayer();
+			if (tempP != null && tempP.equals(player))
+				return true;
+		}
+		
+		for (Player p : player.getMap().getOpponents()) {
+			Player tempP = p.getBrain().getMemory().getBlockPlayer();
+			if (tempP != null && tempP.equals(player))
+				return true;
+		}
+		
+		return false;
+	}*/
 
 	/**
 	 * 
@@ -445,14 +496,14 @@ public enum PlayerState implements State<Player> {
 	 */
 	protected Vector3 getShortestDistanceWVectors(Vector3 position, ArrayList<Vector3> positions) {
 		Vector3 tempVec = positions.get(0);
-		float dist = position.dst(tempVec);
+		float dist = position.dst2(tempVec);
 		for (int i = 1; i < positions.size(); i++) {
 			// Matrix4 tempTrans2 =
 			// position.get(i).getModelInstance().transform;
 
 			Vector3 tempVec2 = positions.get(i);
 
-			float dist2 = position.dst(tempVec2);
+			float dist2 = position.dst2(tempVec2);
 
 			if (dist2 < dist) {
 				dist = dist2;
@@ -464,15 +515,13 @@ public enum PlayerState implements State<Player> {
 	}
 
 	protected Vector3 getShortestDistance(Vector3 position, ArrayList<Player> players) {
-		Vector3 tempVec = players.get(0).getModelInstance().transform.getTranslation(new Vector3());
-		float dist = position.dst(tempVec);
+		Vector3 tempVec = players.get(0).getPosition();
+		float dist = position.dst2(tempVec);
 		// Vector3 diff = position.cpy().sub(tempTeamVec);
 		for (int i = 1; i < players.size(); i++) {
-			Matrix4 tempTrans2 = players.get(i).getModelInstance().transform;
+			Vector3 tempVec2 = players.get(i).getPosition();
 
-			Vector3 tempVec2 = tempTrans2.getTranslation(new Vector3());
-
-			float dist2 = position.dst(tempVec2);
+			float dist2 = position.dst2(tempVec2);
 
 			if (dist2 < dist) {
 				dist = dist2;
@@ -481,6 +530,33 @@ public enum PlayerState implements State<Player> {
 		}
 
 		return tempVec;
+	}
+	
+	/**
+	 * 
+	 * @param position - The position of the player that wants to interact with the closest to it player
+	 * @param players - The players for check for distances
+	 * @param ignored - Players that should be ignored (for example if we are using this to see which player we should block from getting somewhere, the next player should ignore
+	 * him and find someone else to ignore. For example in the co-op state)
+	 * @return The player which is closest to the given position
+	 */
+	protected Player getClosestPlayer(Vector3 position, ArrayList<Player> players, ArrayList<Player> ignored) {
+		Player tempPlayer = players.get(0);
+		float dist = position.dst2(tempPlayer.getPosition());
+		for (int i = 1; i < players.size(); i++) {
+			Player tempPlayer2 = players.get(i);
+			if(ignored.contains(tempPlayer2))
+				continue;
+
+			float dist2 = position.dst2(tempPlayer2.getPosition());
+
+			if (dist2 < dist) {
+				dist = dist2;
+				tempPlayer = tempPlayer2;
+			}
+		}
+		
+		return tempPlayer;
 	}
 
 }
