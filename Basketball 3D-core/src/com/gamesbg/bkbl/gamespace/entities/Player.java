@@ -818,7 +818,7 @@ public abstract class Player extends Entity {
 	}
 	
 	public void walk(Vector3 dir) {
-		if(dir.isZero(0.000035f))
+		if(dir.isZero(0.00001f))
 			return;
 		
 		if(running && !isAiming() && !isShooting()) {
@@ -1501,9 +1501,10 @@ public abstract class Player extends Entity {
 			brain.update();
 			//Vector3 tempVec = moveVec.add(new Vector3(steering.linear.cpy().x, 0, steering.linear.cpy().y)).scl(0.5f);
 			//float tempAng = steering.angular;
+			moveVec.y = 0;
 			prevMoveVec.set(moveVec);
 			
-			moveVec.nor().scl(Gdx.graphics.getDeltaTime()).y = 0;
+			moveVec.nor().scl(Gdx.graphics.getDeltaTime());
 			//System.out.println(moveVec.x + " ; " + moveVec.y + " ; " + moveVec.z);
 			//float len = Math.abs(moveVec.x) + Math.abs(moveVec.z);
 			//System.out.println(len);
@@ -1842,9 +1843,26 @@ public abstract class Player extends Entity {
 			if(callback.reportNeighbor(getTargetBasket()))
 				return 1;
 			else return 0;
+		}else if(callback.equals(brain.getPlayerSeparate())) {
+			int count = 0;
+			if(this instanceof Teammate) {
+				for(Player p : map.getTeammates())
+					if(callback.reportNeighbor(p))
+						count++;
+			}else
+				for(Player p : map.getOpponents())
+					if(callback.reportNeighbor(p))
+						count++;
+			
+			return count;
 		}
 		
 		return super.findNeighbors(callback);
+	}
+	
+	@Override
+	public float getOrientation() {
+		return vectorToAngle(moveVec);
 	}
 
 	public Matrix4 getCamMatrix() {

@@ -42,7 +42,7 @@ public class Brain {
 	LookWhereYouAreGoing<Vector3> lookAt;
 	CollisionAvoidance<Vector3> collAvoid; //For players and basket stands
 	Interpose<Vector3> interpose; //For blocking opponents from getting close to the player holding the ball in co-op state
-	Separation<Vector3> ballSeparate, basketSeparate; //For player and basket surroundings and ball distance keeping
+	Separation<Vector3> ballSeparate, basketSeparate, playerSeparate; //For player and basket surroundings and ball distance keeping
 	RaycastObstacleAvoidance<Vector3> obstAvoid; //For invisible terrain walls
 	BlendedSteering<Vector3> mSBallChase, mSBallInHand, mSCoop;
 	
@@ -66,25 +66,27 @@ public class Brain {
 		interpose = new Interpose<Vector3>(user, null, null);
 		ballSeparate = new Separation<Vector3>(user, user); //The differences between those two behaviors are in the overrided findNeighbors void in the Player class
 		basketSeparate = new Separation<Vector3>(user, user);
+		playerSeparate = new Separation<Vector3>(user, user);
 		
 		rayConfig = new ParallelSideRayConfiguration<Vector3>(user, 3, 0.5f);
 		obstAvoid = new RaycastObstacleAvoidance<Vector3>(user, rayConfig, user.getMap());
 		
 		mSBallChase = new BlendedSteering<Vector3>(user);
 		mSBallChase.add(collAvoid, 0.8f);
+		mSBallChase.add(playerSeparate, 1f);
 		mSBallChase.add(ballSeparate, 1f);
 		mSBallChase.add(pursue, 1.2f);
 		
 		mSBallInHand = new BlendedSteering<Vector3>(user);
-		mSBallInHand.add(collAvoid, 0.7f);
+		mSBallInHand.add(collAvoid, 1f);
 		mSBallInHand.add(basketSeparate, 0.6f);
 		mSBallInHand.add(pursueBallInHand, 1.3f);
 		
 		mSCoop = new BlendedSteering<Vector3>(user);
-		mSCoop.add(collAvoid, 1.3f);
-		mSCoop.add(pursue, 1);
+		mSCoop.add(collAvoid, 0.8f);
+		//mSCoop.add(pursue, 1);
 		mSCoop.add(interpose, 1.2f);
-		mSCoop.add(ballSeparate, 0.5f);
+		//mSCoop.add(playerSeparate, 0.9f);
 	}
 	
 	public void update() {
@@ -171,6 +173,10 @@ public class Brain {
 	
 	public Separation<Vector3> getBasketSeparate() {
 		return basketSeparate;
+	}
+
+	public Separation<Vector3> getPlayerSeparate() {
+		return playerSeparate;
 	}
 
 	public RaycastObstacleAvoidance<Vector3> getObstAvoid() {

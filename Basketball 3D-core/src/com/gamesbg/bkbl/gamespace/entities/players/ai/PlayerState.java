@@ -230,7 +230,8 @@ public enum PlayerState implements State<Player> {
 			//If the following player hadn't just thrown the ball or the amount of players per team is 1 (if the fight is 1v1 the player will be always chasing the ball and trying to catch it)
 			if (player.equals(teamBallCatcher) || player.equals(oppBallCatcher)) {
 				player.getBrain().getPursue().setArrivalTolerance(0.1f);
-
+				player.getBrain().getPlayerSeparate().setEnabled(false);
+				player.getBrain().getBallSeparate().setEnabled(false);
 				//player.getBrain().getPursue().calculateSteering(Player.steering);
 				
 				
@@ -267,6 +268,8 @@ public enum PlayerState implements State<Player> {
 				//}
 			} else {
 				player.getBrain().getPursue().setArrivalTolerance(4);
+				player.getBrain().getPlayerSeparate().setEnabled(true);
+				player.getBrain().getBallSeparate().setEnabled(true);
 
 				player.getBrain().getPursue().calculateSteering(Player.steering);
 				// System.out.println(Player.steering.linear.cpy().x);
@@ -320,33 +323,35 @@ public enum PlayerState implements State<Player> {
 			//Vector3 playerVec = player.getModelInstance().transform.getTranslation(new Vector3());
 
 			Ball tempBall = player.getMap().getBall();
-
-			if(player.getPosition().dst(tempBall.getPosition()) > 6)
-				player.setRunning();
 			
 			//Matrix4 blockTrans = new Matrix4();
-			if(player.getPlayerIndex() == 1 || player.getPlayerIndex() == 2 || ((holdingPlayer.isAiming() || holdingPlayer.isShooting()) && !player.isInAwayBasketZone())) {
+			//if(!player.isAiming() && !player.isShooting() || !player.isInAwayBasketZone()) {
 				if (mem.getBlockPlayer() == null) {
 					Player targetToBlock = getClosestPlayer(tempBall.getPosition(), tempOpp, ignored);
 					mem.setBlockPlayer(targetToBlock);
 					ignored.add(targetToBlock);
 
-					brain.getInterpose().setEnabled(true);
+					//brain.getInterpose().setEnabled(true);
 					brain.getInterpose().setAgentA(tempBall);
 					brain.getInterpose().setAgentB(targetToBlock);
 					
-					player.lookAt(targetToBlock.getPosition());
-				}else player.lookAt(holdingPlayer.getPosition());
-			}else {
-				player.lookAt(holdingPlayer.getPosition());
-				brain.getInterpose().setEnabled(false);
-			}
+					//player.lookAt(targetToBlock.getPosition());
+				}//else player.lookAt(holdingPlayer.getPosition());
+			//}else {
+				
+				//brain.getInterpose().setEnabled(false);
+			//}
+			
+			player.lookAt(holdingPlayer.getPosition());
 			/*else if(mem.getBlockPlayer() != null) {
 					ignored.remove(mem.getBlockPlayer());
 					mem.setBlockPlayer(null);
 			}*/
 			brain.getMSCoop().calculateSteering(Player.steering);
 			player.getMoveVector().set(Player.steering.linear);
+			
+			if(player.getPosition().dst(tempBall.getPosition()) > 6 || player.getMoveVector().len() > 6)
+				player.setRunning();
 			
 			//Vector3 tempVec = getShortestDistance(player.getPosition(), tempOpp);
 
