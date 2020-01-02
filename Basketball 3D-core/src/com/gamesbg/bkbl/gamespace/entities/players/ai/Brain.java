@@ -63,18 +63,18 @@ public class Brain {
 		user.setMaxLinearAcceleration(1);
 		lookAt = new LookWhereYouAreGoing<Vector3>(user);
 		collAvoid = new CollisionAvoidance<Vector3>(user, user);
-		interpose = new Interpose<Vector3>(user, null, null);
-		ballSeparate = new Separation<Vector3>(user, user); //The differences between those two behaviors are in the overrided findNeighbors void in the Player class
-		basketSeparate = new Separation<Vector3>(user, user);
-		playerSeparate = new Separation<Vector3>(user, user);
+		interpose = new Interpose<Vector3>(user, null, null, 0.8f);
+		ballSeparate = new Separation<Vector3>(user, user); //The differences between these behaviors are in the overrided findNeighbors void in the Player class
+		basketSeparate = new Separation<Vector3>(user, user);//
+		playerSeparate = new Separation<Vector3>(user, user);//
 		
 		rayConfig = new ParallelSideRayConfiguration<Vector3>(user, 3, 0.5f);
 		obstAvoid = new RaycastObstacleAvoidance<Vector3>(user, rayConfig, user.getMap());
 		
 		mSBallChase = new BlendedSteering<Vector3>(user);
-		mSBallChase.add(collAvoid, 0.8f);
-		mSBallChase.add(playerSeparate, 1f);
-		mSBallChase.add(ballSeparate, 1f);
+		mSBallChase.add(collAvoid, 1f);
+		mSBallChase.add(playerSeparate, 2.4f);
+		mSBallChase.add(ballSeparate, 2.4f);
 		mSBallChase.add(pursue, 1.2f);
 		
 		mSBallInHand = new BlendedSteering<Vector3>(user);
@@ -83,7 +83,7 @@ public class Brain {
 		mSBallInHand.add(pursueBallInHand, 1.3f);
 		
 		mSCoop = new BlendedSteering<Vector3>(user);
-		mSCoop.add(collAvoid, 0.8f);
+		mSCoop.add(collAvoid, 1f);
 		//mSCoop.add(pursue, 1);
 		mSCoop.add(interpose, 1.2f);
 		//mSCoop.add(playerSeparate, 0.9f);

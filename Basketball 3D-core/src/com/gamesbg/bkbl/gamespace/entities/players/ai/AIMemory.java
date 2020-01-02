@@ -21,6 +21,7 @@ public class AIMemory {
 	float distDiff, resetTime;
 	
 	boolean ballJustShot;
+	boolean ballChaser; //Whether this player is chosen to chase the ball while in chase mode
 	
 	public AIMemory() {
 		shootTime = 20;
@@ -113,6 +114,14 @@ public class AIMemory {
 
 	public void setBallJustShot(boolean ballJustShot) {
 		this.ballJustShot = ballJustShot;
+	}
+
+	public boolean isBallChaser() {
+		return ballChaser;
+	}
+
+	public void setBallChaser(boolean ballChaser) {
+		this.ballChaser = ballChaser;
 	}
 	
 	

@@ -1847,11 +1847,23 @@ public abstract class Player extends Entity {
 			int count = 0;
 			if(this instanceof Teammate) {
 				for(Player p : map.getTeammates())
-					if(callback.reportNeighbor(p))
+					if(!p.equals(this) && callback.reportNeighbor(p))
 						count++;
 			}else
 				for(Player p : map.getOpponents())
-					if(callback.reportNeighbor(p))
+					if(!p.equals(this) && callback.reportNeighbor(p))
+						count++;
+			
+			return count;
+		}else if(callback.equals(brain.getCollAvoid())) {
+			int count = 0;
+			//if(this instanceof Teammate) {
+				for(Player p : map.getTeammates())
+					if(!p.equals(this) && ((p.isMainPlayer() && !p.getBrain().getStateMachine().isInState(PlayerState.BALL_CHASING)) || !p.getBrain().getMemory().isBallChaser()) && callback.reportNeighbor(p))
+						count++;
+			//}else
+				for(Player p : map.getOpponents())
+					if(!p.equals(this) && !p.getBrain().getMemory().isBallChaser() && callback.reportNeighbor(p))
 						count++;
 			
 			return count;

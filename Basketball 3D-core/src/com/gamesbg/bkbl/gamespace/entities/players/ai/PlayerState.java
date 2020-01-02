@@ -186,14 +186,16 @@ public enum PlayerState implements State<Player> {
 	BALL_CHASING() {
 		
 		//To prevent from crowds when the AI tries to catch the ball we will choose only one player from a team to be catching the ball
-		Player teamBallCatcher, oppBallCatcher;
+		boolean teamBallCatcher, oppBallCatcher; //Flags
 		
 		@Override
 		public void enter(Player player) {
-			if(teamBallCatcher == null && !player.getBrain().getMemory().isBallJustShot() && player instanceof Teammate) {
-				teamBallCatcher = player;
-			}else if(oppBallCatcher == null && !player.getBrain().getMemory().isBallJustShot() && player instanceof Opponent) {
-				oppBallCatcher = player;
+			if(!teamBallCatcher && !player.getBrain().getMemory().isBallJustShot() && player instanceof Teammate) {
+				teamBallCatcher = true;
+				player.getBrain().getMemory().setBallChaser(true);
+			}else if(!oppBallCatcher && !player.getBrain().getMemory().isBallJustShot() && player instanceof Opponent) {
+				oppBallCatcher = true;
+				player.getBrain().getMemory().setBallChaser(true);
 			}
 		}
 		
@@ -206,7 +208,9 @@ public enum PlayerState implements State<Player> {
 			player.getBrain().getBallSeparate().setEnabled(true);//Reset
 			player.getBrain().getCollAvoid().setEnabled(true);
 			
-			teamBallCatcher = oppBallCatcher = null;
+			player.getBrain().getMemory().setBallChaser(false);
+			
+			teamBallCatcher = oppBallCatcher = false;
 		}
 		
 		@Override
@@ -228,10 +232,10 @@ public enum PlayerState implements State<Player> {
 			
 
 			//If the following player hadn't just thrown the ball or the amount of players per team is 1 (if the fight is 1v1 the player will be always chasing the ball and trying to catch it)
-			if (player.equals(teamBallCatcher) || player.equals(oppBallCatcher)) {
+			if (player.getBrain().getMemory().isBallChaser()) {
 				player.getBrain().getPursue().setArrivalTolerance(0.1f);
 				player.getBrain().getPlayerSeparate().setEnabled(false);
-				player.getBrain().getBallSeparate().setEnabled(false);
+				//player.getBrain().getBallSeparate().setEnabled(false);
 				//player.getBrain().getPursue().calculateSteering(Player.steering);
 				
 				
@@ -267,11 +271,12 @@ public enum PlayerState implements State<Player> {
 						player.interactWithBallR();
 				//}
 			} else {
-				player.getBrain().getPursue().setArrivalTolerance(4);
+				//player.getBrain().getPursue().setArrivalTolerance(6);
 				player.getBrain().getPlayerSeparate().setEnabled(true);
 				player.getBrain().getBallSeparate().setEnabled(true);
+				player.getBrain().getCollAvoid().setEnabled(false);
 
-				player.getBrain().getPursue().calculateSteering(Player.steering);
+				player.getBrain().getMSBallChase().calculateSteering(Player.steering);
 				// System.out.println(Player.steering.linear.cpy().x);
 				player.getMoveVector().set(Player.steering.linear);
 
