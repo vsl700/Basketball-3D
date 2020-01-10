@@ -6,9 +6,9 @@ import com.badlogic.gdx.ai.fsm.State;
 import com.badlogic.gdx.ai.msg.Telegram;
 import com.badlogic.gdx.math.Matrix4;
 import com.badlogic.gdx.math.Vector3;
+import com.gamesbg.bkbl.gamespace.GameMap;
 import com.gamesbg.bkbl.gamespace.entities.Ball;
 import com.gamesbg.bkbl.gamespace.entities.Player;
-import com.gamesbg.bkbl.gamespace.entities.players.Opponent;
 import com.gamesbg.bkbl.gamespace.entities.players.Teammate;
 import com.gamesbg.bkbl.gamespace.objects.GameObject;
 
@@ -185,17 +185,54 @@ public enum PlayerState implements State<Player> {
 
 	BALL_CHASING() {
 		
-		//To prevent from crowds when the AI tries to catch the ball we will choose only one player from a team to be catching the ball
-		boolean teamBallCatcher, oppBallCatcher; //Flags
+		//To prevent from crowds when the AI tries to catch the ball we will choose only one player from each team to be catching the ball
+		boolean catchersChosen; //Flags
+		
+		private void chooseCatcher(GameMap map) {
+			Ball tempBall = map.getBall();
+			
+			//Optimize
+			ArrayList<Player> justShot = new ArrayList<Player>();
+			for(Player p : map.getTeammates())
+				if(p.getBrain().getMemory().isBallJustShot()) {
+					justShot.add(p);
+					break;
+				}
+			
+			for(Player p : map.getOpponents())
+				if(p.getBrain().getMemory().isBallJustShot()) {
+					justShot.add(p);
+					break;
+				}
+			
+			Player tempTeam = getClosestPlayer(tempBall.getPosition(), map.getTeammates(), justShot);
+			tempTeam.getBrain().getMemory().setBallChaser(true);
+			
+			Player tempOpp = getClosestPlayer(tempBall.getPosition(), map.getOpponents(), justShot);
+			tempOpp.getBrain().getMemory().setBallChaser(true);
+			
+			catchersChosen = true;
+		}
 		
 		@Override
 		public void enter(Player player) {
-			if(!teamBallCatcher && !player.getBrain().getMemory().isBallJustShot() && player instanceof Teammate) {
-				teamBallCatcher = true;
-				player.getBrain().getMemory().setBallChaser(true);
-			}else if(!oppBallCatcher && !player.getBrain().getMemory().isBallJustShot() && player instanceof Opponent) {
-				oppBallCatcher = true;
-				player.getBrain().getMemory().setBallChaser(true);
+			if(!catchersChosen)
+				chooseCatcher(player.getMap());
+			
+			if (player.getBrain().getMemory().isBallChaser()) {
+				player.getBrain().getPursue().setArrivalTolerance(0.1f);
+				player.getBrain().getPlayerSeparate().setEnabled(false);
+
+				if (player.getMap().getTeammates().size() > 1) {
+					// player.getBrain().getCollAvoid().calculateSteering(Player.steering);
+					player.getBrain().getCollAvoid().setEnabled(true);
+					// player.getMoveVector().add(Player.steering.linear.cpy().scl(0.9f));
+				} else
+					player.getBrain().getCollAvoid().setEnabled(false);
+			}else {
+				//player.getBrain().getPursue().setArrivalTolerance(6);
+				player.getBrain().getPlayerSeparate().setEnabled(true);
+				player.getBrain().getCollAvoid().setEnabled(false);
 			}
 		}
 		
@@ -210,7 +247,7 @@ public enum PlayerState implements State<Player> {
 			
 			player.getBrain().getMemory().setBallChaser(false);
 			
-			teamBallCatcher = oppBallCatcher = false;
+			catchersChosen = false;
 		}
 		
 		@Override
@@ -231,23 +268,9 @@ public enum PlayerState implements State<Player> {
 			// player.getBrain().lookAt.calculateSteering(Player.steering);
 			
 
-			//If the following player hadn't just thrown the ball or the amount of players per team is 1 (if the fight is 1v1 the player will be always chasing the ball and trying to catch it)
+			//If the following player hadn't just thrown the ball
 			if (player.getBrain().getMemory().isBallChaser()) {
-				player.getBrain().getPursue().setArrivalTolerance(0.1f);
-				player.getBrain().getPlayerSeparate().setEnabled(false);
-				//player.getBrain().getBallSeparate().setEnabled(false);
-				//player.getBrain().getPursue().calculateSteering(Player.steering);
-				
-				
-				// player.getBrain().obstAvoid.calculateSteering(Player.steering);
-				if(player.getMap().getTeammates().size() > 1) {
-					//player.getBrain().getCollAvoid().calculateSteering(Player.steering);
-					player.getBrain().getCollAvoid().setEnabled(true);
-					//player.getMoveVector().add(Player.steering.linear.cpy().scl(0.9f));
-				}
-				else player.getBrain().getCollAvoid().setEnabled(false);
-				
-				if(player.getMap().getBall().getPosition().y > player.getHeight()) {
+				if(player.getMap().getBall().getPosition().y > player.getHeight() && tempBall.getNeighborPlayers().contains(player)) {
 					player.getBrain().getBallSeparate().setEnabled(true);
 					//player.getBrain().getBallSeparate().calculateSteering(Player.steering);
 					//player.getMoveVector().nor().add(Player.steering.linear.cpy().scl(2.5f));
@@ -271,11 +294,6 @@ public enum PlayerState implements State<Player> {
 						player.interactWithBallR();
 				//}
 			} else {
-				//player.getBrain().getPursue().setArrivalTolerance(6);
-				player.getBrain().getPlayerSeparate().setEnabled(true);
-				player.getBrain().getBallSeparate().setEnabled(true);
-				player.getBrain().getCollAvoid().setEnabled(false);
-
 				player.getBrain().getMSBallChase().calculateSteering(Player.steering);
 				// System.out.println(Player.steering.linear.cpy().x);
 				player.getMoveVector().set(Player.steering.linear);
@@ -562,7 +580,7 @@ public enum PlayerState implements State<Player> {
 	 * @param position - The position of the player that wants to interact with the closest to it player
 	 * @param players - The players for check for distances
 	 * @param ignored - Players that should be ignored (for example if we are using this to see which player we should block from getting somewhere, the next player should ignore
-	 * him and find someone else to ignore. For example in the co-op state)
+	 * him and find someone else to block. For example in the co-op state)
 	 * @return The player which is closest to the given position
 	 */
 	protected Player getClosestPlayer(Vector3 position, ArrayList<Player> players, ArrayList<Player> ignored) {

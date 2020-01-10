@@ -9,6 +9,7 @@ import com.badlogic.gdx.ai.steer.behaviors.BlendedSteering;
 import com.badlogic.gdx.ai.steer.behaviors.CollisionAvoidance;
 import com.badlogic.gdx.ai.steer.behaviors.Interpose;
 import com.badlogic.gdx.ai.steer.behaviors.LookWhereYouAreGoing;
+import com.badlogic.gdx.ai.steer.behaviors.PrioritySteering;
 import com.badlogic.gdx.ai.steer.behaviors.RaycastObstacleAvoidance;
 import com.badlogic.gdx.ai.steer.behaviors.Separation;
 import com.badlogic.gdx.ai.steer.utils.RayConfiguration;
@@ -45,6 +46,7 @@ public class Brain {
 	Separation<Vector3> ballSeparate, basketSeparate, playerSeparate; //For player and basket surroundings and ball distance keeping
 	RaycastObstacleAvoidance<Vector3> obstAvoid; //For invisible terrain walls
 	BlendedSteering<Vector3> mSBallChase, mSBallInHand, mSCoop;
+	PrioritySteering<Vector3> pSBallChasePart;
 	
 	RayConfiguration<Vector3> rayConfig;
 	
@@ -71,11 +73,16 @@ public class Brain {
 		rayConfig = new ParallelSideRayConfiguration<Vector3>(user, 3, 0.5f);
 		obstAvoid = new RaycastObstacleAvoidance<Vector3>(user, rayConfig, user.getMap());
 		
+		pSBallChasePart = new PrioritySteering<Vector3>(user);
+		pSBallChasePart.add(playerSeparate);
+		pSBallChasePart.add(pursue);
+		
 		mSBallChase = new BlendedSteering<Vector3>(user);
 		mSBallChase.add(collAvoid, 1f);
-		mSBallChase.add(playerSeparate, 2.4f);
+		//mSBallChase.add(playerSeparate, 2.4f);
 		mSBallChase.add(ballSeparate, 2.4f);
-		mSBallChase.add(pursue, 1.2f);
+		mSBallChase.add(pSBallChasePart, 1.2f);
+		//mSBallChase.add(pursue, 1.2f);
 		
 		mSBallInHand = new BlendedSteering<Vector3>(user);
 		mSBallInHand.add(collAvoid, 1f);

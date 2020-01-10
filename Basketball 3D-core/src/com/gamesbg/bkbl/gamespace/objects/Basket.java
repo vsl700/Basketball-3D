@@ -33,7 +33,7 @@ public abstract class Basket extends GameObject {
 	static final float tabCentD = 0.01f;
 	static final float bkHoldW = 0.08f;
 	static final float bkHoldD = 0.2f;
-	static final float basketZone = 6;
+	static final float basketZone = 8;
 	
 	protected abstract Color getColor();
 	

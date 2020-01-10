@@ -840,6 +840,11 @@ public abstract class Player extends Entity {
 	}
 	
 	public void run(Vector3 dir) {
+		if(dir.isZero(0.00001f)) {
+			running = false;//In case we use the setRunning method which is used by the AI when the players are obligated to run
+			return;
+		}
+		
 		if (!isAiming() && !isShooting()) {
 			dir.x *= MAX_RUNNING_VELOCITY;
 			dir.z *= MAX_RUNNING_VELOCITY;
@@ -1859,11 +1864,17 @@ public abstract class Player extends Entity {
 			int count = 0;
 			//if(this instanceof Teammate) {
 				for(Player p : map.getTeammates())
-					if(!p.equals(this) && ((p.isMainPlayer() && !p.getBrain().getStateMachine().isInState(PlayerState.BALL_CHASING)) || !p.getBrain().getMemory().isBallChaser()) && callback.reportNeighbor(p))
+					if(!p.equals(this) && 
+							//((p.isMainPlayer() && !p.getBrain().getStateMachine().isInState(PlayerState.BALL_CHASING)) || !p.getBrain().getMemory().isBallChaser()) && 
+							!p.holdingBall() && //Mainly used for co-op mode when the players are trying to interpose
+							callback.reportNeighbor(p))
 						count++;
 			//}else
 				for(Player p : map.getOpponents())
-					if(!p.equals(this) && !p.getBrain().getMemory().isBallChaser() && callback.reportNeighbor(p))
+					if(!p.equals(this) && 
+							//!p.getBrain().getMemory().isBallChaser() && 
+							!p.holdingBall() &&
+							callback.reportNeighbor(p))
 						count++;
 			
 			return count;

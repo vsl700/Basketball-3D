@@ -133,7 +133,7 @@ public class Ball extends Entity {
 			if(callback.reportNeighbor(p))
 				neighborPlayers.add(p);
 		
-		return neighborPlayers.size() + 1;
+		return neighborPlayers.size();
 	}
 
 	public ArrayList<Player> getNeighborPlayers() {
