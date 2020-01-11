@@ -45,8 +45,9 @@ public class Brain {
 	Interpose<Vector3> interpose; //For blocking opponents from getting close to the player holding the ball in co-op state
 	Separation<Vector3> ballSeparate, basketSeparate, playerSeparate; //For player and basket surroundings and ball distance keeping
 	RaycastObstacleAvoidance<Vector3> obstAvoid; //For invisible terrain walls
-	BlendedSteering<Vector3> mSBallChase, mSBallInHand, mSCoop;
-	PrioritySteering<Vector3> pSBallChasePart;
+	PrioritySteering<Vector3> pSBallChasePart, pSSurround;
+	BlendedSteering<Vector3> mSBallChase, mSBallInHand, mSCoop, mSSurround;	//Groups of behaviors for each state
+	
 	
 	RayConfiguration<Vector3> rayConfig;
 	
@@ -73,15 +74,18 @@ public class Brain {
 		rayConfig = new ParallelSideRayConfiguration<Vector3>(user, 3, 0.5f);
 		obstAvoid = new RaycastObstacleAvoidance<Vector3>(user, rayConfig, user.getMap());
 		
+		//In this steering mechanism if the player needs to ride off a player or players (if playerSeparate returns different from 0) it will ride off instead of getting closer to the ball. 
+		//Otherwise it will just follow it. In other words it follows the ball but also keeps distance from other player so that they can catch it.
 		pSBallChasePart = new PrioritySteering<Vector3>(user);
+		pSBallChasePart.add(ballSeparate);
 		pSBallChasePart.add(playerSeparate);
 		pSBallChasePart.add(pursue);
 		
 		mSBallChase = new BlendedSteering<Vector3>(user);
 		mSBallChase.add(collAvoid, 1f);
 		//mSBallChase.add(playerSeparate, 2.4f);
-		mSBallChase.add(ballSeparate, 2.4f);
-		mSBallChase.add(pSBallChasePart, 1.2f);
+		//mSBallChase.add(ballSeparate, 2.4f);
+		mSBallChase.add(pSBallChasePart, 1f);
 		//mSBallChase.add(pursue, 1.2f);
 		
 		mSBallInHand = new BlendedSteering<Vector3>(user);
@@ -93,6 +97,14 @@ public class Brain {
 		mSCoop.add(collAvoid, 1f);
 		//mSCoop.add(pursue, 1);
 		mSCoop.add(interpose, 1.2f);
+		
+		mSSurround = new BlendedSteering<Vector3>(user);
+		mSSurround.add(collAvoid, 1);
+		mSSurround.add(pursue, 1.2f);
+		
+		pSSurround = new PrioritySteering<Vector3>(user);
+		pSSurround.add(collAvoid);
+		pSSurround.add(pursue);
 		//mSCoop.add(playerSeparate, 0.9f);
 	}
 	
@@ -196,6 +208,10 @@ public class Brain {
 	
 	public BlendedSteering<Vector3> getMSBallInHand() {
 		return mSBallInHand;
+	}
+
+	public PrioritySteering<Vector3> getPSSurround() {
+		return pSSurround;
 	}
 	
 }

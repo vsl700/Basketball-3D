@@ -11,8 +11,9 @@ import com.gamesbg.bkbl.gamespace.entities.Player;
  */
 public class AIMemory {
 	
-	//A player to get in front of to block it from catching a ball for example
-	Player blockPlayer;
+	//A temporary player variable used to store a target player to this one (for example when this player is in co-op mode, 
+	//the variable stores a player from the opposite team that should be blocked from touching the ball)
+	Player targetPlayer;
 	
 	//The targetVec represents the position of the target, while shootVec represents the point where the player has to shoot so that he can hit the target with the ball
 	Vector3 shootVec, targetVec;
@@ -27,12 +28,12 @@ public class AIMemory {
 		shootTime = 20;
 	}
 
-	public Player getBlockPlayer() {
-		return blockPlayer;
+	public Player getTargetPlayer() {
+		return targetPlayer;
 	}
 
-	public void setBlockPlayer(Player blockPlayer) {
-		this.blockPlayer = blockPlayer;
+	public void setTargetPlayer(Player targetPlayer) {
+		this.targetPlayer = targetPlayer;
 	}
 
 	public Vector3 getShootVec() {

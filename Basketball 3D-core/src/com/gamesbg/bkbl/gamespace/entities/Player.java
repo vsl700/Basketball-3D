@@ -1866,7 +1866,8 @@ public abstract class Player extends Entity {
 				for(Player p : map.getTeammates())
 					if(!p.equals(this) && 
 							//((p.isMainPlayer() && !p.getBrain().getStateMachine().isInState(PlayerState.BALL_CHASING)) || !p.getBrain().getMemory().isBallChaser()) && 
-							!p.holdingBall() && //Mainly used for co-op mode when the players are trying to interpose
+							!p.holdingBall() && //For example it can be used for co-op mode when the players are trying to interpose
+							!p.getBrain().getStateMachine().isInState(PlayerState.PLAYER_SURROUND) && brain.getStateMachine().isInState(PlayerState.PLAYER_SURROUND) &&
 							callback.reportNeighbor(p))
 						count++;
 			//}else
@@ -1874,6 +1875,7 @@ public abstract class Player extends Entity {
 					if(!p.equals(this) && 
 							//!p.getBrain().getMemory().isBallChaser() && 
 							!p.holdingBall() &&
+							!p.getBrain().getStateMachine().isInState(PlayerState.PLAYER_SURROUND) && brain.getStateMachine().isInState(PlayerState.PLAYER_SURROUND) &&
 							callback.reportNeighbor(p))
 						count++;
 			
@@ -1893,7 +1895,7 @@ public abstract class Player extends Entity {
 	}
 	
 	public void setMoveVector(Vector3 move) {
-		moveVec = move;
+		moveVec.set(move);
 	}
 	
 	public Vector3 getMoveVector() {
