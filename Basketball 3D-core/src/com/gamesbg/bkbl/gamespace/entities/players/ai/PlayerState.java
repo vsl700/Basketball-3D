@@ -334,84 +334,34 @@ public enum PlayerState implements State<Player> {
 			
 			Player holdingPlayer;
 			ArrayList<Player> tempOpp;
-			//ArrayList<Player> tempTeam;
-			//Matrix4 tempPlayerTrans;
 			if (player instanceof Teammate) {
 				holdingPlayer = player.getMap().getTeammateHolding();
 				tempOpp = player.getMap().getOpponents();
-				//tempTeam = player.getMap().getTeammates();
 			}else {
 				holdingPlayer = player.getMap().getOpponentHolding();
 				tempOpp = player.getMap().getTeammates();
-				//tempTeam = player.getMap().getOpponents();
 			}
-			//tempPlayerTrans = holdingPlayer.getModelInstance().transform.cpy();
-
-			//Vector3 playerVec = player.getModelInstance().transform.getTranslation(new Vector3());
 
 			Ball tempBall = player.getMap().getBall();
-			
-			//Matrix4 blockTrans = new Matrix4();
-			//if(!player.isAiming() && !player.isShooting() || !player.isInAwayBasketZone()) {
-				if (mem.getTargetPlayer() == null) {
-					Player targetToBlock = getClosestPlayer(tempBall.getPosition(), tempOpp, ignored);
-					mem.setTargetPlayer(targetToBlock);
-					ignored.add(targetToBlock);
 
-					//brain.getInterpose().setEnabled(true);
-					brain.getInterpose().setAgentA(tempBall);
-					brain.getInterpose().setAgentB(targetToBlock);
-					
-					//player.lookAt(targetToBlock.getPosition());
-				}//else player.lookAt(holdingPlayer.getPosition());
-			//}else {
-				
-				//brain.getInterpose().setEnabled(false);
-			//}
+			if (mem.getTargetPlayer() == null) {
+				Player targetToBlock = getClosestPlayer(tempBall.getPosition(), tempOpp, ignored);
+				mem.setTargetPlayer(targetToBlock);
+				ignored.add(targetToBlock);
+
+				brain.getInterpose().setAgentA(tempBall);
+				brain.getInterpose().setAgentB(targetToBlock);
+
+			}
 			
 			player.lookAt(holdingPlayer.getPosition());
-			/*else if(mem.getBlockPlayer() != null) {
-					ignored.remove(mem.getBlockPlayer());
-					mem.setBlockPlayer(null);
-			}*/
+			
 			brain.getMSCoop().calculateSteering(Player.steering);
 			player.setMoveVector(Player.steering.linear);
 			
 			if(player.getPosition().dst(tempBall.getPosition()) > 6 || player.getMoveVector().len() > 6)
 				player.setRunning();
 			
-			//Vector3 tempVec = getShortestDistance(player.getPosition(), tempOpp);
-
-			/*blockTrans.setToTranslation(tempVec);
-
-			Vector3 dir;
-
-			switch (player.getPlayerIndex()) {
-			case 1:
-				if (player.getMap().getTeammates().size() == 2 && (holdingPlayer.isAiming() || holdingPlayer.isShooting()))
-					dir = player.roamAround(tempPlayerTrans, blockTrans, 8, 8, false, false);
-				else
-					dir = player.roamAround(tempPlayerTrans, blockTrans, 3, -1, false, false);
-				// if(newVel.x > 0 || newVel.z > 0)
-
-				break;
-			case 2:
-				dir = player.roamAround(tempPlayerTrans, blockTrans, 5, 1, false, false);
-				break;
-
-			case 3:
-				dir = player.roamAround(tempPlayerTrans, blockTrans, 12, 2, false, false);
-			case 4:
-				dir = player.roamAround(tempPlayerTrans, blockTrans, 0, 13, false, false);
-			case 5:
-				dir = player.roamAround(tempPlayerTrans, blockTrans, 4, 9, false, false);
-				break;
-			default:
-				dir = new Vector3();
-				break;
-			}
-
-			player.lookAt(dir);*/
 		}
 		
 		@Override
@@ -441,41 +391,6 @@ public enum PlayerState implements State<Player> {
 			Player chased = brain.getMemory().getTargetPlayer();
 			
 			Ball tempBall = player.getMap().getBall();
-			
-			/*Matrix4 chasedTrans = chased.getModelInstance().transform.cpy();
-
-			Matrix4 ballTrans = chased.getMap().getBall().getModelInstance().transform.cpy();
-
-			Vector3 chasedVec = new Vector3();
-			chasedTrans.getTranslation(chasedVec);
-
-			Vector3 result;
-			if (player.getMap().getTeammates().size() == 1)
-				result = player.roamAround(ballTrans, null, 3, 1, false, false);
-			else
-				switch (player.getPlayerIndex()) {
-				case 1:
-					result = player.roamAround(ballTrans, null, 0, 3, false, false);
-					break;
-				case 3:
-					result = player.roamAround(ballTrans, null, -1, 3, false, false);
-					break;
-				case 5:
-					result = player.roamAround(ballTrans, null, -3, 1, false, false);
-					break;
-
-				case 2:
-					result = player.roamAround(ballTrans, null, 1, 3, false, false);
-					break;
-				case 4:
-					result = player.roamAround(ballTrans, null, 3, 1, false, false);
-					break;
-				default:
-					result = new Vector3();
-					break;
-				}
-
-			player.lookAt(result);*/
 			
 			//Movement
 			brain.getPSSurround().calculateSteering(Player.steering);

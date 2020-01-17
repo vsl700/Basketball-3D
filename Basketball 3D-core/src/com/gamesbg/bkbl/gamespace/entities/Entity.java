@@ -246,6 +246,11 @@ public abstract class Entity implements Proximity<Vector3>, Steerable<Vector3> {
 			return false;
 		}
 	}
+	
+	protected boolean isProximityColliding(Steerable<Vector3> other) {
+		float dst = getPosition().dst(other.getPosition());
+		return dst <= getBoundingRadius() && dst <= other.getBoundingRadius();
+	}
 
 	@Override
 	public Vector3 getLinearVelocity() {

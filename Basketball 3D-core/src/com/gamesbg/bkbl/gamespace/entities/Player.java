@@ -115,8 +115,6 @@ public abstract class Player extends Entity {
 		
 		//if(!isMainPlayer())
 		brain = new Brain(this);
-		
-		
 			//stateMachine = new DefaultStateMachine<Player, PlayerState>(this, PlayerState.IDLING);
 			//stateMachine.changeState(PlayerState.IDLING);
 
@@ -1840,19 +1838,21 @@ public abstract class Player extends Entity {
 	
 	@Override
 	public int findNeighbors(ProximityCallback<Vector3> callback) {
-		if(callback.equals(brain.getBallSeparate()) && getPosition().dst(map.getBall().getPosition()) <= getBoundingRadius()) {
+		if(callback.equals(brain.getBallSeparate()) && isProximityColliding(map.getBall())) {
 			callback.reportNeighbor(map.getBall());
 			return 0;
-		}else if(callback.equals(brain.getBasketSeparate()) && getPosition().dst(getTargetBasket().getPosition()) <= getBoundingRadius()) {
+		}else if(callback.equals(brain.getBasketSeparate()) && isProximityColliding(getTargetBasket())) {
 			callback.reportNeighbor(getTargetBasket());
 			return 0;
 		}else if(callback.equals(brain.getPlayerSeparate())) {
 			if(this instanceof Teammate) {
 				for(Player p : map.getTeammates())
-					if(!p.equals(this) && getPosition().dst(p.getPosition()) <= getBoundingRadius()) callback.reportNeighbor(p);
+					if(!p.equals(this) && isProximityColliding(p)) 
+						callback.reportNeighbor(p);
 			}else
 				for(Player p : map.getOpponents())
-					if(!p.equals(this) && getPosition().dst(p.getPosition()) <= getBoundingRadius()) callback.reportNeighbor(p);
+					if(!p.equals(this) && isProximityColliding(p)) 
+						callback.reportNeighbor(p);
 						
 			
 			return 0;
