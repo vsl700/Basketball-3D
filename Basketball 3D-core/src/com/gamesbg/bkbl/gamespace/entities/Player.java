@@ -1840,26 +1840,22 @@ public abstract class Player extends Entity {
 	
 	@Override
 	public int findNeighbors(ProximityCallback<Vector3> callback) {
-		if(callback.equals(brain.getBallSeparate())) {
-			if(callback.reportNeighbor(map.getBall()))
-				return 1;
-			else return 0;
-		}else if(callback.equals(brain.getBasketSeparate())) {
-			if(callback.reportNeighbor(getTargetBasket()))
-				return 1;
-			else return 0;
+		if(callback.equals(brain.getBallSeparate()) && getPosition().dst(map.getBall().getPosition()) <= getBoundingRadius()) {
+			callback.reportNeighbor(map.getBall());
+			return 0;
+		}else if(callback.equals(brain.getBasketSeparate()) && getPosition().dst(getTargetBasket().getPosition()) <= getBoundingRadius()) {
+			callback.reportNeighbor(getTargetBasket());
+			return 0;
 		}else if(callback.equals(brain.getPlayerSeparate())) {
-			int count = 0;
 			if(this instanceof Teammate) {
 				for(Player p : map.getTeammates())
-					if(!p.equals(this) && callback.reportNeighbor(p))
-						count++;
+					if(!p.equals(this) && getPosition().dst(p.getPosition()) <= getBoundingRadius()) callback.reportNeighbor(p);
 			}else
 				for(Player p : map.getOpponents())
-					if(!p.equals(this) && callback.reportNeighbor(p))
-						count++;
+					if(!p.equals(this) && getPosition().dst(p.getPosition()) <= getBoundingRadius()) callback.reportNeighbor(p);
+						
 			
-			return count;
+			return 0;
 		}else if(callback.equals(brain.getCollAvoid())) {
 			int count = 0;
 			//if(this instanceof Teammate) {
