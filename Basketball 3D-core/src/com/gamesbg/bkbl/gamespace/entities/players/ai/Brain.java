@@ -45,8 +45,8 @@ public class Brain {
 	Interpose<Vector3> interpose; //For blocking opponents from getting close to the player holding the ball in co-op state
 	Separation<Vector3> ballSeparate, basketSeparate, playerSeparate; //For player and basket surroundings and ball distance keeping
 	RaycastObstacleAvoidance<Vector3> obstAvoid; //For invisible terrain walls
-	PrioritySteering<Vector3> pSBallChasePart, pSSurround;
-	BlendedSteering<Vector3> mSBallChase, mSBallInHand, mSCoop, mSSurround;	//Groups of behaviors for each state
+	PrioritySteering<Vector3> pSBallChasePart, pSCoop, pSSurround;
+	BlendedSteering<Vector3> mSBallChase, mSBallInHand, mSSurround;	//Groups of behaviors for each state
 	
 	
 	RayConfiguration<Vector3> rayConfig;
@@ -81,7 +81,7 @@ public class Brain {
 		pSBallChasePart.add(playerSeparate);
 		pSBallChasePart.add(pursue);
 		
-		mSBallChase = new BlendedSteering<Vector3>(user);
+		mSBallChase = new BlendedSteering<Vector3>(user);//FIXME Unexpected separation behaviors (see findNeighbors in Player)
 		mSBallChase.add(collAvoid, 1f);
 		//mSBallChase.add(playerSeparate, 2.4f);
 		//mSBallChase.add(ballSeparate, 2.4f);
@@ -93,16 +93,19 @@ public class Brain {
 		mSBallInHand.add(basketSeparate, 0.6f);
 		mSBallInHand.add(pursueBallInHand, 1.3f);
 		
-		mSCoop = new BlendedSteering<Vector3>(user);
-		mSCoop.add(collAvoid, 1f);
+		pSCoop = new PrioritySteering<Vector3>(user);
+		pSCoop.add(collAvoid);
 		//mSCoop.add(pursue, 1);
-		mSCoop.add(interpose, 1.2f);
+		pSCoop.add(interpose);
+		pSCoop.add(pursue);
 		
 		mSSurround = new BlendedSteering<Vector3>(user);
+		mSSurround.add(playerSeparate, 1.3f);
 		mSSurround.add(collAvoid, 1);
-		mSSurround.add(pursue, 1.2f);
+		mSSurround.add(pursue, 1.3f);
 		
 		pSSurround = new PrioritySteering<Vector3>(user);
+		pSSurround.add(playerSeparate);
 		pSSurround.add(collAvoid);
 		pSSurround.add(pursue);
 		//mSCoop.add(playerSeparate, 0.9f);
@@ -182,8 +185,8 @@ public class Brain {
 		return interpose;
 	}
 
-	public BlendedSteering<Vector3> getMSCoop() {
-		return mSCoop;
+	public PrioritySteering<Vector3> getPSCoop() {
+		return pSCoop;
 	}
 
 	public Separation<Vector3> getBallSeparate() {
@@ -208,6 +211,10 @@ public class Brain {
 	
 	public BlendedSteering<Vector3> getMSBallInHand() {
 		return mSBallInHand;
+	}
+	
+	public BlendedSteering<Vector3> getMSSurround() {
+		return mSSurround;
 	}
 
 	public PrioritySteering<Vector3> getPSSurround() {

@@ -4,7 +4,6 @@ import java.util.ArrayList;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.ai.fsm.State;
 import com.badlogic.gdx.ai.msg.Telegram;
-import com.badlogic.gdx.math.Matrix4;
 import com.badlogic.gdx.math.Vector3;
 import com.gamesbg.bkbl.gamespace.GameMap;
 import com.gamesbg.bkbl.gamespace.entities.Ball;
@@ -49,10 +48,10 @@ public enum PlayerState implements State<Player> {
 			
 			Vector3 returnVec = targetVec.cpy().add(0, xzDist / 2 + yDist, 0);
 			
-			System.out.println(xzDist + "; " + yDist);
+			/*System.out.println(xzDist + "; " + yDist);
 			System.out.print(player.getPosition());
 			System.out.print(targetVec);
-			System.out.println(returnVec);
+			System.out.println(returnVec);*/
 			//Modify player shootPower
 			
 			return returnVec;
@@ -224,7 +223,7 @@ public enum PlayerState implements State<Player> {
 			
 			if (player.getBrain().getMemory().isBallChaser() || player.getMap().getTeammates().size() == 1) {
 				player.getBrain().getPursue().setArrivalTolerance(0.1f);
-				player.getBrain().getPlayerSeparate().setEnabled(false);
+				//player.getBrain().getPlayerSeparate().setEnabled(false);
 
 				if (player.getMap().getTeammates().size() > 1) {
 					// player.getBrain().getCollAvoid().calculateSteering(Player.steering);
@@ -234,8 +233,9 @@ public enum PlayerState implements State<Player> {
 					player.getBrain().getCollAvoid().setEnabled(false);
 			}else {
 				//player.getBrain().getPursue().setArrivalTolerance(6);
-				player.getBrain().getPlayerSeparate().setEnabled(true);
+				//player.getBrain().getPlayerSeparate().setEnabled(true);
 				player.getBrain().getCollAvoid().setEnabled(false);
+				//player.getBrain().getBallSeparate().setEnabled(false);
 			}
 		}
 		
@@ -273,11 +273,15 @@ public enum PlayerState implements State<Player> {
 
 			//If the following player hadn't just thrown the ball
 			if (player.getBrain().getMemory().isBallChaser() || player.getMap().getTeammates().size() == 1) {
-				if(player.getMap().getBall().getPosition().y > player.getHeight() && tempBall.getNeighborPlayers().contains(player)) {
+				if(player.getMap().getBall().getPosition().y > player.getHeight() * 2 && player.isProximityColliding(player.getMap().getBall())) {
 					player.getBrain().getBallSeparate().setEnabled(true);
 					//player.getBrain().getBallSeparate().calculateSteering(Player.steering);
 					//player.getMoveVector().nor().add(Player.steering.linear.cpy().scl(2.5f));
 				}else player.getBrain().getBallSeparate().setEnabled(false);
+				
+				if(player.getPosition().dst(tempBall.getPosition()) > 1)
+					player.getBrain().getPlayerSeparate().setEnabled(true);
+				else player.getBrain().getPlayerSeparate().setEnabled(false);
 				
 				player.getBrain().getMSBallChase().calculateSteering(Player.steering);
 				
@@ -287,7 +291,7 @@ public enum PlayerState implements State<Player> {
 				
 				//System.out.println(tempAvg.x + " ; " + tempAvg.y + " ; " + tempAvg.z);
 				//if(Math.abs(tempAvg.x) + Math.abs(tempAvg.z) > 1.5f || Math.abs(tempBall.getLinearVelocity().x) + Math.abs(tempBall.getLinearVelocity().z) > 3.5f)
-				if(!tempBall.getNeighborPlayers().contains(player))	
+				//if(!tempBall.isProximityColliding(player))
 					player.setRunning(); //RUUUN! GO CATCH THAT BALL!
 				
 				
@@ -352,11 +356,13 @@ public enum PlayerState implements State<Player> {
 				brain.getInterpose().setAgentA(tempBall);
 				brain.getInterpose().setAgentB(targetToBlock);
 
-			}
+			}else if(holdingPlayer.getPosition().dst(mem.getTargetPlayer().getPosition()) > 5)
+				brain.getInterpose().setEnabled(false);
+			else brain.getInterpose().setEnabled(true);
 			
 			player.lookAt(holdingPlayer.getPosition());
 			
-			brain.getMSCoop().calculateSteering(Player.steering);
+			brain.getPSCoop().calculateSteering(Player.steering);
 			player.setMoveVector(Player.steering.linear);
 			
 			if(player.getPosition().dst(tempBall.getPosition()) > 6 || player.getMoveVector().len() > 6)
@@ -378,11 +384,14 @@ public enum PlayerState implements State<Player> {
 				player.getBrain().getMemory().setTargetPlayer(player.getMap().getOpponentHolding());
 			else
 				player.getBrain().getMemory().setTargetPlayer(player.getMap().getTeammateHolding());
+			
+			player.getBrain().getPursue().setArrivalTolerance(2f);
 		}
 		
 		@Override
 		public void exit(Player player) {
 			player.getBrain().getMemory().setTargetPlayer(null);
+			player.getBrain().getPursue().setArrivalTolerance(0);
 		}
 
 		@Override
@@ -393,11 +402,14 @@ public enum PlayerState implements State<Player> {
 			Ball tempBall = player.getMap().getBall();
 			
 			//Movement
-			brain.getPSSurround().calculateSteering(Player.steering);
-			player.setMoveVector(Player.steering.linear);
-			
-			if(player.getPosition().dst(tempBall.getPosition()) > 6 || player.getMoveVector().len() > 6)
+			if(player.getPosition().dst(tempBall.getPosition()) > 4.5f || player.getMoveVector().len() > 6) {
 				player.setRunning();
+				
+				brain.getPlayerSeparate().setEnabled(true);
+			}else brain.getPlayerSeparate().setEnabled(false);
+			
+			brain.getMSSurround().calculateSteering(Player.steering);
+			player.setMoveVector(Player.steering.linear);
 			
 			player.lookAt(chased.getPosition());
 			

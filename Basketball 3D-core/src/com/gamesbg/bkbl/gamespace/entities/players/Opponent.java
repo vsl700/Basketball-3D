@@ -2,7 +2,7 @@ package com.gamesbg.bkbl.gamespace.entities.players;
 
 import com.badlogic.gdx.graphics.Color;
 import com.gamesbg.bkbl.gamespace.entities.Player;
-import com.gamesbg.bkbl.gamespace.objects.GameObject;
+import com.gamesbg.bkbl.gamespace.objects.Basket;
 
 public class Opponent extends Player {
 
@@ -13,7 +13,7 @@ public class Opponent extends Player {
 	}
 
 	@Override
-	public GameObject getTargetBasket() {
+	public Basket getTargetBasket() {
 		// TODO Auto-generated method stub
 		return map.getHomeBasket();
 	}

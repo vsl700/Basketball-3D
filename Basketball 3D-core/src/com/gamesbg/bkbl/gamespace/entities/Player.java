@@ -31,7 +31,7 @@ import com.gamesbg.bkbl.gamespace.tools.CustomAnimation;
 import com.gamesbg.bkbl.gamespace.entities.players.Opponent;
 import com.gamesbg.bkbl.gamespace.entities.players.Teammate;
 import com.gamesbg.bkbl.gamespace.entities.players.ai.*;
-import com.gamesbg.bkbl.gamespace.objects.GameObject;
+import com.gamesbg.bkbl.gamespace.objects.Basket;
 import com.gamesbg.bkbl.gamespace.objects.ObjectType;
 
 public abstract class Player extends Entity {
@@ -115,6 +115,7 @@ public abstract class Player extends Entity {
 		
 		//if(!isMainPlayer())
 		brain = new Brain(this);
+		boundRadius = 1;
 			//stateMachine = new DefaultStateMachine<Player, PlayerState>(this, PlayerState.IDLING);
 			//stateMachine.changeState(PlayerState.IDLING);
 
@@ -1838,11 +1839,21 @@ public abstract class Player extends Entity {
 	
 	@Override
 	public int findNeighbors(ProximityCallback<Vector3> callback) {
-		if(callback.equals(brain.getBallSeparate()) && isProximityColliding(map.getBall())) {
-			callback.reportNeighbor(map.getBall());
+		if(callback.equals(brain.getBallSeparate())) {
+			System.out.println("Ball separate invoked");
+			if (isProximityColliding(map.getBall())) {
+				callback.reportNeighbor(map.getBall());
+				System.out.println("Ball separate worked");
+			}
+			
 			return 0;
-		}else if(callback.equals(brain.getBasketSeparate()) && isProximityColliding(getTargetBasket())) {
-			callback.reportNeighbor(getTargetBasket());
+		}else if(callback.equals(brain.getBasketSeparate())) {
+			System.out.println("Basket separate invoked");
+			if (isProximityColliding(getTargetBasket())) {
+				callback.reportNeighbor(getTargetBasket());
+				System.out.println("Basket separate worked");
+			}
+			
 			return 0;
 		}else if(callback.equals(brain.getPlayerSeparate())) {
 			if(this instanceof Teammate) {
@@ -1853,8 +1864,7 @@ public abstract class Player extends Entity {
 				for(Player p : map.getOpponents())
 					if(!p.equals(this) && isProximityColliding(p)) 
 						callback.reportNeighbor(p);
-						
-			
+			System.out.println("Player separate invoked");
 			return 0;
 		}else if(callback.equals(brain.getCollAvoid())) {
 			int count = 0;
@@ -1883,7 +1893,8 @@ public abstract class Player extends Entity {
 	
 	@Override
 	public float getOrientation() {
-		return vectorToAngle(moveVec);
+		return super.getOrientation();
+		//return vectorToAngle(moveVec);
 	}
 
 	public Matrix4 getCamMatrix() {
@@ -1905,7 +1916,7 @@ public abstract class Player extends Entity {
 	/**
 	 * A player from one team should return the basket of the other team as a target
 	 */
-	public abstract GameObject getTargetBasket();
+	public abstract Basket getTargetBasket();
 	
 	public void setRunning() {
 		running = true;

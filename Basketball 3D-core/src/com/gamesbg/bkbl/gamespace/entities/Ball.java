@@ -23,7 +23,7 @@ public class Ball extends Entity {
 	public void create(EntityType type, GameMap map, Vector3 pos) {
 		super.create(type, map, pos);
 		
-		boundRadius = 0.5f;
+		boundRadius = 5.5f;
 		neighborPlayers = new ArrayList<Player>();
 	}
 	
