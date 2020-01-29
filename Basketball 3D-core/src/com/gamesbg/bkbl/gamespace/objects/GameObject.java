@@ -30,6 +30,7 @@ public abstract class GameObject implements Steerable<Vector3>, Proximity<Vector
 	protected ArrayList<Matrix4> matrixes;
 	protected ArrayList<btCollisionShape> visibleCollShapes;
 	protected ArrayList<btCollisionShape> invisibleCollShapes;
+	//protected ArrayList<btCollisionShape> invisibleCollObjShapes;
 	protected ArrayList<btCollisionObject> collisionObjects; //Used for invisible objects that should have collisions with others but should not change the forces of the objects
 	protected ArrayList<btRigidBody> bodies;
 	protected ArrayList<btRigidBody> invisBodies;
@@ -54,6 +55,7 @@ public abstract class GameObject implements Steerable<Vector3>, Proximity<Vector
 		
 		visibleCollShapes = new ArrayList<btCollisionShape>();
 		invisibleCollShapes = new ArrayList<btCollisionShape>();
+		//invisibleCollObjShapes = new ArrayList<btCollisionShape>();
 		constructionInfos = new ArrayList<btRigidBody.btRigidBodyConstructionInfo>();
 		invisConstructionInfos = new ArrayList<btRigidBody.btRigidBodyConstructionInfo>();
 		motionStates = new ArrayList<MotionState>();

@@ -109,7 +109,7 @@ public class Rules {
 					}
 				},
 				
-				new GameRule("move_no_dribble", "Dribble Violation!", "The Player That Is Holding The Ball Is Moving Without Dribbling It For 1 Second!", map) {
+				new GameRule("move_no_dribble", "Dribble Violation!", "The Player That Is Holding The Ball Is Moving Without Dribbling It For A Total Of 1 Second!", map) {
 					float timer = 1;
 					
 					@Override
@@ -120,22 +120,27 @@ public class Rules {
 							return false;
 						}
 						
-						if (!temp.isDribbling() && !temp.getMoveVector().isZero() && !temp.isShooting() && !temp.isAiming()) {
-							if (timer <= 0) {
-								timer = 1;
+						if (!temp.getMoveVector().isZero()) {
+							if (!temp.isDribbling() && !temp.isShooting() && !temp.isAiming()) {
+								if (timer <= 0) {
+									timer = 1;
 
-								ruleBreaker = temp;
-								return true;
+									ruleBreaker = temp;
+									return true;
+								} else
+									timer -= Gdx.graphics.getDeltaTime();
 							} else
-								timer -= Gdx.graphics.getDeltaTime();
+								timer = 1;
 						}
-						else timer = 1;
 						
 						return false;
 					}
 				},
 				
-				new GameRule("backcourt_violation", "Backcourt Violation!", "The Team That Has The Ball Cannot Let The Ball Cross The Midcourt Line Once It Got In The Opposite's Team Zone!", map) {
+				new GameRule("backcourt_violation", "Backcourt Violation!", "The Team That Has The Ball Cannot Let The Ball Cross The Midcourt Line Once It Got In Their Opposite's Team Zone!", map) {
+					Player recentHolder;
+					boolean crossed;//Whether it has already crossed the midcourt lane of the terrain
+					
 					@Override
 					public boolean checkRule() {
 						

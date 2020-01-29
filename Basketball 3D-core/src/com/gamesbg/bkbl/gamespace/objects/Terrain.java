@@ -12,6 +12,7 @@ import com.badlogic.gdx.graphics.g3d.utils.ModelBuilder;
 import com.badlogic.gdx.math.Matrix4;
 import com.badlogic.gdx.math.Vector3;
 import com.badlogic.gdx.physics.bullet.collision.btBoxShape;
+import com.badlogic.gdx.physics.bullet.collision.btCollisionObject;
 import com.badlogic.gdx.physics.bullet.collision.btCollisionShape;
 import com.badlogic.gdx.physics.bullet.dynamics.btRigidBody;
 import com.gamesbg.bkbl.gamespace.MotionState;
@@ -48,6 +49,8 @@ public class Terrain extends GameObject {
 		invisibleCollShapes.add(new btBoxShape(new Vector3(getWidth()*5, 10000, wallDepth)));
 		invisibleCollShapes.add(new btBoxShape(new Vector3(wallDepth, 10000, getDepth()*5)));
 		invisibleCollShapes.add(new btBoxShape(new Vector3(getWidth()*5, 10000, wallDepth)));
+		
+		//invisibleCollShapes.add(new btBoxShape(new Vector3(getWidth() * 2, 10000, 0.1f)));//Midcourt lane
 	}
 
 	@Override
@@ -98,6 +101,16 @@ public class Terrain extends GameObject {
 			invisBodies.get(i).setFriction(1.0f);
 			invisBodies.get(i).setRestitution(0.1f);
 		}
+		
+		ArrayList<btCollisionShape> laneShapes = new ArrayList<btCollisionShape>();
+		laneShapes.add(new btBoxShape(new Vector3(getWidth() * 2, 10000, 0.1f)));
+		
+		for(int i = 0; i < laneShapes.size(); i++) {
+			collisionObjects.add(new btCollisionObject());
+			collisionObjects.get(i).setCollisionShape(laneShapes.get(i));
+		}
+		
+		manuallySetObjects();
 	}
 
 	@Override
@@ -112,17 +125,17 @@ public class Terrain extends GameObject {
 
 	@Override
 	protected void manuallySetObjects() {
-		
+		collisionObjects.get(0).setWorldTransform(getMainTrans());
 	}
 
 	@Override
 	protected void manuallySetBodies() {
 		modelInstance.calculateTransforms();
 		
-		invisBodies.get(0).proceedToTransform(new Matrix4().setToTranslation(x - getWidth() / 2 - wallDepth, y, z));
-		invisBodies.get(1).proceedToTransform(new Matrix4().setToTranslation(x, y, z - getDepth() / 2 - wallDepth));
-		invisBodies.get(2).proceedToTransform(new Matrix4().setToTranslation(x + getWidth() / 2 + wallDepth, y, z));
-		invisBodies.get(3).proceedToTransform(new Matrix4().setToTranslation(x, y, z + getDepth() / 2 + wallDepth));
+		invisBodies.get(0).proceedToTransform(getMainTrans().cpy().mul(new Matrix4().setToTranslation(x - getWidth() / 2 - wallDepth, y, z)));
+		invisBodies.get(1).proceedToTransform(getMainTrans().cpy().mul(new Matrix4().setToTranslation(x, y, z - getDepth() / 2 - wallDepth)));
+		invisBodies.get(2).proceedToTransform(getMainTrans().cpy().mul(new Matrix4().setToTranslation(x + getWidth() / 2 + wallDepth, y, z)));
+		invisBodies.get(3).proceedToTransform(getMainTrans().cpy().mul(new Matrix4().setToTranslation(x, y, z + getDepth() / 2 + wallDepth)));
 	}
 
 }

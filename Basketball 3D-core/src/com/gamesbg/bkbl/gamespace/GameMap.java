@@ -175,6 +175,8 @@ public class GameMap implements RaycastCollisionDetector<Vector3> {
 			index++;
 		}
 		
+		createTerrainLanes();
+		
 		camera = (Camera) ObjectType.createGameObject(ObjectType.CAMERA.getId(), this, 0, 0, 0);
 		for(btRigidBody co : camera.getBodies()) {
 			co.setUserValue(index);
@@ -441,6 +443,22 @@ public class GameMap implements RaycastCollisionDetector<Vector3> {
 		startTimer = -1;//6
 	}
 	
+	private void createTerrainLanes() {
+		btCollisionObject midcourtLane = terrain.getCollisionObjects().get(0);
+		midcourtLane.setUserValue(index);
+		midcourtLane.setCollisionFlags(midcourtLane.getCollisionFlags() | btCollisionObject.CollisionFlags.CF_CUSTOM_MATERIAL_CALLBACK);
+		
+		dynamicsWorld.addCollisionObject(midcourtLane, ENT_SPECIAL_FLAG, SPECIAL_FLAG);
+		midcourtLane.setContactCallbackFlag(ENT_SPECIAL_FLAG);
+		midcourtLane.setContactCallbackFilter(SPECIAL_FLAG);
+		
+		objectsMap.put(index, ObjectType.TERRAIN.getId() + "Mid");
+		collObjsInObjectMap.put(midcourtLane, terrain);
+		collObjsValsMap.put(index, midcourtLane);
+		
+		index++;
+	}
+	
 	private void createBall() {
 		ball = (Ball) EntityType.createEntity(EntityType.BALL.getId(), this, new Vector3(0, 0, 0));
 		for (btRigidBody co : ball.getBodies()) {
@@ -488,8 +506,8 @@ public class GameMap implements RaycastCollisionDetector<Vector3> {
 		camera.setWorldTransform(new Matrix4(mainPlayer.getModelInstance().transform).mul(mainPlayer.getCamMatrix()).mul(new Matrix4().setToTranslation(0, mainPlayer.getHeight(), -10)));
 		
 		float delta2 = Math.min(1f / 30f, delta);
-		for(int i = 0; i < 6; i++)
-			dynamicsWorld.stepSimulation(delta2/6, 15, 1f / 60f);
+		//for(int i = 0; i < 6; i++)
+			dynamicsWorld.stepSimulation(delta2, 15, 1f / 60f);
 		if(gameRunning)
 			controlPlayer(delta);
 		else {
