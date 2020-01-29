@@ -39,6 +39,8 @@ public abstract class Entity implements Proximity<Vector3>, Steerable<Vector3> {
 	
 	protected ArrayList<btCollisionObject> manualSetTransformsBody, manualSetTransformsInvBody, manualSetTransformsObj;
 	
+	protected ArrayList<btCollisionObject> outsideColliders;
+	
 	protected int mainBodyIndex;
 	
 	protected float maxLinAccel;
@@ -54,6 +56,8 @@ public abstract class Entity implements Proximity<Vector3>, Steerable<Vector3> {
 		this.map = map;
 		
 		matrixes = new ArrayList<Matrix4>();
+		
+		outsideColliders = new ArrayList<btCollisionObject>();
 		
 		collisionShapes = new ArrayList<btCollisionShape>();
 		bodies = new ArrayList<btRigidBody>();
@@ -121,6 +125,8 @@ public abstract class Entity implements Proximity<Vector3>, Steerable<Vector3> {
 			grounded = false;
 			timeout = 0;
 		}
+		
+		outsideColliders.clear();
 	}
 	
 	/**
@@ -130,6 +136,8 @@ public abstract class Entity implements Proximity<Vector3>, Steerable<Vector3> {
 		if(map.getObjectsMap().get(objOutside.getUserValue()).equals(ObjectType.TERRAIN.getId())) {
 			grounded = true;
 		}
+		
+		outsideColliders.add(objOutside);
 	}
 	
 	/**
@@ -455,6 +463,10 @@ public abstract class Entity implements Proximity<Vector3>, Steerable<Vector3> {
 		
 		
 		return tempObj;
+	}
+	
+	public ArrayList<btCollisionObject> getOutsideColliders(){
+		return outsideColliders;
 	}
 	
 	public boolean isGrounded() {

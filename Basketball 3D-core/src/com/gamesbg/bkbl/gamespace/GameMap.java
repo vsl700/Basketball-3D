@@ -36,6 +36,7 @@ import com.gamesbg.bkbl.gamespace.objects.Camera;
 import com.gamesbg.bkbl.gamespace.objects.GameObject;
 import com.gamesbg.bkbl.gamespace.objects.ObjectType;
 import com.gamesbg.bkbl.gamespace.objects.Terrain;
+import com.gamesbg.bkbl.gamespace.rules.Rules;
 import com.gamesbg.bkbl.gamespace.tools.InputController;
 
 public class GameMap implements RaycastCollisionDetector<Vector3> {
@@ -85,6 +86,7 @@ public class GameMap implements RaycastCollisionDetector<Vector3> {
 		}
 	}
 	
+	Rules rules;
 	
 	ArrayList<Player> teammates;
 	ArrayList<Player> opponents;
@@ -124,6 +126,8 @@ public class GameMap implements RaycastCollisionDetector<Vector3> {
 	
 	public GameMap() {
 		inputs = new InputController();
+		
+		rules = new Rules(this);
 		
 		Bullet.init();
         dynCollConfig = new btDefaultCollisionConfiguration();
@@ -496,29 +500,25 @@ public class GameMap implements RaycastCollisionDetector<Vector3> {
 		
 		GdxAI.getTimepiece().update(Gdx.graphics.getDeltaTime());
 		
+		rules.update();
+		
 		ball.update(delta);
 		
-		for(Player e : teammates)
+		for(Player e : getAllPlayers())
 			e.update(delta);
 		
-		for(Player e : opponents)
-			e.update(delta);
 		
 		ball.onCycleEnd();
 		
-		for(Player e : teammates)
+		for(Player e : getAllPlayers())
 			e.onCycleEnd();
 		
-		for(Player e : opponents)
-			e.onCycleEnd();
 	}
 	
 	public void render(ModelBatch mBatch, Environment environment) {
-		for(Player e : teammates)
+		for(Player e : getAllPlayers())
 			e.render(mBatch, environment);
 		
-		for(Player e : opponents)
-			e.render(mBatch, environment);
 		
 		ball.render(mBatch, environment);
 		
@@ -559,7 +559,7 @@ public class GameMap implements RaycastCollisionDetector<Vector3> {
 	}
 	
 	private void disposePlayers() {
-		for(Player e : teammates) {
+		for(Player e : getAllPlayers()) {
 			for(btRigidBody co : e.getBodies()) {
 				dynamicsWorld.removeRigidBody(co);
 				collObjsInEntityMap.remove(co);
@@ -570,20 +570,6 @@ public class GameMap implements RaycastCollisionDetector<Vector3> {
 				collObjsInEntityMap.remove(co);
 			}
 			
-			e.dispose();
-		}
-		
-		for (Player e : opponents) {
-			for (btRigidBody co : e.getBodies()) {
-				dynamicsWorld.removeRigidBody(co);
-				collObjsInEntityMap.remove(co);
-			}
-
-			for (btCollisionObject co : e.getCollisionObjects()) {
-				dynamicsWorld.removeCollisionObject(co);
-				collObjsInEntityMap.remove(co);
-			}
-
 			e.dispose();
 		}
 	}
@@ -710,12 +696,26 @@ public class GameMap implements RaycastCollisionDetector<Vector3> {
 		return null;
 	}
 	
+	public Player getHoldingPlayer() {
+		Player temp = getTeammateHolding();
+		
+		return temp != null ? temp : getOpponentHolding();
+	}
+	
 	public ArrayList<Player> getTeammates(){
 		return teammates;
 	}
 	
 	public ArrayList<Player> getOpponents(){
 		return opponents;
+	}
+	
+	public ArrayList<Player> getAllPlayers(){
+		ArrayList<Player> temp = new ArrayList<Player>();
+		temp.addAll(teammates);
+		temp.addAll(opponents);
+		
+		return temp;
 	}
 	
 	public Vector3 getMainPlayerTranslation() {
@@ -793,13 +793,10 @@ public class GameMap implements RaycastCollisionDetector<Vector3> {
 		if(ball.getBodies() != null)
 			tempObj.addAll(ball.getBodies());
 		
-		for(Player player : teammates)
+		for(Player player : getAllPlayers())
 			if(player.getBodies() != null)
 				tempObj.addAll(player.getBodies());
 		
-		for(Player player : opponents)
-			if(player.getBodies() != null)
-				tempObj.addAll(player.getBodies());
 		
 		if(terrain.getInvisBodies() != null)
 			tempObj.addAll(terrain.getInvisBodies());
@@ -839,13 +836,10 @@ public class GameMap implements RaycastCollisionDetector<Vector3> {
 		if(ball.getCollisionObjects() != null)
 			tempObj.addAll(ball.getCollisionObjects());
 		
-		for(Player player : teammates)
+		for(Player player : getAllPlayers())
 			if(player.getCollisionObjects() != null)
 				tempObj.addAll(player.getCollisionObjects());
 		
-		for(Player player : opponents)
-			if(player.getCollisionObjects() != null)
-				tempObj.addAll(player.getCollisionObjects());
 		
 		return tempObj;
 	}

@@ -375,6 +375,20 @@ public abstract class GameObject implements Steerable<Vector3>, Proximity<Vector
 		return collisionObjects;
 	}
 	
+	public ArrayList<btCollisionObject> getAllCollObjects(){
+		ArrayList<btCollisionObject> tempObj = new ArrayList<btCollisionObject>();
+		tempObj.addAll(bodies);
+		
+		if(invisBodies != null)
+			tempObj.addAll(invisBodies);
+		
+		if(collisionObjects != null)
+			tempObj.addAll(collisionObjects);
+		
+		
+		return tempObj;
+	}
+	
 	public ArrayList<Matrix4> getMatrixes() {
 		return matrixes;
 	}
