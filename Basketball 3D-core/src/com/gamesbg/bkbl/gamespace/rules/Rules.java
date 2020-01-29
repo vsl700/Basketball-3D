@@ -5,6 +5,7 @@ package com.gamesbg.bkbl.gamespace.rules;
 
 import com.badlogic.gdx.physics.bullet.collision.btCollisionObject;
 import com.gamesbg.bkbl.gamespace.GameMap;
+import com.gamesbg.bkbl.gamespace.entities.Entity;
 import com.gamesbg.bkbl.gamespace.entities.Player;
 
 /**
@@ -56,16 +57,32 @@ public class Rules {
 					}
 				},
 				
-				new GameRule("incorrect_ball_steal", "Reached In", "The Ball Has Been Touched While The Holding Player Was Not Dribbling!", map) {
+				new GameRule("incorrect_ball_steal", "Reached In!", "The Ball Has Been Touched While The Holding Player Was Not Dribbling!", map) {
 					@Override
 					public boolean checkRule() {
+						Player temp = map.getHoldingPlayer();
+						
+						if (temp != null) {
+							for (btCollisionObject obj : map.getBall().getOutsideColliders()) {
+								// The checked entity would be always a player
+								// as the players and the ball are the only
+								// entities and an entity cannot collide with
+								// its own collision objects
+								Player checked = (Player) map.getCollObjsInEntityMap().get(obj);
+
+								if (checked != null && !checked.equals(temp) && checked.isPointing() && !temp.isDribbling()) {
+									ruleBreaker = checked;
+									return true;
+								}
+							}
+						}
 						
 						return false;
 					}
 				},
 				
 				//FIXME Check again for the names of the following two game rules!
-				new GameRule("stay_no_dribble", "Dribble Violation", "The Ball Has Not Been Dribbled For 5 Seconds!", map) {
+				new GameRule("stay_no_dribble", "Dribble Violation!", "The Ball Has Not Been Dribbled For 5 Seconds!", map) {
 					@Override
 					public boolean checkRule() {
 						
@@ -73,7 +90,7 @@ public class Rules {
 					}
 				},
 				
-				new GameRule("move_no_dribble", "Dribble Violation", "The Player That Is Holding The Ball Is Moving Without Dribbling It For 1 Second!", map) {
+				new GameRule("move_no_dribble", "Dribble Violation!", "The Player That Is Holding The Ball Is Moving Without Dribbling It For 1 Second!", map) {
 					@Override
 					public boolean checkRule() {
 						
@@ -81,7 +98,7 @@ public class Rules {
 					}
 				},
 				
-				new GameRule("backcourt_violation", "Backcourt Violation", "The Team That Has The Ball Cannot Let The Ball Cross The Midcourt Line Once It Got In The Opposite's Team Zone!", map) {
+				new GameRule("backcourt_violation", "Backcourt Violation!", "The Team That Has The Ball Cannot Let The Ball Cross The Midcourt Line Once It Got In The Opposite's Team Zone!", map) {
 					@Override
 					public boolean checkRule() {
 						

@@ -500,13 +500,12 @@ public class GameMap implements RaycastCollisionDetector<Vector3> {
 		
 		GdxAI.getTimepiece().update(Gdx.graphics.getDeltaTime());
 		
-		rules.update();
-		
 		ball.update(delta);
 		
 		for(Player e : getAllPlayers())
 			e.update(delta);
 		
+		rules.update();
 		
 		ball.onCycleEnd();
 		
@@ -674,6 +673,18 @@ public class GameMap implements RaycastCollisionDetector<Vector3> {
 		return objectsMap;
 	}
 	
+	public HashMap<btCollisionObject, Entity> getCollObjsInEntityMap() {
+		return collObjsInEntityMap;
+	}
+
+	public HashMap<btCollisionObject, GameObject> getCollObjsInObjectMap() {
+		return collObjsInObjectMap;
+	}
+
+	public HashMap<Integer, btCollisionObject> getCollObjsValsMap() {
+		return collObjsValsMap;
+	}
+
 	public Player getMainPlayer() {
 		return mainPlayer;
 	}
