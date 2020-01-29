@@ -1487,8 +1487,6 @@ public abstract class Player extends Entity {
 	
 	@Override
 	public void update(float delta) {
-		if(!isMainPlayer())
-			moveVec.setZero();
 		
 		if(!holdingBall()) {
 			dribbleL = dribbleR = false;
@@ -2031,6 +2029,8 @@ public abstract class Player extends Entity {
 		eastObstacle = false;
 		westObstacle = false;
 		inBasketZone = false;
+		
+		moveVec.setZero();
 	}
 	
 	public Matrix4 getShoulderLTrans() {

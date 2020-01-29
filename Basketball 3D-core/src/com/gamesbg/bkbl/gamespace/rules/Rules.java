@@ -3,6 +3,7 @@
  */
 package com.gamesbg.bkbl.gamespace.rules;
 
+import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.physics.bullet.collision.btCollisionObject;
 import com.gamesbg.bkbl.gamespace.GameMap;
 import com.gamesbg.bkbl.gamespace.entities.Entity;
@@ -83,14 +84,30 @@ public class Rules {
 				
 				//FIXME Check again for the names of the following two game rules!
 				new GameRule("stay_no_dribble", "Dribble Violation!", "The Ball Has Not Been Dribbled For 5 Seconds!", map) {
+					float timer = 5;
+					
 					@Override
 					public boolean checkRule() {
+						Player temp = map.getHoldingPlayer();
+						if(temp == null)
+							return false;
+						
+						if(temp.getMoveVector().isZero(0.00001f)) {
+							if(timer <= 0) {
+								timer = 5;
+								
+								ruleBreaker = temp;
+								return true;
+							}else timer -= Gdx.graphics.getDeltaTime();
+						}
 						
 						return false;
 					}
 				},
 				
 				new GameRule("move_no_dribble", "Dribble Violation!", "The Player That Is Holding The Ball Is Moving Without Dribbling It For 1 Second!", map) {
+					float timer = 1;
+					
 					@Override
 					public boolean checkRule() {
 						
