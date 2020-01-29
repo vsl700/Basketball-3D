@@ -89,17 +89,21 @@ public class Rules {
 					@Override
 					public boolean checkRule() {
 						Player temp = map.getHoldingPlayer();
-						if(temp == null)
+						if(temp == null) {
+							timer = 5;
 							return false;
+						}
 						
-						if(temp.getMoveVector().isZero(0.00001f)) {
-							if(timer <= 0) {
+						if (!temp.isDribbling()) {
+							if (timer <= 0) {
 								timer = 5;
-								
+
 								ruleBreaker = temp;
 								return true;
-							}else timer -= Gdx.graphics.getDeltaTime();
+							} else
+								timer -= Gdx.graphics.getDeltaTime();
 						}
+						else timer = 5;
 						
 						return false;
 					}
@@ -110,6 +114,22 @@ public class Rules {
 					
 					@Override
 					public boolean checkRule() {
+						Player temp = map.getHoldingPlayer();
+						if(temp == null) {
+							timer = 1;
+							return false;
+						}
+						
+						if (!temp.isDribbling() && !temp.getMoveVector().isZero() && !temp.isShooting() && !temp.isAiming()) {
+							if (timer <= 0) {
+								timer = 1;
+
+								ruleBreaker = temp;
+								return true;
+							} else
+								timer -= Gdx.graphics.getDeltaTime();
+						}
+						else timer = 1;
 						
 						return false;
 					}
