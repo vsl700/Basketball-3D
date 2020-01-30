@@ -60,17 +60,8 @@ public class GameMap implements RaycastCollisionDetector<Vector3> {
 	class ObjectContactListener extends ContactListener{
 		@Override
 		public boolean onContactAdded (int userValue0, int partId0, int index0, int userValue1, int partId1, int index1) {
-			if(
-			//objectsMap.get(userValue0).equals("teamNorth") || objectsMap.get(userValue0).equals("teamSouth") || objectsMap.get(userValue0).equals("teamEast") || objectsMap.get(userValue0).equals("teamWest") ||
-			//objectsMap.get(userValue1).equals("teamNorth") || objectsMap.get(userValue1).equals("teamSouth") || objectsMap.get(userValue1).equals("teamEast") || objectsMap.get(userValue1).equals("teamWest")
-					//|| 
-					(objectsMap.get(userValue0).equals("oppNorth") || objectsMap.get(userValue0).equals("oppSouth") || objectsMap.get(userValue0).equals("oppEast") || objectsMap.get(userValue0).equals("oppWest") 
-					) && objectsMap.get(userValue1).equals("team") || 
-					(
-							objectsMap.get(userValue1).equals("oppNorth") || objectsMap.get(userValue1).equals("oppSouth") || objectsMap.get(userValue1).equals("oppEast") || objectsMap.get(userValue1).equals("teamWest")
-					) && objectsMap.get(userValue0).equals("team")
-			)
-				System.out.println(objectsMap.get(userValue0) + ";" + objectsMap.get(userValue1));
+			//if(objectsMap.get(userValue0).equals(ObjectType.TERRAIN.getId() + "Team") || objectsMap.get(userValue1).equals(ObjectType.TERRAIN.getId() + "Team"))
+				//System.out.println(objectsMap.get(userValue0) + ";" + objectsMap.get(userValue1));
 			
 			btCollisionObject tempCollObj0 = collObjsValsMap.get(userValue0), tempCollObj1 = collObjsValsMap.get(userValue1);
 			Entity temp0 = collObjsInEntityMap.get(tempCollObj0), temp1 = collObjsInEntityMap.get(tempCollObj1);
@@ -444,17 +435,17 @@ public class GameMap implements RaycastCollisionDetector<Vector3> {
 	}
 	
 	private void createTerrainLanes() {
-		btCollisionObject midcourtLane = terrain.getCollisionObjects().get(0);
-		midcourtLane.setUserValue(index);
-		midcourtLane.setCollisionFlags(midcourtLane.getCollisionFlags() | btCollisionObject.CollisionFlags.CF_CUSTOM_MATERIAL_CALLBACK);
+		btCollisionObject teamZone = terrain.getCollisionObjects().get(0);
+		teamZone.setUserValue(index);
+		teamZone.setCollisionFlags(teamZone.getCollisionFlags() | btCollisionObject.CollisionFlags.CF_CUSTOM_MATERIAL_CALLBACK);
 		
-		dynamicsWorld.addCollisionObject(midcourtLane, ENT_SPECIAL_FLAG, SPECIAL_FLAG);
-		midcourtLane.setContactCallbackFlag(ENT_SPECIAL_FLAG);
-		midcourtLane.setContactCallbackFilter(SPECIAL_FLAG);
+		dynamicsWorld.addCollisionObject(teamZone, OBJECT_FLAG, ENT_SPECIAL_FLAG);//The ball might collide which would cause this object to behave like an invisible wall
+		teamZone.setContactCallbackFlag(OBJECT_FLAG);
+		teamZone.setContactCallbackFilter(ENT_SPECIAL_FLAG);
 		
-		objectsMap.put(index, ObjectType.TERRAIN.getId() + "Mid");
-		collObjsInObjectMap.put(midcourtLane, terrain);
-		collObjsValsMap.put(index, midcourtLane);
+		objectsMap.put(index, ObjectType.TERRAIN.getId() + "Team");
+		collObjsInObjectMap.put(teamZone, terrain);
+		collObjsValsMap.put(index, teamZone);
 		
 		index++;
 	}

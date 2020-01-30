@@ -8,6 +8,7 @@ import com.badlogic.gdx.physics.bullet.collision.btCollisionObject;
 import com.gamesbg.bkbl.gamespace.GameMap;
 import com.gamesbg.bkbl.gamespace.entities.Entity;
 import com.gamesbg.bkbl.gamespace.entities.Player;
+import com.gamesbg.bkbl.gamespace.entities.players.Teammate;
 
 /**
  * This class contains all the game rules and their actions if the go broken
@@ -138,11 +139,43 @@ public class Rules {
 				},
 				
 				new GameRule("backcourt_violation", "Backcourt Violation!", "The Team That Has The Ball Cannot Let The Ball Cross The Midcourt Line Once It Got In Their Opposite's Team Zone!", map) {
-					Player recentHolder;
 					boolean crossed;//Whether it has already crossed the midcourt lane of the terrain
 					
 					@Override
 					public boolean checkRule() {
+						Player currentHolder = map.getHoldingPlayer();
+						
+						if(currentHolder == null)
+							return false;
+						
+						
+						if (currentHolder instanceof Teammate) {
+							if (!currentHolder.getOutsideColliders().contains(map.getTerrain().getTeamzone())) {
+								if (crossed) {
+									System.out.println("MidCourt");
+									crossed = false;
+									
+									//return true;// If the player doesn't collide
+												// with the teamzone any more,
+												// it means that it's not in it.
+												// Then we give the foul
+												// message.
+									
+								}
+							} else
+								crossed = true;
+						}
+						else {
+							if (currentHolder.getOutsideColliders().contains(map.getTerrain().getTeamzone())) {
+								if (crossed) {
+									System.out.println("MidCourt");
+									crossed = false;
+									
+									//return true;
+								}
+							} else
+								crossed = true;
+						}
 						
 						return false;
 					}

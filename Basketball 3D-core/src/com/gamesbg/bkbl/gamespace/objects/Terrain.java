@@ -102,12 +102,14 @@ public class Terrain extends GameObject {
 			invisBodies.get(i).setRestitution(0.1f);
 		}
 		
-		ArrayList<btCollisionShape> laneShapes = new ArrayList<btCollisionShape>();
-		laneShapes.add(new btBoxShape(new Vector3(getWidth() * 2, 10000, 0.1f)));
+		collisionObjects = new ArrayList<btCollisionObject>();
 		
-		for(int i = 0; i < laneShapes.size(); i++) {
+		ArrayList<btCollisionShape> zoneShapes = new ArrayList<btCollisionShape>();
+		zoneShapes.add(new btBoxShape(new Vector3(getWidth() * 2, 10000, getDepth() / 2)));
+		
+		for(int i = 0; i < zoneShapes.size(); i++) {
 			collisionObjects.add(new btCollisionObject());
-			collisionObjects.get(i).setCollisionShape(laneShapes.get(i));
+			collisionObjects.get(i).setCollisionShape(zoneShapes.get(i));
 		}
 		
 		manuallySetObjects();
@@ -125,7 +127,7 @@ public class Terrain extends GameObject {
 
 	@Override
 	protected void manuallySetObjects() {
-		collisionObjects.get(0).setWorldTransform(getMainTrans());
+		collisionObjects.get(0).setWorldTransform(getMainTrans().cpy().trn(0, 0, getDepth() / 2)); //Sends the zone to Teammates' zone
 	}
 
 	@Override
@@ -136,6 +138,10 @@ public class Terrain extends GameObject {
 		invisBodies.get(1).proceedToTransform(getMainTrans().cpy().mul(new Matrix4().setToTranslation(x, y, z - getDepth() / 2 - wallDepth)));
 		invisBodies.get(2).proceedToTransform(getMainTrans().cpy().mul(new Matrix4().setToTranslation(x + getWidth() / 2 + wallDepth, y, z)));
 		invisBodies.get(3).proceedToTransform(getMainTrans().cpy().mul(new Matrix4().setToTranslation(x, y, z + getDepth() / 2 + wallDepth)));
+	}
+	
+	public btCollisionObject getTeamzone() {
+		return collisionObjects.get(0);
 	}
 
 }
