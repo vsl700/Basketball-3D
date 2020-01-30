@@ -700,18 +700,14 @@ public class GameMap implements RaycastCollisionDetector<Vector3> {
 	
 	public Player getTeammateHolding() {
 		if(currentPlayerHoldTeam > -1)
-		for(Player player : teammates)
-			if(player.holdingBall())
-				return player;
+		return teammates.get(currentPlayerHoldTeam);
 		
 		return null;
 	}
 	
 	public Player getOpponentHolding() {
 		if(currentPlayerHoldOpp > -1)
-		for(Player player : opponents)
-			if(player.holdingBall())
-				return player;
+			return opponents.get(currentPlayerHoldOpp);
 		
 		return null;
 	}

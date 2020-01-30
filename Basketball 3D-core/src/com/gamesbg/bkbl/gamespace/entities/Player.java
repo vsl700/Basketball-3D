@@ -1838,18 +1838,18 @@ public abstract class Player extends Entity {
 	@Override
 	public int findNeighbors(ProximityCallback<Vector3> callback) {
 		if(callback.equals(brain.getBallSeparate())) {
-			System.out.println("Ball separate invoked");
+			//System.out.println("Ball separate invoked");
 			if (isProximityColliding(map.getBall())) {
 				callback.reportNeighbor(map.getBall());
-				System.out.println("Ball separate worked");
+				//System.out.println("Ball separate worked");
 			}
 			
 			return 0;
 		}else if(callback.equals(brain.getBasketSeparate())) {
-			System.out.println("Basket separate invoked");
+			//System.out.println("Basket separate invoked");
 			if (isProximityColliding(getTargetBasket())) {
 				callback.reportNeighbor(getTargetBasket());
-				System.out.println("Basket separate worked");
+				//System.out.println("Basket separate worked");
 			}
 			
 			return 0;
@@ -1862,7 +1862,7 @@ public abstract class Player extends Entity {
 				for(Player p : map.getOpponents())
 					if(!p.equals(this) && isProximityColliding(p)) 
 						callback.reportNeighbor(p);
-			System.out.println("Player separate invoked");
+			//System.out.println("Player separate invoked");
 			return 0;
 		}else if(callback.equals(brain.getCollAvoid())) {
 			int count = 0;

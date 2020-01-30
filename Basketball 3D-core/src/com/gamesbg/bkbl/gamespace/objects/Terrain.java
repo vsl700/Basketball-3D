@@ -127,7 +127,7 @@ public class Terrain extends GameObject {
 
 	@Override
 	protected void manuallySetObjects() {
-		collisionObjects.get(0).setWorldTransform(getMainTrans().cpy().trn(0, 0, getDepth() / 2)); //Sends the zone to Teammates' zone
+		collisionObjects.get(0).setWorldTransform(getMainTrans().cpy().trn(0, 0, getDepth() / 2 + 2.5f)); //Sends the zone to Teammates' zone
 	}
 
 	@Override

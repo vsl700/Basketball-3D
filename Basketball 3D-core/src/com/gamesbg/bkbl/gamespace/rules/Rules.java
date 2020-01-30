@@ -145,17 +145,19 @@ public class Rules {
 					public boolean checkRule() {
 						Player currentHolder = map.getHoldingPlayer();
 						
-						if(currentHolder == null)
+						if(currentHolder == null) {
+							crossed = false;
 							return false;
+						}
 						
 						
 						if (currentHolder instanceof Teammate) {
-							if (!currentHolder.getOutsideColliders().contains(map.getTerrain().getTeamzone())) {
+							if (currentHolder.getOutsideColliders().contains(map.getTerrain().getTeamzone())) { //If it is in Teammate zone
 								if (crossed) {
 									System.out.println("MidCourt");
 									crossed = false;
 									
-									//return true;// If the player doesn't collide
+									return true;// If the player doesn't collide
 												// with the teamzone any more,
 												// it means that it's not in it.
 												// Then we give the foul
@@ -166,12 +168,12 @@ public class Rules {
 								crossed = true;
 						}
 						else {
-							if (currentHolder.getOutsideColliders().contains(map.getTerrain().getTeamzone())) {
+							if (!currentHolder.getOutsideColliders().contains(map.getTerrain().getTeamzone())) {
 								if (crossed) {
 									System.out.println("MidCourt");
 									crossed = false;
 									
-									//return true;
+									return true;
 								}
 							} else
 								crossed = true;
