@@ -82,7 +82,7 @@ public class MyGdxGame extends Game {
 		pCam.far = 100;
 		pCam.near = 0.1f;
 		
-		map = new GameMap();
+		map = new GameMap(game);
 	}
 
 	@Override

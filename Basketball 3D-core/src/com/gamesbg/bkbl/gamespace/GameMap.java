@@ -37,6 +37,8 @@ import com.gamesbg.bkbl.gamespace.objects.GameObject;
 import com.gamesbg.bkbl.gamespace.objects.ObjectType;
 import com.gamesbg.bkbl.gamespace.objects.Terrain;
 import com.gamesbg.bkbl.gamespace.rules.Rules;
+import com.gamesbg.bkbl.gamespace.rules.Rules.GameRule;
+import com.gamesbg.bkbl.gamespace.rules.Rules.RulesListener;
 import com.gamesbg.bkbl.gamespace.tools.InputController;
 
 public class GameMap implements RaycastCollisionDetector<Vector3> {
@@ -115,10 +117,10 @@ public class GameMap implements RaycastCollisionDetector<Vector3> {
     
     int index = 0;
 	
-	public GameMap() {
+	public GameMap(RulesListener rulesListener) {
 		inputs = new InputController();
 		
-		rules = new Rules(this);
+		rules = new Rules(this, rulesListener);
 		
 		Bullet.init();
         dynCollConfig = new btDefaultCollisionConfiguration();
@@ -541,6 +543,14 @@ public class GameMap implements RaycastCollisionDetector<Vector3> {
 	
 	public void removeRigidBody(btRigidBody body) {
 		dynamicsWorld.removeRigidBody(body);
+	}
+	
+	public void brokenRule(GameRule rule) {
+		//The game will just stop here
+		
+		//After that, when the player clicks a specified (or any key), the players will go to their specified by the rule places
+		
+		//Finally, after a quick timeout the game will continue
 	}
 	
 	public void dispose() {

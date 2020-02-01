@@ -6,9 +6,7 @@ package com.gamesbg.bkbl.gamespace.rules;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.physics.bullet.collision.btCollisionObject;
 import com.gamesbg.bkbl.gamespace.GameMap;
-import com.gamesbg.bkbl.gamespace.entities.Entity;
 import com.gamesbg.bkbl.gamespace.entities.Player;
-import com.gamesbg.bkbl.gamespace.entities.players.Teammate;
 
 /**
  * This class contains all the game rules and their actions if the go broken
@@ -23,8 +21,11 @@ public class Rules {
 	
 	GameMap map;
 	
-	public Rules(GameMap map) {
+	RulesListener rulesListener;
+	
+	public Rules(GameMap map, RulesListener rulesListener) {
 		this.map = map;
+		this.rulesListener = rulesListener;
 		
 		gameRules = new GameRule[] {
 				new GameRule("ball_out", "Out Of Bounds!", "The Ball Has Reached The Bounds Of The Terrain!", map) {
@@ -138,7 +139,9 @@ public class Rules {
 					}
 				},
 				
-				new GameRule("backcourt_violation", "Backcourt Violation!", "The Team That Has The Ball Cannot Let The Ball Cross The Midcourt Line Once It Got In Their Opposite's Team Zone!", map) {
+				//FIXME Add this rule and also note that the collision world doesn't always detect the collisions which messes the system up. Think about putting a timeout for clearing
+				//collision objects from entities' lists or limiting the FPS of the game!
+				/*new GameRule("backcourt_violation", "Backcourt Violation!", "The Team That Has The Ball Cannot Let The Ball Cross The Midcourt Line Once It Got In Their Opposite's Team Zone!", map) {
 					boolean crossed;//Whether it has already crossed the midcourt lane of the terrain
 					
 					@Override
@@ -181,7 +184,7 @@ public class Rules {
 						
 						return false;
 					}
-				},
+				},*/
 		};
 	}
 	
@@ -196,7 +199,11 @@ public class Rules {
 		}
 	}
 	
-	private class GameRule{
+	public GameRule getBrokenRule() {
+		return brokenRule;
+	}
+	
+	public class GameRule{
 		String name, description;
 		String id;
 		GameMap map;
@@ -231,5 +238,10 @@ public class Rules {
 		public Player getRuleBreaker() {
 			return ruleBreaker;
 		}
+	}
+	
+	public interface RulesListener{
+		
+		public void onRuleBroken(GameRule rule);
 	}
 }

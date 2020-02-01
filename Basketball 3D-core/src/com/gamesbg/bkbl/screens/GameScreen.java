@@ -19,9 +19,11 @@ import com.badlogic.gdx.math.Matrix4;
 import com.badlogic.gdx.math.Vector3;
 import com.gamesbg.bkbl.MyGdxGame;
 import com.gamesbg.bkbl.gamespace.GameMap;
+import com.gamesbg.bkbl.gamespace.rules.Rules.GameRule;
+import com.gamesbg.bkbl.gamespace.rules.Rules.RulesListener;
 import com.gamesbg.bkbl.gui.Label;
 
-public class GameScreen implements Screen {
+public class GameScreen implements Screen, RulesListener {
 
 	ModelBatch mBatch;
 	Environment environment;
@@ -37,6 +39,7 @@ public class GameScreen implements Screen {
 	MyGdxGame game;
 	
 	Label homeScore, awayScore, timer, power, powerNum;
+	Label ruleHeading, ruleDesc, clickToCont;
 	
 	int amount; //Player amount per team
 
@@ -72,12 +75,16 @@ public class GameScreen implements Screen {
 		timer = new Label("Ready?", textFont, Color.ORANGE, true);
 		power = new Label("POWER", textFont, Color.RED, true);
 		powerNum = new Label("10", powFont, Color.WHITE, true);
+		
+		ruleHeading = new Label("", textFont, Color.RED, true);
+		ruleDesc = new Label("", powFont, Color.RED, true);
+		clickToCont = new Label("Click E To Continue!", powFont, Color.WHITE, true);
 	}
 
 	@Override
 	public void show() {
 		if(map == null)
-			game.load3DGraphics();
+			game.load3DGraphics();//If the default menus setting is just to show a simple picture of the game instead of the game world
 		
 		map = game.getMap();
 		
@@ -164,6 +171,11 @@ public class GameScreen implements Screen {
 	
 	public void setPlayersAmount(int amount) {
 		this.amount = amount;
+	}
+
+	@Override
+	public void onRuleBroken(GameRule rule) {
+		
 	}
 
 }
