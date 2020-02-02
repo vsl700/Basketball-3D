@@ -4,6 +4,7 @@
 package com.gamesbg.bkbl.gamespace.rules;
 
 import com.badlogic.gdx.Gdx;
+import com.badlogic.gdx.math.Vector3;
 import com.badlogic.gdx.physics.bullet.collision.btCollisionObject;
 import com.gamesbg.bkbl.gamespace.GameMap;
 import com.gamesbg.bkbl.gamespace.entities.Player;
@@ -21,7 +22,7 @@ public class Rules {
 	
 	GameMap map;
 	
-	RulesListener rulesListener;
+	RulesListener rulesListener; //That's here because the GameScreen does not have any connection with the GameMap or Rules so I had to make the GameScreen an interface
 	
 	public Rules(GameMap map, RulesListener rulesListener) {
 		this.map = map;
@@ -55,9 +56,19 @@ public class Rules {
 									return true;
 								}
 							}
-						
+						//TODO Also add a check for situations in which the ball gets in the basket through its bottom!
 						return false;
 					}
+
+					@Override
+					public Vector3[] getCalculatedTargetPositions() {
+						Vector3[] targets = new Vector3[map.getAllPlayers().size()];
+						
+						
+						return targets;
+					}
+					
+					
 				},
 				
 				new GameRule("incorrect_ball_steal", "Reached In!", "The Ball Has Been Touched While The Holding Player Was Not Dribbling!", map) {
@@ -193,10 +204,16 @@ public class Rules {
 			if(rule.checkRule()) {
 				//A rule has been broken
 				brokenRule = rule;
+				map.onRuleBroken(rule);
+				rulesListener.onRuleBroken(rule);
 				
 				break;
 			}
 		}
+	}
+	
+	public void clearBrokenRule() {
+		brokenRule = null;
 	}
 	
 	public GameRule getBrokenRule() {
@@ -224,10 +241,20 @@ public class Rules {
 		 */
 		public boolean checkRule() {return false;}
 		
+		public Vector3[] getCalculatedTargetPositions() {return null;}
+		
 		public String getId() {
 			return id;
 		}
 		
+		public String getName() {
+			return name;
+		}
+
+		public String getDescription() {
+			return description;
+		}
+
 		/**
 		 * Called when the game continues after the foul
 		 */

@@ -113,7 +113,7 @@ public class GameMap implements RaycastCollisionDetector<Vector3> {
     float startTimer;
     
     boolean gameRunning;//Whether or not the players can play
-    
+    boolean ruleBroken;
     
     int index = 0;
 	
@@ -498,12 +498,15 @@ public class GameMap implements RaycastCollisionDetector<Vector3> {
 		
 		camera.setWorldTransform(new Matrix4(mainPlayer.getModelInstance().transform).mul(mainPlayer.getCamMatrix()).mul(new Matrix4().setToTranslation(0, mainPlayer.getHeight(), -10)));
 		
+		// We're leaving dynamics world outside because the AI might sometimes
+		// make mistakes and if players go one through another that wouldn't be
+		// very funny (for me)
 		float delta2 = Math.min(1f / 30f, delta);
-		//for(int i = 0; i < 6; i++)
-			dynamicsWorld.stepSimulation(delta2, 15, 1f / 60f);
+		dynamicsWorld.stepSimulation(delta2, 15, 1f / 60f);
+			
 		if(gameRunning)
 			controlPlayer(delta);
-		else {
+		else if(!ruleBroken) {
 			if(startTimer <= 0)
 				gameRunning = true;
 			else startTimer-= delta;
@@ -545,12 +548,25 @@ public class GameMap implements RaycastCollisionDetector<Vector3> {
 		dynamicsWorld.removeRigidBody(body);
 	}
 	
-	public void brokenRule(GameRule rule) {
+	public void onRuleBroken(GameRule rule) {
 		//The game will just stop here
+		gameRunning = false;
+		ruleBroken = true;
+	}
+	
+	public void onRuleBrokenContinue() {
+		// When the player clicks a specified (or any key), the players will go
+		// to their specified by the rule places
 		
-		//After that, when the player clicks a specified (or any key), the players will go to their specified by the rule places
+		// So this method will just give the players target positions according
+		// to the broken rule. (Update void) After the players are ready
+		// (moveVecs == 0 && !AIMemory(only one will be enough to show the
+		// current state).target.isZero()) start the timer (brokenRule == false)
+		// and clear the broken rule from Rules
 		
-		//Finally, after a quick timeout the game will continue
+		
+
+		// Finally, after a quick timeout the game will continue
 	}
 	
 	public void dispose() {
