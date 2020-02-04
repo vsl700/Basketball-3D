@@ -73,7 +73,7 @@ public class GameTools {
 		int count = 0;
 		Player tempPlayer = null;
 		for(int i = 0; i < players.size(); i++) {
-			if(ignored.contains(players.get(i))) //They can't be all players ignored, there's always someone left free
+			if(ignored != null && ignored.contains(players.get(i))) //They can't be all players ignored, there's always someone left free
 				continue;
 			
 			tempPlayer = players.get(i);
@@ -83,7 +83,7 @@ public class GameTools {
 		float dist = position.dst2(tempPlayer.getPosition());
 		for (int i = count; i < players.size(); i++) {
 			Player tempPlayer2 = players.get(i);
-			if(ignored.contains(tempPlayer2))
+			if(ignored != null && ignored.contains(tempPlayer2))
 				continue;
 
 			float dist2 = position.dst2(tempPlayer2.getPosition());

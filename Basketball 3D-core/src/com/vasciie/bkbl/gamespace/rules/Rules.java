@@ -3,12 +3,16 @@
  */
 package com.vasciie.bkbl.gamespace.rules;
 
+import java.util.ArrayList;
+
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.math.Vector3;
 import com.badlogic.gdx.physics.bullet.collision.btCollisionObject;
 import com.vasciie.bkbl.gamespace.GameMap;
 import com.vasciie.bkbl.gamespace.entities.Entity;
 import com.vasciie.bkbl.gamespace.entities.Player;
+import com.vasciie.bkbl.gamespace.entities.players.Teammate;
+import com.vasciie.bkbl.gamespace.tools.GameTools;
 
 /**
  * This class contains all the game rules and their actions if the go broken
@@ -63,8 +67,24 @@ public class Rules {
 
 					@Override
 					public Vector3[] getCalculatedTargetPositions() {
-						Vector3[] targets = new Vector3[map.getAllPlayers().size()];
+						ArrayList<Player> allPlayers = map.getAllPlayers();
+						Vector3[] targets = new Vector3[allPlayers.size()];
 						
+						Player thrower;
+						if(ruleBreaker instanceof Teammate) {
+							thrower = GameTools.getClosestPlayer(map.getBall().getPosition(), map.getOpponents(), null);
+						}else {
+							thrower = GameTools.getClosestPlayer(map.getBall().getPosition(), map.getTeammates(), null);
+						}
+						recentHolder = thrower;
+						
+						for(int i = 0; i < targets.length; i++) {
+							Player temp = allPlayers.get(i);
+							if(temp.equals(thrower))
+								targets[i] = map.getBall().getPosition();
+							else
+								targets[i] = new Vector3();
+						}
 						
 						return targets;
 					}
