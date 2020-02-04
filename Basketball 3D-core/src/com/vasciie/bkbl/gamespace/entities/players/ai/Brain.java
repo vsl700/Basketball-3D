@@ -35,9 +35,6 @@ public class Brain {
 	//The player that uses the brain
 	Player user;
 	
-	//A target which is in a different location from all of the game objects in the world
-	CustomSteerable customTarget;
-	
 	//Some player behaviors
 	Arrive<Vector3> pursue, pursueBallInHand, customPursue;
 	LookWhereYouAreGoing<Vector3> lookAt;
@@ -61,7 +58,7 @@ public class Brain {
 		pursue.setDecelerationRadius(user.getMap().getBall().getWidth() * 1.5f);
 		
 		pursueBallInHand = new Arrive<Vector3>(user, user.getTargetBasket());
-		customPursue = new Arrive<Vector3>(user, customTarget);
+		customPursue = new Arrive<Vector3>(user, null);
 		//pursue.setArrivalTolerance(0.1f);
 		user.setMaxLinearAcceleration(1);
 		lookAt = new LookWhereYouAreGoing<Vector3>(user);
@@ -171,14 +168,6 @@ public class Brain {
 
 	public CollisionAvoidance<Vector3> getCollAvoid() {
 		return collAvoid;
-	}
-
-	public CustomSteerable getCustomTarget() {
-		return customTarget;
-	}
-
-	public void setCustomTarget(CustomSteerable customTarget) {
-		this.customTarget = customTarget;
 	}
 
 	public Interpose<Vector3> getInterpose() {

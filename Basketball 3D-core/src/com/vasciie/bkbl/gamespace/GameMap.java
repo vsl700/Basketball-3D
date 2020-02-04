@@ -5,6 +5,7 @@ import java.util.HashMap;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.ai.GdxAI;
+import com.badlogic.gdx.ai.steer.SteerableAdapter;
 import com.badlogic.gdx.ai.utils.Ray;
 import com.badlogic.gdx.ai.utils.RaycastCollisionDetector;
 import com.badlogic.gdx.graphics.g3d.Environment;
@@ -114,6 +115,7 @@ public class GameMap implements RaycastCollisionDetector<Vector3> {
     
     boolean gameRunning;//Whether or not the players can play
     boolean ruleBroken;
+    boolean playersReady; //Whether the players are in positions
     
     int index = 0;
 	
@@ -434,6 +436,7 @@ public class GameMap implements RaycastCollisionDetector<Vector3> {
 		Gdx.input.setInputProcessor(inputs);
 		
 		startTimer = -1;//6
+		playersReady = true;
 	}
 	
 	private void createTerrainLanes() {
@@ -489,6 +492,13 @@ public class GameMap implements RaycastCollisionDetector<Vector3> {
 		teammates.clear();
 		opponents.clear();
 		
+		GameRule rule = rules.getBrokenRule();
+		if(rule != null) {
+			rules.getBrokenRule().clearRuleBreaker();
+			rules.clearBrokenRule();
+		}
+		ruleBroken = false;
+		
 		createBall();
 		
 		gameRunning = false;
@@ -506,10 +516,26 @@ public class GameMap implements RaycastCollisionDetector<Vector3> {
 			
 		if(gameRunning)
 			controlPlayer(delta);
-		else if(!ruleBroken) {
-			if(startTimer <= 0)
-				gameRunning = true;
-			else startTimer-= delta;
+		else if(playersReady){
+			if (!ruleBroken) {
+				if (startTimer <= 0)
+					gameRunning = true;
+				else
+					startTimer -= delta;
+			}
+		}else {
+			//If players are not ready it means they are not in their target positions. So we should go through each one and check
+			ArrayList<Player> allPlayers = getAllPlayers();
+			boolean flag = true;
+			for(Player p : allPlayers) {
+				if(!p.getMoveVector().isZero()) {
+					flag = false;
+					break;
+				}
+			}
+			
+			if(flag)
+				playersReady = true;
 		}
 		
 		GdxAI.getTimepiece().update(Gdx.graphics.getDeltaTime());
@@ -519,7 +545,8 @@ public class GameMap implements RaycastCollisionDetector<Vector3> {
 		for(Player e : getAllPlayers())
 			e.update(delta);
 		
-		rules.update();
+		if(gameRunning)
+			rules.update();
 		
 		ball.onCycleEnd();
 		
@@ -552,19 +579,39 @@ public class GameMap implements RaycastCollisionDetector<Vector3> {
 		//The game will just stop here
 		gameRunning = false;
 		ruleBroken = true;
+		playersReady = false;
 	}
 	
 	public void onRuleBrokenContinue() {
 		// When the player clicks a specified (or any key), the players will go
 		// to their specified by the rule places
-		
+		//
 		// So this method will just give the players target positions according
 		// to the broken rule. (Update void) After the players are ready
 		// (moveVecs == 0 && !AIMemory(only one will be enough to show the
 		// current state).target.isZero()) start the timer (brokenRule == false)
 		// and clear the broken rule from Rules
 		
+		Vector3[] targetPositions = rules.getBrokenRule().getCalculatedTargetPositions();
+		ArrayList<Player> allPlayers = getAllPlayers();
+		for(int i = 0; i < allPlayers.size(); i++) {
+			final Vector3 tempPos = targetPositions[i];
+			
+			allPlayers.get(i).getBrain().getMemory().setTargetPosition(new SteerableAdapter<Vector3>() {
+				@Override
+				public Vector3 getPosition() {
+					return tempPos;
+				}
+				
+				@Override
+				public float getBoundingRadius() {
+					return 1;
+				}
+			});
+		}
 		
+		ruleBroken = false;
+		startTimer = 1;
 
 		// Finally, after a quick timeout the game will continue
 	}
@@ -812,6 +859,10 @@ public class GameMap implements RaycastCollisionDetector<Vector3> {
 		return gameRunning;
 	}
 	
+	public boolean isRuleBroken() {
+		return ruleBroken;
+	}
+
 	public boolean isBallInTeam() {
 		return currentPlayerHoldTeam > -1;
 	}

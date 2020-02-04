@@ -7,6 +7,7 @@ import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.math.Vector3;
 import com.badlogic.gdx.physics.bullet.collision.btCollisionObject;
 import com.vasciie.bkbl.gamespace.GameMap;
+import com.vasciie.bkbl.gamespace.entities.Entity;
 import com.vasciie.bkbl.gamespace.entities.Player;
 
 /**
@@ -82,7 +83,10 @@ public class Rules {
 								// as the players and the ball are the only
 								// entities and an entity cannot collide with
 								// its own collision objects
-								Player checked = (Player) map.getCollObjsInEntityMap().get(obj);
+								Entity tempE = map.getCollObjsInEntityMap().get(obj);
+								if(!(tempE instanceof Player)) break;//Well sometimes crashes occur
+								
+								Player checked = (Player) tempE;
 
 								if (checked != null && !checked.equals(temp) && checked.isPointing() && !temp.isDribbling()) {
 									ruleBreaker = checked;

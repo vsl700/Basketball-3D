@@ -1,5 +1,6 @@
 package com.vasciie.bkbl.gamespace.entities.players.ai;
 
+import com.badlogic.gdx.ai.steer.SteerableAdapter;
 import com.badlogic.gdx.math.Vector3;
 import com.vasciie.bkbl.gamespace.entities.Player;
 
@@ -17,6 +18,8 @@ public class AIMemory {
 	
 	//The targetVec represents the position of the target, while shootVec represents the point where the player has to shoot so that he can hit the target with the ball
 	Vector3 shootVec, targetVec;
+	
+	SteerableAdapter<Vector3> targetPosition;
 	
 	float dribbleTime, aimingTime, shootTime, switchHandTime, catchTime;
 	float distDiff, resetTime;
@@ -47,6 +50,14 @@ public class AIMemory {
 
 	public Vector3 getTargetVec() {
 		return targetVec;
+	}
+
+	public SteerableAdapter<Vector3> getTargetPosition() {
+		return targetPosition;
+	}
+
+	public void setTargetPosition(SteerableAdapter<Vector3> targetPosition) {
+		this.targetPosition = targetPosition;
 	}
 
 	public void setTargetVec(Vector3 targetVec) {

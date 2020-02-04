@@ -132,7 +132,7 @@ public class GameScreen implements Screen, RulesListener {
 					timer.setText((int) map.getTimer() + "");
 
 				timer.render(batch, shape, cam);
-			}else { //If the game is not running and there is no timer counting down, this means it's just a rule being broken
+			}else if(map.isRuleBroken()){ //If the game is not running and there is no timer counting down
 				ruleHeading.render(batch, shape, cam);
 				ruleDesc.render(batch, shape, cam);
 				
@@ -161,9 +161,9 @@ public class GameScreen implements Screen, RulesListener {
 		timer.setPosAndSize(width / 2, height - 120, 10);
 		power.setPosAndSize(width / 2, height - 80, 10);
 		powerNum.setPosAndSize(width / 2, height - 120, 10);
-		ruleHeading.setPosAndSize(width / 2, height - 80, width - 10);
-		ruleDesc.setPosAndSize(width / 2, height - 120, width - 10);
-		clickToCont.setPosAndSize(width / 2, height - 160, width - 10);
+		ruleHeading.setPosAndSize(width / 2 - (width - 10) / 2, height - 80, width - 10);
+		ruleDesc.setPosAndSize(width / 2 - (width - 10) / 2, height - 120, width - 10);
+		clickToCont.setPosAndSize(width / 2 - (width - 10) / 2, height - 160, width - 10);
 		//pCam.update();
 	}
 
