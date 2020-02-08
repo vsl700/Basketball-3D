@@ -6,6 +6,7 @@ package com.vasciie.bkbl.gamespace.rules;
 import java.util.ArrayList;
 
 import com.badlogic.gdx.Gdx;
+import com.badlogic.gdx.math.Matrix4;
 import com.badlogic.gdx.math.Vector3;
 import com.badlogic.gdx.physics.bullet.collision.btCollisionObject;
 import com.vasciie.bkbl.gamespace.GameMap;
@@ -78,12 +79,20 @@ public class Rules {
 						}
 						recentHolder = thrower;
 						
+						// This is supposed to be a position right in front of
+						// the thrower's sight, and then random coordinates from
+						// -6 to 6 will .mul()-ed by this matrix, so that the
+						// other players get in random positions in front of the
+						// thrower. Also the group should be pointed at the
+						// thrower.
+						Matrix4 positionsCalc = new Matrix4().setToLookAt(recentHolder.getPosition().cpy().sub(new Vector3().add(3)), recentHolder.getPosition(), new Vector3(0, -1, 0));
 						for(int i = 0; i < targets.length; i++) {
 							Player temp = allPlayers.get(i);
 							if(temp.equals(thrower))
 								targets[i] = map.getBall().getPosition();
-							else
+							else {
 								targets[i] = new Vector3();
+							}
 						}
 						
 						return targets;
@@ -117,6 +126,12 @@ public class Rules {
 						
 						return false;
 					}
+
+					@Override
+					public Vector3[] getCalculatedTargetPositions() {
+						
+						return null;
+					}
 				},
 				
 				//FIXME Check again for the names of the following two game rules!
@@ -143,6 +158,12 @@ public class Rules {
 						else timer = 5;
 						
 						return false;
+					}
+
+					@Override
+					public Vector3[] getCalculatedTargetPositions() {
+						
+						return null;
 					}
 				},
 				
@@ -171,6 +192,12 @@ public class Rules {
 						}
 						
 						return false;
+					}
+
+					@Override
+					public Vector3[] getCalculatedTargetPositions() {
+						
+						return null;
 					}
 				},
 				
@@ -244,7 +271,7 @@ public class Rules {
 		return brokenRule;
 	}
 	
-	public class GameRule{
+	public abstract class GameRule{
 		String name, description;
 		String id;
 		GameMap map;
@@ -263,9 +290,9 @@ public class Rules {
 		 * 
 		 * @return true if the rule is broken
 		 */
-		public boolean checkRule() {return false;}
+		public abstract boolean checkRule();
 		
-		public Vector3[] getCalculatedTargetPositions() {return null;}
+		public abstract Vector3[] getCalculatedTargetPositions();
 		
 		public String getId() {
 			return id;

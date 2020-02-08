@@ -5,6 +5,7 @@ package com.vasciie.bkbl.gamespace.tools;
 
 import java.util.ArrayList;
 
+import com.badlogic.gdx.math.Matrix4;
 import com.badlogic.gdx.math.Vector3;
 import com.vasciie.bkbl.gamespace.entities.Player;
 
@@ -95,6 +96,13 @@ public class GameTools {
 		}
 		
 		return tempPlayer;
+	}
+	
+	public static Vector3[] getRotatedPositionsGroup(Vector3[] group, float angle) {
+		Matrix4 rectOfRotation = new Matrix4().rotate(0, 1, 0, angle);
+		
+		
+		return group;
 	}
 	
 }
