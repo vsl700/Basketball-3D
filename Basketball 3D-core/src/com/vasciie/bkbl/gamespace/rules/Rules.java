@@ -6,6 +6,7 @@ package com.vasciie.bkbl.gamespace.rules;
 import java.util.ArrayList;
 
 import com.badlogic.gdx.Gdx;
+import com.badlogic.gdx.math.MathUtils;
 import com.badlogic.gdx.math.Matrix4;
 import com.badlogic.gdx.math.Vector3;
 import com.badlogic.gdx.physics.bullet.collision.btCollisionObject;
@@ -67,9 +68,8 @@ public class Rules {
 					}
 
 					@Override
-					public Vector3[] getCalculatedTargetPositions() {
+					public void calculateTargetPositions() {
 						ArrayList<Player> allPlayers = map.getAllPlayers();
-						Vector3[] targets = new Vector3[allPlayers.size()];
 						
 						Player thrower;
 						if(ruleBreaker instanceof Teammate) {
@@ -79,23 +79,27 @@ public class Rules {
 						}
 						recentHolder = thrower;
 						
+						
+						Vector3 posGroupPos = recentHolder.getPosition().cpy().sub(recentHolder.angleToVector(new Vector3(), recentHolder.getOrientation()).scl(3));
 						// This is supposed to be a position right in front of
 						// the thrower's sight, and then random coordinates from
-						// -6 to 6 will .mul()-ed by this matrix, so that the
-						// other players get in random positions in front of the
-						// thrower. Also the group should be pointed at the
-						// thrower.
-						Matrix4 positionsCalc = new Matrix4().setToLookAt(recentHolder.getPosition().cpy().sub(new Vector3().add(3)), recentHolder.getPosition(), new Vector3(0, -1, 0));
-						for(int i = 0; i < targets.length; i++) {
+						// -6 to 6 z-axis and -3 to 3 x-axis will .mul()-ed by
+						// this matrix, so that the other players get in random
+						// positions in front of the thrower. Also the group
+						// should be pointed at the thrower.
+						Matrix4 positionsCalc = new Matrix4().setToLookAt(posGroupPos, recentHolder.getPosition(), new Vector3(0, -1, 0)).trn(posGroupPos);
+						for(int i = 0; i < allPlayers.size(); i++) {
 							Player temp = allPlayers.get(i);
 							if(temp.equals(thrower))
-								targets[i] = map.getBall().getPosition();
+								map.setPlayerTargetPosition(map.getBall().getPosition(), temp);
 							else {
-								targets[i] = new Vector3();
+								//Choosing a random target position for the following players
+								Matrix4 tempTrans = new Matrix4().setToTranslation(new Vector3(MathUtils.random(-3f, 3f), 0, MathUtils.random(-6f, 6f))); //We need to specify that the range value is a float (with an f), otherwise we are calling the integer method
+								
+								//Putting a calculated from the original by the group one position into the targets vector
+								map.setPlayerTargetPosition(positionsCalc.cpy().mul(tempTrans).getTranslation(new Vector3()), temp);
 							}
 						}
-						
-						return targets;
 					}
 					
 					
@@ -128,9 +132,8 @@ public class Rules {
 					}
 
 					@Override
-					public Vector3[] getCalculatedTargetPositions() {
+					public void calculateTargetPositions() {
 						
-						return null;
 					}
 				},
 				
@@ -161,9 +164,8 @@ public class Rules {
 					}
 
 					@Override
-					public Vector3[] getCalculatedTargetPositions() {
+					public void calculateTargetPositions() {
 						
-						return null;
 					}
 				},
 				
@@ -195,9 +197,8 @@ public class Rules {
 					}
 
 					@Override
-					public Vector3[] getCalculatedTargetPositions() {
+					public void calculateTargetPositions() {
 						
-						return null;
 					}
 				},
 				
@@ -251,7 +252,7 @@ public class Rules {
 	}
 	
 	public void update() {
-		for(GameRule rule : gameRules) {
+		/*for(GameRule rule : gameRules) {
 			if(rule.checkRule()) {
 				//A rule has been broken
 				brokenRule = rule;
@@ -260,6 +261,13 @@ public class Rules {
 				
 				break;
 			}
+		}*/ //TODO Bring this back after you finish testing the rules!!!
+		
+		GameRule tempRule = gameRules[0];
+		if(tempRule.checkRule()) {
+			brokenRule = tempRule;
+			map.onRuleBroken(tempRule);
+			rulesListener.onRuleBroken(tempRule);
 		}
 	}
 	
@@ -292,7 +300,7 @@ public class Rules {
 		 */
 		public abstract boolean checkRule();
 		
-		public abstract Vector3[] getCalculatedTargetPositions();
+		public abstract void calculateTargetPositions();
 		
 		public String getId() {
 			return id;

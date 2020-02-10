@@ -114,7 +114,8 @@ public class GameMap implements RaycastCollisionDetector<Vector3> {
     float startTimer;
     
     boolean gameRunning;//Whether or not the players can play
-    boolean ruleBroken;
+    boolean ruleBroken; 
+    boolean ruleBrokenActing;//Whether the players are currently acting like after a broken rule (for example during a throw-in, until the thrower throws the ball and another player catches it, this boolean stays true)
     boolean playersReady; //Whether the players are in positions
     
     int index = 0;
@@ -590,30 +591,41 @@ public class GameMap implements RaycastCollisionDetector<Vector3> {
 		// to the broken rule. (Update void) After the players are ready
 		// (moveVecs == 0 && !AIMemory(only one will be enough to show the
 		// current state).target.isZero()) start the timer (brokenRule == false)
-		// and clear the broken rule from Rules
-		
-		Vector3[] targetPositions = rules.getBrokenRule().getCalculatedTargetPositions();
-		ArrayList<Player> allPlayers = getAllPlayers();
-		for(int i = 0; i < allPlayers.size(); i++) {
-			final Vector3 tempPos = targetPositions[i];
-			
-			allPlayers.get(i).getBrain().getMemory().setTargetPosition(new SteerableAdapter<Vector3>() {
-				@Override
-				public Vector3 getPosition() {
-					return tempPos;
-				}
-				
-				@Override
-				public float getBoundingRadius() {
-					return 1;
-				}
-			});
-		}
-		
+		// and clear the broken rule from Rule
+		rules.getBrokenRule().calculateTargetPositions();
 		ruleBroken = false;
+		ruleBrokenActing = true;
 		startTimer = 1;
 
 		// Finally, after a quick timeout the game will continue
+	}
+	
+	/**
+	 * Sets a new target position of a player. I created this method because of the Rules system. Read the note inside the {@link GameMap#onRuleBrokenContinue()} method
+	 * @param pos - the target position
+	 * @param index - the index of the player
+	 */
+	public void setPlayerTargetPosition(final Vector3 pos, Player player) {
+		// I decided to put the target setter outside of the rules's methods
+		// because I'm using a SteerableAdapter to set the targets and inside
+		// the adapter I'm also setting the bounding radius and if I have to
+		// change it (or add something), I'll have to do it everywhere on
+		// all game rules.
+		player.getBrain().getMemory().setTargetPosition(new SteerableAdapter<Vector3>() {
+			@Override
+			public Vector3 getPosition() {
+				return pos;
+			}
+			
+			@Override
+			public float getBoundingRadius() {
+				return 1;
+			}
+		});
+	}
+	
+	public void actionOver() {
+		ruleBrokenActing = false;
 	}
 	
 	public void dispose() {
@@ -861,6 +873,10 @@ public class GameMap implements RaycastCollisionDetector<Vector3> {
 	
 	public boolean isRuleBroken() {
 		return ruleBroken;
+	}
+
+	public boolean isRuleBrokenActing() {
+		return ruleBrokenActing;
 	}
 
 	public boolean isBallInTeam() {

@@ -1888,12 +1888,6 @@ public abstract class Player extends Entity {
 		
 		return super.findNeighbors(callback);
 	}
-	
-	@Override
-	public float getOrientation() {
-		return super.getOrientation();
-		//return vectorToAngle(moveVec);
-	}
 
 	public Matrix4 getCamMatrix() {
 		return camMatrix;
