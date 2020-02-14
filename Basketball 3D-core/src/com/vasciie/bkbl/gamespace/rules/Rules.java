@@ -80,29 +80,32 @@ public class Rules {
 						recentHolder = thrower;
 						
 						
-						Vector3 posGroupPos = recentHolder.getPosition().cpy().sub(recentHolder.angleToVector(new Vector3(), recentHolder.getOrientation()).scl(3));
+						Vector3 posGroupPos = thrower.getPosition().cpy().sub(thrower.angleToVector(new Vector3(), thrower.getOrientation()).scl(3));
 						// This is supposed to be a position right in front of
 						// the thrower's sight, and then random coordinates from
 						// -6 to 6 z-axis and -3 to 3 x-axis will .mul()-ed by
 						// this matrix, so that the other players get in random
 						// positions in front of the thrower. Also the group
 						// should be pointed at the thrower.
-						Matrix4 positionsCalc = new Matrix4().setToLookAt(posGroupPos, recentHolder.getPosition(), new Vector3(0, -1, 0)).trn(posGroupPos);
+						Matrix4 positionsCalc = new Matrix4().setToLookAt(posGroupPos, thrower.getPosition(), new Vector3(0, -1, 0)).trn(posGroupPos);
 						for(int i = 0; i < allPlayers.size(); i++) {
 							Player temp = allPlayers.get(i);
-							if(temp.equals(thrower))
-								map.setPlayerTargetPosition(map.getBall().getPosition(), temp);
+							if(temp.equals(thrower)) {
+								//map.setPlayerTargetPosition(map.getBall().getPosition(), temp);
+								temp.getBrain().getMemory().setTargetPosition(map.getBall());
+								temp.getBrain().getMemory().setCatchBall(true);
+							}
 							else {
 								//Choosing a random target position for the following players
-								Matrix4 tempTrans = new Matrix4().setToTranslation(new Vector3(MathUtils.random(-3f, 3f), 0, MathUtils.random(-6f, 6f))); //We need to specify that the range value is a float (with an f), otherwise we are calling the integer method
+								Matrix4 tempTrans = new Matrix4().setToTranslation(MathUtils.random(-3f, 3f), 0, MathUtils.random(-6f, 6f)); //We need to specify that the range value is a float (with an f), otherwise we are calling the integer method
 								
 								//Putting a calculated from the original by the group one position into the targets vector
 								map.setPlayerTargetPosition(positionsCalc.cpy().mul(tempTrans).getTranslation(new Vector3()), temp);
 							}
 						}
+						
+						System.out.println("Calculated targets");
 					}
-					
-					
 				},
 				
 				new GameRule("incorrect_ball_steal", "Reached In!", "The Ball Has Been Touched While The Holding Player Was Not Dribbling!", map) {
@@ -272,6 +275,11 @@ public class Rules {
 	}
 	
 	public void clearBrokenRule() {
+		brokenRule = null;
+	}
+	
+	public void clearBrokenRuleWRuleBreaker() {
+		brokenRule.clearRuleBreaker();
 		brokenRule = null;
 	}
 	

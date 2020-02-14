@@ -262,11 +262,6 @@ public enum PlayerState implements State<Player> {
 			Ball tempBall = player.getMap().getBall();
 			
 			Vector3 ballVec = tempBall.getModelInstance().transform.getTranslation(new Vector3());
-			ArrayList<Vector3> handVecs = new ArrayList<Vector3>();
-			handVecs.add(player.getShoulderLTrans().getTranslation(new Vector3()));
-			handVecs.add(player.getShoulderRTrans().getTranslation(new Vector3()));
-
-			Vector3 tempHandVec = GameTools.getShortestDistanceWVectors(ballVec, handVecs);
 
 			// player.getBrain().lookAt.setTarget(player.getMap().getBall());
 			// player.getBrain().lookAt.calculateSteering(Player.steering);
@@ -297,10 +292,7 @@ public enum PlayerState implements State<Player> {
 				
 				
 				//if (mem.getCatchTime() > 0.5f) {
-					if (tempHandVec.idt(handVecs.get(0)))
-						player.interactWithBallL();
-					else
-						player.interactWithBallR();
+					player.interactWithBallA();
 				//}
 			} else {
 				player.getBrain().getMSBallChase().calculateSteering(Player.steering);
@@ -435,8 +427,11 @@ public enum PlayerState implements State<Player> {
 
 		@Override
 		public void enter(Player player) {
-			if(player.getMap().isRuleBroken())
-				player.getBrain().getCustomPursue().setTarget(player.getBrain().getMemory().getTargetPosition());
+			Brain brain = player.getBrain();
+			brain.getCustomPursue().setArrivalTolerance(brain.getMemory().getTargetPosition().getBoundingRadius());
+			brain.getCustomPursue().setTarget(brain.getMemory().getTargetPosition());
+			
+			System.out.println("Switched to Idle");
 		}
 
 		@Override
@@ -445,9 +440,14 @@ public enum PlayerState implements State<Player> {
 			
 			if(brain.getCustomPursue().getTarget() != null) {
 				brain.getCustomPursue().calculateSteering(Player.steering);
+				//System.out.println("Idling movement");
 				
 				player.setMoveVector(Player.steering.linear);
 				player.lookAt(player.getMap().getBall().getPosition());
+				
+				if(brain.getMemory().isCatchBall()) {
+					player.interactWithBallA();
+				}
 			}
 		}
 		
@@ -459,6 +459,8 @@ public enum PlayerState implements State<Player> {
 				brain.getCustomPursue().setTarget(null);
 				brain.getMemory().setTargetPosition(null);
 			}
+			
+			System.out.println("Switched out of Idle");
 		}
 	};
 

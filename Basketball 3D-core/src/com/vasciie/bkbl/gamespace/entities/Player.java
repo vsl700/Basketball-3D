@@ -33,6 +33,7 @@ import com.vasciie.bkbl.gamespace.entities.players.ai.*;
 import com.vasciie.bkbl.gamespace.objects.Basket;
 import com.vasciie.bkbl.gamespace.objects.ObjectType;
 import com.vasciie.bkbl.gamespace.tools.CustomAnimation;
+import com.vasciie.bkbl.gamespace.tools.GameTools;
 
 public abstract class Player extends Entity {
 
@@ -893,6 +894,27 @@ public abstract class Player extends Entity {
 		}
 	}
 	
+	public void interactWithBallA() {
+		if (!holdingBall()) {
+			Ball tempBall = map.getBall();
+
+			Vector3 ballVec = tempBall.getModelInstance().transform.getTranslation(new Vector3());
+			ArrayList<Vector3> handVecs = new ArrayList<Vector3>();
+			handVecs.add(getShoulderLTrans().getTranslation(new Vector3()));
+			handVecs.add(getShoulderRTrans().getTranslation(new Vector3()));
+
+			Vector3 tempHandVec = GameTools.getShortestDistanceWVectors(ballVec, handVecs);
+
+			if (tempHandVec.idt(handVecs.get(0)))
+				interactWithBallL();
+			else
+				interactWithBallR();
+		}else if(leftHoldingBall)
+			interactWithBallL();
+		else if(rightHoldingBall)
+			interactWithBallR();
+	}
+	
 	public void switchDribble() {
 		if(leftHoldingBall)
 			interactWithBallR();
@@ -931,6 +953,8 @@ public abstract class Player extends Entity {
 			map.getBall().getMainBody().setGravity(new Vector3());
 
 			map.setHoldingPlayer(this);
+			
+			brain.getMemory().setCatchBall(false);
 		}
 	}
 	
@@ -1491,6 +1515,7 @@ public abstract class Player extends Entity {
 		if(!holdingBall()) {
 			dribbleL = dribbleR = false;
 			leftHoldingBall = rightHoldingBall = false;
+			map.getBall().getMainBody().setGravity(map.getDynamicsWorld().getGravity());
 		}
 		
 		else if(!leftHoldingBall && !rightHoldingBall && !isDribbling()) {
@@ -1498,9 +1523,9 @@ public abstract class Player extends Entity {
 			map.getBall().getMainBody().setGravity(map.getDynamicsWorld().getGravity());
 		}
 		
-		if(!isMainPlayer()) {
-			steering.setZero();
-			brain.update();
+		if(!isMainPlayer() || map.isRuleBrokenActing()) {
+			if(!map.isRuleBroken())
+				brain.update();
 			//Vector3 tempVec = moveVec.add(new Vector3(steering.linear.cpy().x, 0, steering.linear.cpy().y)).scl(0.5f);
 			//float tempAng = steering.angular;
 			moveVec.y = 0;

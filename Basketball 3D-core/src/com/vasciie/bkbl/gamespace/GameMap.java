@@ -119,6 +119,7 @@ public class GameMap implements RaycastCollisionDetector<Vector3> {
     boolean playersReady; //Whether the players are in positions
     
     int index = 0;
+    int checker; //For now used only by the rule action checker
 	
 	public GameMap(RulesListener rulesListener) {
 		inputs = new InputController();
@@ -509,9 +510,9 @@ public class GameMap implements RaycastCollisionDetector<Vector3> {
 		
 		camera.setWorldTransform(new Matrix4(mainPlayer.getModelInstance().transform).mul(mainPlayer.getCamMatrix()).mul(new Matrix4().setToTranslation(0, mainPlayer.getHeight(), -10)));
 		
-		// We're leaving dynamics world outside because the AI might sometimes
-		// make mistakes and if players go one through another that wouldn't be
-		// very funny (for me)
+		// We're leaving dynamics world outside of the check below
+		// because the AI might sometimes make mistakes and if 
+		// players go one through another that wouldn't be very funny (for me)
 		float delta2 = Math.min(1f / 30f, delta);
 		dynamicsWorld.stepSimulation(delta2, 15, 1f / 60f);
 			
@@ -524,36 +525,66 @@ public class GameMap implements RaycastCollisionDetector<Vector3> {
 				else
 					startTimer -= delta;
 			}
-		}else {
+		}else if(!ruleBroken){
+			updateGame(delta);
+			
 			//If players are not ready it means they are not in their target positions. So we should go through each one and check
 			ArrayList<Player> allPlayers = getAllPlayers();
 			boolean flag = true;
 			for(Player p : allPlayers) {
-				if(!p.getMoveVector().isZero()) {
+				if(!p.getMoveVector().isZero()) { //We use player velocities for checking if they are in their places
 					flag = false;
 					break;
 				}
 			}
 			
-			if(flag)
-				playersReady = true;
+			if(flag) {
+				if (checker == 3) {
+					playersReady = true;
+					actionOver();
+					rules.clearBrokenRuleWRuleBreaker();
+				}
+				else checker++;
+			}
+			
+			return;
 		}
 		
-		GdxAI.getTimepiece().update(Gdx.graphics.getDeltaTime());
+		updateFullGame(delta);
 		
+	}
+	
+	private void updateGame(float delta) {
 		ball.update(delta);
 		
-		for(Player e : getAllPlayers())
-			e.update(delta);
+		updatePlayers(delta);
 		
-		if(gameRunning)
+		if(gameRunning) {
 			rules.update();
+		}
+		
+	}
+	
+	private void updateFullGame(float delta) {
+		ball.update(delta);
+		
+		updatePlayers(delta);
+		
+		if(gameRunning) {
+			rules.update();
+		}
 		
 		ball.onCycleEnd();
 		
 		for(Player e : getAllPlayers())
 			e.onCycleEnd();
+	}
+	
+	private void updatePlayers(float delta) {
+		GdxAI.getTimepiece().update(delta);
 		
+		for(Player e : getAllPlayers())
+			e.update(delta);
 	}
 	
 	public void render(ModelBatch mBatch, Environment environment) {
@@ -581,6 +612,8 @@ public class GameMap implements RaycastCollisionDetector<Vector3> {
 		gameRunning = false;
 		ruleBroken = true;
 		playersReady = false;
+		
+		playerReleaseBall();
 	}
 	
 	public void onRuleBrokenContinue() {
@@ -595,8 +628,8 @@ public class GameMap implements RaycastCollisionDetector<Vector3> {
 		rules.getBrokenRule().calculateTargetPositions();
 		ruleBroken = false;
 		ruleBrokenActing = true;
-		startTimer = 1;
-
+		startTimer = 3;
+		System.out.println("On rule broken continue");
 		// Finally, after a quick timeout the game will continue
 	}
 	
@@ -619,7 +652,7 @@ public class GameMap implements RaycastCollisionDetector<Vector3> {
 			
 			@Override
 			public float getBoundingRadius() {
-				return 1;
+				return 2;
 			}
 		});
 	}

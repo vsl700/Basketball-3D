@@ -27,6 +27,8 @@ public class AIMemory {
 	boolean ballJustShot;
 	boolean ballChaser; //Whether this player is chosen to chase the ball while in chase mode
 	
+	boolean catchBall;
+	
 	public AIMemory() {
 		shootTime = 20;
 	}
@@ -134,6 +136,14 @@ public class AIMemory {
 
 	public void setBallChaser(boolean ballChaser) {
 		this.ballChaser = ballChaser;
+	}
+
+	public boolean isCatchBall() {
+		return catchBall;
+	}
+
+	public void setCatchBall(boolean catchBall) {
+		this.catchBall = catchBall;
 	}
 	
 	
