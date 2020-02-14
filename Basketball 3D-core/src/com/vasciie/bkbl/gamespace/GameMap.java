@@ -119,7 +119,6 @@ public class GameMap implements RaycastCollisionDetector<Vector3> {
     boolean playersReady; //Whether the players are in positions
     
     int index = 0;
-    int checker; //For now used only by the rule action checker
 	
 	public GameMap(RulesListener rulesListener) {
 		inputs = new InputController();
@@ -539,12 +538,9 @@ public class GameMap implements RaycastCollisionDetector<Vector3> {
 			}
 			
 			if(flag) {
-				if (checker == 3) {
-					playersReady = true;
-					actionOver();
-					rules.clearBrokenRuleWRuleBreaker();
-				}
-				else checker++;
+				playersReady = true;
+				actionOver();
+				rules.clearBrokenRuleWRuleBreaker();
 			}
 			
 			return;
