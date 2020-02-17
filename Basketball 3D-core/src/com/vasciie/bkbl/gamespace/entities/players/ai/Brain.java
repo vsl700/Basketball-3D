@@ -116,7 +116,7 @@ public class Brain {
 		//The state switcher
 		if(user.getMap().isGameRunning()) {
 			//If the current player is holding the ball
-			if(user.holdingBall()) {
+			if(user.isHoldingBall()) {
 				if(!stateMachine.isInState(PlayerState.BALL_IN_HAND)) stateMachine.changeState(PlayerState.BALL_IN_HAND);
 			
 			}else {

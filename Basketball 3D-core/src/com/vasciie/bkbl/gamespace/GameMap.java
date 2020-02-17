@@ -515,9 +515,9 @@ public class GameMap implements RaycastCollisionDetector<Vector3> {
 		float delta2 = Math.min(1f / 30f, delta);
 		dynamicsWorld.stepSimulation(delta2, 15, 1f / 60f);
 			
-		if(gameRunning)
-			controlPlayer(delta);
-		else if(playersReady){
+		//if(gameRunning)
+		controlPlayer(delta);
+		if(playersReady){
 			if (!ruleBroken) {
 				if (startTimer <= 0)
 					gameRunning = true;
@@ -525,9 +525,9 @@ public class GameMap implements RaycastCollisionDetector<Vector3> {
 					startTimer -= delta;
 			}
 		}else if(!ruleBroken){
-			updateGame(delta);
+			updateFullGame(delta);
 			
-			//If players are not ready it means they are not in their target positions. So we should go through each one and check
+			/*//If players are not ready it means they are not in their target positions. So we should go through each one and check
 			ArrayList<Player> allPlayers = getAllPlayers();
 			boolean flag = true;
 			for(Player p : allPlayers) {
@@ -543,21 +543,17 @@ public class GameMap implements RaycastCollisionDetector<Vector3> {
 				rules.clearBrokenRuleWRuleBreaker();
 			}
 			
+			return;*/
+			
+			if(playersReady = rules.getBrokenRule().arePlayersReady()) {
+				actionOver();
+				//rules.clearBrokenRuleWRuleBreaker();
+			}
+			
 			return;
 		}
 		
 		updateFullGame(delta);
-		
-	}
-	
-	private void updateGame(float delta) {
-		ball.update(delta);
-		
-		updatePlayers(delta);
-		
-		if(gameRunning) {
-			rules.update();
-		}
 		
 	}
 	
@@ -640,6 +636,17 @@ public class GameMap implements RaycastCollisionDetector<Vector3> {
 		// the adapter I'm also setting the bounding radius and if I have to
 		// change it (or add something), I'll have to do it everywhere on
 		// all game rules.
+		
+		if(pos.x < 0)
+			pos.x = 0;
+		else if(pos.x > terrain.getWidth())
+			pos.x = terrain.getWidth();
+		
+		if(pos.z < 0)
+			pos.z = 0;
+		else if(pos.z > terrain.getDepth())
+			pos.z = terrain.getDepth();
+		
 		player.getBrain().getMemory().setTargetPosition(new SteerableAdapter<Vector3>() {
 			@Override
 			public Vector3 getPosition() {
@@ -783,7 +790,7 @@ public class GameMap implements RaycastCollisionDetector<Vector3> {
 		else if(Gdx.input.getY() < substractor)
 			Gdx.input.setCursorPosition(Gdx.input.getX(), Gdx.graphics.getHeight() - substractor);
 		
-		inputs.update(mainPlayer.holdingBall());
+		inputs.update(mainPlayer.isHoldingBall());
 		
 		
 	}

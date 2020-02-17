@@ -36,8 +36,8 @@ public class Rules {
 		this.rulesListener = rulesListener;
 		
 		gameRules = new GameRule[] {
-				new GameRule("ball_out", "Out Of Bounds!", "The Ball Has Reached The Bounds Of The Terrain!", map) {
-					Player recentHolder;
+				new GameRule(this, "ball_out", "Out Of Bounds!", "The Ball Has Reached The Bounds Of The Terrain!", map) {
+					Player recentHolder, thrower;
 					
 					@Override
 					public boolean checkRule() {
@@ -71,7 +71,6 @@ public class Rules {
 					public void calculateTargetPositions() {
 						ArrayList<Player> allPlayers = map.getAllPlayers();
 						
-						Player thrower;
 						if(ruleBreaker instanceof Teammate) {
 							thrower = GameTools.getClosestPlayer(map.getBall().getPosition(), map.getOpponents(), null);
 						}else {
@@ -106,9 +105,24 @@ public class Rules {
 						
 						System.out.println("Calculated targets");
 					}
+
+					@Override
+					public void managePlayers() {
+						if(recentHolder.equals(thrower)) {
+							rules.clearBrokenRuleWRuleBreaker();
+						}
+					}
+
+					@Override
+					public boolean arePlayersReady() {
+						if(recentHolder.isHoldingBall())
+							return true;
+						
+						return false;
+					}
 				},
 				
-				new GameRule("incorrect_ball_steal", "Reached In!", "The Ball Has Been Touched While The Holding Player Was Not Dribbling!", map) {
+				new GameRule(this, "incorrect_ball_steal", "Reached In!", "The Ball Has Been Touched While The Holding Player Was Not Dribbling!", map) {
 					@Override
 					public boolean checkRule() {
 						Player temp = map.getHoldingPlayer();
@@ -138,10 +152,22 @@ public class Rules {
 					public void calculateTargetPositions() {
 						
 					}
+
+					@Override
+					public void managePlayers() {
+						
+						
+					}
+
+					@Override
+					public boolean arePlayersReady() {
+						
+						return false;
+					}
 				},
 				
 				//FIXME Check again for the names of the following two game rules!
-				new GameRule("stay_no_dribble", "Dribble Violation!", "The Ball Has Not Been Dribbled For 5 Seconds!", map) {
+				new GameRule(this, "stay_no_dribble", "Dribble Violation!", "The Ball Has Not Been Dribbled For 5 Seconds!", map) {
 					float timer = 5;
 					
 					@Override
@@ -170,9 +196,21 @@ public class Rules {
 					public void calculateTargetPositions() {
 						
 					}
+
+					@Override
+					public void managePlayers() {
+						
+						
+					}
+
+					@Override
+					public boolean arePlayersReady() {
+						
+						return false;
+					}
 				},
 				
-				new GameRule("move_no_dribble", "Dribble Violation!", "The Player That Is Holding The Ball Is Moving Without Dribbling It For A Total Of 1 Second!", map) {
+				new GameRule(this, "move_no_dribble", "Dribble Violation!", "The Player That Is Holding The Ball Is Moving Without Dribbling It For A Total Of 1 Second!", map) {
 					float timer = 1;
 					
 					@Override
@@ -202,6 +240,18 @@ public class Rules {
 					@Override
 					public void calculateTargetPositions() {
 						
+					}
+
+					@Override
+					public void managePlayers() {
+						
+						
+					}
+
+					@Override
+					public boolean arePlayersReady() {
+						
+						return false;
 					}
 				},
 				
@@ -255,22 +305,26 @@ public class Rules {
 	}
 	
 	public void update() {
-		/*for(GameRule rule : gameRules) {
-			if(rule.checkRule()) {
-				//A rule has been broken
-				brokenRule = rule;
-				map.onRuleBroken(rule);
-				rulesListener.onRuleBroken(rule);
-				
-				break;
+		if(brokenRule != null)
+			brokenRule.managePlayers();
+		else {
+			/*for (GameRule rule : gameRules) {
+				if (rule.checkRule()) {
+					// A rule has been broken
+					brokenRule = rule;
+					map.onRuleBroken(rule);
+					rulesListener.onRuleBroken(rule);
+
+					break;
+				}
+			}*/ // TODO Bring this back after you finish testing the rules!!!
+
+			GameRule tempRule = gameRules[0];
+			if (tempRule.checkRule()) {
+				brokenRule = tempRule;
+				map.onRuleBroken(tempRule);
+				rulesListener.onRuleBroken(tempRule);
 			}
-		}*/ //TODO Bring this back after you finish testing the rules!!!
-		
-		GameRule tempRule = gameRules[0];
-		if(tempRule.checkRule()) {
-			brokenRule = tempRule;
-			map.onRuleBroken(tempRule);
-			rulesListener.onRuleBroken(tempRule);
 		}
 	}
 	
@@ -294,11 +348,14 @@ public class Rules {
 		
 		Player ruleBreaker;
 		
-		public GameRule(String id, String name, String desc, GameMap map) {
+		Rules rules;
+		
+		public GameRule(Rules rules, String id, String name, String desc, GameMap map) {
 			this.id = id;
 			this.name = name;
 			description = desc;
 			this.map = map;
+			this.rules = rules;
 		}
 		
 		/**
@@ -309,6 +366,13 @@ public class Rules {
 		public abstract boolean checkRule();
 		
 		public abstract void calculateTargetPositions();
+		
+		/**
+		 * Used after a rule is broken (when the players are acting on the broken rule)
+		 */
+		public abstract void managePlayers();
+		
+		public abstract boolean arePlayersReady();
 		
 		public String getId() {
 			return id;

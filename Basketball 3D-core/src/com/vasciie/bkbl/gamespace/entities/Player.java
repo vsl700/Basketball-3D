@@ -91,9 +91,14 @@ public abstract class Player extends Entity {
 	int shootingPower = 10;
 	//int cycleTimeout;
 	
+	float minRotateDegrees, maxRotateDegrees;
+	
 	float time;
 	
 	int playerIndex;
+	
+	//Abilities
+	boolean ableToMove;
 	
 	@Override
 	public void create(EntityType type, GameMap map, Vector3 pos) {
@@ -113,6 +118,11 @@ public abstract class Player extends Entity {
 		
 		stopLegsAnim();
 		stopBodyAnim();
+		
+		minRotateDegrees = -1;
+		maxRotateDegrees = -1;
+		
+		ableToMove = true;
 		
 		//if(!isMainPlayer())
 		brain = new Brain(this);
@@ -801,6 +811,9 @@ public abstract class Player extends Entity {
 	 * @param y - the y-axis
 	 */
 	public void turnY(float y) {
+		//float yaw = modelInstance.transform.getRotation(new Quaternion()).getYaw();
+		
+		//if(minRotateDegrees != maxRotateDegrees && (yaw + y > minRotateDegrees && yaw + y < maxRotateDegrees))
 		modelInstance.transform.rotate(0, 1, 0, y);
 		
 		setCollisionTransform(true);
@@ -818,6 +831,9 @@ public abstract class Player extends Entity {
 	}
 	
 	public void walk(Vector3 dir) {
+		if(!ableToMove)
+			return;
+		
 		if(dir.isZero(0.00001f))
 			return;
 		
@@ -840,6 +856,9 @@ public abstract class Player extends Entity {
 	}
 	
 	public void run(Vector3 dir) {
+		if(!ableToMove)
+			return;
+		
 		if(dir.isZero(0.00001f)) {
 			running = false;//In case we use the setRunning method which is used by the AI when the players are obligated to run
 			return;
@@ -895,7 +914,7 @@ public abstract class Player extends Entity {
 	}
 	
 	public void interactWithBallA() {
-		if (!holdingBall()) {
+		if (!isHoldingBall()) {
 			Ball tempBall = map.getBall();
 
 			Vector3 ballVec = tempBall.getModelInstance().transform.getTranslation(new Vector3());
@@ -1512,7 +1531,7 @@ public abstract class Player extends Entity {
 	@Override
 	public void update(float delta) {
 		
-		if(!holdingBall()) {
+		if(!isHoldingBall()) {
 			dribbleL = dribbleR = false;
 			leftHoldingBall = rightHoldingBall = false;
 			map.getBall().getMainBody().setGravity(map.getDynamicsWorld().getGravity());
@@ -1895,7 +1914,7 @@ public abstract class Player extends Entity {
 				for(Player p : map.getTeammates())
 					if(!p.equals(this) && 
 							//((p.isMainPlayer() && !p.getBrain().getStateMachine().isInState(PlayerState.BALL_CHASING)) || !p.getBrain().getMemory().isBallChaser()) && 
-							!p.holdingBall() && //For example it can be used for co-op mode when the players are trying to interpose
+							!p.isHoldingBall() && //For example it can be used for co-op mode when the players are trying to interpose
 							!p.getBrain().getStateMachine().isInState(PlayerState.PLAYER_SURROUND) && brain.getStateMachine().isInState(PlayerState.PLAYER_SURROUND) &&
 							callback.reportNeighbor(p))
 						count++;
@@ -1903,7 +1922,7 @@ public abstract class Player extends Entity {
 				for(Player p : map.getOpponents())
 					if(!p.equals(this) && 
 							//!p.getBrain().getMemory().isBallChaser() && 
-							!p.holdingBall() &&
+							!p.isHoldingBall() &&
 							!p.getBrain().getStateMachine().isInState(PlayerState.PLAYER_SURROUND) && brain.getStateMachine().isInState(PlayerState.PLAYER_SURROUND) &&
 							callback.reportNeighbor(p))
 						count++;
@@ -2080,11 +2099,36 @@ public abstract class Player extends Entity {
 		return shootingPower;
 	}
 	
+	//TODO If you don't need those limiters, delete them and their property values above!
+	public float getMinRotateDegrees() {
+		return minRotateDegrees;
+	}
+
+	public void setMinRotateDegrees(float minRotateDegrees) {
+		this.minRotateDegrees = minRotateDegrees;
+	}
+
+	public float getMaxRotateDegrees() {
+		return maxRotateDegrees;
+	}
+
+	public void setMaxRotateDegrees(float maxRotateDegrees) {
+		this.maxRotateDegrees = maxRotateDegrees;
+	}
+
+	public boolean isAbleToMove() {
+		return ableToMove;
+	}
+
+	public void setAbleToMove(boolean ableToMove) {
+		this.ableToMove = ableToMove;
+	}
+
 	public boolean isAbleToCatch() {
 		return leftHandInWorld && rightHandInWorld;
 	}
 	
-	public boolean holdingBall() {
+	public boolean isHoldingBall() {
 		
 		//System.out.println(map.getCurrentPlayerHoldTeam());
 		//System.out.println("Not holding");
