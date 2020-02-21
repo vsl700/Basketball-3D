@@ -141,6 +141,12 @@ public class Brain {
 		//Regular state updating
 		stateMachine.update();
 	}
+	
+	public void clearCustomTarget() {
+		customPursue.setTarget(null);
+		memory.setTargetPosition(null);
+		memory.setTargetFacing(null);
+	}
 
 	public StateMachine<Player, PlayerState> getStateMachine() {
 		return stateMachine;

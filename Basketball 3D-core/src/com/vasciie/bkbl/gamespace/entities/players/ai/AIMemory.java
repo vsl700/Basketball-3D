@@ -19,7 +19,7 @@ public class AIMemory {
 	//The targetVec represents the position of the target, while shootVec represents the point where the player has to shoot so that he can hit the target with the ball
 	Vector3 shootVec, targetVec;
 	
-	Steerable<Vector3> targetPosition;
+	Steerable<Vector3> targetPosition, targetFacing;
 	
 	float dribbleTime, aimingTime, shootTime, switchHandTime, catchTime;
 	float distDiff, resetTime;
@@ -60,6 +60,14 @@ public class AIMemory {
 
 	public void setTargetPosition(Steerable<Vector3> targetPosition) {
 		this.targetPosition = targetPosition;
+	}
+
+	public Steerable<Vector3> getTargetFacing() {
+		return targetFacing;
+	}
+
+	public void setTargetFacing(Steerable<Vector3> targetFacing) {
+		this.targetFacing = targetFacing;
 	}
 
 	public void setTargetVec(Vector3 targetVec) {

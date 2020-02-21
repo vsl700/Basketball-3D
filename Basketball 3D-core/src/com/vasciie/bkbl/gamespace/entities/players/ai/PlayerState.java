@@ -428,7 +428,7 @@ public enum PlayerState implements State<Player> {
 		@Override
 		public void enter(Player player) {
 			Brain brain = player.getBrain();
-			brain.getCustomPursue().setArrivalTolerance(brain.getMemory().getTargetPosition().getBoundingRadius());
+			//brain.getCustomPursue().setArrivalTolerance(brain.getMemory().getTargetPosition().getBoundingRadius());
 			brain.getCustomPursue().setTarget(brain.getMemory().getTargetPosition());
 			
 			System.out.println("Switched to Idle");
@@ -437,15 +437,17 @@ public enum PlayerState implements State<Player> {
 		@Override
 		public void update(Player player) {
 			Brain brain = player.getBrain();
+			AIMemory memory = brain.getMemory();
 			
 			if(brain.getCustomPursue().getTarget() != null) {
 				brain.getCustomPursue().calculateSteering(Player.steering);
 				//System.out.println("Idling movement");
 				
 				player.setMoveVector(Player.steering.linear);
-				player.lookAt(player.getMap().getBall().getPosition());
+				if(memory.getTargetFacing() != null)
+					player.lookAt(memory.getTargetFacing().getPosition());
 				
-				if(brain.getMemory().isCatchBall()) {
+				if(memory.isCatchBall()) {
 					player.interactWithBallA();
 				}
 			}

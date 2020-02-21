@@ -100,6 +100,8 @@ public class Rules {
 								
 								//Putting a calculated from the original by the group one position into the targets vector
 								map.setPlayerTargetPosition(positionsCalc.cpy().mul(tempTrans).getTranslation(new Vector3()), temp);
+								temp.getBrain().getMemory().setTargetFacing(map.getBall());
+								temp.getBrain().getCustomPursue().setArrivalTolerance(2);
 							}
 						}
 						
@@ -115,8 +117,10 @@ public class Rules {
 
 					@Override
 					public boolean arePlayersReady() {
-						if(recentHolder.isHoldingBall())
+						if(recentHolder.isHoldingBall()) {
+							recentHolder.getBrain().clearCustomTarget();
 							return true;
+						}
 						
 						return false;
 					}

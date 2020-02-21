@@ -1488,44 +1488,8 @@ public abstract class Player extends Entity {
 		//setCollisionTransform();
 	}
 	
-	/**
-	 * Moves the player to the according to the given arguments using the "run" and "walk" commands.
-	 * 
-	 * @param target - the location which the player should follow
-	 * @param block
-	 * @param xDist - what distance on x-axis the player should keep from the target
-	 * @param zDist - what distance on z-axis the player should keep from the target
-	 * @param forceSprint - when true, the player will sprint to the target no matter how far away it is from it
-	 * @param forceWalk - when true, the player will only walk to the target no matter how far away it is from it
-	 * @return The calculated target point including the x and z distance. It is used to be put inside the lookAt method as it is NOT being called by this one.
-	 */
-	public Vector3 roamAround(Matrix4 target, Matrix4 block, float xDist, float zDist, boolean forceSprint, boolean forceWalk) {
-		//The point's trans where the player should go to
-		Matrix4 temp = target.cpy().mul(new Matrix4().setToTranslation(xDist, 0, zDist));
+	public void lookAtPlayer() {
 		
-		//The translation of the point
-		Vector3 tempVec = new Vector3();
-		temp.getTranslation(tempVec);
-		
-		//The translation of the target
-		Vector3 targetVec = new Vector3();
-		target.getTranslation(targetVec);
-		
-		//The vector used in players walking + distance measurment between the point and the player
-		Vector3 diffWalk = distance(tempVec);
-		
-		//Distance between this player and the target one
-		Vector3 diffDist = distance(targetVec);
-		
-		float xDiff = diffDist.x;
-		float zDiff = diffDist.z;
-		diffWalk.nor().scl(Gdx.graphics.getDeltaTime());
-		if(!forceWalk && (forceSprint || (Math.abs(xDiff) + Math.abs(zDiff) > xDist + zDist + 6)))
-			run(diffWalk);
-		else if(Math.abs(xDiff) > Math.abs(xDist) + 0.5f || Math.abs(zDiff) > Math.abs(zDist) + 0.5f)
-			walk(diffWalk);
-			
-		return targetVec;
 	}
 	
 	@Override
@@ -1542,9 +1506,8 @@ public abstract class Player extends Entity {
 			map.getBall().getMainBody().setGravity(map.getDynamicsWorld().getGravity());
 		}
 		
-		if(!isMainPlayer() || map.isRuleBrokenActing()) {
-			if(!map.isRuleBroken())
-				brain.update();
+		if(!isMainPlayer() && map.isPlayersReady() || map.isRuleBrokenActing()) {
+			brain.update();
 			//Vector3 tempVec = moveVec.add(new Vector3(steering.linear.cpy().x, 0, steering.linear.cpy().y)).scl(0.5f);
 			//float tempAng = steering.angular;
 			moveVec.y = 0;

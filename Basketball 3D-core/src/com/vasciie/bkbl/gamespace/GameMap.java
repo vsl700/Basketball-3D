@@ -493,12 +493,13 @@ public class GameMap implements RaycastCollisionDetector<Vector3> {
 		teammates.clear();
 		opponents.clear();
 		
-		GameRule rule = rules.getBrokenRule();
-		if(rule != null) {
+		if(rules.getBrokenRule() != null) {
 			rules.getBrokenRule().clearRuleBreaker();
 			rules.clearBrokenRule();
 		}
 		ruleBroken = false;
+		
+		mainPlayer = null;
 		
 		createBall();
 		
@@ -516,7 +517,10 @@ public class GameMap implements RaycastCollisionDetector<Vector3> {
 		dynamicsWorld.stepSimulation(delta2, 15, 1f / 60f);
 			
 		//if(gameRunning)
-		controlPlayer(delta);
+		if(!gameRunning) {
+			turnPlayer(delta);
+			updateInputs();
+		}else controlPlayer(delta);
 		if(playersReady){
 			if (!ruleBroken) {
 				if (startTimer <= 0)
@@ -629,6 +633,7 @@ public class GameMap implements RaycastCollisionDetector<Vector3> {
 	 * Sets a new target position of a player. I created this method because of the Rules system. Read the note inside the {@link GameMap#onRuleBrokenContinue()} method
 	 * @param pos - the target position
 	 * @param index - the index of the player
+	 * @param radius - the bounding radius of the target
 	 */
 	public void setPlayerTargetPosition(final Vector3 pos, Player player) {
 		// I decided to put the target setter outside of the rules's methods
@@ -651,11 +656,6 @@ public class GameMap implements RaycastCollisionDetector<Vector3> {
 			@Override
 			public Vector3 getPosition() {
 				return pos;
-			}
-			
-			@Override
-			public float getBoundingRadius() {
-				return 2;
 			}
 		});
 	}
@@ -718,6 +718,18 @@ public class GameMap implements RaycastCollisionDetector<Vector3> {
 	}
 	
 	private void controlPlayer(float delta) {
+		movePlayer(delta);
+		
+		turnPlayer(delta);
+		
+		updateInputs();
+	}
+	
+	private void updateInputs() {
+		inputs.update(mainPlayer.isHoldingBall());
+	}
+	
+	private void movePlayer(float delta) {
 		Matrix4 playerM = new Matrix4().set(mainPlayer.getMainBody().getWorldTransform().val);
 		
 		Quaternion dir = playerM.getRotation(new Quaternion());
@@ -727,9 +739,6 @@ public class GameMap implements RaycastCollisionDetector<Vector3> {
 		
 		float dirX = tempVec.x;
 		float dirZ = tempVec.z;
-		
-		float turnY = Gdx.input.getDeltaX(); //Around the Y-axis
-		float turnX = Gdx.input.getDeltaY(); //Around the X-axis
 		
 		if(inputs.isSprintPressed()) {
 			if (inputs.isForwardPressed()) {
@@ -767,8 +776,11 @@ public class GameMap implements RaycastCollisionDetector<Vector3> {
 		else if(inputs.isDribbleRPressed()) {
 			mainPlayer.interactWithBallR();
 		}
-		
-		
+	}
+	
+	private void turnPlayer(float delta) {
+		float turnY = Gdx.input.getDeltaX(); //Around the Y-axis
+		float turnX = Gdx.input.getDeltaY(); //Around the X-axis
 		
 		if(Math.abs(turnY) < Gdx.graphics.getWidth() / 4) {
 			mainPlayer.turnY(turnY * delta * 9);
@@ -789,10 +801,6 @@ public class GameMap implements RaycastCollisionDetector<Vector3> {
 			Gdx.input.setCursorPosition(Gdx.input.getX(), substractor);
 		else if(Gdx.input.getY() < substractor)
 			Gdx.input.setCursorPosition(Gdx.input.getX(), Gdx.graphics.getHeight() - substractor);
-		
-		inputs.update(mainPlayer.isHoldingBall());
-		
-		
 	}
 	
 	public btDynamicsWorld getDynamicsWorld() {
@@ -913,6 +921,10 @@ public class GameMap implements RaycastCollisionDetector<Vector3> {
 
 	public boolean isRuleBrokenActing() {
 		return ruleBrokenActing;
+	}
+
+	public boolean isPlayersReady() {
+		return playersReady;
 	}
 
 	public boolean isBallInTeam() {
