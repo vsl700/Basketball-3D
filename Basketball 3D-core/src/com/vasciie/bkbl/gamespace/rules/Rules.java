@@ -14,6 +14,7 @@ import com.vasciie.bkbl.gamespace.GameMap;
 import com.vasciie.bkbl.gamespace.entities.Entity;
 import com.vasciie.bkbl.gamespace.entities.Player;
 import com.vasciie.bkbl.gamespace.entities.players.Teammate;
+import com.vasciie.bkbl.gamespace.rules.Rules.GameRule.Actions.Action;
 import com.vasciie.bkbl.gamespace.tools.GameTools;
 
 /**
@@ -38,6 +39,7 @@ public class Rules {
 		gameRules = new GameRule[] {
 				new GameRule(this, "ball_out", "Out Of Bounds!", "The Ball Has Reached The Bounds Of The Terrain!", map) {
 					Player recentHolder, thrower;
+					
 					
 					@Override
 					public boolean checkRule() {
@@ -67,62 +69,104 @@ public class Rules {
 						return false;
 					}
 
-					@Override
-					public void calculateTargetPositions() {
-						ArrayList<Player> allPlayers = map.getAllPlayers();
-						
-						if(ruleBreaker instanceof Teammate) {
-							thrower = GameTools.getClosestPlayer(map.getBall().getPosition(), map.getOpponents(), null);
-						}else {
-							thrower = GameTools.getClosestPlayer(map.getBall().getPosition(), map.getTeammates(), null);
-						}
-						recentHolder = thrower;
-						
-						
-						Vector3 posGroupPos = thrower.getPosition().cpy().sub(thrower.angleToVector(new Vector3(), thrower.getOrientation()).scl(3));
-						// This is supposed to be a position right in front of
-						// the thrower's sight, and then random coordinates from
-						// -6 to 6 z-axis and -3 to 3 x-axis will .mul()-ed by
-						// this matrix, so that the other players get in random
-						// positions in front of the thrower. Also the group
-						// should be pointed at the thrower.
-						Matrix4 positionsCalc = new Matrix4().setToLookAt(posGroupPos, thrower.getPosition(), new Vector3(0, -1, 0)).trn(posGroupPos);
-						for(int i = 0; i < allPlayers.size(); i++) {
-							Player temp = allPlayers.get(i);
-							if(temp.equals(thrower)) {
-								//map.setPlayerTargetPosition(map.getBall().getPosition(), temp);
-								temp.getBrain().getMemory().setTargetPosition(map.getBall());
-								temp.getBrain().getMemory().setCatchBall(true);
-							}
-							else {
-								//Choosing a random target position for the following players
-								Matrix4 tempTrans = new Matrix4().setToTranslation(MathUtils.random(-3f, 3f), 0, MathUtils.random(-6f, 6f)); //We need to specify that the range value is a float (with an f), otherwise we are calling the integer method
-								
-								//Putting a calculated from the original by the group one position into the targets vector
-								map.setPlayerTargetPosition(positionsCalc.cpy().mul(tempTrans).getTranslation(new Vector3()), temp);
-								temp.getBrain().getMemory().setTargetFacing(map.getBall());
-								temp.getBrain().getCustomPursue().setArrivalTolerance(2);
-							}
-						}
-						
-						System.out.println("Calculated targets");
-					}
-
-					@Override
+					/*@Override
 					public void managePlayers() {
 						if(recentHolder.equals(thrower)) {
 							rules.clearBrokenRuleWRuleBreaker();
 						}
-					}
+					}*/
 
 					@Override
-					public boolean arePlayersReady() {
-						if(recentHolder.isHoldingBall()) {
-							recentHolder.getBrain().clearCustomTarget();
-							return true;
-						}
+					public void createActions() {
+						actions.addAction(new Action() {
+
+							@Override
+							public boolean act() {
+								ArrayList<Player> allPlayers = map.getAllPlayers();
+								
+								if(ruleBreaker instanceof Teammate) {
+									thrower = GameTools.getClosestPlayer(map.getBall().getPosition(), map.getOpponents(), null);
+								}else {
+									thrower = GameTools.getClosestPlayer(map.getBall().getPosition(), map.getTeammates(), null);
+								}
+								recentHolder = thrower;
+								
+								
+								Vector3 posGroupPos = thrower.getPosition().cpy().sub(thrower.angleToVector(new Vector3(), thrower.getOrientation()).scl(3));
+								// This is supposed to be a position right in front of
+								// the thrower's sight, and then random coordinates from
+								// -6 to 6 z-axis and -3 to 3 x-axis will .mul()-ed by
+								// this matrix, so that the other players get in random
+								// positions in front of the thrower. Also the group
+								// should be pointed at the thrower.
+								Matrix4 positionsCalc = new Matrix4().setToLookAt(posGroupPos, thrower.getPosition(), new Vector3(0, -1, 0)).trn(posGroupPos);
+								for(int i = 0; i < allPlayers.size(); i++) {
+									Player temp = allPlayers.get(i);
+									if(temp.equals(thrower)) {
+										//map.setPlayerTargetPosition(map.getBall().getPosition(), temp);
+										if(temp.getBrain().getMemory().getTargetPosition() == null) {
+											temp.getBrain().getMemory().setTargetPosition(map.getBall());
+											temp.getBrain().getMemory().setCatchBall(true);
+										}
+									}
+									else {
+										//Choosing a random target position for the following players
+										Matrix4 tempTrans = new Matrix4().setToTranslation(MathUtils.random(-3f, 3f), 0, MathUtils.random(-6f, 6f)); //We need to specify that the range value is a float (with an f), otherwise we are calling the integer method
+										
+										//Putting a calculated from the original by the group one position into the targets vector
+										map.setPlayerTargetPosition(positionsCalc.cpy().mul(tempTrans).getTranslation(new Vector3()), temp);
+										temp.getBrain().getMemory().setTargetFacing(map.getBall());
+										temp.getBrain().getCustomPursue().setArrivalTolerance(2);
+									}
+								}
+								
+								System.out.println("Calculated targets");
+								
+								return true;
+							}
+
+							@Override
+							public boolean isGameDependent() {
+								return false;
+							}
+							
+						});
 						
-						return false;
+						actions.addAction(new Action() {
+
+							@Override
+							public boolean act() {
+								if(recentHolder.isHoldingBall()) {
+									recentHolder.getBrain().clearCustomTarget();
+									return true;
+								}
+								
+								return false;
+							}
+
+							@Override
+							public boolean isGameDependent() {
+								return false;
+							}
+							
+						});
+						
+						actions.addAction(new Action() {
+
+							@Override
+							public boolean act() {
+								
+								
+								return false;
+							}
+
+							@Override
+							public boolean isGameDependent() {
+								return true;
+							}
+							
+						});
+						
 					}
 				},
 				
@@ -153,20 +197,9 @@ public class Rules {
 					}
 
 					@Override
-					public void calculateTargetPositions() {
-						
-					}
-
-					@Override
-					public void managePlayers() {
+					public void createActions() {
 						
 						
-					}
-
-					@Override
-					public boolean arePlayersReady() {
-						
-						return false;
 					}
 				},
 				
@@ -197,20 +230,9 @@ public class Rules {
 					}
 
 					@Override
-					public void calculateTargetPositions() {
-						
-					}
-
-					@Override
-					public void managePlayers() {
+					public void createActions() {
 						
 						
-					}
-
-					@Override
-					public boolean arePlayersReady() {
-						
-						return false;
 					}
 				},
 				
@@ -242,20 +264,9 @@ public class Rules {
 					}
 
 					@Override
-					public void calculateTargetPositions() {
-						
-					}
-
-					@Override
-					public void managePlayers() {
+					public void createActions() {
 						
 						
-					}
-
-					@Override
-					public boolean arePlayersReady() {
-						
-						return false;
 					}
 				},
 				
@@ -345,10 +356,12 @@ public class Rules {
 		return brokenRule;
 	}
 	
-	public abstract class GameRule{
+	public static abstract class GameRule{
 		String name, description;
 		String id;
 		GameMap map;
+		
+		Actions actions;
 		
 		Player ruleBreaker;
 		
@@ -360,7 +373,12 @@ public class Rules {
 			description = desc;
 			this.map = map;
 			this.rules = rules;
+			
+			actions = new Actions(map);
+			createActions();
 		}
+		
+		public abstract void createActions();
 		
 		/**
 		 * To see if the following rule is broken, this method should be called to which should check that for each rule
@@ -369,14 +387,23 @@ public class Rules {
 		 */
 		public abstract boolean checkRule();
 		
-		public abstract void calculateTargetPositions();
+		public boolean arePlayersReady() {
+			return actions.getCurrentAction().isGameDependent();
+		}
 		
 		/**
 		 * Used after a rule is broken (when the players are acting on the broken rule)
+		 * 
+		 * @return true if the players are ready
 		 */
-		public abstract void managePlayers();
-		
-		public abstract boolean arePlayersReady();
+		public boolean managePlayers() {
+			if(actions.act()) {
+				rules.clearBrokenRuleWRuleBreaker();
+				return true;
+			}
+			
+			return false;
+		}
 		
 		public String getId() {
 			return id;
@@ -394,11 +421,84 @@ public class Rules {
 		 * Called when the game continues after the foul
 		 */
 		public void clearRuleBreaker() {
+			actions.firstAction();
 			ruleBreaker = null;
 		}
 		
 		public Player getRuleBreaker() {
 			return ruleBreaker;
+		}
+		
+		public static class Actions{
+			Action firstAction, currentAction;
+			GameMap map;
+			
+			public Actions(GameMap map) {
+				this.map = map;
+			}
+			
+			public void addAction(Action action) {
+				if(currentAction == null) {
+					firstAction = currentAction = action;
+					return;
+				}
+				
+				Action temp = currentAction;
+				while(temp.next != null) {
+					temp = temp.next;
+				}
+				
+				temp.next = action;
+			}
+			
+			public Action getCurrentAction() {
+				return currentAction;
+			}
+			
+			public void nextAction() {
+				currentAction = currentAction.next;
+			}
+			
+			public void firstAction() {
+				currentAction = firstAction;
+			}
+			
+			public boolean isLastAction() {
+				return currentAction.next == null;
+			}
+			
+			/**
+			 * 
+			 * @return true if all the actions are completed
+			 */
+			public boolean act() {
+				if(((currentAction.isGameDependent() && map.isGameRunning()) || !currentAction.isGameDependent()) && currentAction.act()) {
+					if(isLastAction()) {
+						firstAction();
+						return true;
+					}
+					
+					nextAction();
+				}
+				
+				return false;
+			}
+			
+			public static abstract class Action{
+				public Action next;
+				
+				/**
+				 * 
+				 * @return true if the action is dependent on the game and the game should start (it doesn't clear the broken rule or rule breaker)
+				 */
+				public abstract boolean isGameDependent();
+				
+				/**
+				 * 
+				 * @return true if the action is completed
+				 */
+				public abstract boolean act();
+			}
 		}
 	}
 	

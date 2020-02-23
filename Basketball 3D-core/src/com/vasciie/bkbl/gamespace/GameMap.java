@@ -504,6 +504,7 @@ public class GameMap implements RaycastCollisionDetector<Vector3> {
 		createBall();
 		
 		gameRunning = false;
+		ruleBrokenActing = false;
 	}
 	
 	public void update(float delta) {
@@ -548,8 +549,8 @@ public class GameMap implements RaycastCollisionDetector<Vector3> {
 			}
 			
 			return;*/
-			
-			if(playersReady = rules.getBrokenRule().arePlayersReady()) {
+			playersReady = rules.getBrokenRule().arePlayersReady();
+			if(rules.getBrokenRule() == null) {
 				actionOver();
 				//rules.clearBrokenRuleWRuleBreaker();
 			}
@@ -621,7 +622,6 @@ public class GameMap implements RaycastCollisionDetector<Vector3> {
 		// (moveVecs == 0 && !AIMemory(only one will be enough to show the
 		// current state).target.isZero()) start the timer (brokenRule == false)
 		// and clear the broken rule from Rule
-		rules.getBrokenRule().calculateTargetPositions();
 		ruleBroken = false;
 		ruleBrokenActing = true;
 		startTimer = 3;

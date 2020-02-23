@@ -1451,9 +1451,9 @@ public abstract class Player extends Entity {
 	 * @param target
 	 * @return
 	 */
-	private Vector3 distance(Vector3 target) {
+	/*private Vector3 distance(Vector3 target) {
 		return target.cpy().sub(modelInstance.transform.getTranslation(new Vector3()));
-	}
+	}*/
 	
 	public void lookAt(Vector3 target) {
 		Vector3 thisVec = modelInstance.transform.getTranslation(new Vector3());
