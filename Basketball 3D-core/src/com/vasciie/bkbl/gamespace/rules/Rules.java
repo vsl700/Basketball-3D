@@ -18,14 +18,14 @@ import com.vasciie.bkbl.gamespace.rules.Rules.GameRule.Actions.Action;
 import com.vasciie.bkbl.gamespace.tools.GameTools;
 
 /**
- * This class contains all the game rules and their actions if the go broken
+ * This class contains all the game rules and their actions if they go broken
  * 
  * @author studi
  *
  */
 public class Rules {
 
-	GameRule[] gameRules;
+	final GameRule[] gameRules;
 	GameRule brokenRule;
 	
 	GameMap map;
@@ -320,16 +320,14 @@ public class Rules {
 	}
 	
 	public void update() {
-		if(brokenRule != null)
-			brokenRule.managePlayers();
-		else {
+		if(brokenRule == null) {
 			/*for (GameRule rule : gameRules) {
 				if (rule.checkRule()) {
 					// A rule has been broken
 					brokenRule = rule;
 					map.onRuleBroken(rule);
 					rulesListener.onRuleBroken(rule);
-
+	
 					break;
 				}
 			}*/ // TODO Bring this back after you finish testing the rules!!!
@@ -340,6 +338,9 @@ public class Rules {
 				map.onRuleBroken(tempRule);
 				rulesListener.onRuleBroken(tempRule);
 			}
+		}
+		else {
+			brokenRule.managePlayers();
 		}
 	}
 	
@@ -382,7 +383,6 @@ public class Rules {
 		
 		/**
 		 * To see if the following rule is broken, this method should be called to which should check that for each rule
-		 * 
 		 * @return true if the rule is broken
 		 */
 		public abstract boolean checkRule();
@@ -393,7 +393,6 @@ public class Rules {
 		
 		/**
 		 * Used after a rule is broken (when the players are acting on the broken rule)
-		 * 
 		 * @return true if the players are ready
 		 */
 		public boolean managePlayers() {

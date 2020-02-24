@@ -125,7 +125,7 @@ public class GameScreen implements Screen, RulesListener {
 			powerNum.render(batch, shape, cam);
 		}
 		else {
-			if (map.getTimer() >= 0) {
+			if (map.getTimer() >= 0 && map.isPlayersReady()) {
 				if ((int) map.getTimer() == 0)
 					timer.setText("GO!");
 				else if (map.getTimer() <= 4)

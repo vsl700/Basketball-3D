@@ -4,9 +4,11 @@ import java.util.ArrayList;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.ai.fsm.State;
 import com.badlogic.gdx.ai.msg.Telegram;
+import com.badlogic.gdx.ai.utils.Location;
 import com.badlogic.gdx.math.Vector3;
 import com.vasciie.bkbl.gamespace.GameMap;
 import com.vasciie.bkbl.gamespace.entities.Ball;
+import com.vasciie.bkbl.gamespace.entities.Entity;
 import com.vasciie.bkbl.gamespace.entities.Player;
 import com.vasciie.bkbl.gamespace.entities.players.Teammate;
 import com.vasciie.bkbl.gamespace.objects.GameObject;
@@ -439,11 +441,16 @@ public enum PlayerState implements State<Player> {
 			Brain brain = player.getBrain();
 			AIMemory memory = brain.getMemory();
 			
-			if(brain.getCustomPursue().getTarget() != null) {
+			Location<Vector3> tempTarget = brain.getCustomPursue().getTarget();
+			if(tempTarget != null) {
 				brain.getCustomPursue().calculateSteering(Player.steering);
 				//System.out.println("Idling movement");
 				
 				player.setMoveVector(Player.steering.linear);
+				
+				if(tempTarget instanceof Entity && ((Entity) tempTarget).getLinearVelocity().isZero(0.3f) && GameTools.getDistanceBetweenSteerables(tempTarget, player) >= 2)
+					player.setRunning();
+				
 				if(memory.getTargetFacing() != null)
 					player.lookAt(memory.getTargetFacing().getPosition());
 				

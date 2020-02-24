@@ -1506,7 +1506,7 @@ public abstract class Player extends Entity {
 			map.getBall().getMainBody().setGravity(map.getDynamicsWorld().getGravity());
 		}
 		
-		if(!isMainPlayer() && map.isPlayersReady() || map.isRuleBrokenActing()) {
+		if(isMainPlayer() && map.isRuleBrokenActing() || !isMainPlayer() && !map.isRuleBroken()) {
 			brain.update();
 			//Vector3 tempVec = moveVec.add(new Vector3(steering.linear.cpy().x, 0, steering.linear.cpy().y)).scl(0.5f);
 			//float tempAng = steering.angular;

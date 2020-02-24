@@ -114,7 +114,7 @@ public class Brain {
 		memory.setResetTime(memory.getResetTime() + Gdx.graphics.getDeltaTime());
 		
 		//The state switcher
-		if(user.getMap().isGameRunning()) {
+		if(user.getMap().isGameRunning() && !user.getMap().isRuleBrokenActing()) {
 			//If the current player is holding the ball
 			if(user.isHoldingBall()) {
 				if(!stateMachine.isInState(PlayerState.BALL_IN_HAND)) stateMachine.changeState(PlayerState.BALL_IN_HAND);

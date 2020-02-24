@@ -529,7 +529,8 @@ public class GameMap implements RaycastCollisionDetector<Vector3> {
 				else
 					startTimer -= delta;
 			}
-		}else if(!ruleBroken){
+		}
+		if(ruleBrokenActing){
 			updateFullGame(delta);
 			
 			/*//If players are not ready it means they are not in their target positions. So we should go through each one and check
@@ -567,9 +568,7 @@ public class GameMap implements RaycastCollisionDetector<Vector3> {
 		
 		updatePlayers(delta);
 		
-		if(gameRunning) {
-			rules.update();
-		}
+		rules.update();
 		
 		ball.onCycleEnd();
 		
