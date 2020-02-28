@@ -142,6 +142,79 @@ public class Brain {
 		stateMachine.update();
 	}
 	
+	public void performShooting(Vector3 tempAimVec) {
+		memory.setTargetVec(tempAimVec);
+		user.lookAt(tempAimVec);
+		user.interactWithBallS();
+		memory.setAimingTime(memory.getAimingTime() + Gdx.graphics.getDeltaTime());
+	}
+	
+	private void performShooting() {
+		user.lookAt(memory.getShootVec());//When the calculation starts being correct turn shoot vec into target vec!!!
+		user.interactWithBallS();
+		memory.setAimingTime(memory.getAimingTime() + Gdx.graphics.getDeltaTime());
+	}
+	
+	/**
+	 * Calculates shooting vector according to the location of the player, shooting target
+	 * and distance between the player and the target. It also modifies player's shooting 
+	 * power.
+	 * 
+	 * @param player - the shooting player
+	 * @param targetVec - the target of the player
+	 * @return
+	 */
+	private Vector3 calculateShootVector(Vector3 targetVec) {
+		Vector3 distVec = targetVec.cpy().sub(user.getPosition()); //Distance between the target and the player
+		
+		float xzDist = distVec.cpy().scl(1, 0, 1).len(); //Calculate only xz distance. That's what we multiplied y by 0 for.
+		float yDist = distVec.cpy().scl(0, 1, 0).len(); //Calculate only y distance. That's what we multiplied x and z by 0 for.
+		
+		Vector3 returnVec = targetVec.cpy().add(0, xzDist / 2 + yDist, 0);
+		
+		/*System.out.println(xzDist + "; " + yDist);
+		System.out.print(player.getPosition());
+		System.out.print(targetVec);
+		System.out.println(returnVec);*/
+		//Modify player shootPower
+		
+		return returnVec;
+	}
+	
+	/**
+	 * Updates AI shooting, if it has ever started of course
+	 * @return true if the shooting has ever started and it has been updated
+	 */
+	public boolean updateShooting() {
+		if (isShooting()) {
+			memory.setShootVec(calculateShootVector(memory.getTargetVec())); //As the player can move even while shooting, we update shootVec every time
+			
+			if(memory.getAimingTime() <= 1.25f) {
+				performShooting();
+			}
+			else if (memory.getAimingTime() > 1.25f) {
+				//System.out.println(memory.getShootVec());
+				memory.setShootTime(0);
+				memory.setCatchTime(0);
+				// user.throwBall(memory.getShootVec());
+				memory.setBallJustShot(true);
+				
+			}
+			
+			return true;
+		}
+		
+		return false;
+	}
+	
+	public boolean isShooting() {
+		return memory.getAimingTime() > 0;
+	}
+	
+	/*public boolean isAbleToShoot() {
+		return memory.getShootTime() > 20;
+	}*/
+	
 	public void clearCustomTarget() {
 		customPursue.setTarget(null);
 		memory.setTargetPosition(null);

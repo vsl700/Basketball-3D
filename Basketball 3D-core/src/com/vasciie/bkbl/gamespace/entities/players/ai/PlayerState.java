@@ -11,54 +11,11 @@ import com.vasciie.bkbl.gamespace.entities.Ball;
 import com.vasciie.bkbl.gamespace.entities.Entity;
 import com.vasciie.bkbl.gamespace.entities.Player;
 import com.vasciie.bkbl.gamespace.entities.players.Teammate;
-import com.vasciie.bkbl.gamespace.objects.GameObject;
+import com.vasciie.bkbl.gamespace.objects.Basket;
 import com.vasciie.bkbl.gamespace.tools.GameTools;
 
 public enum PlayerState implements State<Player> {
 	BALL_IN_HAND() {
-
-		private void performShooting(Player player, Vector3 tempAimVec) {
-			AIMemory mem = player.getBrain().getMemory();
-
-			mem.setTargetVec(tempAimVec);
-			player.lookAt(tempAimVec);
-			player.interactWithBallS();
-			mem.setAimingTime(mem.getAimingTime() + Gdx.graphics.getDeltaTime());
-		}
-		
-		private void performShooting(Player player) {
-			AIMemory mem = player.getBrain().getMemory();
-			
-			player.lookAt(mem.getShootVec());//When the calculation starts being correct turn shoot vec into target vec!!!
-			player.interactWithBallS();
-			mem.setAimingTime(mem.getAimingTime() + Gdx.graphics.getDeltaTime());
-		}
-		
-		/**
-		 * Calculates shooting vector according to the location of the player, shooting target
-		 * and distance between the player and the target. It also modifies player's shooting 
-		 * power.
-		 * 
-		 * @param player - the shooting player
-		 * @param targetVec - the target of the player
-		 * @return
-		 */
-		private Vector3 calculateShootVector(Player player, Vector3 targetVec) {
-			Vector3 distVec = targetVec.cpy().sub(player.getPosition()); //Distance between the target and the player
-			
-			float xzDist = distVec.cpy().scl(1, 0, 1).len(); //Calculate only xz distance. That's what we multiplied y by 0 for.
-			float yDist = distVec.cpy().scl(0, 1, 0).len(); //Calculate only y distance. That's what we multiplied x and z by 0 for.
-			
-			Vector3 returnVec = targetVec.cpy().add(0, xzDist / 2 + yDist, 0);
-			
-			/*System.out.println(xzDist + "; " + yDist);
-			System.out.print(player.getPosition());
-			System.out.print(targetVec);
-			System.out.println(returnVec);*/
-			//Modify player shootPower
-			
-			return returnVec;
-		}
 
 		@Override
 		public void enter(Player player) {
@@ -67,34 +24,20 @@ public enum PlayerState implements State<Player> {
 		
 		@Override
 		public void update(Player player) {
+			Brain brain = player.getBrain();
+			AIMemory mem = brain.getMemory();
 
-			AIMemory mem = player.getBrain().getMemory();
-
-			GameObject basket = player.getTargetBasket();
+			Basket basket = player.getTargetBasket();
 
 			// Ball behavior mechanism
-			if (mem.getAimingTime() > 0) {
-				mem.setShootVec(calculateShootVector(player, mem.getTargetVec())); //As the player can move even while shooting, we update shootVec every time
-				
-				if(mem.getAimingTime() <= 1.25f) {
-					performShooting(player);
-				}
-				else if (mem.getAimingTime() > 1.25f) {
-					//System.out.println(mem.getShootVec());
-					mem.setShootTime(0);
-					mem.setCatchTime(0);
-					// player.throwBall(mem.getShootVec());
-					mem.setBallJustShot(true);
-					return;
-				}
-			} else {
+			if (!brain.updateShooting()) {
 				if (/*player.isSurrounded() && player.getMap().getTeammates().size() > 1 || */player.isInAwayBasketZone()) {
 					Vector3 playerVec = player.getModelInstance().transform.getTranslation(new Vector3());
 					Vector3 tempAimVec = playerVec.cpy().sub(new Vector3());
 
 					if (!player.isBehindBasket())
 						tempAimVec = basket.calcTransformFromNodesTransform(basket.getMatrixes().get(3)).getTranslation(new Vector3());
-					else if (mem.getShootTime() > 20 || !player.isInAwayBasketZone()) {
+					else if (!player.isInAwayBasketZone()) {
 						ArrayList<Player> tempTeam;
 						if (player instanceof Teammate)
 							tempTeam = player.getMap().getTeammates();
@@ -104,7 +47,7 @@ public enum PlayerState implements State<Player> {
 						tempAimVec = GameTools.getShortestDistance(playerVec, tempTeam);
 					}
 					
-					performShooting(player, tempAimVec);
+					brain.performShooting(tempAimVec);
 
 				}
 
@@ -148,7 +91,7 @@ public enum PlayerState implements State<Player> {
 			
 			player.setRunning();
 			
-			if(mem.getAimingTime() == 0)
+			if(!brain.isShooting())
 				player.lookAt(basket.getPosition());
 
 			// Setting the distances from the target (when a player gets in
@@ -457,6 +400,8 @@ public enum PlayerState implements State<Player> {
 				if(memory.isCatchBall()) {
 					player.interactWithBallA();
 				}
+				
+				brain.updateShooting();
 			}
 		}
 		
