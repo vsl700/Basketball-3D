@@ -10,7 +10,10 @@ public class InputController implements InputProcessor {
 	static final int forward = Keys.W, backward = Keys.S, strafeRight = Keys.D, strafeLeft = Keys.A;
 	static final int sprint = Keys.SHIFT_LEFT;
 	static final int shoot = Keys.CONTROL_LEFT;
+	static final int focus = Keys.ALT_LEFT;
 	static final int dribbleL = Buttons.LEFT, dribbleR = Buttons.RIGHT;
+	
+	//Alternative keys
 	static final int altDribbleL = Keys.J, altDribbleR = Keys.L;
 	static final int altScrollUp = Keys.E, altScrollDown = Keys.Q;
 	
@@ -20,6 +23,7 @@ public class InputController implements InputProcessor {
 	boolean forwardPressed, backwardPressed, strRightPressed, strLeftPressed;
 	boolean sprintPressed;
 	boolean shootPressed;
+	boolean focusPressed;
 	boolean dribbleLPressed, dribbleRPressed;
 	boolean scrollUpPressed, scrollDownPressed;
 	
@@ -77,6 +81,10 @@ public class InputController implements InputProcessor {
 		return shootPressed;
 	}
 
+	public boolean isFocusPressed() {
+		return focusPressed;
+	}
+
 	public boolean isDribbleLPressed() {
 		return dribbleLPressed;
 	}
@@ -109,6 +117,9 @@ public class InputController implements InputProcessor {
 			break;
 		case shoot:
 			shootPressed = true;
+			break;
+		case focus:
+			focusPressed = true;
 			break;
 		case altDribbleL:
 			dribbleLPressed = true;
@@ -146,6 +157,9 @@ public class InputController implements InputProcessor {
 			break;
 		case shoot:
 			shootPressed = false;
+			break;
+		case focus:
+			focusPressed = false;
 			break;
 		case altDribbleL:
 			dribbleLPressed = false;

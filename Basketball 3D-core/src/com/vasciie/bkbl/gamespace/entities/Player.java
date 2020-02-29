@@ -79,6 +79,7 @@ public abstract class Player extends Entity {
 	boolean leftAimBall, rightAimBall;
 	boolean leftThrowBall, rightThrowBall, readyBall;
 	boolean leftPointBall, rightPointBall;
+	boolean focus;
 	boolean dribbleL, dribbleR;
 	boolean ballColl; 
 	boolean leftHandBall, rightHandBall;
@@ -127,6 +128,8 @@ public abstract class Player extends Entity {
 		//if(!isMainPlayer())
 		brain = new Brain(this);
 		boundRadius = 1;
+		
+		currentRot.setFromMatrix(modelInstance.transform.cpy());
 			//stateMachine = new DefaultStateMachine<Player, PlayerState>(this, PlayerState.IDLING);
 			//stateMachine.changeState(PlayerState.IDLING);
 
@@ -811,12 +814,20 @@ public abstract class Player extends Entity {
 	 * @param y - the y-axis
 	 */
 	public void turnY(float y) {
+		Matrix4 temp = new Matrix4().set(getPosition(), currentRot);
+		
 		//float yaw = modelInstance.transform.getRotation(new Quaternion()).getYaw();
 		
 		//if(minRotateDegrees != maxRotateDegrees && (yaw + y > minRotateDegrees && yaw + y < maxRotateDegrees))
-		modelInstance.transform.rotate(0, 1, 0, y);
 		
-		setCollisionTransform(true);
+		temp.rotate(0, 1, 0, y);
+		
+		temp.getRotation(currentRot);
+		
+		if(!focus) {
+			modelInstance.transform.set(temp);		
+			setCollisionTransform(true);
+		}
 	}
 	
 	/**
@@ -932,6 +943,10 @@ public abstract class Player extends Entity {
 			interactWithBallL();
 		else if(rightHoldingBall)
 			interactWithBallR();
+	}
+	
+	public void focus() {
+		focus = true;
 	}
 	
 	public void switchDribble() {
@@ -1211,7 +1226,7 @@ public abstract class Player extends Entity {
 	/**
 	 * The transform of the player in the previous frame. Used for dribble hand switching when the ball has to follow the player and also dynamically follow its other hand.
 	 */
-	private Matrix4 prevTrans;
+	private final Matrix4 prevTrans = new Matrix4();
 	
 	/**
 	 * This method helps modifying the dribble function for both of the hands at the same time
@@ -1455,6 +1470,10 @@ public abstract class Player extends Entity {
 		return target.cpy().sub(modelInstance.transform.getTranslation(new Vector3()));
 	}*/
 	
+	/**
+	 * Points the player's view (rotation) at a target
+	 * @param target - the target this player should point at
+	 */
 	public void lookAt(Vector3 target) {
 		Vector3 thisVec = modelInstance.transform.getTranslation(new Vector3());
 		
@@ -1488,8 +1507,45 @@ public abstract class Player extends Entity {
 		//setCollisionTransform();
 	}
 	
-	public void lookAtPlayer() {
+	private final Quaternion currentRot = new Quaternion();
+	private void lookAtClosestToViewPlayer() {
+		ArrayList<Player> tempPlayers;
 		
+		if(this instanceof Teammate)
+			tempPlayers = map.getTeammates();
+		else
+			tempPlayers = map.getOpponents();
+		
+		if(tempPlayers.size() == 1)
+			return;
+		
+		Vector3 direction = currentRot.transform(Vector3.Z.cpy());
+		
+		Player startingPlayer;
+		if(!tempPlayers.get(0).equals(this))
+			startingPlayer = tempPlayers.get(0);
+		else startingPlayer = tempPlayers.get(1);
+		
+		Vector3 closestPos = startingPlayer.getPosition().cpy();
+		float minDist = direction.dst(closestPos);
+		
+		
+		for(Player p : tempPlayers) {
+			if(p.equals(this) || p.equals(startingPlayer))
+				continue;
+			
+			Vector3 tempVec = p.getPosition().cpy();
+			Vector3 tempVecNor = tempVec.nor();
+			float dist = direction.dst(tempVecNor);
+			
+			if(dist < minDist) {
+				closestPos = tempVec;
+				minDist = dist;
+			}
+		}
+		
+		
+		lookAt(closestPos);
 	}
 	
 	@Override
@@ -1507,7 +1563,7 @@ public abstract class Player extends Entity {
 		}
 		
 		if(isMainPlayer() && map.isRuleBrokenActing() || !isMainPlayer() && !map.isRuleBroken()) {
-			brain.update();
+			//brain.update();
 			//Vector3 tempVec = moveVec.add(new Vector3(steering.linear.cpy().x, 0, steering.linear.cpy().y)).scl(0.5f);
 			//float tempAng = steering.angular;
 			moveVec.y = 0;
@@ -1534,6 +1590,10 @@ public abstract class Player extends Entity {
 		//if(Math.abs(getMainBody().getLinearVelocity().x) < 0.0008f && Math.abs(getMainBody().getLinearVelocity().z) < 0.0008f) {
 			//walking = running = false;
 		//}
+		
+		//TODO Take this into the shoot interaction checkers when everything gets to work!
+		if(focus)
+			lookAtClosestToViewPlayer();
 		
 		if (dribbleL) {
 			dribble(delta, true);
@@ -1831,7 +1891,7 @@ public abstract class Player extends Entity {
 		legRController.update(delta);
 		bodyController.update(delta);
 		
-		prevTrans = modelInstance.transform.cpy();
+		prevTrans.set(modelInstance.transform);
 		
 		//if(this instanceof Opponent && (northSurround || southSurround || eastSurround || westSurround))
 			//System.out.println("Surround" + northSurround + ";" + southSurround + ";" + eastSurround + ";" + westSurround);
@@ -2021,6 +2081,7 @@ public abstract class Player extends Entity {
 		rightAimBall = false;
 		leftPointBall = false;
 		rightPointBall = false;
+		focus = false;
 		northSurround = false;
 		southSurround = false;
 		eastSurround = false;
