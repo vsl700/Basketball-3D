@@ -814,7 +814,7 @@ public abstract class Player extends Entity {
 	 * @param y - the y-axis
 	 */
 	public void turnY(float y) {
-		Matrix4 temp = new Matrix4().set(getPosition(), currentRot);
+		Matrix4 temp = new Matrix4().set(getPosition(), currentRot, modelInstance.transform.getScale(new Vector3()));
 		
 		//float yaw = modelInstance.transform.getRotation(new Quaternion()).getYaw();
 		
@@ -1488,21 +1488,22 @@ public abstract class Player extends Entity {
 		
 		modelInstance.transform.set(thisVec, quat).rotate(0, 1, 0, 180);
 		
-		//Matrix4 camTrans = new Matrix4().setToLookAt(rotVec, new Vector3(0, -1, 0));
+		Vector3 camRotVec = target.cpy().sub(calcTransformFromNodesTransform(camMatrix).getTranslation(new Vector3()));
+		Matrix4 camTrans = new Matrix4().setToLookAt(camRotVec, new Vector3(0, -1, 0));
 		
 		Quaternion quat2 = new Quaternion();
-		calcTrans.getRotation(quat2);
+		camTrans.getRotation(quat2);
 		float degrees;
-		if(quat2.getPitch() > 38)
-			degrees = 38;
-		else if(quat2.getPitch() < -38)
-			degrees = -38;
+		if(quat2.getPitch() >= 38)
+			degrees = 37;
+		else if(quat2.getPitch() <= -38)
+			degrees = -37;
 		else degrees = quat2.getPitch();
 		
 		quat2.setEulerAngles(0, degrees, 0);
 		
 		Vector3 camVec = camMatrix.getTranslation(new Vector3());
-		camMatrix.set(camVec, quat2).rotate(1, 0, 0, 180);
+		camMatrix.set(camVec, quat2);
 		
 		//setCollisionTransform();
 	}
@@ -1519,7 +1520,8 @@ public abstract class Player extends Entity {
 		if(tempPlayers.size() == 1)
 			return;
 		
-		Vector3 direction = currentRot.transform(Vector3.Z.cpy());
+		Vector3 direction = Vector3.Z.cpy();
+		direction.rotate(currentRot.getYaw(), 0, 1, 0);
 		
 		Player startingPlayer;
 		if(!tempPlayers.get(0).equals(this))
@@ -1535,8 +1537,8 @@ public abstract class Player extends Entity {
 				continue;
 			
 			Vector3 tempVec = p.getPosition().cpy();
-			Vector3 tempVecNor = tempVec.nor();
-			float dist = direction.dst(tempVecNor);
+			Vector3 tempDir = tempVec.sub(getPosition()).nor();
+			float dist = direction.dst(tempDir);
 			
 			if(dist < minDist) {
 				closestPos = tempVec;

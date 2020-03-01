@@ -99,7 +99,8 @@ public class GameScreen implements Screen, RulesListener {
 		Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT | GL20.GL_DEPTH_BUFFER_BIT);
 		
 		map.update(delta);
-		map.getCamera().getMainTrans().getTranslation(pCam.position);
+		//map.getCamera().getMainTrans().getTranslation(pCam.position);
+		new Matrix4(map.getMainPlayer().getModelInstance().transform).mul(map.getMainPlayer().getCamMatrix()).mul(new Matrix4().setToTranslation(0, map.getMainPlayer().getHeight(), -10)).getTranslation(pCam.position);
 		game.customLookAt(pCam, new Matrix4(map.getMainPlayer().getModelInstance().transform).mul(new Matrix4().setToTranslation(0, map.getMainPlayer().getHeight(), 0)).getTranslation(new Vector3()));
 		pCam.update();
 
