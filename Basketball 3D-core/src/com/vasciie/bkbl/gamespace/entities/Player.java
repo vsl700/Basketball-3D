@@ -814,7 +814,7 @@ public abstract class Player extends Entity {
 	 * @param y - the y-axis
 	 */
 	public void turnY(float y) {
-		Matrix4 temp = new Matrix4().set(getPosition(), currentRot, modelInstance.transform.getScale(new Vector3()));
+		Matrix4 temp = new Matrix4(currentRot);
 		
 		//float yaw = modelInstance.transform.getRotation(new Quaternion()).getYaw();
 		
@@ -825,7 +825,7 @@ public abstract class Player extends Entity {
 		temp.getRotation(currentRot);
 		
 		if(!focus) {
-			modelInstance.transform.set(temp);		
+			modelInstance.transform.set(getPosition(), currentRot);	
 			setCollisionTransform(true);
 		}
 	}
@@ -837,7 +837,7 @@ public abstract class Player extends Entity {
 	public void turnX(float x) {
 		float pitch = camMatrix.getRotation(new Quaternion()).getPitch();
 		
-		if(Math.abs(pitch + x) < 38)
+		if(Math.abs(pitch + x) <= 38)
 			camMatrix.rotate(1, 0, 0, x);
 	}
 	
@@ -1494,10 +1494,10 @@ public abstract class Player extends Entity {
 		Quaternion quat2 = new Quaternion();
 		camTrans.getRotation(quat2);
 		float degrees;
-		if(quat2.getPitch() >= 38)
-			degrees = 37;
-		else if(quat2.getPitch() <= -38)
-			degrees = -37;
+		if(quat2.getPitch() > 38)
+			degrees = 38;
+		else if(quat2.getPitch() < -38)
+			degrees = -38;
 		else degrees = quat2.getPitch();
 		
 		quat2.setEulerAngles(0, degrees, 0);
@@ -1536,8 +1536,8 @@ public abstract class Player extends Entity {
 			if(p.equals(this) || p.equals(startingPlayer))
 				continue;
 			
-			Vector3 tempVec = p.getPosition().cpy();
-			Vector3 tempDir = tempVec.sub(getPosition()).nor();
+			Vector3 tempVec = p.getPosition();
+			Vector3 tempDir = tempVec.cpy().sub(getPosition()).nor();
 			float dist = direction.dst(tempDir);
 			
 			if(dist < minDist) {
