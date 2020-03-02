@@ -38,7 +38,7 @@ public class DesktopLauncher {
 		config.addIcon("application/icons/bkbl.png", FileType.Internal);
 		//LwjglApplicationConfiguration.disableAudio = true;
 		//config.resizable = false;
-		config.foregroundFPS = 120;
+		config.foregroundFPS = 60;
 		config.backgroundFPS = 20;
 	}
 }
