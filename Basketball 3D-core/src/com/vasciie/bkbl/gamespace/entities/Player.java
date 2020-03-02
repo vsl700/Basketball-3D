@@ -814,28 +814,11 @@ public abstract class Player extends Entity {
 	 * @param y - the y-axis
 	 */
 	public void turnY(float y) {
-		//Matrix4 temp = new Matrix4(currentRot);
-		
-		//float yaw = modelInstance.transform.getRotation(new Quaternion()).getYaw();
-		
-		//if(minRotateDegrees != maxRotateDegrees && (yaw + y > minRotateDegrees && yaw + y < maxRotateDegrees))
-		
-		//temp.rotate(0, 1, 0, y);
-		
-		//temp.getRotation(currentRot);
-		
-		Vector3 tempDir = currentRot.transform(new Vector3(0, 0, -1));
-		
-		tempDir.rotate(y, 0, 1, 0);
-		System.out.println(tempDir);
-		
-		Vector3 upVec = new Vector3(0, 1, 0);
-		Vector3 upVec1 = upVec.cpy();
-		currentRot.setFromMatrix(new Matrix4().setToLookAt(tempDir, upVec));
-		
-		if(!focus) {
-			Vector3 tempVec = modelInstance.transform.getTranslation(new Vector3());
-			modelInstance.transform.setToLookAt(tempDir, upVec1).trn(tempVec);
+		if(focus) {
+			Matrix4 temp = new Matrix4(currentRot);
+			temp.rotate(0, 1, 0, y).getRotation(currentRot);
+		}else {
+			modelInstance.transform.rotate(0, 1, 0, y).getRotation(currentRot);
 			setCollisionTransform(true);
 		}
 	}
@@ -1519,6 +1502,7 @@ public abstract class Player extends Entity {
 	}
 	
 	private final Quaternion currentRot = new Quaternion();
+	boolean rotDifference;
 	private void lookAtClosestToViewPlayer() {
 		ArrayList<Player> tempPlayers;
 		
@@ -1556,8 +1540,10 @@ public abstract class Player extends Entity {
 			}
 		}
 		
+		rotDifference = true;
 		
 		lookAt(closestPos);
+		setCollisionTransform(true);
 	}
 	
 	@Override
@@ -1606,6 +1592,10 @@ public abstract class Player extends Entity {
 		//TODO Take this into the shoot interaction checkers when everything gets to work!
 		if(focus)
 			lookAtClosestToViewPlayer();
+		else if(rotDifference) {
+			modelInstance.transform.getRotation(currentRot);
+			rotDifference = false;
+		}
 		
 		if (dribbleL) {
 			dribble(delta, true);
