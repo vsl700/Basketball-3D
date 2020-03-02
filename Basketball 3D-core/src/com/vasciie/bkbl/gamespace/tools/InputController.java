@@ -10,7 +10,7 @@ public class InputController implements InputProcessor {
 	static final int forward = Keys.W, backward = Keys.S, strafeRight = Keys.D, strafeLeft = Keys.A;
 	static final int sprint = Keys.SHIFT_LEFT;
 	static final int shoot = Keys.CONTROL_LEFT;
-	static final int focus = Keys.ALT_LEFT;
+	static final int focus = Keys.SPACE;
 	static final int dribbleL = Buttons.LEFT, dribbleR = Buttons.RIGHT;
 	
 	//Alternative keys
