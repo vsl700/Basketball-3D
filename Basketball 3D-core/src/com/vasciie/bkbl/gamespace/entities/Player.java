@@ -814,18 +814,28 @@ public abstract class Player extends Entity {
 	 * @param y - the y-axis
 	 */
 	public void turnY(float y) {
-		Matrix4 temp = new Matrix4(currentRot);
+		//Matrix4 temp = new Matrix4(currentRot);
 		
 		//float yaw = modelInstance.transform.getRotation(new Quaternion()).getYaw();
 		
 		//if(minRotateDegrees != maxRotateDegrees && (yaw + y > minRotateDegrees && yaw + y < maxRotateDegrees))
 		
-		temp.rotate(0, 1, 0, y);
+		//temp.rotate(0, 1, 0, y);
 		
-		temp.getRotation(currentRot);
+		//temp.getRotation(currentRot);
+		
+		Vector3 tempDir = currentRot.transform(new Vector3(0, 0, -1));
+		
+		tempDir.rotate(y, 0, 1, 0);
+		System.out.println(tempDir);
+		
+		Vector3 upVec = new Vector3(0, 1, 0);
+		Vector3 upVec1 = upVec.cpy();
+		currentRot.setFromMatrix(new Matrix4().setToLookAt(tempDir, upVec));
 		
 		if(!focus) {
-			modelInstance.transform.set(getPosition(), currentRot);	
+			Vector3 tempVec = modelInstance.transform.getTranslation(new Vector3());
+			modelInstance.transform.setToLookAt(tempDir, upVec1).trn(tempVec);
 			setCollisionTransform(true);
 		}
 	}
