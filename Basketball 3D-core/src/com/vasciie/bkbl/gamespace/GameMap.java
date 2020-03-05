@@ -643,13 +643,13 @@ public class GameMap implements RaycastCollisionDetector<Vector3> {
 		
 		if(pos.x < 0)
 			pos.x = 0;
-		else if(pos.x > terrain.getWidth())
-			pos.x = terrain.getWidth();
+		else if(pos.x > terrain.getWidth() / 2)
+			pos.x = terrain.getWidth() / 2;
 		
 		if(pos.z < 0)
 			pos.z = 0;
-		else if(pos.z > terrain.getDepth())
-			pos.z = terrain.getDepth();
+		else if(pos.z > terrain.getDepth() / 2)
+			pos.z = terrain.getDepth() / 2;
 		
 		player.getBrain().getMemory().setTargetPosition(new SteerableAdapter<Vector3>() {
 			@Override
