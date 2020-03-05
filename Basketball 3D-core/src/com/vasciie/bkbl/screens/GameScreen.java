@@ -100,7 +100,7 @@ public class GameScreen implements Screen, RulesListener {
 		
 		map.update(delta);
 		//map.getCamera().getMainTrans().getTranslation(pCam.position);
-		new Matrix4(map.getMainPlayer().getModelInstance().transform).mul(map.getMainPlayer().getCamMatrix()).mul(new Matrix4().setToTranslation(0, map.getMainPlayer().getHeight(), -10)).getTranslation(pCam.position);
+		map.getMainPlayer().getFocusTransform().mul(new Matrix4().setToTranslation(0, map.getMainPlayer().getHeight(), -10)).getTranslation(pCam.position);
 		game.customLookAt(pCam, new Matrix4(map.getMainPlayer().getModelInstance().transform).mul(new Matrix4().setToTranslation(0, map.getMainPlayer().getHeight(), 0)).getTranslation(new Vector3()));
 		pCam.update();
 
