@@ -74,7 +74,7 @@ public class GameScreen implements Screen, RulesListener {
 		
 		homeScore = new Label("0", textFont, Color.BLUE, true);
 		awayScore = new Label("0", textFont, Color.RED, true);
-		timer = new Label("Ready?", textFont, Color.ORANGE, true);
+		timer = new Label("", textFont, Color.ORANGE, true);
 		power = new Label("POWER", textFont, Color.RED, true);
 		powerNum = new Label("10", powFont, Color.WHITE, true);
 		
@@ -131,6 +131,7 @@ public class GameScreen implements Screen, RulesListener {
 					timer.setText("GO!");
 				else if (map.getTimer() <= 4)
 					timer.setText((int) map.getTimer() + "");
+				else timer.setText("Ready?");
 
 				timer.render(batch, shape, cam);
 			}else if(map.isRuleBroken()){ //If the game is not running and there is no timer counting down
