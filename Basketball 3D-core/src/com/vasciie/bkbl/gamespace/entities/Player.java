@@ -129,7 +129,7 @@ public abstract class Player extends Entity {
 		brain = new Brain(this);
 		boundRadius = 1;
 		
-		currentRot.setFromMatrix(modelInstance.transform.cpy());
+		invTrans.set(modelInstance.transform);
 			//stateMachine = new DefaultStateMachine<Player, PlayerState>(this, PlayerState.IDLING);
 			//stateMachine.changeState(PlayerState.IDLING);
 
@@ -803,10 +803,10 @@ public abstract class Player extends Entity {
 	public void setCollisionTransform(boolean updateMain) {
 		super.setCollisionTransform(updateMain);
 		
-		collObjMap.get("poleNObj").setWorldTransform(calcTransformFromNodesTransform(new Matrix4().set(new Vector3(0, poleScale / 2, getDepth() / 2 + poleScale / 2), new Quaternion())));
+		/*collObjMap.get("poleNObj").setWorldTransform(calcTransformFromNodesTransform(new Matrix4().set(new Vector3(0, poleScale / 2, getDepth() / 2 + poleScale / 2), new Quaternion())));
 		collObjMap.get("poleSObj").setWorldTransform(calcTransformFromNodesTransform(new Matrix4().set(new Vector3(0, poleScale / 2, -getDepth() / 2 - poleScale / 2), new Quaternion())));
 		collObjMap.get("poleEObj").setWorldTransform(calcTransformFromNodesTransform(new Matrix4().set(new Vector3(-poleScale, poleScale / 2, 0), new Quaternion())));//W and E sizes are multiplied by 2
-		collObjMap.get("poleWObj").setWorldTransform(calcTransformFromNodesTransform(new Matrix4().set(new Vector3(poleScale, poleScale / 2, 0), new Quaternion())));
+		collObjMap.get("poleWObj").setWorldTransform(calcTransformFromNodesTransform(new Matrix4().set(new Vector3(poleScale, poleScale / 2, 0), new Quaternion())));*/
 	}
 	
 	/**
@@ -815,10 +815,9 @@ public abstract class Player extends Entity {
 	 */
 	public void turnY(float y) {
 		if(focus) {
-			Matrix4 temp = new Matrix4(currentRot);
-			temp.rotate(0, 1, 0, y).getRotation(currentRot);
+			invTrans.rotate(0, 1, 0, y);
 		}else {
-			modelInstance.transform.rotate(0, 1, 0, y).getRotation(currentRot);
+			invTrans.set(modelInstance.transform.rotate(0, 1, 0, y));
 			setCollisionTransform(true);
 		}
 	}
@@ -1467,7 +1466,7 @@ public abstract class Player extends Entity {
 	 * Points the player's view (rotation) at a target
 	 * @param target - the target this player should point at
 	 */
-	public void lookAt(Vector3 target) {
+	public void lookAt(Vector3 target, boolean rotateHead) {
 		Vector3 rotVec = target.cpy().sub(getPosition());
 		
 		//Calculated lookAt transform
@@ -1479,6 +1478,9 @@ public abstract class Player extends Entity {
 		
 		modelInstance.transform.set(getPosition(), quat).rotate(0, 1, 0, 180);
 		
+		if(!rotateHead)
+			return;
+			
 		Vector3 camRotVec = target.cpy().sub(calcTransformFromNodesTransform(camMatrix).getTranslation(new Vector3()));
 		Matrix4 camTrans = new Matrix4().setToLookAt(camRotVec, new Vector3(0, -1, 0));
 		
@@ -1499,7 +1501,8 @@ public abstract class Player extends Entity {
 		//setCollisionTransform();
 	}
 	
-	private final Quaternion currentRot = new Quaternion();
+	private final Matrix4 invTrans = new Matrix4();
+	//private final Quaternion currentRot = new Quaternion();
 	private boolean rotDifference;
 	private void lookAtClosestToViewPlayer() {
 		ArrayList<Player> tempPlayers;
@@ -1514,6 +1517,7 @@ public abstract class Player extends Entity {
 		
 		Vector3 direction = Vector3.Z.cpy();
 		//direction.rotate(currentRot.getYaw(), 0, 1, 0);
+		Quaternion currentRot = invTrans.getRotation(new Quaternion());
 		currentRot.transform(direction).nor();
 		
 		Player startingPlayer;
@@ -1539,13 +1543,13 @@ public abstract class Player extends Entity {
 			}
 		}
 		
-		rotDifference = true;
-		
-		lookAt(closestPos);
+		lookAt(closestPos, false);
 		setCollisionTransform(true);
 		
 		if(!rotDifference)
-			modelInstance.transform.getRotation(currentRot);
+			invTrans.set(modelInstance.transform);
+		
+		rotDifference = true;
 	}
 	
 	@Override
@@ -1595,7 +1599,7 @@ public abstract class Player extends Entity {
 		if(focus)
 			lookAtClosestToViewPlayer();
 		else if(rotDifference) {
-			modelInstance.transform.getRotation(currentRot);
+			invTrans.set(modelInstance.transform);
 			rotDifference = false;
 		}
 		
@@ -1963,9 +1967,9 @@ public abstract class Player extends Entity {
 	public Matrix4 getFocusTransform() {
 		Matrix4 returnTrans;
 		
-		if(rotDifference)
-			returnTrans = new Matrix4().set(getPosition(), currentRot);
-		else returnTrans = modelInstance.transform.cpy();
+		if(rotDifference) {
+			returnTrans = invTrans.cpy().mul(camMatrix).setTranslation(getPosition());
+		}else returnTrans = modelInstance.transform.cpy().mul(camMatrix);
 		
 		return returnTrans;
 	}

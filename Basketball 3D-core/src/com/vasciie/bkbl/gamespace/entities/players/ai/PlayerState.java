@@ -92,7 +92,7 @@ public enum PlayerState implements State<Player> {
 			player.setRunning();
 			
 			if(!brain.isShooting())
-				player.lookAt(basket.getPosition());
+				player.lookAt(basket.getPosition(), false);
 
 			// Setting the distances from the target (when a player gets in
 			// front of this player)
@@ -255,9 +255,9 @@ public enum PlayerState implements State<Player> {
 				//player.getBrain().getLookAt().calculateSteering(Player.steering);
 				
 				//player.lookAt(player.angleToVector(new Vector3(), Player.steering.angular));
-				player.lookAt(mem.getShootVec());//Just in case the mechanics drop it and the player accidentally looks at the ball instead of the target while shooting
+				player.lookAt(mem.getShootVec(), false);//Just in case the mechanics drop it and the player accidentally looks at the ball instead of the target while shooting
 			}else
-				player.lookAt(ballVec);
+				player.lookAt(ballVec, false);
 			
 			mem.setCatchTime(mem.getCatchTime() + Gdx.graphics.getDeltaTime());
 		}
@@ -298,7 +298,7 @@ public enum PlayerState implements State<Player> {
 				brain.getInterpose().setEnabled(false);
 			else brain.getInterpose().setEnabled(true);
 			
-			player.lookAt(holdingPlayer.getPosition());
+			player.lookAt(holdingPlayer.getPosition(), false);
 			
 			brain.getPSCoop().calculateSteering(Player.steering);
 			player.setMoveVector(Player.steering.linear);
@@ -349,7 +349,7 @@ public enum PlayerState implements State<Player> {
 			brain.getMSSurround().calculateSteering(Player.steering);
 			player.setMoveVector(Player.steering.linear);
 			
-			player.lookAt(chased.getPosition());
+			player.lookAt(chased.getPosition(), false);
 			
 			//Additional controls
 			if (chased.isDribbling()) {
@@ -395,7 +395,7 @@ public enum PlayerState implements State<Player> {
 					player.setRunning();
 				
 				if(memory.getTargetFacing() != null)
-					player.lookAt(memory.getTargetFacing().getPosition());
+					player.lookAt(memory.getTargetFacing().getPosition(), false);
 				
 				if(memory.isCatchBall()) {
 					player.interactWithBallA();

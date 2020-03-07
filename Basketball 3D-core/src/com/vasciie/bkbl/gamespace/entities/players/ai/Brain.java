@@ -144,13 +144,13 @@ public class Brain {
 	
 	public void performShooting(Vector3 tempAimVec) {
 		memory.setTargetVec(tempAimVec);
-		user.lookAt(tempAimVec);
+		user.lookAt(tempAimVec, true);
 		user.interactWithBallS();
 		memory.setAimingTime(memory.getAimingTime() + Gdx.graphics.getDeltaTime());
 	}
 	
 	private void performShooting() {
-		user.lookAt(memory.getShootVec());//When the calculation starts being correct turn shoot vec into target vec!!!
+		user.lookAt(memory.getShootVec(), true);//When the calculation starts being correct turn shoot vec into target vec!!!
 		user.interactWithBallS();
 		memory.setAimingTime(memory.getAimingTime() + Gdx.graphics.getDeltaTime());
 	}
