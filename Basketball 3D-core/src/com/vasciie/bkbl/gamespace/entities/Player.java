@@ -1520,20 +1520,20 @@ public abstract class Player extends Entity {
 		Quaternion currentRot = invTrans.setTranslation(new Vector3()).getRotation(new Quaternion());
 		currentRot.transform(direction).nor().y = 0;
 		
+		Player prevTarget = focusTarget;
 		Player startingPlayer;
-		//if (focusTarget == null) {
-			if (!tempPlayers.get(0).equals(this))
-				startingPlayer = focusTarget = tempPlayers.get(0);
-			else
-				startingPlayer = focusTarget = tempPlayers.get(1);
-		//}else startingPlayer = focusTarget;
+		if (!tempPlayers.get(0).equals(this))
+			startingPlayer = focusTarget = tempPlayers.get(0);
+		else
+			startingPlayer = focusTarget = tempPlayers.get(1);
 		
 		Vector3 closestPos = startingPlayer.getPosition();
 		Vector3 tempClosestDir = closestPos.cpy().sub(getPosition()).nor();
 		tempClosestDir.y = 0;
 		float minDist = direction.dst2(tempClosestDir);
 		
-		boolean changed = false;
+		Player tempTarget = startingPlayer;//Used to store the closest player while there's still not found any unblocked player (if any at all)
+		boolean change = true;//If true, the system below will keep changing the player no matter he is being blocked or not. Otherwise, it checks for blockings
 		for(Player p : tempPlayers) {//The players this player should choose from for pointing at
 			if(p.equals(this) || p.equals(startingPlayer))
 				continue;
@@ -1547,7 +1547,7 @@ public abstract class Player extends Entity {
 				if(avoidInterpose) {//Usually AI would use this
 					boolean flag = false;//Whether the chosen player gets blocked
 
-					for(Player p1 : map.getAllPlayers()) {//The players that may block the chosen player (if so, the chosen player won't be chosen)
+					for(Player p1 : map.getAllPlayers()) {//The players that may block the chosen player 
 						if(p1.equals(this) || p1.equals(p))
 							continue;
 						
@@ -1556,9 +1556,9 @@ public abstract class Player extends Entity {
 						tempDir1.y = 0;
 						
 						float dirDist = tempDir.dst(tempDir1);
-						float checkConst = getWidth() / 4;
+						float checkConst = getWidth() / 2;
 						if(dirDist <= checkConst) {
-							float posDist = tempPos1.dst(getPosition()) - tempPos.dst(getPosition());
+							float posDist = tempPos1.dst2(getPosition()) - tempPos.dst2(getPosition());
 							if(posDist < 0) { //If the eventual blocker (tempPos1) is in front of the chosen one (tempPos)
 								flag = true;
 								break;
@@ -1566,26 +1566,34 @@ public abstract class Player extends Entity {
 						}
 					}
 					
-					if(flag) 
+					if(flag) {
+						tempTarget = p;
+						closestPos = tempPos;
+						minDist = dist;
+						
 						continue;
-					
+					}else change = false;
+
 					closestPos = tempPos;
 					minDist = dist;
-					changed = true;
 					focusTarget = p;
 				} else {
+					change = false;
 					closestPos = tempPos;
 					minDist = dist;
-					changed = true;
 					focusTarget = p;
 				}
 			}
 		}
 		
-		lookAt(closestPos, false);
+		if(change)//If there's no unblocked players
+			lookAt(tempTarget.getPosition(), false);
+		else
+			lookAt(closestPos, false);
+		
 		setCollisionTransform(true);
 		
-		if(!rotDifference || changed) {
+		if(!rotDifference || !focusTarget.equals(prevTarget)) {
 			invTrans.set(modelInstance.transform);
 			rotDifference = true;
 		}
