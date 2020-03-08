@@ -155,6 +155,13 @@ public class Rules {
 
 							@Override
 							public boolean act() {
+								// We also check whether it is holding or not,
+								// because when the action starts, the player
+								// won't be aiming or shooting, which will
+								// result in ending the action before it starts
+								if(!thrower.isHoldingBall() && !thrower.isAiming() && !thrower.isShooting())
+									return true;
+								
 								
 								
 								return false;
