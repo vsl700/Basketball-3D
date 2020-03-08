@@ -1502,6 +1502,7 @@ public abstract class Player extends Entity {
 	}
 	
 	private final Matrix4 invTrans = new Matrix4();
+	private Player tempTarget;
 	private boolean rotDifference;
 	private void lookAtClosestToViewPlayer() {
 		ArrayList<Player> tempPlayers;
@@ -1514,16 +1515,18 @@ public abstract class Player extends Entity {
 		if(tempPlayers.size() == 1)
 			return;
 		
-		/*Quaternion tempRot = modelInstance.transform.getRotation(new Quaternion());*/
 		
 		Vector3 direction = Vector3.Z.cpy();
 		Quaternion currentRot = invTrans.setTranslation(new Vector3()).getRotation(new Quaternion());
 		currentRot.transform(direction).nor();
 		
 		Player startingPlayer;
-		if(!tempPlayers.get(0).equals(this))
-			startingPlayer = tempPlayers.get(0);
-		else startingPlayer = tempPlayers.get(1);
+		if (tempTarget == null) {
+			if (!tempPlayers.get(0).equals(this))
+				startingPlayer = tempTarget = tempPlayers.get(0);
+			else
+				startingPlayer = tempTarget = tempPlayers.get(1);
+		}else startingPlayer = tempTarget;
 		
 		Vector3 closestPos = startingPlayer.getPosition();
 		float minDist = direction.dst(closestPos.cpy().sub(getPosition()).nor());
@@ -1540,13 +1543,14 @@ public abstract class Player extends Entity {
 			if(dist < minDist) {
 				closestPos = tempVec;
 				minDist = dist;
+				tempTarget = p;
 			}
 		}
 		
 		lookAt(closestPos, false);
 		setCollisionTransform(true);
 		
-		if(!rotDifference/* || !tempRot.equals(modelInstance.transform.getRotation(new Quaternion()))*/) {
+		if(!rotDifference || !startingPlayer.equals(tempTarget)) {
 			invTrans.set(modelInstance.transform);
 			rotDifference = true;
 		}
@@ -1601,6 +1605,7 @@ public abstract class Player extends Entity {
 		else if(rotDifference) {
 			invTrans.set(modelInstance.transform);
 			rotDifference = false;
+			tempTarget = null;
 		}
 		
 		if (dribbleL) {
