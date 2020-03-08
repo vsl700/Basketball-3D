@@ -1502,7 +1502,6 @@ public abstract class Player extends Entity {
 	}
 	
 	private final Matrix4 invTrans = new Matrix4();
-	//private final Quaternion currentRot = new Quaternion();
 	private boolean rotDifference;
 	private void lookAtClosestToViewPlayer() {
 		ArrayList<Player> tempPlayers;
@@ -1515,9 +1514,10 @@ public abstract class Player extends Entity {
 		if(tempPlayers.size() == 1)
 			return;
 		
+		/*Quaternion tempRot = modelInstance.transform.getRotation(new Quaternion());*/
+		
 		Vector3 direction = Vector3.Z.cpy();
-		//direction.rotate(currentRot.getYaw(), 0, 1, 0);
-		Quaternion currentRot = invTrans.getRotation(new Quaternion());
+		Quaternion currentRot = invTrans.setTranslation(new Vector3()).getRotation(new Quaternion());
 		currentRot.transform(direction).nor();
 		
 		Player startingPlayer;
@@ -1526,7 +1526,7 @@ public abstract class Player extends Entity {
 		else startingPlayer = tempPlayers.get(1);
 		
 		Vector3 closestPos = startingPlayer.getPosition();
-		float minDist = direction.dst(closestPos.cpy().nor());
+		float minDist = direction.dst(closestPos.cpy().sub(getPosition()).nor());
 		
 		
 		for(Player p : tempPlayers) {
@@ -1546,10 +1546,10 @@ public abstract class Player extends Entity {
 		lookAt(closestPos, false);
 		setCollisionTransform(true);
 		
-		if(!rotDifference)
+		if(!rotDifference/* || !tempRot.equals(modelInstance.transform.getRotation(new Quaternion()))*/) {
 			invTrans.set(modelInstance.transform);
-		
-		rotDifference = true;
+			rotDifference = true;
+		}
 	}
 	
 	@Override
