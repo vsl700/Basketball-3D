@@ -1502,9 +1502,9 @@ public abstract class Player extends Entity {
 	}
 	
 	private final Matrix4 invTrans = new Matrix4();
-	private Player tempTarget;
+	private Player focusTarget;
 	private boolean rotDifference;
-	private void lookAtClosestToViewPlayer() {
+	private void lookAtClosestToViewPlayer(boolean avoidInterpose) {
 		ArrayList<Player> tempPlayers;
 		
 		if(this instanceof Teammate)
@@ -1518,39 +1518,74 @@ public abstract class Player extends Entity {
 		
 		Vector3 direction = Vector3.Z.cpy();
 		Quaternion currentRot = invTrans.setTranslation(new Vector3()).getRotation(new Quaternion());
-		currentRot.transform(direction).nor();
+		currentRot.transform(direction).nor().y = 0;
 		
 		Player startingPlayer;
-		if (tempTarget == null) {
+		//if (focusTarget == null) {
 			if (!tempPlayers.get(0).equals(this))
-				startingPlayer = tempTarget = tempPlayers.get(0);
+				startingPlayer = focusTarget = tempPlayers.get(0);
 			else
-				startingPlayer = tempTarget = tempPlayers.get(1);
-		}else startingPlayer = tempTarget;
+				startingPlayer = focusTarget = tempPlayers.get(1);
+		//}else startingPlayer = focusTarget;
 		
 		Vector3 closestPos = startingPlayer.getPosition();
-		float minDist = direction.dst(closestPos.cpy().sub(getPosition()).nor());
+		Vector3 tempClosestDir = closestPos.cpy().sub(getPosition()).nor();
+		tempClosestDir.y = 0;
+		float minDist = direction.dst2(tempClosestDir);
 		
-		
-		for(Player p : tempPlayers) {
+		boolean changed = false;
+		for(Player p : tempPlayers) {//The players this player should choose from for pointing at
 			if(p.equals(this) || p.equals(startingPlayer))
 				continue;
 			
-			Vector3 tempVec = p.getPosition();
-			Vector3 tempDir = tempVec.cpy().sub(getPosition()).nor();
-			float dist = direction.dst(tempDir);
+			Vector3 tempPos = p.getPosition();
+			Vector3 tempDir = tempPos.cpy().sub(getPosition()).nor();
+			tempDir.y = 0;
+			float dist = direction.dst2(tempDir);
 			
 			if(dist < minDist) {
-				closestPos = tempVec;
-				minDist = dist;
-				tempTarget = p;
+				if(avoidInterpose) {//Usually AI would use this
+					boolean flag = false;//Whether the chosen player gets blocked
+
+					for(Player p1 : map.getAllPlayers()) {//The players that may block the chosen player (if so, the chosen player won't be chosen)
+						if(p1.equals(this) || p1.equals(p))
+							continue;
+						
+						Vector3 tempPos1 = p1.getPosition();
+						Vector3 tempDir1 = tempPos1.cpy().sub(getPosition()).nor();
+						tempDir1.y = 0;
+						
+						float dirDist = tempDir.dst(tempDir1);
+						float checkConst = getWidth() / 4;
+						if(dirDist <= checkConst) {
+							float posDist = tempPos1.dst(getPosition()) - tempPos.dst(getPosition());
+							if(posDist < 0) { //If the eventual blocker (tempPos1) is in front of the chosen one (tempPos)
+								flag = true;
+								break;
+							}
+						}
+					}
+					
+					if(flag) 
+						continue;
+					
+					closestPos = tempPos;
+					minDist = dist;
+					changed = true;
+					focusTarget = p;
+				} else {
+					closestPos = tempPos;
+					minDist = dist;
+					changed = true;
+					focusTarget = p;
+				}
 			}
 		}
 		
 		lookAt(closestPos, false);
 		setCollisionTransform(true);
 		
-		if(!rotDifference || !startingPlayer.equals(tempTarget)) {
+		if(!rotDifference || changed) {
 			invTrans.set(modelInstance.transform);
 			rotDifference = true;
 		}
@@ -1601,11 +1636,11 @@ public abstract class Player extends Entity {
 		
 		//TODO Take this into the shoot interaction checkers when everything gets to work!
 		if(focus)
-			lookAtClosestToViewPlayer();
+			lookAtClosestToViewPlayer(true);
 		else if(rotDifference) {
 			invTrans.set(modelInstance.transform);
 			rotDifference = false;
-			tempTarget = null;
+			focusTarget = null;
 		}
 		
 		if (dribbleL) {
@@ -2128,6 +2163,10 @@ public abstract class Player extends Entity {
 	
 	public HashMap<String, btRigidBody> getBodiesMap() {
 		return bodiesMap;
+	}
+	
+	public Player getFocusedPlayer() {
+		return focusTarget;
 	}
 	
 	public void setPlayerIndex(int playerIndex) {
