@@ -79,7 +79,7 @@ public abstract class Player extends Entity {
 	boolean leftAimBall, rightAimBall;
 	boolean leftThrowBall, rightThrowBall, readyBall;
 	boolean leftPointBall, rightPointBall;
-	boolean focus;
+	boolean focus, avoidInterpose;
 	boolean dribbleL, dribbleR;
 	boolean ballColl; 
 	boolean leftHandBall, rightHandBall;
@@ -937,8 +937,9 @@ public abstract class Player extends Entity {
 			interactWithBallR();
 	}
 	
-	public void focus() {
+	public void focus(boolean special) {
 		focus = true;
+		avoidInterpose = special;
 	}
 	
 	public void switchDribble() {
@@ -1424,7 +1425,7 @@ public abstract class Player extends Entity {
 		map.getBall().setWorldTransform(bodiesMap.get("hand" + primaryId).getWorldTransform().cpy());
 		
 		if(focus)
-			lookAtClosestToViewPlayer(false);
+			lookAtClosestToViewPlayer();
 		
 		if(aimBall) {
 			float transistion = 0.25f;
@@ -1604,7 +1605,7 @@ public abstract class Player extends Entity {
 	private final Matrix4 invTrans = new Matrix4();
 	private Player focusTarget;
 	private boolean rotDifference;
-	private void lookAtClosestToViewPlayer(boolean avoidInterpose) {
+	private void lookAtClosestToViewPlayer() {
 		ArrayList<Player> tempPlayers;
 		
 		if(this instanceof Teammate)

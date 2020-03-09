@@ -766,7 +766,7 @@ public class GameMap implements RaycastCollisionDetector<Vector3> {
 		mainPlayer.shootPowerScroll(inputs.getScroll());
 		
 		if(inputs.isFocusPressed())
-			mainPlayer.focus();
+			mainPlayer.focus(false);
 		
 		if(inputs.isShootPressed()) {
 			mainPlayer.interactWithBallS();
