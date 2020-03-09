@@ -550,11 +550,15 @@ public class GameMap implements RaycastCollisionDetector<Vector3> {
 			}
 			
 			return;*/
-			playersReady = rules.getBrokenRule().arePlayersReady();
+
 			if(rules.getBrokenRule() == null) {
 				actionOver();
 				//rules.clearBrokenRuleWRuleBreaker();
+				
+				return;
 			}
+			
+			playersReady = rules.getBrokenRule().arePlayersReady();
 			
 			return;
 		}
@@ -566,9 +570,9 @@ public class GameMap implements RaycastCollisionDetector<Vector3> {
 	private void updateFullGame(float delta) {
 		ball.update(delta);
 		
-		updatePlayers(delta);
-		
 		rules.update();
+		
+		updatePlayers(delta);
 		
 		ball.onCycleEnd();
 		

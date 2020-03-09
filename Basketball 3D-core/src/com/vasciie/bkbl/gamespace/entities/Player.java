@@ -1718,7 +1718,7 @@ public abstract class Player extends Entity {
 		}
 		
 		if(isMainPlayer() && map.isRuleBrokenActing() || !isMainPlayer() && !map.isRuleBroken()) {
-			//brain.update();
+			brain.update();
 			//Vector3 tempVec = moveVec.add(new Vector3(steering.linear.cpy().x, 0, steering.linear.cpy().y)).scl(0.5f);
 			//float tempAng = steering.angular;
 			moveVec.y = 0;
@@ -2218,6 +2218,10 @@ public abstract class Player extends Entity {
 	
 	public boolean isDribbling() {
 		return dribbleL || dribbleR;
+	}
+	
+	public boolean isFocusing() {
+		return focus || focusTarget != null;
 	}
 	
 	public boolean isAiming() {

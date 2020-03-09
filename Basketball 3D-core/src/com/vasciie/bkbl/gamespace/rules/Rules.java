@@ -58,6 +58,9 @@ public class Rules {
 						}else
 							recentHolder = tempPlayer;
 						
+						if(thrower != null && thrower.equals(recentHolder))
+							return false;
+						
 						if (recentHolder != null) //If the ball is still not ever touched, don't check for terrain bounds collision (CPU economy) 
 							for (btCollisionObject obj : map.getBall().getOutsideColliders()) {
 								if (map.getTerrain().getInvisBodies().contains(obj)) {
@@ -162,7 +165,17 @@ public class Rules {
 								if(!thrower.isHoldingBall() && !thrower.isAiming() && !thrower.isShooting())
 									return true;
 								
+								thrower.focus(true);
 								
+								Player focusedPlayer = thrower.getFocusedPlayer();
+								if(focusedPlayer == null)
+									return false;
+								
+								Vector3 tempAimVec = focusedPlayer.getPosition();
+								
+								if(!thrower.getBrain().updateShooting())
+									thrower.getBrain().performShooting(tempAimVec);
+								else thrower.getBrain().getMemory().setTargetVec(tempAimVec);
 								
 								return false;
 							}
