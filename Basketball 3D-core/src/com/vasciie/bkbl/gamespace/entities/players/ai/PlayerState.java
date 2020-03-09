@@ -167,7 +167,7 @@ public enum PlayerState implements State<Player> {
 			if(!catchersChosen)
 				chooseCatcher(player.getMap());
 			
-			if (player.getBrain().getMemory().isBallChaser() || player.getMap().getTeammates().size() == 1) {
+			if (/*player.getBrain().getMemory().isBallChaser() || */player.getMap().getTeammates().size() == 1) {
 				player.getBrain().getPursue().setArrivalTolerance(0.1f);
 				//player.getBrain().getPlayerSeparate().setEnabled(false);
 
@@ -181,7 +181,7 @@ public enum PlayerState implements State<Player> {
 				//player.getBrain().getPursue().setArrivalTolerance(6);
 				//player.getBrain().getPlayerSeparate().setEnabled(true);
 				player.getBrain().getCollAvoid().setEnabled(false);
-				//player.getBrain().getBallSeparate().setEnabled(false);
+				player.getBrain().getBallSeparate().setEnabled(false);
 			}
 		}
 		
@@ -213,7 +213,7 @@ public enum PlayerState implements State<Player> {
 			
 
 			//If the following player hadn't just thrown the ball
-			if (player.getBrain().getMemory().isBallChaser() || player.getMap().getTeammates().size() == 1) {
+			if (/*player.getBrain().getMemory().isBallChaser() || */player.getMap().getTeammates().size() == 1) {
 				if(player.getMap().getBall().getPosition().y > player.getHeight() * 2 && player.isProximityColliding(player.getMap().getBall())) {
 					player.getBrain().getBallSeparate().setEnabled(true);
 					//player.getBrain().getBallSeparate().calculateSteering(Player.steering);
