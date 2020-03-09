@@ -1533,9 +1533,9 @@ public abstract class Player extends Entity {
 		float minDist = direction.dst2(tempClosestDir);
 		
 		Player tempTarget = startingPlayer;//Used to store the closest player while there's still not found any unblocked player (if any at all)
-		boolean change = true;//If true, the system below will keep changing the player no matter he is being blocked or not. Otherwise, it checks for blockings
+		boolean change = avoidInterpose;//If true, the system below will keep changing the player no matter he is being blocked or not. Otherwise, it checks for blockings
 		for(Player p : tempPlayers) {//The players this player should choose from for pointing at
-			if(p.equals(this) || p.equals(startingPlayer))
+			if(p.equals(this) || p.equals(startingPlayer) && !avoidInterpose)
 				continue;
 			
 			Vector3 tempPos = p.getPosition();
@@ -1543,9 +1543,10 @@ public abstract class Player extends Entity {
 			tempDir.y = 0;
 			float dist = direction.dst2(tempDir);
 			
-			if(dist < minDist) {
+			boolean closer = dist < minDist;
+			if(closer || change) {
 				if(avoidInterpose) {//Usually AI would use this
-					boolean flag = false;//Whether the chosen player gets blocked
+					boolean block = false;//Whether the chosen player gets blocked
 
 					for(Player p1 : map.getAllPlayers()) {//The players that may block the chosen player 
 						if(p1.equals(this) || p1.equals(p))
@@ -1556,29 +1557,31 @@ public abstract class Player extends Entity {
 						tempDir1.y = 0;
 						
 						float dirDist = tempDir.dst(tempDir1);
-						float checkConst = getWidth() / 2;
+						float checkConst = getWidth() / 2.3f;
 						if(dirDist <= checkConst) {
 							float posDist = tempPos1.dst2(getPosition()) - tempPos.dst2(getPosition());
 							if(posDist < 0) { //If the eventual blocker (tempPos1) is in front of the chosen one (tempPos)
-								flag = true;
+								block = true;
 								break;
 							}
 						}
 					}
 					
-					if(flag) {
-						tempTarget = p;
-						closestPos = tempPos;
-						minDist = dist;
+					if(block) {
+						if (change && closer) {
+							tempTarget = p;
+							closestPos = tempPos;
+							minDist = dist;
+						}
 						
 						continue;
-					}else change = false;
-
-					closestPos = tempPos;
-					minDist = dist;
-					focusTarget = p;
+					}else if (closer || change) {
+						change = false;
+						closestPos = tempPos;
+						minDist = dist;
+						focusTarget = p;
+					}
 				} else {
-					change = false;
 					closestPos = tempPos;
 					minDist = dist;
 					focusTarget = p;
@@ -1593,7 +1596,7 @@ public abstract class Player extends Entity {
 		
 		setCollisionTransform(true);
 		
-		if(!rotDifference || !focusTarget.equals(prevTarget)) {
+		if(!rotDifference || !focusTarget.equals(prevTarget)/* || change && !tempTarget.equals(prevTarget)*/) {
 			invTrans.set(modelInstance.transform);
 			rotDifference = true;
 		}
