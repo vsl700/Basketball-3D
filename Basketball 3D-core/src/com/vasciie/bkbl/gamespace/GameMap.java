@@ -514,8 +514,8 @@ public class GameMap implements RaycastCollisionDetector<Vector3> {
 		// We're leaving dynamics world outside of the check below
 		// because the AI might sometimes make mistakes and if 
 		// players go one through another that wouldn't be very funny (for me)
-		float delta2 = Math.min(1f / 30f, delta);
-		dynamicsWorld.stepSimulation(delta2, 15, 1f / 60f);
+		//float delta2 = Math.min(1f / 30f, delta);
+		dynamicsWorld.stepSimulation(delta, 15, 1f / 120f);
 			
 		//if(gameRunning)
 		if(!gameRunning) {
