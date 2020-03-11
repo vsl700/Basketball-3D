@@ -627,7 +627,7 @@ public class GameMap implements RaycastCollisionDetector<Vector3> {
 		// and clear the broken rule from Rule
 		ruleBroken = false;
 		ruleBrokenActing = true;
-		startTimer = 3;
+		startTimer = 0.9f;
 		System.out.println("On rule broken continue");
 		// Finally, after a quick timeout the game will continue
 	}
