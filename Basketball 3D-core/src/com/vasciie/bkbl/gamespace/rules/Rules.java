@@ -38,6 +38,7 @@ public class Rules {
 		
 		gameRules = new GameRule[] {
 				new GameRule(this, "ball_out", "Out Of Bounds!", "The Ball Has Reached The Bounds Of The Terrain!", map) {
+					final Vector3 occurPlace = new Vector3();
 					Player recentHolder, thrower;
 					
 					
@@ -65,6 +66,7 @@ public class Rules {
 							for (btCollisionObject obj : map.getBall().getOutsideColliders()) {
 								if (map.getTerrain().getInvisBodies().contains(obj)) {
 									ruleBreaker = recentHolder;
+									occurPlace.set(map.getBall().getPosition());
 									return true;
 								}
 							}
@@ -95,7 +97,7 @@ public class Rules {
 								recentHolder = thrower;
 								
 								
-								Vector3 posGroupPos = thrower.getPosition().cpy().sub(thrower.angleToVector(new Vector3(), thrower.getOrientation()).scl(3));
+								Vector3 posGroupPos = thrower.getPosition().cpy().sub(thrower.angleToVector(Vector3.Z, thrower.getOrientation()).scl(3));
 								// This is supposed to be a position right in front of
 								// the thrower's sight, and then random coordinates from
 								// -6 to 6 z-axis and -3 to 3 x-axis will .mul()-ed by
@@ -109,6 +111,7 @@ public class Rules {
 										//map.setPlayerTargetPosition(map.getBall().getPosition(), temp);
 										if(temp.getBrain().getMemory().getTargetPosition() == null) {
 											temp.getBrain().getMemory().setTargetPosition(map.getBall());
+											temp.getBrain().getMemory().setTargetFacing(map.getBall());
 											temp.getBrain().getMemory().setCatchBall(true);
 										}
 									}
@@ -141,12 +144,36 @@ public class Rules {
 							public boolean act() {
 								if(recentHolder.isHoldingBall()) {
 									recentHolder.getBrain().clearCustomTarget();
+									
+									//map.setPlayerTargetPosition(occurPlace, recentHolder);
+									recentHolder.getBrain().setCustomVecTarget(occurPlace);
+									
 									return true;
 								}
 								
 								return false;
 							}
 
+							@Override
+							public boolean isGameDependent() {
+								return false;
+							}
+							
+						});
+						
+						actions.addAction(new Action() {
+							
+							@Override
+							public boolean act() {
+								if(thrower.getPosition().dst(occurPlace) < 1f) {
+									thrower.getBrain().clearCustomTarget();
+									thrower.focus(true);//Just for beauty (it's just for one frame and I don't think that it will cost that much)
+									return true;
+								}
+								
+								return false;
+							}
+							
 							@Override
 							public boolean isGameDependent() {
 								return false;
@@ -173,7 +200,7 @@ public class Rules {
 								
 								Vector3 tempAimVec = focusedPlayer.getPosition();
 								
-								if(!thrower.getBrain().updateShooting())
+								if(!thrower.getBrain().updateShooting(3))
 									thrower.getBrain().performShooting(tempAimVec);
 								else thrower.getBrain().getMemory().setTargetVec(tempAimVec);
 								
