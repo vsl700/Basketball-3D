@@ -7,6 +7,7 @@ import com.vasciie.bkbl.gamespace.entities.players.Opponent;
 import com.vasciie.bkbl.gamespace.entities.players.Teammate;
 import com.badlogic.gdx.ai.fsm.DefaultStateMachine;
 import com.badlogic.gdx.ai.fsm.StateMachine;
+import com.badlogic.gdx.ai.steer.SteerableAdapter;
 import com.badlogic.gdx.ai.steer.behaviors.Arrive;
 import com.badlogic.gdx.ai.steer.behaviors.BlendedSteering;
 import com.badlogic.gdx.ai.steer.behaviors.CollisionAvoidance;
@@ -42,7 +43,7 @@ public class Brain {
 	Interpose<Vector3> interpose; //For blocking opponents from getting close to the player holding the ball in co-op state
 	Separation<Vector3> ballSeparate, basketSeparate, playerSeparate; //For player and basket surroundings and ball distance keeping
 	RaycastObstacleAvoidance<Vector3> obstAvoid; //For invisible terrain walls
-	PrioritySteering<Vector3> pSBallChasePart, pSCoop, pSSurround;
+	PrioritySteering<Vector3> pSBallChasePart, pSCoop, pSSurround, pSCustom;
 	BlendedSteering<Vector3> mSBallChase, mSBallInHand, mSSurround;	//Groups of behaviors for each state
 	
 	
@@ -59,6 +60,7 @@ public class Brain {
 		
 		pursueBallInHand = new Arrive<Vector3>(user, user.getTargetBasket());
 		customPursue = new Arrive<Vector3>(user, null);
+		customPursue.setArrivalTolerance(0);
 		//pursue.setArrivalTolerance(0.1f);
 		user.setMaxLinearAcceleration(1);
 		lookAt = new LookWhereYouAreGoing<Vector3>(user);
@@ -105,6 +107,10 @@ public class Brain {
 		pSSurround.add(playerSeparate);
 		pSSurround.add(collAvoid);
 		pSSurround.add(pursue);
+		
+		pSCustom = new PrioritySteering<Vector3>(user);
+		pSCustom.add(collAvoid);
+		pSCustom.add(customPursue);
 		//mSCoop.add(playerSeparate, 0.9f);
 	}
 	
@@ -185,17 +191,20 @@ public class Brain {
 	 * Updates AI shooting, if it has ever started of course
 	 * @return true if the shooting has ever started and it has been updated
 	 */
-	public boolean updateShooting() {
+	public boolean updateShooting(float maxShootingTime) {
 		if (isShooting()) {
 			memory.setShootVec(calculateShootVector(memory.getTargetVec())); //As the player can move even while shooting, we update shootVec every time
 			
-			if(memory.getAimingTime() <= 1.25f) {
+			if(memory.getAimingTime() <= maxShootingTime) {
 				performShooting();
 			}
-			else if (memory.getAimingTime() > 1.25f) {
+			else if (memory.getAimingTime() > maxShootingTime) {
 				//System.out.println(memory.getShootVec());
 				memory.setShootTime(0);
 				memory.setCatchTime(0);
+				memory.setAimingTime(0);
+				memory.setTargetVec(null);
+				memory.setShootVec(null);
 				// user.throwBall(memory.getShootVec());
 				memory.setBallJustShot(true);
 				
@@ -203,6 +212,9 @@ public class Brain {
 			
 			return true;
 		}
+		
+		if(memory.isBallJustShot())//Practically, if the ball has just been shot, there has been a shooting initialized, so we return true (also there'are shooting problems without this check)
+			return true;
 		
 		return false;
 	}
@@ -214,6 +226,18 @@ public class Brain {
 	/*public boolean isAbleToShoot() {
 		return memory.getShootTime() > 20;
 	}*/
+	
+	public void setCustomVecTarget(final Vector3 target) {
+		SteerableAdapter<Vector3> tempSteerable = new SteerableAdapter<Vector3>() {
+			@Override
+			public Vector3 getPosition() {
+				return target;
+			}
+		};
+		
+		memory.setTargetPosition(tempSteerable);
+		customPursue.setTarget(tempSteerable);
+	}
 	
 	public void clearCustomTarget() {
 		customPursue.setTarget(null);
@@ -287,6 +311,10 @@ public class Brain {
 
 	public PrioritySteering<Vector3> getPSSurround() {
 		return pSSurround;
+	}
+	
+	public PrioritySteering<Vector3> getPSCustom(){
+		return pSCustom;
 	}
 	
 }

@@ -1971,25 +1971,31 @@ public abstract class Player extends Entity {
 			int count = 0;
 			//if(this instanceof Teammate) {
 				for(Player p : map.getTeammates())
-					if(!p.equals(this) && 
-							//((p.isMainPlayer() && !p.getBrain().getStateMachine().isInState(PlayerState.BALL_CHASING)) || !p.getBrain().getMemory().isBallChaser()) && 
-							!p.isHoldingBall() && //For example it can be used for co-op mode when the players are trying to interpose
-							!p.getBrain().getStateMachine().isInState(PlayerState.PLAYER_SURROUND) && brain.getStateMachine().isInState(PlayerState.PLAYER_SURROUND) &&
-							callback.reportNeighbor(p))
+					if(collAvoidCheck(p) && callback.reportNeighbor(p))
 						count++;
 			//}else
 				for(Player p : map.getOpponents())
-					if(!p.equals(this) && 
-							//!p.getBrain().getMemory().isBallChaser() && 
-							!p.isHoldingBall() &&
-							!p.getBrain().getStateMachine().isInState(PlayerState.PLAYER_SURROUND) && brain.getStateMachine().isInState(PlayerState.PLAYER_SURROUND) &&
-							callback.reportNeighbor(p))
+					if(collAvoidCheck(p) && callback.reportNeighbor(p))
 						count++;
+				
+				if(callback.reportNeighbor(map.getHomeBasket()))
+					count++;
+				
+				else if(callback.reportNeighbor(map.getAwayBasket()))
+					count++;
 			
 			return count;
 		}
 		
 		return super.findNeighbors(callback);
+	}
+	
+	private boolean collAvoidCheck(Player p) {
+		return !p.equals(this) && 
+				//((p.isMainPlayer() && !p.getBrain().getStateMachine().isInState(PlayerState.BALL_CHASING)) || !p.getBrain().getMemory().isBallChaser()) && 
+				(!p.isHoldingBall() && //For example it can be used for co-op mode when the players are trying to interpose
+				!p.getBrain().getStateMachine().isInState(PlayerState.PLAYER_SURROUND) && brain.getStateMachine().isInState(PlayerState.PLAYER_SURROUND) ||
+				brain.getStateMachine().isInState(PlayerState.BALL_CHASING) || brain.getStateMachine().isInState(PlayerState.IDLING));
 	}
 	
 	public Matrix4 getFocusTransform() {

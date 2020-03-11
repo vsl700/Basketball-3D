@@ -17,7 +17,7 @@ public class AIMemory {
 	Player targetPlayer;
 	
 	//The targetVec represents the position of the target, while shootVec represents the point where the player has to shoot so that he can hit the target with the ball
-	Vector3 shootVec, targetVec;
+	Vector3 shootVec, targetVec;//targetVec is not only used for shooting
 	
 	Steerable<Vector3> targetPosition, targetFacing;
 	
@@ -25,7 +25,6 @@ public class AIMemory {
 	float distDiff, resetTime;
 	
 	boolean ballJustShot;
-	boolean ballChaser; //Whether this player is chosen to chase the ball while in chase mode
 	
 	boolean catchBall;
 	
@@ -136,14 +135,6 @@ public class AIMemory {
 
 	public void setBallJustShot(boolean ballJustShot) {
 		this.ballJustShot = ballJustShot;
-	}
-
-	public boolean isBallChaser() {
-		return ballChaser;
-	}
-
-	public void setBallChaser(boolean ballChaser) {
-		this.ballChaser = ballChaser;
 	}
 
 	public boolean isCatchBall() {
