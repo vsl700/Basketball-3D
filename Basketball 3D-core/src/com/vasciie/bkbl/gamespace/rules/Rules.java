@@ -165,7 +165,7 @@ public class Rules {
 							
 							@Override
 							public boolean act() {
-								if(thrower.getPosition().dst(occurPlace) < 1f) {
+								if(thrower.getPosition().dst(occurPlace) < 1.5f) {
 									thrower.getBrain().clearCustomTarget();
 									thrower.focus(true);//Just for beauty (it's just for one frame and I don't think that it will cost that much)
 									return true;
