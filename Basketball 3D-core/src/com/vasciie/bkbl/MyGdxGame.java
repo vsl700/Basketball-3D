@@ -129,7 +129,7 @@ public class MyGdxGame extends Game {
 	}
 	
 	/**
-	 * This method is being overriden inside the LwjglApplication's constructor, where we can modify the LwjglApplicationConfiguration's values from, something we cannot
+	 * This method is being overridden inside the LwjglApplication's constructor, where we can modify the LwjglApplicationConfiguration's values from, something we cannot
 	 * do in other way in runtime.
 	 * @param fps
 	 */
