@@ -59,14 +59,14 @@ public class Rules {
 						}else
 							recentHolder = tempPlayer;
 						
-						if(thrower != null && thrower.equals(recentHolder))
-							return false;
+						/*if(thrower != null && thrower.equals(recentHolder))
+							return false;*/
 						
 						if (recentHolder != null) //If the ball is still not ever touched, don't check for terrain bounds collision (CPU economy) 
 							for (btCollisionObject obj : map.getBall().getOutsideColliders()) {
 								if (map.getTerrain().getInvisBodies().contains(obj)) {
 									ruleBreaker = recentHolder;
-									occurPlace.set(map.getBall().getPosition());
+									occurPlace.set(map.getBall().getPosition()).y = 0;
 									return true;
 								}
 							}
@@ -97,10 +97,10 @@ public class Rules {
 								recentHolder = thrower;
 								
 								
-								Vector3 posGroupPos = thrower.getPosition().cpy().sub(thrower.angleToVector(Vector3.Z, thrower.getOrientation()).scl(3));
+								Vector3 posGroupPos = thrower.getPosition().cpy().sub(thrower.angleToVector(Vector3.Z, thrower.getOrientation()));
 								// This is supposed to be a position right in front of
 								// the thrower's sight, and then random coordinates from
-								// -6 to 6 z-axis and -3 to 3 x-axis will .mul()-ed by
+								// -3 to 3 z-axis and -1.5 to 1.5 x-axis will be .mul()-ed by
 								// this matrix, so that the other players get in random
 								// positions in front of the thrower. Also the group
 								// should be pointed at the thrower.
@@ -113,11 +113,12 @@ public class Rules {
 											temp.getBrain().getMemory().setTargetPosition(map.getBall());
 											temp.getBrain().getMemory().setTargetFacing(map.getBall());
 											temp.getBrain().getMemory().setCatchBall(true);
+											temp.getBrain().getCustomPursue().setArrivalTolerance(0);
 										}
 									}
 									else {
 										//Choosing a random target position for the following players
-										Matrix4 tempTrans = new Matrix4().setToTranslation(MathUtils.random(-3f, 3f), 0, MathUtils.random(-6f, 6f)); //We need to specify that the range value is a float (with an f), otherwise we are calling the integer method
+										Matrix4 tempTrans = new Matrix4().setToTranslation(MathUtils.random(-1.5f, 1.5f), 0, MathUtils.random(-3f, 3f)); //We need to specify that the range value is a float (with an f), otherwise we are calling the integer method
 										
 										//Putting a calculated from the original by the group one position into the targets vector
 										map.setPlayerTargetPosition(positionsCalc.cpy().mul(tempTrans).getTranslation(new Vector3()), temp);
@@ -165,7 +166,7 @@ public class Rules {
 							
 							@Override
 							public boolean act() {
-								if(thrower.getPosition().dst(occurPlace) < 1.5f) {
+								if(thrower.getPosition().dst(occurPlace) < 2.5f) {
 									thrower.getBrain().clearCustomTarget();
 									thrower.focus(true);//Just for beauty (it's just for one frame and I don't think that it will cost that much)
 									return true;
