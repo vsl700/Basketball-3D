@@ -342,13 +342,18 @@ public enum PlayerState implements State<Player> {
 			//brain.getCustomPursue().setArrivalTolerance(brain.getMemory().getTargetPosition().getBoundingRadius());
 			brain.getCustomPursue().setTarget(brain.getMemory().getTargetPosition());
 			
-			System.out.println("Switched to Idle");
+			if(player.isMainPlayer())
+				System.out.println("Main player switched to idle");
+			else System.out.println("Switched to Idle");
 		}
 
 		@Override
 		public void update(Player player) {
 			Brain brain = player.getBrain();
 			AIMemory memory = brain.getMemory();
+			
+			if(player.isMainPlayer())
+				System.out.println("Updating main player's state");
 			
 			Location<Vector3> tempTarget = brain.getCustomPursue().getTarget();
 			if(tempTarget != null) {
@@ -357,7 +362,7 @@ public enum PlayerState implements State<Player> {
 				
 				player.setMoveVector(Player.steering.linear);
 				
-				if(tempTarget instanceof Entity && !((Entity) tempTarget).getLinearVelocity().isZero(0.1f) && GameTools.getDistanceBetweenSteerables(tempTarget, player) >= 2)
+				if(tempTarget instanceof Entity && !((Entity) tempTarget).getLinearVelocity().isZero(0.1f) || GameTools.getDistanceBetweenSteerables(tempTarget, player) >= 3)
 					player.setRunning();
 				
 				if(memory.getTargetFacing() != null)

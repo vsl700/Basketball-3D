@@ -83,6 +83,7 @@ public class GameTools {
 			
 			tempPlayer = players.get(i);
 			count = i;
+			break;
 		}
 		
 		float dist = position.dst2(tempPlayer.getPosition());

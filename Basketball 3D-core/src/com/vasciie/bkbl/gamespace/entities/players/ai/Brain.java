@@ -6,6 +6,7 @@ import com.badlogic.gdx.math.Vector3;
 import com.vasciie.bkbl.gamespace.entities.Player;
 import com.vasciie.bkbl.gamespace.entities.players.Opponent;
 import com.vasciie.bkbl.gamespace.entities.players.Teammate;
+import com.vasciie.bkbl.gamespace.objects.Basket;
 import com.badlogic.gdx.ai.fsm.DefaultStateMachine;
 import com.badlogic.gdx.ai.fsm.StateMachine;
 import com.badlogic.gdx.ai.steer.SteerableAdapter;
@@ -116,7 +117,7 @@ public class Brain {
 		//mSCoop.add(playerSeparate, 0.9f);
 	}
 	
-	public void update() {
+	public void update(boolean updateAI) {
 		memory.setShootTime(memory.getShootTime() + Gdx.graphics.getDeltaTime());
 		//System.out.println(memory.getShootTime());
 		memory.setResetTime(memory.getResetTime() + Gdx.graphics.getDeltaTime());
@@ -147,6 +148,7 @@ public class Brain {
 			if(!stateMachine.isInState(PlayerState.IDLING)) stateMachine.changeState(PlayerState.IDLING);
 		
 		//Regular state updating
+		if(updateAI)
 		stateMachine.update();
 	}
 	
@@ -197,7 +199,7 @@ public class Brain {
 		if (isShooting()) {
 			memory.setShootVec(calculateShootVector(memory.getTargetVec())); //As the player can move even while shooting, we update shootVec every time
 			
-			if(isShootTargetABasket())
+			if(!isShootTargetABasket())
 				checkForObstacles();
 			
 			if(memory.getAimingTime() <= maxShootingTime) {
@@ -251,8 +253,11 @@ public class Brain {
 	private boolean isShootTargetABasket() {
 		Vector3 targetVec = memory.getTargetVec();
 		
-		Vector3 homeBasketPos = user.getMap().getHomeBasket().getPosition();
-		Vector3 awayBasketPos = user.getMap().getAwayBasket().getPosition();
+		Basket homeBasket = user.getMap().getHomeBasket();
+		Vector3 homeBasketPos = homeBasket.calcTransformFromNodesTransform(homeBasket.getMatrixes().get(3)).getTranslation(new Vector3());
+		
+		Basket awayBasket = user.getMap().getAwayBasket();
+		Vector3 awayBasketPos = awayBasket.calcTransformFromNodesTransform(awayBasket.getMatrixes().get(3)).getTranslation(new Vector3());
 		
 		float checkConst = 0.001f;
 		

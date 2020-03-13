@@ -105,25 +105,23 @@ public class Rules {
 								// positions in front of the thrower. Also the group
 								// should be pointed at the thrower.
 								Matrix4 positionsCalc = new Matrix4().setToLookAt(posGroupPos, thrower.getPosition(), new Vector3(0, -1, 0)).trn(posGroupPos);
-								for(int i = 0; i < allPlayers.size(); i++) {
-									Player temp = allPlayers.get(i);
-									if(temp.equals(thrower)) {
+								for(Player p : allPlayers) {
+									if(p.equals(thrower)) {
 										//map.setPlayerTargetPosition(map.getBall().getPosition(), temp);
-										if(temp.getBrain().getMemory().getTargetPosition() == null) {
-											temp.getBrain().getMemory().setTargetPosition(map.getBall());
-											temp.getBrain().getMemory().setTargetFacing(map.getBall());
-											temp.getBrain().getMemory().setCatchBall(true);
-											temp.getBrain().getCustomPursue().setArrivalTolerance(0);
-										}
+										p.getBrain().getMemory().setTargetPosition(map.getBall());
+										p.getBrain().getMemory().setTargetFacing(map.getBall());
+										p.getBrain().getMemory().setCatchBall(true);
+										p.getBrain().getCustomPursue().setArrivalTolerance(0);
+										//p.setUpdateBrain(true);
 									}
 									else {
 										//Choosing a random target position for the following players
 										Matrix4 tempTrans = new Matrix4().setToTranslation(MathUtils.random(-1.5f, 1.5f), 0, MathUtils.random(-3f, 3f)); //We need to specify that the range value is a float (with an f), otherwise we are calling the integer method
 										
 										//Putting a calculated from the original by the group one position into the targets vector
-										map.setPlayerTargetPosition(positionsCalc.cpy().mul(tempTrans).getTranslation(new Vector3()), temp);
-										temp.getBrain().getMemory().setTargetFacing(map.getBall());
-										temp.getBrain().getCustomPursue().setArrivalTolerance(2);
+										map.setPlayerTargetPosition(positionsCalc.cpy().mul(tempTrans).getTranslation(new Vector3()), p);
+										p.getBrain().getMemory().setTargetFacing(p.getBrain().getMemory().getTargetPosition());
+										p.getBrain().getCustomPursue().setArrivalTolerance(2);
 									}
 								}
 								
@@ -169,6 +167,11 @@ public class Rules {
 								if(thrower.getPosition().dst(occurPlace) < 2.5f) {
 									thrower.getBrain().clearCustomTarget();
 									thrower.focus(true);//Just for beauty (it's just for one frame and I don't think that it will cost that much)
+									
+									for(Player p : map.getAllPlayers())
+										if(!p.equals(thrower))
+											p.getBrain().getMemory().setTargetFacing(map.getBall());
+									
 									return true;
 								}
 								
@@ -193,17 +196,21 @@ public class Rules {
 								if(!thrower.isHoldingBall() && !thrower.isAiming() && !thrower.isShooting())
 									return true;
 								
-								thrower.focus(true);
+								if (!thrower.isMainPlayer()) {
+									thrower.focus(true);
+
+									Player focusedPlayer = thrower.getFocusedPlayer();
+									if (focusedPlayer == null)
+										return false;
+
+									Vector3 tempAimVec = focusedPlayer.getPosition();
+
+									if (!thrower.getBrain().updateShooting(3))
+										thrower.getBrain().performShooting(tempAimVec);
+									else
+										thrower.getBrain().getMemory().setTargetVec(tempAimVec);
+								}
 								
-								Player focusedPlayer = thrower.getFocusedPlayer();
-								if(focusedPlayer == null)
-									return false;
-								
-								Vector3 tempAimVec = focusedPlayer.getPosition();
-								
-								if(!thrower.getBrain().updateShooting(3))
-									thrower.getBrain().performShooting(tempAimVec);
-								else thrower.getBrain().getMemory().setTargetVec(tempAimVec);
 								
 								return false;
 							}
