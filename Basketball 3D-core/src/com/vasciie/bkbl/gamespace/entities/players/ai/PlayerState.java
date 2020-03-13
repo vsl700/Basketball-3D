@@ -67,9 +67,9 @@ public enum PlayerState implements State<Player> {
 							mem.setSwitchHandTime(0);
 						}
 					} else */if (mem.getDribbleTime() > 0.75f) {
-						if (player.leftHolding())
+						if (player.isLeftHolding())
 							player.interactWithBallL();
-						else if (player.rightHolding())
+						else if (player.isRightHolding())
 							player.interactWithBallR();
 
 						mem.setDribbleTime(0);

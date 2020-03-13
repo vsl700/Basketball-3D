@@ -1733,7 +1733,8 @@ public abstract class Player extends Entity {
 			//else {
 				//running = false;
 			//}
-			
+			if(isMainPlayer())
+				System.out.println("Updated main player brain");
 			//System.out.println(getWidth() * getDepth());
 		}
 		
@@ -2242,11 +2243,11 @@ public abstract class Player extends Entity {
 		return leftPointBall || rightPointBall;
 	}
 	
-	public boolean leftHolding() {
+	public boolean isLeftHolding() {
 		return leftHoldingBall;
 	}
 	
-	public boolean rightHolding() {
+	public boolean isRightHolding() {
 		return rightHoldingBall;
 	}
 	
