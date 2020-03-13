@@ -1,6 +1,7 @@
 package com.vasciie.bkbl.gamespace.entities.players.ai;
 
 import com.badlogic.gdx.Gdx;
+import com.badlogic.gdx.math.Quaternion;
 import com.badlogic.gdx.math.Vector3;
 import com.vasciie.bkbl.gamespace.entities.Player;
 import com.vasciie.bkbl.gamespace.entities.players.Opponent;
@@ -18,6 +19,7 @@ import com.badlogic.gdx.ai.steer.behaviors.RaycastObstacleAvoidance;
 import com.badlogic.gdx.ai.steer.behaviors.Separation;
 import com.badlogic.gdx.ai.steer.utils.RayConfiguration;
 import com.badlogic.gdx.ai.steer.utils.rays.ParallelSideRayConfiguration;
+import com.badlogic.gdx.ai.utils.Location;
 
 /**
  * Each player needs a brain to think with, otherwise there will be no point of having a head on the players' models ;)
@@ -195,6 +197,9 @@ public class Brain {
 		if (isShooting()) {
 			memory.setShootVec(calculateShootVector(memory.getTargetVec())); //As the player can move even while shooting, we update shootVec every time
 			
+			if(isShootTargetABasket())
+				checkForObstacles();
+			
 			if(memory.getAimingTime() <= maxShootingTime) {
 				performShooting();
 			}
@@ -219,8 +224,39 @@ public class Brain {
 		return false;
 	}
 	
+	private void checkForObstacles() {
+		Vector3 dirVec = Vector3.Z.cpy();
+		user.getModelInstance().transform.getRotation(new Quaternion()).transform(dirVec);
+		
+		avoidObstacles(user.getMap().getHomeBasket(), dirVec);
+		avoidObstacles(user.getMap().getAwayBasket(), dirVec);
+	}
+	
+	private void avoidObstacles(Location<Vector3> obstacle, Vector3 currentDir) {
+		Vector3 tempVec = obstacle.getPosition().nor();
+		
+		if(currentDir.dst(tempVec) <= user.getWidth()) {
+			float delta = Gdx.graphics.getDeltaTime();
+			
+			if(user.isLeftHolding())
+				user.walk(new Vector3(-1, 0, 0).scl(delta));
+			else user.walk(new Vector3(1, 0, 0).scl(delta));
+		}
+	}
+	
 	public boolean isShooting() {
 		return memory.getAimingTime() > 0;
+	}
+	
+	private boolean isShootTargetABasket() {
+		Vector3 targetVec = memory.getTargetVec();
+		
+		Vector3 homeBasketPos = user.getMap().getHomeBasket().getPosition();
+		Vector3 awayBasketPos = user.getMap().getAwayBasket().getPosition();
+		
+		float checkConst = 0.001f;
+		
+		return targetVec.dst(homeBasketPos) <= checkConst || targetVec.dst(awayBasketPos) <= checkConst;
 	}
 	
 	/*public boolean isAbleToShoot() {
