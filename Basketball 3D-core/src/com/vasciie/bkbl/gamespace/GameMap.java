@@ -509,7 +509,7 @@ public class GameMap implements RaycastCollisionDetector<Vector3> {
 	
 	public void update(float delta) {
 		
-		camera.setWorldTransform(new Matrix4(mainPlayer.getModelInstance().transform).mul(mainPlayer.getCamMatrix()).mul(new Matrix4().setToTranslation(0, mainPlayer.getHeight(), -10)));
+		//camera.setWorldTransform(new Matrix4(mainPlayer.getModelInstance().transform).mul(mainPlayer.getCamMatrix()).mul(new Matrix4().setToTranslation(0, mainPlayer.getHeight(), -10)));
 		
 		// We're leaving dynamics world outside of the check below
 		// because the AI might sometimes make mistakes and if 
