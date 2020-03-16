@@ -17,7 +17,7 @@ import com.vasciie.bkbl.gamespace.entities.Player;
  */
 public class GameTools {
 	
-	public static float getDistanceBetweenSteerables(Location<Vector3> st1, Location<Vector3> st2) {
+	public static float getDistanceBetweenLocations(Location<Vector3> st1, Location<Vector3> st2) {
 		return st1.getPosition().dst(st2.getPosition());
 	}
 	

@@ -128,7 +128,7 @@ public abstract class Player extends Entity {
 		
 		//if(!isMainPlayer())
 		brain = new Brain(this);
-		boundRadius = 1;
+		boundRadius = 2;
 		
 		invTrans.set(modelInstance.transform);
 			//stateMachine = new DefaultStateMachine<Player, PlayerState>(this, PlayerState.IDLING);
@@ -1718,7 +1718,8 @@ public abstract class Player extends Entity {
 			map.getBall().getMainBody().setGravity(map.getDynamicsWorld().getGravity());
 		}
 		
-		if(isMainPlayer() && map.isRuleBrokenActing() && !map.isGameRunning() /*updateBrain && map.isRuleBrokenActing()*/ || !isMainPlayer() && !map.isRuleBroken()) {
+		boolean mainPlayerBrainUpdate = isMainPlayer() && map.isRuleBrokenActing() && !map.isGameRunning();
+		if(mainPlayerBrainUpdate /*updateBrain && map.isRuleBrokenActing()*/ || !isMainPlayer() && !map.isRuleBroken()) {
 			brain.update(true);
 			//Vector3 tempVec = moveVec.add(new Vector3(steering.linear.cpy().x, 0, steering.linear.cpy().y)).scl(0.5f);
 			//float tempAng = steering.angular;
@@ -1792,11 +1793,11 @@ public abstract class Player extends Entity {
 		else if(!leftHandInWorld || !rightHandInWorld)
 			time = 0;
 		
-		if((!focus || !isHoldingBall()) && rotDifference) {
+		if((!focus || !isHoldingBall()) && rotDifference && !mainPlayerBrainUpdate) {
 			invTrans.set(modelInstance.transform);
 			rotDifference = false;
 			focusTarget = null;
-		}
+		}else if(mainPlayerBrainUpdate) rotDifference = true;
 		
 		
 		if(leftPointBall)
@@ -1972,6 +1973,12 @@ public abstract class Player extends Entity {
 					if(!p.equals(this) && isProximityColliding(p)) 
 						callback.reportNeighbor(p);
 			//System.out.println("Player separate invoked");
+			return 0;
+		}else if(callback.equals(brain.getAllPlayerSeparate())) {
+			for(Player p : map.getAllPlayers())
+				if(!p.equals(this) && isProximityColliding(p)) 
+					callback.reportNeighbor(p);
+			
 			return 0;
 		}else if(callback.equals(brain.getCollAvoid())) {
 			int count = 0;
@@ -2262,6 +2269,14 @@ public abstract class Player extends Entity {
 	
 	public boolean isRightHolding() {
 		return rightHoldingBall;
+	}
+	
+	/**
+	 * 
+	 * @return true if the ball is out of player's hands range (after it has been thrown for example)
+	 */
+	public boolean isBallFree() {
+		return !downBody;
 	}
 	
 	public boolean isNorthSurround() {

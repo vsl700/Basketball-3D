@@ -439,6 +439,10 @@ public abstract class Entity implements Proximity<Vector3>, Steerable<Vector3> {
 		return bodies.get(mainBodyIndex);
 	}
 	
+	public ArrayList<Matrix4> getMatrixes() {
+		return matrixes;
+	}
+	
 	public ArrayList<btRigidBody> getBodies(){
 		return bodies;
 	}

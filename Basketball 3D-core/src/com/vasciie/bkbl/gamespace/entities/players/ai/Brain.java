@@ -7,8 +7,10 @@ import com.vasciie.bkbl.gamespace.entities.Player;
 import com.vasciie.bkbl.gamespace.entities.players.Opponent;
 import com.vasciie.bkbl.gamespace.entities.players.Teammate;
 import com.vasciie.bkbl.gamespace.objects.Basket;
+import com.vasciie.bkbl.gamespace.tools.GameTools;
 import com.badlogic.gdx.ai.fsm.DefaultStateMachine;
 import com.badlogic.gdx.ai.fsm.StateMachine;
+import com.badlogic.gdx.ai.steer.Steerable;
 import com.badlogic.gdx.ai.steer.SteerableAdapter;
 import com.badlogic.gdx.ai.steer.behaviors.Arrive;
 import com.badlogic.gdx.ai.steer.behaviors.BlendedSteering;
@@ -44,8 +46,8 @@ public class Brain {
 	LookWhereYouAreGoing<Vector3> lookAt;
 	CollisionAvoidance<Vector3> collAvoid; //For players and basket stands
 	Interpose<Vector3> interpose; //For blocking opponents from getting close to the player holding the ball in co-op state
-	Separation<Vector3> ballSeparate, basketSeparate, playerSeparate; //For player and basket surroundings and ball distance keeping
-	RaycastObstacleAvoidance<Vector3> obstAvoid; //For invisible terrain walls
+	Separation<Vector3> ballSeparate, basketSeparate, playerSeparate, allPlayerSeparate; //For player and basket surroundings and ball distance keeping
+	RaycastObstacleAvoidance<Vector3> obstAvoid; //For invisible user.getMap().getTerrain() walls
 	PrioritySteering<Vector3> pSBallChasePart, pSCoop, pSSurround, pSCustom;
 	BlendedSteering<Vector3> mSBallChase, mSBallInHand, mSSurround;	//Groups of behaviors for each state
 	
@@ -72,6 +74,7 @@ public class Brain {
 		ballSeparate = new Separation<Vector3>(user, user); //The differences between these behaviors are in the overrided findNeighbors void in the Player class
 		basketSeparate = new Separation<Vector3>(user, user);//
 		playerSeparate = new Separation<Vector3>(user, user);//
+		allPlayerSeparate = new Separation<Vector3>(user, user);
 		
 		rayConfig = new ParallelSideRayConfiguration<Vector3>(user, 3, 0.5f);
 		obstAvoid = new RaycastObstacleAvoidance<Vector3>(user, rayConfig, user.getMap());
@@ -84,14 +87,14 @@ public class Brain {
 		pSBallChasePart.add(pursue);
 		
 		mSBallChase = new BlendedSteering<Vector3>(user);//FIXME Unexpected separation behaviors (see findNeighbors in Player)
-		mSBallChase.add(collAvoid, 1f);
+		mSBallChase.add(collAvoid, 0.9f);
 		//mSBallChase.add(playerSeparate, 2.4f);
 		//mSBallChase.add(ballSeparate, 2.4f);
 		mSBallChase.add(pSBallChasePart, 1f);
 		//mSBallChase.add(pursue, 1.2f);
 		
 		mSBallInHand = new BlendedSteering<Vector3>(user);
-		mSBallInHand.add(collAvoid, 1f);
+		mSBallInHand.add(collAvoid, 1.3f);
 		mSBallInHand.add(basketSeparate, 0.6f);
 		mSBallInHand.add(pursueBallInHand, 1.3f);
 		
@@ -112,6 +115,8 @@ public class Brain {
 		pSSurround.add(pursue);
 		
 		pSCustom = new PrioritySteering<Vector3>(user);
+		pSCustom.add(ballSeparate);
+		pSCustom.add(allPlayerSeparate);
 		pSCustom.add(collAvoid);
 		pSCustom.add(customPursue);
 		//mSCoop.add(playerSeparate, 0.9f);
@@ -149,7 +154,7 @@ public class Brain {
 		
 		//Regular state updating
 		if(updateAI)
-		stateMachine.update();
+			stateMachine.update();
 	}
 	
 	public void performShooting(Vector3 tempAimVec) {
@@ -235,14 +240,33 @@ public class Brain {
 	}
 	
 	private void avoidObstacles(Location<Vector3> obstacle, Vector3 currentDir) {
-		Vector3 tempVec = obstacle.getPosition().nor();
-		
-		if(currentDir.dst(tempVec) <= user.getWidth()) {
-			float delta = Gdx.graphics.getDeltaTime();
+		if (GameTools.getDistanceBetweenLocations(user, obstacle) < 2) {
+			Vector3 tempPos = obstacle.getPosition();
+			Vector3 tempVec = tempPos.nor();
 			
-			if(user.isLeftHolding())
-				user.walk(new Vector3(-1, 0, 0).scl(delta));
-			else user.walk(new Vector3(1, 0, 0).scl(delta));
+			Vector3 handPos;
+			if(user.isLeftHolding()) {
+				handPos = user.calcTransformFromNodesTransform(user.getModelInstance().getNode("handL").globalTransform).getTranslation(new Vector3());
+				
+				float checkConst = user.getWidth();
+				if (currentDir.cpy().sub(handPos.cpy().nor()).dst(tempVec) <= checkConst) {
+					float delta = Gdx.graphics.getDeltaTime();
+
+					user.walk(new Vector3(-1, 0, 0).scl(delta));
+				}
+				
+			}else {
+				handPos = user.calcTransformFromNodesTransform(user.getModelInstance().getNode("handR").globalTransform).getTranslation(new Vector3());
+				
+				float checkConst = user.getWidth();
+				if (currentDir.cpy().sub(handPos.cpy().nor()).dst(tempVec) <= checkConst) {
+					float delta = Gdx.graphics.getDeltaTime();
+
+					user.walk(new Vector3(1, 0, 0).scl(delta));
+				}
+			}
+			
+			
 		}
 	}
 	
@@ -268,7 +292,25 @@ public class Brain {
 		return memory.getShootTime() > 20;
 	}*/
 	
-	public void setCustomVecTarget(final Vector3 target) {
+	public void setCustomTarget(Steerable<Vector3> steerable) {
+		memory.setTargetPosition(steerable);
+		customPursue.setTarget(steerable);
+	}
+	
+	public void setCustomVecTarget(final Vector3 target, boolean facing) {
+		float terrainWidth = user.getMap().getTerrain().getWidth();
+		float terrainDepth = user.getMap().getTerrain().getDepth();
+		
+		if(target.x < -terrainWidth / 2)
+			target.x = -terrainWidth / 2;
+		else if(target.x > terrainWidth / 2)
+			target.x = terrainWidth / 2;
+		
+		if(target.z < -terrainDepth / 2)
+			target.z = -terrainDepth / 2;
+		else if(target.z > terrainDepth / 2)
+			target.z = terrainDepth / 2;
+		
 		SteerableAdapter<Vector3> tempSteerable = new SteerableAdapter<Vector3>() {
 			@Override
 			public Vector3 getPosition() {
@@ -278,12 +320,19 @@ public class Brain {
 		
 		memory.setTargetPosition(tempSteerable);
 		customPursue.setTarget(tempSteerable);
+		
+		if(facing)
+			memory.setTargetFacing(tempSteerable);
 	}
 	
 	public void clearCustomTarget() {
 		customPursue.setTarget(null);
 		memory.setTargetPosition(null);
 		memory.setTargetFacing(null);
+	}
+	
+	public void clearCustomPS() {
+		
 	}
 
 	public StateMachine<Player, PlayerState> getStateMachine() {
@@ -332,6 +381,10 @@ public class Brain {
 
 	public Separation<Vector3> getPlayerSeparate() {
 		return playerSeparate;
+	}
+
+	public Separation<Vector3> getAllPlayerSeparate() {
+		return allPlayerSeparate;
 	}
 
 	public RaycastObstacleAvoidance<Vector3> getObstAvoid() {

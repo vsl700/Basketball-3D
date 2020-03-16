@@ -162,19 +162,24 @@ public abstract class Basket extends GameObject {
 	@Override
 	public float getWidth() {
 		
-		return 0;
+		return tabW;
 	}
 
 	@Override
 	public float getHeight() {
 		
-		return 0;
+		return standH + tabH / 2;
 	}
 
 	@Override
 	public float getDepth() {
 		
-		return 0;
+		return standD + tabD + bkHoldD + tabCentD;
+	}
+	
+	@Override
+	public float getBoundingRadius() {
+		return 6;
 	}
 
 	@Override
