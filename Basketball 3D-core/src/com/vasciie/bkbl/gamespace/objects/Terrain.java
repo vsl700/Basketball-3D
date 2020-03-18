@@ -38,6 +38,10 @@ public class Terrain extends GameObject {
 		modelInstance = new ModelInstance(model, x, y - getHeight() / 2, z);
 		
 		matrixes.add(modelInstance.transform);
+		matrixes.add(new Matrix4());//Walls
+		matrixes.add(new Matrix4());
+		matrixes.add(new Matrix4());
+		matrixes.add(new Matrix4());
 	}
 
 	@Override
@@ -45,8 +49,8 @@ public class Terrain extends GameObject {
 		
 		visibleCollShapes.add(new btBoxShape(new Vector3(getWidth() * 2, getHeight() / 2, getDepth() * 2)));
 		
-		invisibleCollShapes.add(new btBoxShape(new Vector3(wallDepth, 10000, getDepth()*5)));
-		invisibleCollShapes.add(new btBoxShape(new Vector3(getWidth()*5, 10000, wallDepth)));
+		invisibleCollShapes.add(new btBoxShape(new Vector3(wallDepth, 10000, getDepth()*5)));//Wide wall
+		invisibleCollShapes.add(new btBoxShape(new Vector3(getWidth()*5, 10000, wallDepth)));//Short wall
 		invisibleCollShapes.add(new btBoxShape(new Vector3(wallDepth, 10000, getDepth()*5)));
 		invisibleCollShapes.add(new btBoxShape(new Vector3(getWidth()*5, 10000, wallDepth)));
 		
@@ -75,6 +79,10 @@ public class Terrain extends GameObject {
 	public float getDepth() {
 		
 		return 60;
+	}
+
+	public static float getWalldepth() {
+		return wallDepth;
 	}
 
 	@Override
@@ -134,10 +142,19 @@ public class Terrain extends GameObject {
 	protected void manuallySetBodies() {
 		modelInstance.calculateTransforms();
 		
-		invisBodies.get(0).proceedToTransform(getMainTrans().cpy().mul(new Matrix4().setToTranslation(x - getWidth() / 2 - wallDepth, y, z)));
-		invisBodies.get(1).proceedToTransform(getMainTrans().cpy().mul(new Matrix4().setToTranslation(x, y, z - getDepth() / 2 - wallDepth)));
-		invisBodies.get(2).proceedToTransform(getMainTrans().cpy().mul(new Matrix4().setToTranslation(x + getWidth() / 2 + wallDepth, y, z)));
-		invisBodies.get(3).proceedToTransform(getMainTrans().cpy().mul(new Matrix4().setToTranslation(x, y, z + getDepth() / 2 + wallDepth)));
+		int index = 1;
+		int index1 = 0;
+		matrixes.get(index).set(getMainTrans().cpy().mul(new Matrix4().setToTranslation(x - getWidth() / 2 - wallDepth, y, z)));
+		invisBodies.get(index1++).proceedToTransform(matrixes.get(index++));
+		
+		matrixes.get(index).set(getMainTrans().cpy().mul(new Matrix4().setToTranslation(x, y, z - getDepth() / 2 - wallDepth)));
+		invisBodies.get(index1++).proceedToTransform(matrixes.get(index++));
+		
+		matrixes.get(index).set(getMainTrans().cpy().mul(new Matrix4().setToTranslation(x + getWidth() / 2 + wallDepth, y, z)));
+		invisBodies.get(index1++).proceedToTransform(matrixes.get(index++));
+		
+		matrixes.get(index).set(getMainTrans().cpy().mul(new Matrix4().setToTranslation(x, y, z + getDepth() / 2 + wallDepth)));
+		invisBodies.get(index1++).proceedToTransform(matrixes.get(index++));
 	}
 	
 	public btCollisionObject getTeamzone() {

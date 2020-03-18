@@ -14,6 +14,7 @@ import com.vasciie.bkbl.gamespace.GameMap;
 import com.vasciie.bkbl.gamespace.entities.Entity;
 import com.vasciie.bkbl.gamespace.entities.Player;
 import com.vasciie.bkbl.gamespace.entities.players.Teammate;
+import com.vasciie.bkbl.gamespace.objects.Terrain;
 import com.vasciie.bkbl.gamespace.rules.Rules.GameRule.Actions.Action;
 import com.vasciie.bkbl.gamespace.tools.GameTools;
 
@@ -92,11 +93,13 @@ public class Rules {
 							public boolean act() {
 								ArrayList<Player> allPlayers = map.getAllPlayers();
 								
-								if(ruleBreaker instanceof Teammate) {
+								/*if(ruleBreaker instanceof Teammate) {
 									thrower = GameTools.getClosestPlayer(map.getBall().getPosition(), map.getOpponents(), null);
 								}else {
 									thrower = GameTools.getClosestPlayer(map.getBall().getPosition(), map.getTeammates(), null);
-								}
+								}*/
+								
+								thrower = map.getMainPlayer();
 								recentHolder = thrower;
 								
 								
@@ -232,7 +235,7 @@ public class Rules {
 					@Override
 					public GameRule[] createInnerRules() {
 						GameRule[] gameRules = new GameRule[] {
-								new GameRule(rules, this, "move_zone", "Moved Out!", "You Should Stay Around The Terrain Bounds During Throw-in", map) {
+								new GameRule(rules, this, "move_zone", "Moved Out!", "You Should Stay Around The Terrain Bounds During Throw-in!", map) {
 
 									@Override
 									public GameRule[] createInnerRules() {
@@ -242,23 +245,56 @@ public class Rules {
 
 									@Override
 									public void createActions() {
-										
+										//This will just stay empty! The system will automatically switch to the parent rule.
 										
 									}
 
 									@Override
 									public boolean checkRule() {
+										Terrain terrain = map.getTerrain();
+										
 										Vector3 closestWallPos, secondCloseWallPos;
+										Vector3 throwerPos = thrower.getPosition();
 										
 										ArrayList<Vector3> wallPositions = new ArrayList<Vector3>();
-										//Add wall positions and check them with game tools
 										
-										//if(thrower.isMainPlayer() && thrower.getPosition().dst(map.getTerrain()))
+										for(int i = 1; i < 5; i++)//We set it from 1 to 5 because the matrixes for the walls in this case start from index 1
+											wallPositions.add(terrain.getMatrixes().get(i).getTranslation(new Vector3()));
+										
+										closestWallPos = GameTools.getShortestDistanceWVectors(occurPlace, wallPositions);
+										
+										wallPositions.remove(closestWallPos);
+										
+										secondCloseWallPos = GameTools.getShortestDistanceWVectors(occurPlace, wallPositions);
+										
+										
+										float terrainCheck = terrain.getWidth() / 2 + Terrain.getWalldepth() / 2;
+										closestWallPos.y = occurPlace.y;
+										if(Math.abs(closestWallPos.x) == terrainCheck)
+											closestWallPos.z = occurPlace.z;
+										else closestWallPos.x = occurPlace.x;
+										
+										secondCloseWallPos.y = occurPlace.y;
+										if(Math.abs(secondCloseWallPos.x) == terrainCheck)
+											secondCloseWallPos.z = occurPlace.z;
+										else secondCloseWallPos.x = occurPlace.x;
+										
+										float checkConst = 4.5f;
+										if(throwerPos.dst(closestWallPos) > checkConst && throwerPos.dst(secondCloseWallPos) > checkConst) {
+											System.out.println(closestWallPos);
+											System.out.println(secondCloseWallPos);
+											System.out.println(occurPlace);
+											ruleBreaker = thrower;
+											return true;
+										}
+										
+										
 										return false;
 									}
 									
 								}
 						};
+						
 						return gameRules;
 					}
 				},
@@ -454,9 +490,12 @@ public class Rules {
 	}
 	
 	public void setBrokenRule(GameRule rule) {
+		if(rule.getParent() != null || brokenRule == null) {
+			map.onRuleBroken(rule);
+			rulesListener.onRuleBroken(rule);
+		}
+		
 		brokenRule = rule;
-		map.onRuleBroken(rule);
-		rulesListener.onRuleBroken(rule);
 	}
 	
 	public void clearBrokenRule() {
@@ -511,28 +550,43 @@ public class Rules {
 		public abstract boolean checkRule();
 		
 		public boolean arePlayersReady() {
+			if(actions.isEmpty()) {
+				if(parent == null)
+					return true;
+				
+				return false;
+			}
 			return actions.getCurrentAction().isGameDependent();
 		}
 		
 		/**
 		 * Used after a rule is broken (when the players are acting on the broken rule)
-		 * @return true if the players are ready
 		 */
-		public boolean managePlayers() {
-			if(innerRules != null)
+		public void managePlayers() {
+			if(actions.act()) {
+				if(parent != null) {
+					rules.setBrokenRule(parent);
+					//return false;
+				}
+				else rules.clearBrokenRuleWRuleBreaker();
+				
+				return;
+				//return true;
+			}
+			
+			if(innerRules != null && map.isGameRunning())
 				for(GameRule r : innerRules)
 					if(r.checkRule()) {
 						rules.setBrokenRule(r);
 						actions.firstAction();
-						return false;
+						//return false;
 					}
 			
-			if(actions.act()) {
-				rules.clearBrokenRuleWRuleBreaker();
-				return true;
-			}
-			
-			return false;
+			//return false;
+		}
+		
+		public GameRule getParent() {
+			return parent;
 		}
 		
 		public String getId() {
@@ -569,7 +623,8 @@ public class Rules {
 			
 			public void addAction(Action action) {
 				if(currentAction == null) {
-					firstAction = currentAction = action;
+					firstAction = action; 
+					currentAction = action;
 					return;
 				}
 				
@@ -593,6 +648,10 @@ public class Rules {
 				currentAction = firstAction;
 			}
 			
+			public boolean isEmpty() {
+				return firstAction == null;
+			}
+			
 			public boolean isLastAction() {
 				return currentAction.next == null;
 			}
@@ -602,6 +661,9 @@ public class Rules {
 			 * @return true if all the actions are completed
 			 */
 			public boolean act() {
+				if(isEmpty())
+					return true;
+				
 				if(((currentAction.isGameDependent() && map.isGameRunning()) || !currentAction.isGameDependent()) && currentAction.act()) {
 					if(isLastAction()) {
 						firstAction();

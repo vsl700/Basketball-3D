@@ -1753,6 +1753,8 @@ public abstract class Player extends Entity {
 			//walking = running = false;
 		//}
 		
+		if(isHoldingBall())
+			brain.getMemory().setCatchBall(false);
 		
 		if (dribbleL) {
 			dribble(delta, true);

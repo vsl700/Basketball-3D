@@ -563,8 +563,20 @@ public class GameMap implements RaycastCollisionDetector<Vector3> {
 			return;
 		}
 		
-		updateFullGame(delta);
+		if(gameRunning || ruleBrokenActing)
+			updateFullGame(delta);
+		else updateGameEnvironment(delta);
 		
+	}
+	
+	private void updateGameEnvironment(float delta) {
+		ball.update(delta);
+		
+		updatePlayers(delta);
+		
+		ball.onCycleEnd();
+		
+		endPlayersCycle();
 	}
 	
 	private void updateFullGame(float delta) {
@@ -576,8 +588,7 @@ public class GameMap implements RaycastCollisionDetector<Vector3> {
 		
 		ball.onCycleEnd();
 		
-		for(Player e : getAllPlayers())
-			e.onCycleEnd();
+		endPlayersCycle();
 	}
 	
 	private void updatePlayers(float delta) {
@@ -585,6 +596,11 @@ public class GameMap implements RaycastCollisionDetector<Vector3> {
 		
 		for(Player e : getAllPlayers())
 			e.update(delta);
+	}
+	
+	private void endPlayersCycle() {
+		for(Player e : getAllPlayers())
+			e.onCycleEnd();
 	}
 	
 	public void render(ModelBatch mBatch, Environment environment) {
@@ -612,6 +628,7 @@ public class GameMap implements RaycastCollisionDetector<Vector3> {
 		gameRunning = false;
 		ruleBroken = true;
 		playersReady = false;
+		ruleBrokenActing = false;
 		
 		playerReleaseBall();
 	}
