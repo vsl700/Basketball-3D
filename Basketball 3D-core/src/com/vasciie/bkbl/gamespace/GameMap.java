@@ -553,6 +553,9 @@ public class GameMap implements RaycastCollisionDetector<Vector3> {
 
 			if(rules.getBrokenRule() == null) {
 				actionOver();
+				
+				if(!gameRunning)
+					playersReady = true;
 				//rules.clearBrokenRuleWRuleBreaker();
 				
 				return;

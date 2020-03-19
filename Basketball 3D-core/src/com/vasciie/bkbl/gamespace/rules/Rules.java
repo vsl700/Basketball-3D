@@ -327,7 +327,21 @@ public class Rules {
 
 					@Override
 					public void createActions() {
-						
+						actions.addAction(new Action() {
+
+							@Override
+							public boolean isGameDependent() {
+								
+								return false;
+							}
+
+							@Override
+							public boolean act() {
+								//Make actions that will make the current holding player shoot the ball to the opposite team's basket. After that (eventually) the game continues if there's no score.
+								return true;
+							}
+							
+						});
 						
 					}
 
@@ -479,7 +493,7 @@ public class Rules {
 				}
 			}*/ // TODO Bring this back after you finish testing the rules!!!
 
-			GameRule tempRule = gameRules[0];
+			GameRule tempRule = gameRules[1];
 			if (tempRule.checkRule()) {
 				setBrokenRule(tempRule);
 			}
