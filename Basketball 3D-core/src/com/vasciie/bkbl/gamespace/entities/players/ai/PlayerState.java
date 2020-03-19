@@ -32,11 +32,11 @@ public enum PlayerState implements State<Player> {
 			if (!brain.updateShooting(1.25f)) {
 				if (/*player.isSurrounded() && player.getMap().getTeammates().size() > 1 || */player.isInAwayBasketZone()) {
 					Vector3 playerVec = player.getModelInstance().transform.getTranslation(new Vector3());
-					Vector3 tempAimVec = playerVec.cpy().sub(new Vector3());
+					Vector3 tempAimVec;
 
 					if (!player.isBehindBasket())
 						tempAimVec = basket.calcTransformFromNodesTransform(basket.getMatrixes().get(3)).getTranslation(new Vector3());
-					else if (!player.isInAwayBasketZone()) {
+					else {
 						ArrayList<Player> tempTeam;
 						if (player instanceof Teammate)
 							tempTeam = player.getMap().getTeammates();
@@ -187,7 +187,7 @@ public enum PlayerState implements State<Player> {
 					//player.getMoveVector().nor().add(Player.steering.linear.cpy().scl(2.5f));
 				}else player.getBrain().getBallSeparate().setEnabled(false);
 				
-				if(player.getPosition().cpy().scl(0, 1, 0).dst(tempBall.getPosition().cpy().scl(0, 1, 0)) > 1)
+				if(player.getPosition().dst(ballVec) > 2.5f)
 					player.getBrain().getPlayerSeparate().setEnabled(true);
 				else player.getBrain().getPlayerSeparate().setEnabled(false);
 				
@@ -357,7 +357,7 @@ public enum PlayerState implements State<Player> {
 			if(player.isMainPlayer())
 				System.out.println("Updating main player's state");
 			
-			if(player.getMap().getBall().getPosition().y > player.getHeight() * 2 && player.isProximityColliding(player.getMap().getBall())) {
+			if(!player.isHoldingBall() && player.getMap().getBall().getPosition().y > player.getHeight() * 2 && player.isProximityColliding(player.getMap().getBall())) {
 				player.getBrain().getBallSeparate().setEnabled(true);
 				//player.getBrain().getBallSeparate().calculateSteering(Player.steering);
 				//player.getMoveVector().nor().add(Player.steering.linear.cpy().scl(2.5f));
@@ -377,7 +377,7 @@ public enum PlayerState implements State<Player> {
 
 			player.setMoveVector(Player.steering.linear);
 
-			if (tempTarget != null && (tempTarget instanceof Entity && !((Entity) tempTarget).getLinearVelocity().isZero(0.1f) || GameTools.getDistanceBetweenLocations(tempTarget, player) >= 3))
+			if (!player.isRunning() && tempTarget != null && (tempTarget instanceof Entity && !((Entity) tempTarget).getLinearVelocity().isZero(0.1f) || GameTools.getDistanceBetweenLocations(tempTarget, player) >= 3))
 				player.setRunning();
 
 			if (memory.getTargetFacing() != null)
@@ -399,10 +399,15 @@ public enum PlayerState implements State<Player> {
 				brain.getMemory().setTargetPosition(null);
 			}
 			
+			brain.clearCustomTarget();
+			
 			brain.getMemory().setCatchBall(false);
+			
+			brain.getCustomPursue().setArrivalTolerance(0);
 			
 			brain.getCollAvoid().setEnabled(true);
 			brain.getBallSeparate().setEnabled(true);
+			brain.getAllPlayerSeparate().setEnabled(true);
 			
 			System.out.println("Switched out of Idle");
 		}

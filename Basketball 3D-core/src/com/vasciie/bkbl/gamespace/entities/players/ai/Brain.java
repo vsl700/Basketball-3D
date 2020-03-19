@@ -318,8 +318,7 @@ public class Brain {
 			}
 		};
 		
-		memory.setTargetPosition(tempSteerable);
-		customPursue.setTarget(tempSteerable);
+		setCustomTarget(tempSteerable);
 		
 		if(facing)
 			memory.setTargetFacing(tempSteerable);
@@ -329,10 +328,6 @@ public class Brain {
 		customPursue.setTarget(null);
 		memory.setTargetPosition(null);
 		memory.setTargetFacing(null);
-	}
-	
-	public void clearCustomPS() {
-		
 	}
 
 	public StateMachine<Player, PlayerState> getStateMachine() {

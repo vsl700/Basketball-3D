@@ -70,6 +70,7 @@ public class Rules {
 								if (map.getTerrain().getInvisBodies().contains(obj)) {
 									ruleBreaker = recentHolder;
 									occurPlace.set(map.getBall().getPosition()).y = recentHolder.getPosition().y;
+									map.playerReleaseBall();
 									return true;
 								}
 							}
@@ -330,15 +331,76 @@ public class Rules {
 						actions.addAction(new Action() {
 
 							@Override
+							public boolean act() {
+								Player holdingPlayer = map.getHoldingPlayer();
+								
+								if(holdingPlayer == null) {
+									Vector3 ballVec = map.getBall().getPosition();
+									
+									if(ruleBreaker instanceof Teammate)
+										map.setHoldingPlayer(holdingPlayer = GameTools.getClosestPlayer(ballVec, map.getOpponents(), null));
+									else map.setHoldingPlayer(holdingPlayer = GameTools.getClosestPlayer(ballVec, map.getTeammates(), null));
+								}
+								
+								
+								for(Player p : map.getAllPlayers()) {
+									if(p.equals(holdingPlayer))
+										continue;
+									
+									p.setAbleToRun(false);
+									
+									p.getBrain().setCustomTarget(holdingPlayer);
+									p.getBrain().getMemory().setTargetFacing(holdingPlayer);
+									
+									p.getBrain().getCustomPursue().setArrivalTolerance(10);//See here!
+								}
+								
+								return true;
+							}
+
+							@Override
 							public boolean isGameDependent() {
 								
 								return false;
 							}
+							
+						});
+						
+						actions.addAction(new Action() {
 
 							@Override
 							public boolean act() {
 								//Make actions that will make the current holding player shoot the ball to the opposite team's basket. After that (eventually) the game continues if there's no score.
-								return true;
+								Player holdingPlayer = map.getHoldingPlayer();
+								
+								holdingPlayer.getBrain().setCustomTarget(holdingPlayer.getTargetBasket());
+								holdingPlayer.getBrain().getMemory().setTargetFacing(holdingPlayer.getTargetBasket());
+								holdingPlayer.getBrain().getAllPlayerSeparate().setEnabled(false);
+								
+								holdingPlayer.setRunning();
+								
+								if(holdingPlayer.isInAwayBasketZone()) {
+									if(!holdingPlayer.getBrain().updateShooting(1.25f))
+										holdingPlayer.getBrain().performShooting(holdingPlayer.getTargetBasket().getMatrixes().get(3).getTranslation(new Vector3()));
+									else if(!holdingPlayer.getBrain().isShooting()) {
+										for(Player p : map.getAllPlayers()) {
+											if(p.equals(holdingPlayer))
+												continue;
+											
+											p.setAbleToRun(true);
+										}
+										
+										return true;
+									}
+								}
+								
+								return false;
+							}
+							
+							@Override
+							public boolean isGameDependent() {
+								
+								return false;
 							}
 							
 						});
@@ -694,15 +756,16 @@ public class Rules {
 				
 				/**
 				 * 
+				 * @return true if the action is completed
+				 */
+				public abstract boolean act();
+				
+				/**
+				 * 
 				 * @return true if the action is dependent on the game and the game should start (it doesn't clear the broken rule or rule breaker)
 				 */
 				public abstract boolean isGameDependent();
 				
-				/**
-				 * 
-				 * @return true if the action is completed
-				 */
-				public abstract boolean act();
 			}
 		}
 	}

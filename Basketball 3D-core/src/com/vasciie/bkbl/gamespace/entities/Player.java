@@ -101,7 +101,7 @@ public abstract class Player extends Entity {
 	int playerIndex;
 	
 	//Abilities
-	boolean ableToMove;
+	boolean ableToRun;
 	
 	@Override
 	public void create(EntityType type, GameMap map, Vector3 pos) {
@@ -125,7 +125,7 @@ public abstract class Player extends Entity {
 		minRotateDegrees = -1;
 		maxRotateDegrees = -1;
 		
-		ableToMove = true;
+		ableToRun = true;
 		
 		//if(!isMainPlayer())
 		brain = new Brain(this);
@@ -836,9 +836,6 @@ public abstract class Player extends Entity {
 	}
 	
 	public void walk(Vector3 dir) {
-		if(!ableToMove)
-			return;
-		
 		if(dir.isZero(0.00001f))
 			return;
 		
@@ -861,8 +858,11 @@ public abstract class Player extends Entity {
 	}
 	
 	public void run(Vector3 dir) {
-		if(!ableToMove)
+		if(!ableToRun) {
+			running = false;
+			walk(dir);
 			return;
+		}
 		
 		if(dir.isZero(0.00001f)) {
 			running = false;//In case we use the setRunning method which is used by the AI when the players are obligated to run
@@ -885,10 +885,17 @@ public abstract class Player extends Entity {
 		else walk(dir);
 	}
 	
+	private boolean isAbleToInteractWithHands() {
+		return map.getHoldingPlayer() != null && !map.getHoldingPlayer().equals(this) && (this instanceof Teammate && map.getTeammateHolding() != null || this instanceof Opponent && map.getOpponentHolding() != null);
+	}
+	
 	/**
 	 * When left mouse button is pressed (or button for left hand)
 	 */
 	public void interactWithBallL() {
+		if(isAbleToInteractWithHands())
+			return;
+		
 		if (!isShooting()) {
 			if (leftHoldingBall || rightHoldingBall) {
 				dribbleL = true;
@@ -904,6 +911,9 @@ public abstract class Player extends Entity {
 	}
 	
 	public void interactWithBallR() {
+		if(isAbleToInteractWithHands())
+			return;
+		
 		if (!isShooting()) {
 			if (rightHoldingBall || leftHoldingBall) {
 				dribbleR = true;
@@ -1749,6 +1759,9 @@ public abstract class Player extends Entity {
 			//updateBrain = false;
 		}
 		
+		if(!ableToRun)//I think it could look better, but HEY it's working!
+			running = false;
+		
 		lockRotationAndRandomFloating(true);
 		
 		String prevIdArmL = armLController.current.animation.id;
@@ -1989,20 +2002,22 @@ public abstract class Player extends Entity {
 			return 0;
 		}else if(callback.equals(brain.getCollAvoid())) {
 			int count = 0;
-			//if(this instanceof Teammate) {
-				for(Player p : map.getTeammates())
-					if(collAvoidCheck(p) && callback.reportNeighbor(p))
-						count++;
-			//}else
-				for(Player p : map.getOpponents())
-					if(collAvoidCheck(p) && callback.reportNeighbor(p))
-						count++;
-				
-				if(callback.reportNeighbor(map.getHomeBasket()))
+
+			for (Player p : map.getTeammates())
+				if (collAvoidCheck(p) && callback.reportNeighbor(p))
 					count++;
-				
-				else if(callback.reportNeighbor(map.getAwayBasket()))
+
+			for (Player p : map.getOpponents())
+				if (collAvoidCheck(p) && callback.reportNeighbor(p))
 					count++;
+	
+			if (!isHoldingBall()) {
+				if (callback.reportNeighbor(map.getHomeBasket()))
+					count++;
+
+				else if (callback.reportNeighbor(map.getAwayBasket()))
+					count++;
+			}
 			
 			return count;
 		}
@@ -2011,7 +2026,8 @@ public abstract class Player extends Entity {
 	}
 	
 	private boolean collAvoidCheck(Player p) {
-		return !p.equals(this) && 
+		return !p.equals(this) &&
+				GameTools.getDistanceBetweenLocations(p, this) < 4 && 
 				//((p.isMainPlayer() && !p.getBrain().getStateMachine().isInState(PlayerState.BALL_CHASING)) || !p.getBrain().getMemory().isBallChaser()) && 
 				(!p.isHoldingBall() && //For example it can be used for co-op mode when the players are trying to interpose
 				!p.getBrain().getStateMachine().isInState(PlayerState.PLAYER_SURROUND) && brain.getStateMachine().isInState(PlayerState.PLAYER_SURROUND) ||
@@ -2230,11 +2246,11 @@ public abstract class Player extends Entity {
 	}
 
 	public boolean isAbleToMove() {
-		return ableToMove;
+		return ableToRun;
 	}
 
-	public void setAbleToMove(boolean ableToMove) {
-		this.ableToMove = ableToMove;
+	public void setAbleToRun(boolean ableToRun) {
+		this.ableToRun = ableToRun;
 	}
 
 	public boolean isAbleToCatch() {
@@ -2284,6 +2300,10 @@ public abstract class Player extends Entity {
 	 */
 	public boolean isBallFree() {
 		return !downBody;
+	}
+	
+	public boolean isRunning() {
+		return running;
 	}
 	
 	public boolean isNorthSurround() {

@@ -515,14 +515,14 @@ public class GameMap implements RaycastCollisionDetector<Vector3> {
 		// because the AI might sometimes make mistakes and if 
 		// players go one through another that wouldn't be very funny (for me)
 		//float delta2 = Math.min(1f / 30f, delta);
-		dynamicsWorld.stepSimulation(delta, 5, 1f / 120f);
+		dynamicsWorld.stepSimulation(delta, 5, delta);
 			
 		//if(gameRunning)
 		if(!gameRunning) {
 			turnPlayer(delta);
 			updateInputs();
 		}else controlPlayer(delta);
-		if(playersReady){
+		if(playersReady && !gameRunning){
 			if (!ruleBroken) {
 				if (startTimer <= 0)
 					gameRunning = true;
@@ -554,8 +554,10 @@ public class GameMap implements RaycastCollisionDetector<Vector3> {
 			if(rules.getBrokenRule() == null) {
 				actionOver();
 				
-				if(!gameRunning)
+				if(!gameRunning) {
 					playersReady = true;
+					gameRunning = true;
+				}
 				//rules.clearBrokenRuleWRuleBreaker();
 				
 				return;
@@ -632,8 +634,6 @@ public class GameMap implements RaycastCollisionDetector<Vector3> {
 		ruleBroken = true;
 		playersReady = false;
 		ruleBrokenActing = false;
-		
-		playerReleaseBall();
 	}
 	
 	public void onRuleBrokenContinue() {
@@ -854,7 +854,7 @@ public class GameMap implements RaycastCollisionDetector<Vector3> {
 	
 	public Player getTeammateHolding() {
 		if(currentPlayerHoldTeam > -1)
-		return teammates.get(currentPlayerHoldTeam);
+			return teammates.get(currentPlayerHoldTeam);
 		
 		return null;
 	}
