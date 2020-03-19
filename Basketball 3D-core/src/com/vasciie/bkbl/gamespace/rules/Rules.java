@@ -14,7 +14,6 @@ import com.vasciie.bkbl.gamespace.GameMap;
 import com.vasciie.bkbl.gamespace.entities.Entity;
 import com.vasciie.bkbl.gamespace.entities.Player;
 import com.vasciie.bkbl.gamespace.entities.players.Teammate;
-import com.vasciie.bkbl.gamespace.objects.Terrain;
 import com.vasciie.bkbl.gamespace.rules.Rules.GameRule.Actions.Action;
 import com.vasciie.bkbl.gamespace.tools.GameTools;
 
@@ -70,7 +69,7 @@ public class Rules {
 							for (btCollisionObject obj : map.getBall().getOutsideColliders()) {
 								if (map.getTerrain().getInvisBodies().contains(obj)) {
 									ruleBreaker = recentHolder;
-									occurPlace.set(map.getBall().getPosition()).y = 0;
+									occurPlace.set(map.getBall().getPosition()).y = recentHolder.getPosition().y;
 									return true;
 								}
 							}
@@ -93,13 +92,13 @@ public class Rules {
 							public boolean act() {
 								ArrayList<Player> allPlayers = map.getAllPlayers();
 								
-								/*if(ruleBreaker instanceof Teammate) {
+								if(ruleBreaker instanceof Teammate) {
 									thrower = GameTools.getClosestPlayer(map.getBall().getPosition(), map.getOpponents(), null);
 								}else {
 									thrower = GameTools.getClosestPlayer(map.getBall().getPosition(), map.getTeammates(), null);
-								}*/
+								}
 								
-								thrower = map.getMainPlayer();
+								//thrower = map.getMainPlayer();
 								recentHolder = thrower;
 								
 								
@@ -235,7 +234,7 @@ public class Rules {
 					@Override
 					public GameRule[] createInnerRules() {
 						GameRule[] gameRules = new GameRule[] {
-								new GameRule(rules, this, "move_zone", "Moved Out!", "You Should Stay Around The Terrain Bounds During Throw-in!", map) {
+								new GameRule(rules, this, "move_zone", "Moved Out!", "You Should Stay Around The Foul Occuring Plcae During Throw-in!", map) {
 
 									@Override
 									public GameRule[] createInnerRules() {
@@ -251,12 +250,13 @@ public class Rules {
 
 									@Override
 									public boolean checkRule() {
-										Terrain terrain = map.getTerrain();
+										//Terrain terrain = map.getTerrain();
 										
-										Vector3 closestWallPos, secondCloseWallPos;
+										//Vector3 closestWallPos, secondCloseWallPos;
 										Vector3 throwerPos = thrower.getPosition();
+										Vector3 occurPlaceCpy = occurPlace.cpy();
 										
-										ArrayList<Vector3> wallPositions = new ArrayList<Vector3>();
+										/*ArrayList<Vector3> wallPositions = new ArrayList<Vector3>();
 										
 										for(int i = 1; i < 5; i++)//We set it from 1 to 5 because the matrixes for the walls in this case start from index 1
 											wallPositions.add(terrain.getMatrixes().get(i).getTranslation(new Vector3()));
@@ -268,22 +268,22 @@ public class Rules {
 										secondCloseWallPos = GameTools.getShortestDistanceWVectors(occurPlace, wallPositions);
 										
 										
-										float terrainCheck = terrain.getWidth() / 2 + Terrain.getWalldepth() / 2;
-										closestWallPos.y = occurPlace.y;
-										if(Math.abs(closestWallPos.x) == terrainCheck)
-											closestWallPos.z = occurPlace.z;
-										else closestWallPos.x = occurPlace.x;
+										closestWallPos.y = throwerPos.y;
+										if(closestWallPos.z == 0)
+											closestWallPos.z = throwerPos.z;
+										else closestWallPos.x = throwerPos.x;
 										
-										secondCloseWallPos.y = occurPlace.y;
-										if(Math.abs(secondCloseWallPos.x) == terrainCheck)
-											secondCloseWallPos.z = occurPlace.z;
-										else secondCloseWallPos.x = occurPlace.x;
+										secondCloseWallPos.y = throwerPos.y;
+										if(secondCloseWallPos.z == 0)
+											secondCloseWallPos.z = throwerPos.z;
+										else secondCloseWallPos.x = throwerPos.x;*/
 										
-										float checkConst = 4.5f;
-										if(throwerPos.dst(closestWallPos) > checkConst && throwerPos.dst(secondCloseWallPos) > checkConst) {
-											System.out.println(closestWallPos);
-											System.out.println(secondCloseWallPos);
-											System.out.println(occurPlace);
+										/*if(occurPlaceCpy.z == 0)
+											occurPlaceCpy.z = throwerPos.z;
+										else occurPlaceCpy.x = throwerPos.x;*/
+										
+										float checkConst = /*Terrain.getWalldepth() * 1.6f*/ 3;
+										if(throwerPos.dst(occurPlaceCpy) > checkConst/* && throwerPos.dst(secondCloseWallPos) > checkConst*/) {
 											ruleBreaker = thrower;
 											return true;
 										}
@@ -623,8 +623,7 @@ public class Rules {
 			
 			public void addAction(Action action) {
 				if(currentAction == null) {
-					firstAction = action; 
-					currentAction = action;
+					firstAction = currentAction = action;
 					return;
 				}
 				

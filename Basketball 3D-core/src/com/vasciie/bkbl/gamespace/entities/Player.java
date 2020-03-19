@@ -5,6 +5,7 @@ import java.util.HashMap;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.ai.steer.SteeringAcceleration;
+import com.badlogic.gdx.ai.utils.Location;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.VertexAttributes;
@@ -1649,8 +1650,12 @@ public abstract class Player extends Entity {
 			if(closer || change) {
 				if(avoidInterpose) {//Usually AI would use this
 					boolean block = false;//Whether the chosen player gets blocked
-
-					for(Player p1 : map.getAllPlayers()) {//The players that may block the chosen player 
+					ArrayList<Location<Vector3>> locations = new ArrayList<Location<Vector3>>();
+					locations.addAll(map.getAllPlayers());
+					locations.add(map.getHomeBasket());
+					locations.add(map.getAwayBasket());
+					
+					for(Location<Vector3> p1 : locations) {//The players that may block the chosen player 
 						if(p1.equals(this) || p1.equals(p))
 							continue;
 						
