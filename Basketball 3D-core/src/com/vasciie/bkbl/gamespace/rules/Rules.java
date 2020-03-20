@@ -24,7 +24,7 @@ import com.vasciie.bkbl.gamespace.tools.GameTools;
  *
  */
 public class Rules {
-
+	
 	final GameRule[] gameRules;
 	GameRule brokenRule;
 	
@@ -229,13 +229,12 @@ public class Rules {
 							}
 							
 						});
-						
 					}
 
 					@Override
 					public GameRule[] createInnerRules() {
 						GameRule[] gameRules = new GameRule[] {
-								new GameRule(rules, this, "move_zone", "Moved Out!", "You Should Stay Around The Foul Occuring Plcae During Throw-in!", map) {
+								new GameRule(rules, this, "move_zone", "Moved Out!", "The Thrower Should Stay Around The Foul Occuring Plcae During Throw-in!", map) {
 
 									@Override
 									public GameRule[] createInnerRules() {
@@ -284,7 +283,7 @@ public class Rules {
 										else occurPlaceCpy.x = throwerPos.x;*/
 										
 										float checkConst = /*Terrain.getWalldepth() * 1.6f*/ 3;
-										if(throwerPos.dst(occurPlaceCpy) > checkConst/* && throwerPos.dst(secondCloseWallPos) > checkConst*/) {
+										if(!thrower.getPrevMoveVec().isZero() && throwerPos.dst(occurPlaceCpy) > checkConst/* && throwerPos.dst(secondCloseWallPos) > checkConst*/) {
 											ruleBreaker = thrower;
 											return true;
 										}
@@ -414,35 +413,50 @@ public class Rules {
 					}
 				},
 				
-				//FIXME Check again for the names of the following two game rules!
 				new GameRule(this, null, "stay_no_dribble", "Dribble Violation!", "The Ball Has Not Been Dribbled For 5 Seconds!", map) {
-					float timer = 5;
+					final float defaultTime = 5;
+					float timer = defaultTime;
 					
 					@Override
 					public boolean checkRule() {
 						Player temp = map.getHoldingPlayer();
 						if(temp == null) {
-							timer = 5;
+							timer = defaultTime;
 							return false;
 						}
 						
 						if (!temp.isDribbling()) {
 							if (timer <= 0) {
-								timer = 5;
+								timer = defaultTime;
 
 								ruleBreaker = temp;
+								map.playerReleaseBall();
 								return true;
 							} else
 								timer -= Gdx.graphics.getDeltaTime();
 						}
-						else timer = 5;
+						else timer = defaultTime;
 						
 						return false;
 					}
 
 					@Override
 					public void createActions() {
-						
+						actions.addAction(new Action() {
+
+							@Override
+							public boolean act() {
+								// TODO Auto-generated method stub
+								return true;
+							}
+
+							@Override
+							public boolean isGameDependent() {
+								// TODO Auto-generated method stub
+								return false;
+							}
+							
+						});
 						
 					}
 
@@ -453,28 +467,30 @@ public class Rules {
 					}
 				},
 				
-				new GameRule(this, null, "move_no_dribble", "Dribble Violation!", "The Player That Is Holding The Ball Is Moving Without Dribbling It For A Total Of 1 Second!", map) {
-					float timer = 1;
+				new GameRule(this, null, "move_no_dribble", "Dribble Violation!", "The Player That Is Holding The Ball Is Moving Without Dribbling It For A Total Of Half A Second!", map) {
+					final float defaultTime = 0.5f;
+					float timer = defaultTime;
 					
 					@Override
 					public boolean checkRule() {
 						Player temp = map.getHoldingPlayer();
 						if(temp == null) {
-							timer = 1;
+							timer = defaultTime;
 							return false;
 						}
 						
 						if (!temp.getMoveVector().isZero()) {
 							if (!temp.isDribbling() && !temp.isShooting() && !temp.isAiming()) {
 								if (timer <= 0) {
-									timer = 1;
+									timer = defaultTime;
 
 									ruleBreaker = temp;
+									map.playerReleaseBall();
 									return true;
 								} else
 									timer -= Gdx.graphics.getDeltaTime();
 							} else
-								timer = 1;
+								timer = defaultTime;
 						}
 						
 						return false;
@@ -482,7 +498,6 @@ public class Rules {
 
 					@Override
 					public void createActions() {
-						
 						
 					}
 
@@ -540,6 +555,7 @@ public class Rules {
 					}
 				},*/
 		};
+		
 	}
 	
 	public void update() {
@@ -555,10 +571,12 @@ public class Rules {
 				}
 			}*/ // TODO Bring this back after you finish testing the rules!!!
 
-			GameRule tempRule = gameRules[1];
-			if (tempRule.checkRule()) {
-				setBrokenRule(tempRule);
-			}
+			//GameRule tempRule = gameRules[1];
+			GameRule[] ruleTest = new GameRule[] {gameRules[2]};
+			for (GameRule r : ruleTest)
+				if (r.checkRule()) {
+					setBrokenRule(r);
+				}
 		}
 		else {
 			brokenRule.managePlayers();
@@ -585,6 +603,19 @@ public class Rules {
 	
 	public GameRule getBrokenRule() {
 		return brokenRule;
+	}
+	
+	public GameRule getGameRuleById(String id) {
+		for(GameRule r : gameRules) {
+			if(r.getId().equals(id))
+				return r;
+		}
+		
+		return null;
+	}
+	
+	public GameRule[] getGameRules() {
+		return gameRules;
 	}
 	
 	public static abstract class GameRule{
@@ -661,6 +692,10 @@ public class Rules {
 			//return false;
 		}
 		
+		public Actions getActions() {
+			return actions;
+		}
+		
 		public GameRule getParent() {
 			return parent;
 		}
@@ -709,6 +744,14 @@ public class Rules {
 				}
 				
 				temp.next = action;
+			}
+			
+			public void copyActions(Actions actions) {
+				while(actions.getCurrentAction() != null) {
+					addAction(actions.getCurrentAction());
+					
+					actions.nextAction();
+				}
 			}
 			
 			public Action getCurrentAction() {

@@ -515,7 +515,7 @@ public class GameMap implements RaycastCollisionDetector<Vector3> {
 		// because the AI might sometimes make mistakes and if 
 		// players go one through another that wouldn't be very funny (for me)
 		//float delta2 = Math.min(1f / 30f, delta);
-		dynamicsWorld.stepSimulation(delta, 5, delta);
+		dynamicsWorld.stepSimulation(delta, 5, 1f / 60f);
 			
 		//if(gameRunning)
 		if(!gameRunning) {
