@@ -14,6 +14,7 @@ import com.vasciie.bkbl.gamespace.GameMap;
 import com.vasciie.bkbl.gamespace.entities.Entity;
 import com.vasciie.bkbl.gamespace.entities.Player;
 import com.vasciie.bkbl.gamespace.entities.players.Teammate;
+import com.vasciie.bkbl.gamespace.objects.Terrain;
 import com.vasciie.bkbl.gamespace.rules.Rules.GameRule.Actions.Action;
 import com.vasciie.bkbl.gamespace.tools.GameTools;
 
@@ -38,7 +39,6 @@ public class Rules {
 		
 		gameRules = new GameRule[] {
 				new GameRule(this, null, "ball_out", "Out Of Bounds!", "The Ball Has Reached The Bounds Of The Terrain!", map) {
-					final Vector3 occurPlace = new Vector3();
 					Player recentHolder, thrower;
 					
 					
@@ -46,7 +46,7 @@ public class Rules {
 					public boolean checkRule() {
 						Player tempPlayer = map.getHoldingPlayer();
 						
-						if(thrower != null && thrower.isBallFree() && thrower.getPosition().dst(map.getBall().getPosition()) <= 1)
+						if(thrower != null && thrower.isBallFree() && thrower.getPosition().dst(map.getBall().getPosition()) <= 2)
 							return false;
 						
 						if (tempPlayer == null) {//If there is currently holding player
@@ -69,7 +69,7 @@ public class Rules {
 							for (btCollisionObject obj : map.getBall().getOutsideColliders()) {
 								if (map.getTerrain().getInvisBodies().contains(obj)) {
 									ruleBreaker = recentHolder;
-									occurPlace.set(map.getBall().getPosition()).y = recentHolder.getPosition().y;
+									occurPlace.set(map.getBall().getPosition()).add(occurPlace.cpy().scl(-1).nor().scl(3)).y = recentHolder.getPosition().y;
 									map.playerReleaseBall();
 									return true;
 								}
@@ -103,7 +103,7 @@ public class Rules {
 								recentHolder = thrower;
 								
 								
-								Vector3 posGroupPos = thrower.getPosition().cpy().sub(thrower.angleToVector(Vector3.Z, thrower.getOrientation()));
+								Vector3 posGroupPos = occurPlace.cpy().nor().scl(5);
 								// This is supposed to be a position right in front of
 								// the thrower's sight, and then random coordinates from
 								// -3 to 3 z-axis and -1.5 to 1.5 x-axis will be .mul()-ed by
@@ -196,6 +196,9 @@ public class Rules {
 
 							@Override
 							public boolean act() {
+								if(map.getTeammates().size() == 1)
+									return true;
+								
 								// We also check whether it is holding or not,
 								// because when the action starts, the player
 								// won't be aiming or shooting, which will
@@ -413,8 +416,8 @@ public class Rules {
 					}
 				},
 				
-				new GameRule(this, null, "stay_no_dribble", "Dribble Violation!", "The Ball Has Not Been Dribbled For 5 Seconds!", map) {
-					final float defaultTime = 5;
+				new GameRule(this, null, "stay_no_dribble", "Dribble Violation!", "The Ball Has Not Been Dribbled For 3 Seconds!", map) {
+					final float defaultTime = 3;
 					float timer = defaultTime;
 					
 					@Override
@@ -431,6 +434,37 @@ public class Rules {
 
 								ruleBreaker = temp;
 								map.playerReleaseBall();
+								
+								ArrayList<Vector3> wallPositions = new ArrayList<Vector3>(8);
+								Terrain terrain = map.getTerrain();
+								
+								for(int i = 1; i < 5; i++) {
+									Vector3 wallPos = terrain.getMatrixes().get(i).getTranslation(new Vector3());
+									wallPos.y = temp.getPosition().y;
+									
+									float changer, compatibChange = map.getBall().getWidth() / 2 + Terrain.getWalldepth();
+									
+									if(wallPos.x == 0) {//Basket-side wall
+										changer = terrain.getWidth() / 4;
+										
+										if(wallPos.z < 0)
+											compatibChange = -compatibChange;
+										
+										wallPositions.add(wallPos.cpy().add(changer, 0, -compatibChange));
+										wallPositions.add(wallPos.sub(changer, 0, compatibChange));
+									}else {//Sidewall
+										changer = terrain.getDepth() / 4;
+										
+										if(wallPos.x < 0)
+											compatibChange = -compatibChange;
+										
+										wallPositions.add(wallPos.cpy().add(-compatibChange, 0, changer));
+										wallPositions.add(wallPos.sub(compatibChange, 0, changer));
+									}
+								}
+								
+								occurPlace.set(GameTools.getShortestDistanceWVectors(temp.getPosition(), wallPositions));
+								
 								return true;
 							} else
 								timer -= Gdx.graphics.getDeltaTime();
@@ -439,24 +473,18 @@ public class Rules {
 						
 						return false;
 					}
+					
+					@Override
+					public void managePlayers() {
+						GameRule switchRule = rules.getGameRules()[0];
+						switchRule.setRuleBreaker(ruleBreaker);
+						
+						rules.setBrokenRule(switchRule);
+					}
 
 					@Override
 					public void createActions() {
-						actions.addAction(new Action() {
-
-							@Override
-							public boolean act() {
-								// TODO Auto-generated method stub
-								return true;
-							}
-
-							@Override
-							public boolean isGameDependent() {
-								// TODO Auto-generated method stub
-								return false;
-							}
-							
-						});
+						
 						
 					}
 
@@ -486,6 +514,37 @@ public class Rules {
 
 									ruleBreaker = temp;
 									map.playerReleaseBall();
+									
+									ArrayList<Vector3> wallPositions = new ArrayList<Vector3>(8);
+									Terrain terrain = map.getTerrain();
+									
+									for(int i = 1; i < 5; i++) {
+										Vector3 wallPos = terrain.getMatrixes().get(i).getTranslation(new Vector3());
+										wallPos.y = temp.getPosition().y;
+										
+										float changer, compatibChange = map.getBall().getWidth() / 2 + Terrain.getWalldepth();
+										
+										if(wallPos.x == 0) {//Basket-side wall
+											changer = terrain.getWidth() / 4;
+											
+											if(wallPos.z < 0)
+												compatibChange = -compatibChange;
+											
+											wallPositions.add(wallPos.cpy().add(changer, 0, -compatibChange));
+											wallPositions.add(wallPos.sub(changer, 0, compatibChange));
+										}else {//Sidewall
+											changer = terrain.getDepth() / 4;
+											
+											if(wallPos.x < 0)
+												compatibChange = -compatibChange;
+											
+											wallPositions.add(wallPos.cpy().add(-compatibChange, 0, changer));
+											wallPositions.add(wallPos.sub(compatibChange, 0, changer));
+										}
+									}
+									
+									occurPlace.set(GameTools.getShortestDistanceWVectors(temp.getPosition(), wallPositions));
+									
 									return true;
 								} else
 									timer -= Gdx.graphics.getDeltaTime();
@@ -494,6 +553,14 @@ public class Rules {
 						}
 						
 						return false;
+					}
+					
+					@Override
+					public void managePlayers() {
+						GameRule switchRule = rules.getGameRules()[0];
+						switchRule.setRuleBreaker(ruleBreaker);
+						
+						rules.setBrokenRule(switchRule);
 					}
 
 					@Override
@@ -560,7 +627,7 @@ public class Rules {
 	
 	public void update() {
 		if(brokenRule == null) {
-			/*for (GameRule rule : gameRules) {
+			for (GameRule rule : gameRules) {
 				if (rule.checkRule()) {
 					// A rule has been broken
 					brokenRule = rule;
@@ -569,14 +636,14 @@ public class Rules {
 	
 					break;
 				}
-			}*/ // TODO Bring this back after you finish testing the rules!!!
+			} // TODO Bring this back after you finish testing the rules!!!
 
 			//GameRule tempRule = gameRules[1];
-			GameRule[] ruleTest = new GameRule[] {gameRules[2]};
+			/*GameRule[] ruleTest = new GameRule[] {gameRules[0], gameRules[3]};
 			for (GameRule r : ruleTest)
 				if (r.checkRule()) {
 					setBrokenRule(r);
-				}
+				}*/
 		}
 		else {
 			brokenRule.managePlayers();
@@ -631,6 +698,8 @@ public class Rules {
 		
 		GameRule parent;
 		GameRule[] innerRules;//Rules of the rule
+		
+		static final Vector3 occurPlace = new Vector3();
 		
 		public GameRule(Rules rules, GameRule parent, String id, String name, String desc, GameMap map) {
 			this.id = id;
@@ -718,6 +787,10 @@ public class Rules {
 		public void clearRuleBreaker() {
 			actions.firstAction();
 			ruleBreaker = null;
+		}
+		
+		public void setRuleBreaker(Player ruleBreaker) {
+			this.ruleBreaker = ruleBreaker;
 		}
 		
 		public Player getRuleBreaker() {
