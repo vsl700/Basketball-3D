@@ -12,6 +12,12 @@ public class Label extends Text {
 
 	boolean multiline, textShorten;
 
+	public Label(String text, BitmapFont font, boolean multiline) {
+		this.text = text;
+		this.font = font;
+		this.multiline = multiline;
+	}
+	
 	public Label(String text, BitmapFont font, Color color, boolean multiline) {
 		this.text = text;
 		this.font = font;

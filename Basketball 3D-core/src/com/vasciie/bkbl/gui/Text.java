@@ -1,5 +1,6 @@
 package com.vasciie.bkbl.gui;
 
+import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.g2d.BitmapFont;
 
 public abstract class Text extends GUI {
@@ -46,6 +47,13 @@ public abstract class Text extends GUI {
 	
 	public void setTextChangeListener(TextChangeListener listener) {
 		textChangeListener = listener;
+	}
+	
+	public void setColor(Color color) {
+		r = color.r;
+		g = color.g;
+		b = color.b;
+		a = color.a;
 	}
 	
 }

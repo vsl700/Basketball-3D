@@ -78,8 +78,8 @@ public class GameScreen implements Screen, RulesListener {
 		power = new Label("POWER", textFont, Color.RED, true);
 		powerNum = new Label("10", powFont, Color.WHITE, true);
 		
-		ruleHeading = new Label("", textFont, Color.RED, true);
-		ruleDesc = new Label("", powFont, Color.RED, true);
+		ruleHeading = new Label("", textFont, true);
+		ruleDesc = new Label("", powFont, true);
 		clickToCont = new Label("Click E To Continue!", powFont, Color.WHITE, true);
 	}
 
@@ -134,7 +134,7 @@ public class GameScreen implements Screen, RulesListener {
 				else timer.setText("Ready?");
 
 				timer.render(batch, shape, cam);
-			}else if(map.isRuleBroken()){ //If the game is not running and there is no timer counting down
+			}else if(map.isRuleTriggered()){ //If the game is not running and there is no timer counting down
 				ruleHeading.render(batch, shape, cam);
 				ruleDesc.render(batch, shape, cam);
 				
@@ -194,9 +194,17 @@ public class GameScreen implements Screen, RulesListener {
 	}
 
 	@Override
-	public void onRuleBroken(GameRule rule) {
+	public void onRuleTriggered(GameRule rule) {
+		Color textColor = rule.getTextColor();
+		
 		ruleHeading.setText(rule.getName());
+		ruleHeading.setColor(textColor);
+		
 		ruleDesc.setText(rule.getDescription());
+		ruleDesc.setColor(textColor);
+		
+		homeScore.setText(map.getTeamScore() + "");
+		awayScore.setText(map.getOppScore() + "");
 		
 		contTimer = 1;
 	}

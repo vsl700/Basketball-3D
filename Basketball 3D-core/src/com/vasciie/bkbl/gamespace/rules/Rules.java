@@ -6,6 +6,7 @@ package com.vasciie.bkbl.gamespace.rules;
 import java.util.ArrayList;
 
 import com.badlogic.gdx.Gdx;
+import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.math.MathUtils;
 import com.badlogic.gdx.math.Matrix4;
 import com.badlogic.gdx.math.Vector3;
@@ -27,7 +28,7 @@ import com.vasciie.bkbl.gamespace.tools.GameTools;
 public class Rules {
 	
 	final GameRule[] gameRules;
-	GameRule brokenRule;
+	GameRule triggeredRule;
 	
 	GameMap map;
 	
@@ -38,7 +39,7 @@ public class Rules {
 		this.rulesListener = rulesListener;
 		
 		gameRules = new GameRule[] {
-				new GameRule(this, null, "ball_out", "Out Of Bounds!", "The Ball Has Reached The Bounds Of The Terrain!", map) {
+				new GameRule(this, null, "ball_out", "Out Of Bounds!", map) {
 					Player recentHolder, thrower;
 					
 					
@@ -68,7 +69,7 @@ public class Rules {
 						if (recentHolder != null) //If the ball is still not ever touched, don't check for terrain bounds collision (CPU economy) 
 							for (btCollisionObject obj : map.getBall().getOutsideColliders()) {
 								if (map.getTerrain().getInvisBodies().contains(obj)) {
-									ruleBreaker = recentHolder;
+									ruleTriggerer = recentHolder;
 									occurPlace.set(map.getBall().getPosition()).add(occurPlace.cpy().scl(-1).nor().scl(3)).y = recentHolder.getPosition().y;
 									map.playerReleaseBall();
 									return true;
@@ -93,7 +94,7 @@ public class Rules {
 							public boolean act() {
 								ArrayList<Player> allPlayers = map.getAllPlayers();
 								
-								if(ruleBreaker instanceof Teammate) {
+								if(ruleTriggerer instanceof Teammate) {
 									thrower = GameTools.getClosestPlayer(map.getBall().getPosition(), map.getOpponents(), null);
 								}else {
 									thrower = GameTools.getClosestPlayer(map.getBall().getPosition(), map.getTeammates(), null);
@@ -237,7 +238,7 @@ public class Rules {
 					@Override
 					public GameRule[] createInnerRules() {
 						GameRule[] gameRules = new GameRule[] {
-								new GameRule(rules, this, "move_zone", "Moved Out!", "The Thrower Should Stay Around The Foul Occuring Plcae During Throw-in!", map) {
+								new GameRule(rules, this, "move_zone", "Moved Out!", map) {
 
 									@Override
 									public GameRule[] createInnerRules() {
@@ -287,12 +288,18 @@ public class Rules {
 										
 										float checkConst = /*Terrain.getWalldepth() * 1.6f*/ 3;
 										if(!thrower.getPrevMoveVec().isZero() && throwerPos.dst(occurPlaceCpy) > checkConst/* && throwerPos.dst(secondCloseWallPos) > checkConst*/) {
-											ruleBreaker = thrower;
+											ruleTriggerer = thrower;
 											return true;
 										}
 										
 										
 										return false;
+									}
+
+									@Override
+									public String getDescription() {
+										
+										return "The Thrower Should Stay Around The Foul Occuring Plcae During Throw-in!";
 									}
 									
 								}
@@ -300,9 +307,15 @@ public class Rules {
 						
 						return gameRules;
 					}
+
+					@Override
+					public String getDescription() {
+						
+						return "The Ball Has Reached The Bounds Of The Terrain!";
+					}
 				},
 				
-				new GameRule(this, null, "incorrect_ball_steal", "Reached In!", "The Ball Has Been Touched While The Holding Player Was Not Dribbling!", map) {
+				new GameRule(this, null, "incorrect_ball_steal", "Reached In!", map) {
 					@Override
 					public boolean checkRule() {
 						Player temp = map.getHoldingPlayer();
@@ -319,7 +332,7 @@ public class Rules {
 								Player checked = (Player) tempE;
 
 								if (checked != null && !checked.equals(temp) && checked.isPointing() && !temp.isDribbling()) {
-									ruleBreaker = checked;
+									ruleTriggerer = checked;
 									return true;
 								}
 							}
@@ -339,7 +352,7 @@ public class Rules {
 								if(holdingPlayer == null) {
 									Vector3 ballVec = map.getBall().getPosition();
 									
-									if(ruleBreaker instanceof Teammate)
+									if(ruleTriggerer instanceof Teammate)
 										map.setHoldingPlayer(holdingPlayer = GameTools.getClosestPlayer(ballVec, map.getOpponents(), null));
 									else map.setHoldingPlayer(holdingPlayer = GameTools.getClosestPlayer(ballVec, map.getTeammates(), null));
 								}
@@ -414,9 +427,15 @@ public class Rules {
 						
 						return null;
 					}
+
+					@Override
+					public String getDescription() {
+						
+						return "The Ball Has Been Touched While The Holding Player Was Not Dribbling!";
+					}
 				},
 				
-				new GameRule(this, null, "stay_no_dribble", "Dribble Violation!", "The Ball Has Not Been Dribbled For 3 Seconds!", map) {
+				new GameRule(this, null, "stay_no_dribble", "Dribble Violation!", map) {
 					final float defaultTime = 3;
 					float timer = defaultTime;
 					
@@ -432,7 +451,7 @@ public class Rules {
 							if (timer <= 0) {
 								timer = defaultTime;
 
-								ruleBreaker = temp;
+								ruleTriggerer = temp;
 								map.playerReleaseBall();
 								
 								ArrayList<Vector3> wallPositions = new ArrayList<Vector3>(8);
@@ -476,10 +495,10 @@ public class Rules {
 					
 					@Override
 					public void managePlayers() {
-						GameRule switchRule = rules.getGameRules()[0];
-						switchRule.setRuleBreaker(ruleBreaker);
+						GameRule switchRule = rules.getGameRuleById("ball_out");
+						switchRule.setRuleBreaker(ruleTriggerer);
 						
-						rules.setBrokenRule(switchRule);
+						rules.setTriggeredRule(switchRule);
 					}
 
 					@Override
@@ -493,9 +512,15 @@ public class Rules {
 						
 						return null;
 					}
+
+					@Override
+					public String getDescription() {
+						
+						return "The Ball Has Not Been Dribbled For 3 Seconds!";
+					}
 				},
 				
-				new GameRule(this, null, "move_no_dribble", "Dribble Violation!", "The Player That Is Holding The Ball Is Moving Without Dribbling It For A Total Of Half A Second!", map) {
+				new GameRule(this, null, "move_no_dribble", "Dribble Violation!", map) {
 					final float defaultTime = 0.5f;
 					float timer = defaultTime;
 					
@@ -512,7 +537,7 @@ public class Rules {
 								if (timer <= 0) {
 									timer = defaultTime;
 
-									ruleBreaker = temp;
+									ruleTriggerer = temp;
 									map.playerReleaseBall();
 									
 									ArrayList<Vector3> wallPositions = new ArrayList<Vector3>(8);
@@ -557,10 +582,10 @@ public class Rules {
 					
 					@Override
 					public void managePlayers() {
-						GameRule switchRule = rules.getGameRules()[0];
-						switchRule.setRuleBreaker(ruleBreaker);
+						GameRule switchRule = rules.getGameRuleById("ball_out");
+						switchRule.setRuleBreaker(ruleTriggerer);
 						
-						rules.setBrokenRule(switchRule);
+						rules.setTriggeredRule(switchRule);
 					}
 
 					@Override
@@ -572,6 +597,12 @@ public class Rules {
 					public GameRule[] createInnerRules() {
 						
 						return null;
+					}
+
+					@Override
+					public String getDescription() {
+						
+						return "The Player That Is Holding The Ball Is Moving Without Dribbling It For A Total Of Half A Second!";
 					}
 				},
 				
@@ -621,55 +652,143 @@ public class Rules {
 						return false;
 					}
 				},*/
+				
+				new GameRule(this, null, "basket_score", "SCORE!", map) {
+					Player recentHolder;
+					boolean holderInZone = false;
+					
+					boolean teamScore = false;
+					
+					@Override
+					public GameRule[] createInnerRules() {
+						
+						return null;
+					}
+
+					@Override
+					public void createActions() {
+						
+						
+					}
+					
+					@Override
+					public void managePlayers() {
+						GameRule switchRule = rules.getGameRuleById("ball_out");
+						switchRule.setRuleBreaker(ruleTriggerer);
+						
+						rules.setTriggeredRule(switchRule);
+					}
+
+					@Override
+					public boolean checkRule() {
+						Player holdingPlayer = map.getHoldingPlayer();
+						if(holdingPlayer != null) {
+							recentHolder = holdingPlayer;
+							
+							if(holdingPlayer.isInAwayBasketZone())
+								holderInZone = true;
+						}
+						
+						if (map.getBall().getLinearVelocity().y < 0) {
+							if (map.getBall().isCollidedWTeamBasket()) {
+								teamScore = false;
+								map.scoreOpp(!holderInZone);
+								
+								ruleTriggerer = recentHolder;
+								setOccurPlace();
+								return true;
+							} else if (map.getBall().isCollidedWOppBasket()) {
+								teamScore = true;
+								map.scoreTeam(!holderInZone);
+
+								ruleTriggerer = recentHolder;
+								setOccurPlace();
+								return true;
+							}
+						}
+						
+						
+						return false;
+					}
+					
+					private void setOccurPlace() {
+						/*Vector3 ballPos = map.getBall().getPosition();*/
+						Vector3 basketPos;
+						/*float compatibChange = map.getBall().getWidth() / 2 + Terrain.getWalldepth();*/
+						
+						if(teamScore)
+							basketPos = map.getAwayBasket().getPosition();
+						else basketPos = map.getHomeBasket().getPosition();
+						
+						occurPlace.set(basketPos).x = map.getTerrain().getWidth() / 4;
+					}
+					
+					@Override
+					public Color getTextColor() {
+						if(teamScore)
+							return Color.BLUE;
+						
+						return Color.RED;
+					}
+
+					@Override
+					public String getDescription() {
+						if(teamScore)
+							return "Your Team Has Just Scored!";
+						
+						return "The Opposite Team Has Just Scored!";
+					}
+					
+				}
 		};
 		
 	}
 	
 	public void update() {
-		if(brokenRule == null) {
+		if(triggeredRule == null) {
 			for (GameRule rule : gameRules) {
 				if (rule.checkRule()) {
 					// A rule has been broken
-					brokenRule = rule;
-					map.onRuleBroken(rule);
-					rulesListener.onRuleBroken(rule);
+					triggeredRule = rule;
+					map.onRuleTriggered(rule);
+					rulesListener.onRuleTriggered(rule);
 	
 					break;
 				}
 			} // TODO Bring this back after you finish testing the rules!!!
 
 			//GameRule tempRule = gameRules[1];
-			/*GameRule[] ruleTest = new GameRule[] {gameRules[0], gameRules[3]};
+			/*GameRule[] ruleTest = new GameRule[] {getGameRuleById("basket_score")};
 			for (GameRule r : ruleTest)
 				if (r.checkRule()) {
-					setBrokenRule(r);
+					setTriggeredRule(r);
 				}*/
 		}
 		else {
-			brokenRule.managePlayers();
+			triggeredRule.managePlayers();
 		}
 	}
 	
-	public void setBrokenRule(GameRule rule) {
-		if(rule.getParent() != null || brokenRule == null) {
-			map.onRuleBroken(rule);
-			rulesListener.onRuleBroken(rule);
+	public void setTriggeredRule(GameRule rule) {
+		if(rule.getParent() != null || triggeredRule == null) {
+			map.onRuleTriggered(rule);
+			rulesListener.onRuleTriggered(rule);
 		}
 		
-		brokenRule = rule;
+		triggeredRule = rule;
 	}
 	
-	public void clearBrokenRule() {
-		brokenRule = null;
+	public void clearTriggeredRule() {
+		triggeredRule = null;
 	}
 	
-	public void clearBrokenRuleWRuleBreaker() {
-		brokenRule.clearRuleBreaker();
-		brokenRule = null;
+	public void clearTriggeredRuleWRuleBreaker() {
+		triggeredRule.clearRuleTriggerer();
+		triggeredRule = null;
 	}
 	
-	public GameRule getBrokenRule() {
-		return brokenRule;
+	public GameRule getTriggeredRule() {
+		return triggeredRule;
 	}
 	
 	public GameRule getGameRuleById(String id) {
@@ -686,13 +805,13 @@ public class Rules {
 	}
 	
 	public static abstract class GameRule{
-		String name, description;
+		String name;
 		String id;
 		GameMap map;
 		
 		Actions actions;
 		
-		Player ruleBreaker;
+		Player ruleTriggerer;
 		
 		Rules rules;
 		
@@ -701,10 +820,9 @@ public class Rules {
 		
 		static final Vector3 occurPlace = new Vector3();
 		
-		public GameRule(Rules rules, GameRule parent, String id, String name, String desc, GameMap map) {
+		public GameRule(Rules rules, GameRule parent, String id, String name, GameMap map) {
 			this.id = id;
 			this.name = name;
-			description = desc;
 			this.map = map;
 			this.rules = rules;
 			this.parent = parent;
@@ -741,10 +859,10 @@ public class Rules {
 		public void managePlayers() {
 			if(actions.act()) {
 				if(parent != null) {
-					rules.setBrokenRule(parent);
+					rules.setTriggeredRule(parent);
 					//return false;
 				}
-				else rules.clearBrokenRuleWRuleBreaker();
+				else rules.clearTriggeredRuleWRuleBreaker();
 				
 				return;
 				//return true;
@@ -753,7 +871,7 @@ public class Rules {
 			if(innerRules != null && map.isGameRunning())
 				for(GameRule r : innerRules)
 					if(r.checkRule()) {
-						rules.setBrokenRule(r);
+						rules.setTriggeredRule(r);
 						actions.firstAction();
 						//return false;
 					}
@@ -777,24 +895,26 @@ public class Rules {
 			return name;
 		}
 
-		public String getDescription() {
-			return description;
+		public abstract String getDescription();
+		
+		public Color getTextColor() {
+			return Color.RED.cpy().sub(0.3f, 0, 0, 0);
 		}
 
 		/**
 		 * Called when the game continues after the foul
 		 */
-		public void clearRuleBreaker() {
+		public void clearRuleTriggerer() {
 			actions.firstAction();
-			ruleBreaker = null;
+			ruleTriggerer = null;
 		}
 		
 		public void setRuleBreaker(Player ruleBreaker) {
-			this.ruleBreaker = ruleBreaker;
+			this.ruleTriggerer = ruleBreaker;
 		}
 		
 		public Player getRuleBreaker() {
-			return ruleBreaker;
+			return ruleTriggerer;
 		}
 		
 		public static class Actions{
@@ -888,6 +1008,6 @@ public class Rules {
 	
 	public interface RulesListener{
 		
-		public void onRuleBroken(GameRule rule);
+		public void onRuleTriggered(GameRule rule);
 	}
 }

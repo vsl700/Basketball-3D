@@ -20,6 +20,8 @@ public class Ball extends Entity {
 	
 	ArrayList<Player> neighborPlayers;
 	
+	boolean collidedWTeamBasket, collidedWOppBasket;
+	
 	public void create(EntityType type, GameMap map, Vector3 pos) {
 		super.create(type, map, pos);
 		
@@ -50,6 +52,18 @@ public class Ball extends Entity {
 		modelInstance.transform.set(getMainBody().getWorldTransform());
 		//getMainBody().getWorldTransform(); //For some reason I had to call this to make everything work :| (ball's modelInstance teleports into the main player's stomach)
 	}
+	
+	@Override
+	public void collisionOccured(btCollisionObject objInside, btCollisionObject objOutside) {
+		super.collisionOccured(objInside, objOutside);
+		
+		if(objInside.equals(collisionObjects.get(1))) {
+			if(map.getHomeBasket().getCollisionObjects().get(0).equals(objOutside))
+				collidedWTeamBasket = true;
+			else if(map.getAwayBasket().getCollisionObjects().get(0).equals(objOutside))
+				collidedWOppBasket = true;
+		}
+	}
 
 	@Override
 	protected void createCollisions() {
@@ -68,7 +82,7 @@ public class Ball extends Entity {
 		 * When the ball gets around a basket, with its normal collision object the game would detect a collision even if the ball doesnt get in. This coll obj will 
 		 * detect if the center of the ball gets inside a basket.
 		 */
-		invisCollShapes.add(new btSphereShape(0.15f)); 
+		invisCollShapes.add(new btSphereShape(0.2f)); 
 		matrixes.add(matrixes.get(0));
 	}
 	
@@ -83,6 +97,7 @@ public class Ball extends Entity {
 	 */
 	private void manuallySetCollTransform() {
 		collisionObjects.get(0).setWorldTransform(matrixes.get(1));
+		collisionObjects.get(1).setWorldTransform(matrixes.get(2));
 	}
 	
 	@Override
@@ -94,6 +109,9 @@ public class Ball extends Entity {
 		
 		collisionObjects.add(new btCollisionObject());
 		collisionObjects.get(0).setCollisionShape(invisCollShapes.get(0));
+		
+		collisionObjects.add(new btCollisionObject());
+		collisionObjects.get(1).setCollisionShape(invisCollShapes.get(1));
 		
 		manuallySetCollTransform();
 		
@@ -118,6 +136,8 @@ public class Ball extends Entity {
 	public void onCycleEnd() {
 		super.onCycleEnd();
 		
+		collidedWTeamBasket = false;
+		collidedWOppBasket = false;
 		//modelInstance.transform.set(getMainBody().getWorldTransform());
 	}
 	
@@ -138,6 +158,14 @@ public class Ball extends Entity {
 
 	public ArrayList<Player> getNeighborPlayers() {
 		return neighborPlayers;
+	}
+
+	public boolean isCollidedWTeamBasket() {
+		return collidedWTeamBasket;
+	}
+
+	public boolean isCollidedWOppBasket() {
+		return collidedWOppBasket;
 	}
 	
 	

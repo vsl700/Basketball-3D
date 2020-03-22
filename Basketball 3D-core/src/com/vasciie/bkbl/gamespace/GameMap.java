@@ -114,8 +114,8 @@ public class GameMap implements RaycastCollisionDetector<Vector3> {
     float startTimer;
     
     boolean gameRunning;//Whether or not the players can play
-    boolean ruleBroken; 
-    boolean ruleBrokenActing;//Whether the players are currently acting like after a broken rule (for example during a throw-in, until the thrower throws the ball and another player catches it, this boolean stays true)
+    boolean ruleTriggered; 
+    boolean ruleTriggeredActing;//Whether the players are currently acting like after a broken rule (for example during a throw-in, until the thrower throws the ball and another player catches it, this boolean stays true)
     boolean playersReady; //Whether the players are in positions
     
     int index = 0;
@@ -493,18 +493,18 @@ public class GameMap implements RaycastCollisionDetector<Vector3> {
 		teammates.clear();
 		opponents.clear();
 		
-		if(rules.getBrokenRule() != null) {
-			rules.getBrokenRule().clearRuleBreaker();
-			rules.clearBrokenRule();
+		if(rules.getTriggeredRule() != null) {
+			rules.getTriggeredRule().clearRuleTriggerer();
+			rules.clearTriggeredRule();
 		}
-		ruleBroken = false;
+		ruleTriggered = false;
 		
 		mainPlayer = null;
 		
 		createBall();
 		
 		gameRunning = false;
-		ruleBrokenActing = false;
+		ruleTriggeredActing = false;
 	}
 	
 	public void update(float delta) {
@@ -523,14 +523,14 @@ public class GameMap implements RaycastCollisionDetector<Vector3> {
 			updateInputs();
 		}else controlPlayer(delta);
 		if(playersReady && !gameRunning){
-			if (!ruleBroken) {
+			if (!ruleTriggered) {
 				if (startTimer <= 0)
 					gameRunning = true;
 				else
 					startTimer -= delta;
 			}
 		}
-		if(ruleBrokenActing){
+		if(ruleTriggeredActing){
 			updateFullGame(delta);
 			
 			/*//If players are not ready it means they are not in their target positions. So we should go through each one and check
@@ -551,7 +551,7 @@ public class GameMap implements RaycastCollisionDetector<Vector3> {
 			
 			return;*/
 
-			if(rules.getBrokenRule() == null) {
+			if(rules.getTriggeredRule() == null) {
 				actionOver();
 				
 				if(!gameRunning) {
@@ -563,12 +563,12 @@ public class GameMap implements RaycastCollisionDetector<Vector3> {
 				return;
 			}
 			
-			playersReady = rules.getBrokenRule().arePlayersReady();
+			playersReady = rules.getTriggeredRule().arePlayersReady();
 			
 			return;
 		}
 		
-		if(gameRunning || ruleBrokenActing)
+		if(gameRunning || ruleTriggeredActing)
 			updateFullGame(delta);
 		else updateGameEnvironment(delta);
 		
@@ -628,12 +628,12 @@ public class GameMap implements RaycastCollisionDetector<Vector3> {
 		dynamicsWorld.removeRigidBody(body);
 	}
 	
-	public void onRuleBroken(GameRule rule) {
+	public void onRuleTriggered(GameRule rule) {
 		//The game will just stop here
 		gameRunning = false;
-		ruleBroken = true;
+		ruleTriggered = true;
 		playersReady = false;
-		ruleBrokenActing = false;
+		ruleTriggeredActing = false;
 	}
 	
 	public void onRuleBrokenContinue() {
@@ -645,8 +645,8 @@ public class GameMap implements RaycastCollisionDetector<Vector3> {
 		// (moveVecs == 0 && !AIMemory(only one will be enough to show the
 		// current state).target.isZero()) start the timer (brokenRule == false)
 		// and clear the broken rule from Rule
-		ruleBroken = false;
-		ruleBrokenActing = true;
+		ruleTriggered = false;
+		ruleTriggeredActing = true;
 		startTimer = 0.9f;
 		System.out.println("On rule broken continue");
 		// Finally, after a quick timeout the game will continue
@@ -684,7 +684,7 @@ public class GameMap implements RaycastCollisionDetector<Vector3> {
 	}
 	
 	public void actionOver() {
-		ruleBrokenActing = false;
+		ruleTriggeredActing = false;
 	}
 	
 	public void dispose() {
@@ -828,6 +828,18 @@ public class GameMap implements RaycastCollisionDetector<Vector3> {
 			Gdx.input.setCursorPosition(Gdx.input.getX(), Gdx.graphics.getHeight() - substractor);
 	}
 	
+	public void scoreTeam(boolean triple) {
+		if(triple)
+			teamScore+= 3;
+		else teamScore+= 2;
+	}
+	
+	public void scoreOpp(boolean triple) {
+		if(triple)
+			oppScore+= 3;
+		else oppScore+= 2;
+	}
+	
 	public btDynamicsWorld getDynamicsWorld() {
 		return dynamicsWorld;
 	}
@@ -924,11 +936,11 @@ public class GameMap implements RaycastCollisionDetector<Vector3> {
 		return currentPlayerHoldOpp;
 	}
 
-	public int teamScore() {
+	public int getTeamScore() {
 		return teamScore;
 	}
 	
-	public int oppScore() {
+	public int getOppScore() {
 		return oppScore;
 	}
 	
@@ -940,12 +952,12 @@ public class GameMap implements RaycastCollisionDetector<Vector3> {
 		return gameRunning;
 	}
 	
-	public boolean isRuleBroken() {
-		return ruleBroken;
+	public boolean isRuleTriggered() {
+		return ruleTriggered;
 	}
 
-	public boolean isRuleBrokenActing() {
-		return ruleBrokenActing;
+	public boolean isRuleTriggeredActing() {
+		return ruleTriggeredActing;
 	}
 
 	public boolean isPlayersReady() {

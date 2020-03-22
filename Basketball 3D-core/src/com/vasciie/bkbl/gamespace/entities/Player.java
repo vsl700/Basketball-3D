@@ -1733,9 +1733,9 @@ public abstract class Player extends Entity {
 			map.getBall().getMainBody().setGravity(map.getDynamicsWorld().getGravity());
 		}
 		
-		boolean mainPlayerBrainUpdate = isMainPlayer() && map.isRuleBrokenActing() && !map.isGameRunning();
-		if(mainPlayerBrainUpdate /*updateBrain && map.isRuleBrokenActing()*/ || !isMainPlayer() && !map.isRuleBroken()) {
-			brain.update(true);
+		boolean mainPlayerBrainUpdate = isMainPlayer() && map.isRuleTriggeredActing() && !map.isGameRunning();
+		if(mainPlayerBrainUpdate /*updateBrain && map.isRuleBrokenActing()*/ || !isMainPlayer() && !map.isRuleTriggered()) {
+			//brain.update(true);
 			//Vector3 tempVec = moveVec.add(new Vector3(steering.linear.cpy().x, 0, steering.linear.cpy().y)).scl(0.5f);
 			//float tempAng = steering.angular;
 			moveVec.y = 0;
@@ -1753,7 +1753,7 @@ public abstract class Player extends Entity {
 			if(isMainPlayer())
 				System.out.println("Updated main player brain");
 			//System.out.println(getWidth() * getDepth());
-		}else if(isMainPlayer() && !map.isRuleBroken()) {
+		}else if(isMainPlayer() && !map.isRuleTriggered()) {
 			brain.update(false);//It's important that we control the state machine
 			
 			//updateBrain = false;
