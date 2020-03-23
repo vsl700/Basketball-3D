@@ -969,6 +969,10 @@ public abstract class Player extends Entity {
 			shootingPower = (int) Math.max(10, shootingPower + value);
 	}
 	
+	public void setShootPower(float value) {
+		shootingPower = (int) Math.min(20, Math.max(10, value));
+	}
+	
 	private void catchBall(boolean left) {
 		if(isAbleToCatch() || isDribbling())
 		if ((map.getCurrentPlayerHoldTeam() == -1 && map.getCurrentPlayerHoldOpp() == -1) || 
@@ -1155,6 +1159,12 @@ public abstract class Player extends Entity {
 	}
 	
 	private void throwBall() {
+		Vector3 shootVec = brain.getMemory().getShootVec();
+		if(shootVec != null) {
+			throwBall(shootVec);
+			return;
+		}
+		
 		Quaternion dir = modelInstance.transform.getRotation(new Quaternion());
 		Vector3 tempVec = new Vector3(0, 0, 1);
 		tempVec.rotate(dir.getYaw(), 0, 1, 0);
@@ -1185,7 +1195,7 @@ public abstract class Player extends Entity {
 	 * @param target
 	 */
 	public void throwBall(Vector3 target) {
-		Vector3 tempVec = target.cpy();
+		Vector3 tempVec = target.cpy().sub(map.getBall().getPosition()).nor();
 		tempVec.x *= shootingPower;
 		tempVec.y *= shootingPower * 1.4f;
 		tempVec.z *= shootingPower;
@@ -1741,7 +1751,7 @@ public abstract class Player extends Entity {
 			moveVec.y = 0;
 			prevMoveVec.set(moveVec);
 			
-			moveVec.nor().scl(Gdx.graphics.getDeltaTime());
+			moveVec.nor().scl(Math.min(1, Gdx.graphics.getDeltaTime()));
 			//System.out.println(moveVec.x + " ; " + moveVec.y + " ; " + moveVec.z);
 			//float len = Math.abs(moveVec.x) + Math.abs(moveVec.z);
 			//System.out.println(len);
@@ -1750,8 +1760,6 @@ public abstract class Player extends Entity {
 			//else {
 				//running = false;
 			//}
-			if(isMainPlayer())
-				System.out.println("Updated main player brain");
 			//System.out.println(getWidth() * getDepth());
 		}else if(isMainPlayer() && !map.isRuleTriggered()) {
 			brain.update(false);//It's important that we control the state machine
@@ -2287,11 +2295,11 @@ public abstract class Player extends Entity {
 	}
 	
 	public boolean isLeftHolding() {
-		return leftHoldingBall;
+		return leftHoldingBall || dribbleL || leftThrowBall;
 	}
 	
 	public boolean isRightHolding() {
-		return rightHoldingBall;
+		return rightHoldingBall || dribbleR || rightThrowBall;
 	}
 	
 	/**

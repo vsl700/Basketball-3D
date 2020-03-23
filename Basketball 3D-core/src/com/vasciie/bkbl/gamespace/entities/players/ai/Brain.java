@@ -159,7 +159,6 @@ public class Brain {
 	
 	public void performShooting(Vector3 tempAimVec) {
 		memory.setTargetVec(tempAimVec);
-		user.lookAt(tempAimVec, true);
 		user.interactWithBallS();
 		memory.setAimingTime(memory.getAimingTime() + Gdx.graphics.getDeltaTime());
 	}
@@ -180,18 +179,55 @@ public class Brain {
 	 * @return
 	 */
 	private Vector3 calculateShootVector(Vector3 targetVec) {
-		Vector3 distVec = targetVec.cpy().sub(user.getPosition()); //Distance between the target and the player
+		/*Vector3 distVec = targetVec.cpy().sub(user.getPosition()); //Distance between the target and the player
 		
 		float xzDist = distVec.cpy().scl(1, 0, 1).len(); //Calculate only xz distance. That's what we multiplied y by 0 for.
 		float yDist = distVec.cpy().scl(0, 1, 0).len(); //Calculate only y distance. That's what we multiplied x and z by 0 for.
 		
-		Vector3 returnVec = targetVec.cpy().add(0, xzDist / 2 + yDist, 0);
+		Vector3 returnVec = targetVec.cpy().add(0, xzDist / 2 + yDist, 0);*/
+		
+		Vector3 returnVec = targetVec.cpy();
+		//Vector3 tempTargetVec;
+		
+		//returnVec.scl(0.5f, 1, 0.5f);
+		
+		/*Vector3 changeVec = returnVec.cpy();
+		float changer = user.getWidth() / 2;
+		if(user.isLeftHolding()) {
+			changeVec.rotate(-90, 0, 1, 0).nor().scl(changer).y = 0;
+		}else if(user.isRightHolding()){
+			changeVec.rotate(90, 0, 1, 0).nor().scl(changer).y = 0;
+		}
+		
+		returnVec.add(changeVec);*/
+		
+		float near = 11;
+		
+		float dst = user.getPosition().dst(targetVec);
+		
+		float farRotation = -dst / 1.5f;
+		float nearRotation = -(1 / dst) * 50;
+		float rotation;
+		if(dst < near)
+			rotation = nearRotation;
+		else rotation = farRotation;
+		
+		returnVec.rotate(rotation, 1, 0, 0);
 		
 		/*System.out.println(xzDist + "; " + yDist);
 		System.out.print(player.getPosition());
 		System.out.print(targetVec);
 		System.out.println(returnVec);*/
 		//Modify player shootPower
+		float farShootPower = dst * 0.8f;
+		float nearShootPower = (20 - dst) / 8f;
+		float shootPower;
+		if(dst < near)
+			shootPower = nearShootPower;
+		else shootPower = farShootPower;
+		
+		user.setShootPower(shootPower);
+		System.out.println(farShootPower + " ; " + nearShootPower + ": " + shootPower + "; dst: " + dst);
 		
 		return returnVec;
 	}
@@ -215,8 +251,6 @@ public class Brain {
 				memory.setShootTime(0);
 				memory.setCatchTime(0);
 				memory.setAimingTime(0);
-				memory.setTargetVec(null);
-				memory.setShootVec(null);
 				// user.throwBall(memory.getShootVec());
 				memory.setBallJustShot(true);
 				

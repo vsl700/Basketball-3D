@@ -85,12 +85,17 @@ public enum PlayerState implements State<Player> {
 				
 			}
 			
+			if(player.isInAwayBasketZone())
+				brain.getPursueBallInHand().setEnabled(false);
+			else {
+				brain.getPursueBallInHand().setEnabled(true);
+				player.setRunning();
+			}
+			
 			player.getBrain().getMSBallInHand().calculateSteering(Player.steering);
 			player.setMoveVector(Player.steering.linear);
 			
-			player.setRunning();
-			
-			if(!brain.isShooting())
+			if(!brain.isShooting() && !mem.isBallJustShot())
 				player.lookAt(basket.getPosition(), false);
 
 			// Setting the distances from the target (when a player gets in
@@ -123,6 +128,9 @@ public enum PlayerState implements State<Player> {
 			player.getBrain().getMemory().setAimingTime(0);
 			
 			player.getBrain().getBallSeparate().setEnabled(true);
+			
+			player.getBrain().getMemory().setTargetVec(null);
+			player.getBrain().getMemory().setShootVec(null);
 		}
 
 	},
@@ -222,7 +230,7 @@ public enum PlayerState implements State<Player> {
 				//player.getBrain().getLookAt().calculateSteering(Player.steering);
 				
 				//player.lookAt(player.angleToVector(new Vector3(), Player.steering.angular));
-				player.lookAt(mem.getShootVec(), false);//Just in case the mechanics drop it and the player accidentally looks at the ball instead of the target while shooting
+				player.lookAt(mem.getShootVec(), true);//Just in case the mechanics drop it and the player accidentally looks at the ball instead of the target while shooting
 			}else
 				player.lookAt(ballVec, false);
 			
@@ -344,9 +352,6 @@ public enum PlayerState implements State<Player> {
 			//brain.getCustomPursue().setArrivalTolerance(brain.getMemory().getTargetPosition().getBoundingRadius());
 			//brain.getCustomPursue().setTarget(brain.getMemory().getTargetPosition());
 			
-			if(player.isMainPlayer())
-				System.out.println("Main player switched to idle");
-			else System.out.println("Switched to Idle");
 		}
 
 		@Override
@@ -354,8 +359,6 @@ public enum PlayerState implements State<Player> {
 			Brain brain = player.getBrain();
 			AIMemory memory = brain.getMemory();
 			
-			if(player.isMainPlayer())
-				System.out.println("Updating main player's state");
 			
 			if(!player.isHoldingBall() && player.getMap().getBall().getPosition().y > player.getHeight() * 2 && player.isProximityColliding(player.getMap().getBall())) {
 				player.getBrain().getBallSeparate().setEnabled(true);
@@ -411,7 +414,8 @@ public enum PlayerState implements State<Player> {
 			brain.getBallSeparate().setEnabled(true);
 			brain.getAllPlayerSeparate().setEnabled(true);
 			
-			System.out.println("Switched out of Idle");
+			brain.getMemory().setTargetVec(null);
+			brain.getMemory().setShootVec(null);
 		}
 	};
 

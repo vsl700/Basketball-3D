@@ -66,7 +66,10 @@ public class Rules {
 						/*if(thrower != null && thrower.equals(recentHolder))
 							return false;*/
 						
-						if (recentHolder != null) //If the ball is still not ever touched, don't check for terrain bounds collision (CPU economy) 
+						if (recentHolder != null) {//If the ball is still not ever touched, don't check for terrain bounds collision (CPU economy) 
+							if(!recentHolder.isBallFree())
+								return false;
+							
 							for (btCollisionObject obj : map.getBall().getOutsideColliders()) {
 								if (map.getTerrain().getInvisBodies().contains(obj)) {
 									ruleTriggerer = recentHolder;
@@ -75,6 +78,7 @@ public class Rules {
 									return true;
 								}
 							}
+						}
 						//TODO Also add a check for situations in which the ball gets in the basket through its bottom!
 						return false;
 					}

@@ -182,6 +182,8 @@ public class GameScreen implements Screen, RulesListener {
 	@Override
 	public void hide() {
 		map.clear();
+		homeScore.setText(0 + "");
+		awayScore.setText(0 + "");
 	}
 
 	@Override

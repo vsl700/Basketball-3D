@@ -212,7 +212,7 @@ public abstract class Basket extends GameObject {
 		modelInstance.calculateTransforms();
 		
 		collisionObjects.get(0).setWorldTransform(calcTransformFromNodesTransform(modelInstance.getNode("basket1").globalTransform.cpy().trn(0, 0, -tabCentW / 2)));
-		collisionObjects.get(1).setWorldTransform(calcTransformFromNodesTransform(new Matrix4().setToTranslation(0, basketZone / 2, -basketZone / 2)));
+		collisionObjects.get(1).setWorldTransform(calcTransformFromNodesTransform(modelInstance.getNode("stand").globalTransform.cpy()));
 		
 	}
 

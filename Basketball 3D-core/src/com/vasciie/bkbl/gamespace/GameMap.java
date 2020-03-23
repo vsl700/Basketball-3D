@@ -493,6 +493,8 @@ public class GameMap implements RaycastCollisionDetector<Vector3> {
 		teammates.clear();
 		opponents.clear();
 		
+		teamScore = oppScore = 0;
+		
 		if(rules.getTriggeredRule() != null) {
 			rules.getTriggeredRule().clearRuleTriggerer();
 			rules.clearTriggeredRule();
