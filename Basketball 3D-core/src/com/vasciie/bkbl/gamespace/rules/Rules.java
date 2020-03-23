@@ -47,7 +47,7 @@ public class Rules {
 					public boolean checkRule() {
 						Player tempPlayer = map.getHoldingPlayer();
 						
-						if(thrower != null && thrower.isBallFree() && thrower.getPosition().dst(map.getBall().getPosition()) <= 2)
+						if(thrower != null && !thrower.isBallFree())
 							return false;
 						
 						if (tempPlayer == null) {//If there is currently holding player
