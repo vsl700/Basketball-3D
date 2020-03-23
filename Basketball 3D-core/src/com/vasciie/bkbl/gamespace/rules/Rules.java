@@ -349,14 +349,18 @@ public class Rules {
 							public boolean act() {
 								Player holdingPlayer = map.getHoldingPlayer();
 								
-								if(holdingPlayer == null) {
+								if (holdingPlayer == null) {
 									Vector3 ballVec = map.getBall().getPosition();
+
+									if (ruleTriggerer instanceof Teammate)
+										holdingPlayer = GameTools.getClosestPlayer(ballVec, map.getOpponents(), null);
+									else
+										holdingPlayer = GameTools.getClosestPlayer(ballVec, map.getTeammates(), null);
 									
-									if(ruleTriggerer instanceof Teammate)
-										map.setHoldingPlayer(holdingPlayer = GameTools.getClosestPlayer(ballVec, map.getOpponents(), null));
-									else map.setHoldingPlayer(holdingPlayer = GameTools.getClosestPlayer(ballVec, map.getTeammates(), null));
+									holdingPlayer.getBrain().setCustomTarget(map.getBall());
+									holdingPlayer.getBrain().getMemory().setTargetFacing(map.getBall());
+									holdingPlayer.getBrain().getMemory().setCatchBall(true);
 								}
-								
 								
 								for(Player p : map.getAllPlayers()) {
 									if(p.equals(holdingPlayer))
@@ -368,6 +372,25 @@ public class Rules {
 									p.getBrain().getMemory().setTargetFacing(holdingPlayer);
 									
 									p.getBrain().getCustomPursue().setArrivalTolerance(10);//See here!
+								}
+								
+								return true;
+							}
+
+							@Override
+							public boolean isGameDependent() {
+								
+								return false;
+							}
+							
+						});
+						
+						actions.addAction(new Action() {
+
+							@Override
+							public boolean act() {
+								if(map.getHoldingPlayer() == null) {
+									return false;
 								}
 								
 								return true;

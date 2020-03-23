@@ -1735,7 +1735,7 @@ public abstract class Player extends Entity {
 		
 		boolean mainPlayerBrainUpdate = isMainPlayer() && map.isRuleTriggeredActing() && !map.isGameRunning();
 		if(mainPlayerBrainUpdate /*updateBrain && map.isRuleBrokenActing()*/ || !isMainPlayer() && !map.isRuleTriggered()) {
-			//brain.update(true);
+			brain.update(true);
 			//Vector3 tempVec = moveVec.add(new Vector3(steering.linear.cpy().x, 0, steering.linear.cpy().y)).scl(0.5f);
 			//float tempAng = steering.angular;
 			moveVec.y = 0;

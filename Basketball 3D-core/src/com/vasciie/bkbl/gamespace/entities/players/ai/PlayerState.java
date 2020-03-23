@@ -385,9 +385,11 @@ public enum PlayerState implements State<Player> {
 			/*else if(memory.getTargetVec() != null)
 			player.lookAt(memory.getTargetVec(), false);*/
 
-			if (memory.isCatchBall()) {
+			if(player.isHoldingBall())
+				memory.setCatchBall(false);
+			else if (memory.isCatchBall())
 				player.interactWithBallA();
-			}
+			
 		}
 		
 		@Override
