@@ -46,6 +46,8 @@ public class GameScreen implements Screen, RulesListener {
 	int amount; //Player amount per team
 	
 	float contTimer;//clickToCont timer
+	
+	boolean ignorePause;
 
 	public GameScreen(MyGdxGame mg) {
 		game = mg;
@@ -94,8 +96,10 @@ public class GameScreen implements Screen, RulesListener {
 			map = game.getMap();
 		}
 		
-		if(map.getTeammates().size() > 0)
+		if(map.getTeammates().size() > 0) {
+			ignorePause = true;
 			return;
+		}
 		
 		map.spawnPlayers(amount);
 	}
@@ -121,46 +125,52 @@ public class GameScreen implements Screen, RulesListener {
 		homeScore.render(batch, shape, cam);
 		awayScore.render(batch, shape, cam);
 		
-		
-		if (map.isGameRunning() && !paused()) {
-			int pow = map.getMainPlayer().getShootingPower();
-			
-			power.render(batch, shape, cam);
-			shape.begin(ShapeRenderer.ShapeType.Filled);
-			shape.setColor(Color.RED);
-			shape.rect(cam.viewportWidth / 2 - pow * 8 / 2, power.getY() - power.getHeight() / 2 - 30, pow * 8, 30);
-			shape.end();
-			
-			powerNum.setText(pow + "");
-			powerNum.render(batch, shape, cam);
-		}
-		else {
-			if (map.getTimer() >= 0 && map.isPlayersReady()) {
-				if ((int) map.getTimer() == 0)
-					timer.setText("GO!");
-				else if (map.getTimer() <= 4)
-					timer.setText((int) map.getTimer() + "");
-				else timer.setText("Ready?");
+		if (!paused())
+			if (map.isGameRunning()) {
+				int pow = map.getMainPlayer().getShootingPower();
 
-				timer.render(batch, shape, cam);
-			}else if(map.isRuleTriggered()){ //If the game is not running and there is no timer counting down
-				ruleHeading.render(batch, shape, cam);
-				ruleDesc.render(batch, shape, cam);
-				
-				if(contTimer <= 0) {
-					clickToCont.render(batch, shape, cam);
-					
-					if(Gdx.input.isKeyJustPressed(Keys.E))
-						map.onRuleBrokenContinue();
-				}else contTimer -= delta;
+				power.render(batch, shape, cam);
+				shape.begin(ShapeRenderer.ShapeType.Filled);
+				shape.setColor(Color.RED);
+				shape.rect(cam.viewportWidth / 2 - pow * 8 / 2, power.getY() - power.getHeight() / 2 - 30, pow * 8, 30);
+				shape.end();
+
+				powerNum.setText(pow + "");
+				powerNum.render(batch, shape, cam);
+			} else {
+				if (map.getTimer() >= 0 && map.isPlayersReady()) {
+					if ((int) map.getTimer() == 0)
+						timer.setText("GO!");
+					else if (map.getTimer() <= 4)
+						timer.setText((int) map.getTimer() + "");
+					else
+						timer.setText("Ready?");
+
+					timer.render(batch, shape, cam);
+				} else if (map.isRuleTriggered()) { // If the game is not
+													// running and there is no
+													// timer counting down
+					ruleHeading.render(batch, shape, cam);
+					ruleDesc.render(batch, shape, cam);
+
+					if (contTimer <= 0) {
+						clickToCont.render(batch, shape, cam);
+
+						if (Gdx.input.isKeyJustPressed(Keys.E))
+							map.onRuleBrokenContinue();
+					} else
+						contTimer -= delta;
+				}
+
 			}
-			
-		}
 		
-		if(pause.isActive() && game.getScreen().equals(this))
+		if(paused() && game.getScreen().equals(this)) {
 			pause.render(delta);
-		else if(Gdx.input.isKeyJustPressed(Keys.ESCAPE))
+			return;
+		}else if(Gdx.input.isKeyJustPressed(Keys.ESCAPE) && !ignorePause)
 			pause.show();
+		
+		ignorePause = false;
 	}
 
 	@Override

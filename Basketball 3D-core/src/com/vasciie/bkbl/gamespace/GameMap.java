@@ -650,7 +650,6 @@ public class GameMap implements RaycastCollisionDetector<Vector3> {
 		ruleTriggered = false;
 		ruleTriggeredActing = true;
 		startTimer = 0.9f;
-		System.out.println("On rule broken continue");
 		// Finally, after a quick timeout the game will continue
 	}
 	

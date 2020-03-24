@@ -136,8 +136,6 @@ public class Rules {
 									}
 								}
 								
-								System.out.println("Calculated targets");
-								
 								return true;
 							}
 

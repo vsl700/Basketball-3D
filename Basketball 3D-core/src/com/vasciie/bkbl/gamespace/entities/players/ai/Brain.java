@@ -205,7 +205,7 @@ public class Brain {
 		
 		float dst = user.getPosition().dst(targetVec);
 		
-		float farRotation = dst / 1.5f;
+		float farRotation = dst / 1.35f;
 		float nearRotation = (1 / dst) * 59;
 		float rotation;
 		if(dst < near)

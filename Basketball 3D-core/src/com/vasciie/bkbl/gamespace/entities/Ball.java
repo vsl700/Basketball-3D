@@ -48,8 +48,8 @@ public class Ball extends Entity {
 	@Override
 	public void update(float delta) {
 		//System.out.println(getWidth() + " ball radius");
-		manuallySetCollTransform();
 		modelInstance.transform.set(getMainBody().getWorldTransform());
+		manuallySetCollTransform();
 		//getMainBody().getWorldTransform(); //For some reason I had to call this to make everything work :| (ball's modelInstance teleports into the main player's stomach)
 	}
 	
