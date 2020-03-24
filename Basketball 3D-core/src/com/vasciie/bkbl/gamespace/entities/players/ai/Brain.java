@@ -122,6 +122,40 @@ public class Brain {
 		//mSCoop.add(playerSeparate, 0.9f);
 	}
 	
+	public void clear() {
+		stateMachine = null;
+		memory.clear();
+		memory = null;
+		
+		user = null;
+		
+		pursue.setTarget(null);
+		pursue.setOwner(null);
+		pursueBallInHand.setTarget(null);
+		pursueBallInHand.setOwner(null);
+		customPursue.setTarget(null);
+		customPursue.setOwner(null);
+		pursue = pursueBallInHand = customPursue = null;
+		
+		lookAt.setTarget(null);
+		lookAt.setOwner(null);
+		lookAt = null;
+		
+		collAvoid.setOwner(null);
+		collAvoid = null;
+		
+		interpose.setTarget(null);
+		interpose.setOwner(null);
+		interpose.setAgentA(null);
+		interpose.setAgentB(null);
+		interpose = null;
+		
+		ballSeparate = basketSeparate = playerSeparate = allPlayerSeparate = null;
+		obstAvoid = null;
+		pSBallChasePart = pSCoop = pSSurround = pSCustom = null;
+		mSBallChase = mSBallInHand = mSSurround = null;
+	}
+	
 	public void update(boolean updateAI) {
 		memory.setShootTime(memory.getShootTime() + Gdx.graphics.getDeltaTime());
 		//System.out.println(memory.getShootTime());

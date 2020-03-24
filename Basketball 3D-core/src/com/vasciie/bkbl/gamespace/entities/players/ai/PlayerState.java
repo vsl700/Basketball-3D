@@ -413,9 +413,6 @@ public enum PlayerState implements State<Player> {
 			brain.getCollAvoid().setEnabled(true);
 			brain.getBallSeparate().setEnabled(true);
 			brain.getAllPlayerSeparate().setEnabled(true);
-			
-			brain.getMemory().setTargetVec(null);
-			brain.getMemory().setShootVec(null);
 		}
 	};
 

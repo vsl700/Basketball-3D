@@ -2080,6 +2080,13 @@ public abstract class Player extends Entity {
 	public Brain getBrain() {
 		return brain;
 	}
+	
+	@Override
+	public void dispose() {
+		super.dispose();
+		
+		brain.clear();
+	}
 
 	@Override
 	public float getWidth() {

@@ -145,5 +145,11 @@ public class AIMemory {
 		this.catchBall = catchBall;
 	}
 	
+	public void clear() {
+		targetPlayer = null;
+		targetVec = shootVec = null;
+		targetPosition = targetFacing = null;
+	}
+	
 	
 }

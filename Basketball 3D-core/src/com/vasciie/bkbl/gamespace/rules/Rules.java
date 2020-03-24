@@ -413,16 +413,11 @@ public class Rules {
 								//Make actions that will make the current holding player shoot the ball to the opposite team's basket. After that (eventually) the game continues if there's no score.
 								Player holdingPlayer = map.getHoldingPlayer();
 								
-								holdingPlayer.getBrain().setCustomTarget(holdingPlayer.getTargetBasket());
-								holdingPlayer.getBrain().getMemory().setTargetFacing(holdingPlayer.getTargetBasket());
-								holdingPlayer.getBrain().getAllPlayerSeparate().setEnabled(false);
-								
-								holdingPlayer.setRunning();
-								
 								if(holdingPlayer.isInAwayBasketZone()) {
-									if(!holdingPlayer.getBrain().updateShooting(1.25f))
-										holdingPlayer.getBrain().performShooting(holdingPlayer.getTargetBasket().getMatrixes().get(3).getTranslation(new Vector3()));
-									else if(!holdingPlayer.getBrain().isShooting()) {
+									if(!holdingPlayer.getBrain().updateShooting(1.25f)) {
+										holdingPlayer.getBrain().clearCustomTarget();
+										holdingPlayer.getBrain().performShooting(holdingPlayer.getTargetBasket().calcTransformFromNodesTransform(holdingPlayer.getTargetBasket().getMatrixes().get(3)).getTranslation(new Vector3()));
+									}else if(!holdingPlayer.getBrain().isShooting()) {
 										for(Player p : map.getAllPlayers()) {
 											if(p.equals(holdingPlayer))
 												continue;
@@ -432,6 +427,12 @@ public class Rules {
 										
 										return true;
 									}
+								}else {
+									holdingPlayer.getBrain().setCustomTarget(holdingPlayer.getTargetBasket());
+									holdingPlayer.getBrain().getMemory().setTargetFacing(holdingPlayer.getTargetBasket());
+									holdingPlayer.getBrain().getAllPlayerSeparate().setEnabled(false);
+									
+									holdingPlayer.setRunning();
 								}
 								
 								return false;
