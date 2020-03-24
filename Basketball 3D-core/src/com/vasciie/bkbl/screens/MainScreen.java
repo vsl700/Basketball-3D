@@ -55,8 +55,10 @@ public class MainScreen implements Screen {
 		
 		if(quit.justReleased(cam))
 			Gdx.app.exit();
-		else if(settings.justReleased(cam))
+		else if(settings.justReleased(cam)) {
+			game.settings.setPreviousScreen(this);
 			game.setScreen(game.settings);
+		}
 		else if(play.justReleased(cam))
 			game.setScreen(game.level);
 		//batch.end();

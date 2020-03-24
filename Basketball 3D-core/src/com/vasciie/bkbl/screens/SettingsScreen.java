@@ -37,6 +37,8 @@ public class SettingsScreen implements Screen, UpDownListener {
 	//TextUpDown resUpDown;
 	Label fpsLabel;
 	
+	Screen prevScreen;
+	
 	//boolean checkForFSCN; //Check for fullscreen
 	
 	public SettingsScreen(MyGdxGame mg) {
@@ -134,7 +136,7 @@ public class SettingsScreen implements Screen, UpDownListener {
 				Gdx.graphics.setWindowedMode(MyGdxGame.WIDTH, MyGdxGame.HEIGHT);
 			}
 			
-			game.setScreen(game.main);
+			game.setScreen(prevScreen);
 		}
 	}
 	
@@ -184,6 +186,10 @@ public class SettingsScreen implements Screen, UpDownListener {
 		//resLabel.setPosAndSize(resUpDown.getX() + resUpDown.getTotalWidth() / 2 - 164 / 2, resUpDown.getY() + resUpDown.getHeight() + 10, 164);
 		
 		//resUpDown.setTextOption(width + "x" + height);
+	}
+	
+	public void setPreviousScreen(Screen prevScreen) {
+		this.prevScreen = prevScreen;
 	}
 
 	@Override

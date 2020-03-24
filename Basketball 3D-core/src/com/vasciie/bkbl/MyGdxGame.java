@@ -87,38 +87,36 @@ public class MyGdxGame extends Game {
 
 	@Override
 	public void render () {
-		if(!getScreen().equals(game)) {
-			if(beautifulBack) {
-				if(map == null)
+		if (!getScreen().equals(game) && !game.paused()) {
+			if (beautifulBack) {
+				if (map == null)
 					load3DGraphics();
-				
+
 				Gdx.gl.glClearColor(0, 0.7f, 0.8f, 1);
-				Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT|GL20.GL_DEPTH_BUFFER_BIT);
-				
+				Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT | GL20.GL_DEPTH_BUFFER_BIT);
+
 				pCam.update();
 				mBatch.begin(pCam);
 				map.render(mBatch, environment);
 				mBatch.end();
-				
+
 				pCam.rotateAround(new Vector3(), new Vector3(0, 1, 0), 10 * Gdx.graphics.getDeltaTime());
 				customLookAt(pCam, new Vector3());
-			}
-			else {
+			} else {
 				Gdx.gl.glClearColor(0, 0, 0, 1);
-				Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT|GL20.GL_DEPTH_BUFFER_BIT);
-				
+				Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT | GL20.GL_DEPTH_BUFFER_BIT);
+
 				batch.setProjectionMatrix(cam.combined);
 				batch.begin();
-				if(!beautifulBack) {
-					if(background == null) loadTexture();
+				if (!beautifulBack) {
+					if (background == null)
+						loadTexture();
 					batch.draw(background, WIDTH / 2 - background.getWidth() / 2, HEIGHT / 2 - background.getHeight() / 2);
 				}
 				batch.end();
 			}
-		}else {
-			Gdx.gl.glClearColor(0, 0, 0, 1);
-			Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT|GL20.GL_DEPTH_BUFFER_BIT);
 		}
+		else if(game.paused()) game.render(Gdx.graphics.getDeltaTime());
 		
 		super.render();
 		
@@ -173,6 +171,9 @@ public class MyGdxGame extends Game {
 		}
 		
 		getScreen().resize(width, height); //That method doesn't automatically call in the screen so we have to call it manually
+		
+		if(game.paused())
+			game.resize(width, height);
 	}
 	
 	@Override

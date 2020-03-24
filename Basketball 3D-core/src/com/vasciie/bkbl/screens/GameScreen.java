@@ -38,6 +38,8 @@ public class GameScreen implements Screen, RulesListener {
 
 	MyGdxGame game;
 	
+	PauseScreen pause;
+	
 	Label homeScore, awayScore, timer, power, powerNum;
 	Label ruleHeading, ruleDesc, clickToCont;
 	
@@ -72,6 +74,8 @@ public class GameScreen implements Screen, RulesListener {
 		powFont = new BitmapFont();
 		powFont.getData().setScale(2);
 		
+		pause = new PauseScreen(mg);
+		
 		homeScore = new Label("0", textFont, Color.BLUE, true);
 		awayScore = new Label("0", textFont, Color.RED, true);
 		timer = new Label("", textFont, Color.ORANGE, true);
@@ -85,10 +89,13 @@ public class GameScreen implements Screen, RulesListener {
 
 	@Override
 	public void show() {
-		if(map == null)
+		if(map == null) {
 			game.load3DGraphics();//If the default menus setting is just to show a simple picture of the game instead of the game world
+			map = game.getMap();
+		}
 		
-		map = game.getMap();
+		if(map.getTeammates().size() > 0)
+			return;
 		
 		map.spawnPlayers(amount);
 	}
@@ -98,11 +105,13 @@ public class GameScreen implements Screen, RulesListener {
 		Gdx.gl.glClearColor(0, 0.7f, 0.8f, 1);
 		Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT | GL20.GL_DEPTH_BUFFER_BIT);
 		
-		map.update(delta);
-		//map.getCamera().getMainTrans().getTranslation(pCam.position);
-		map.getMainPlayer().getFocusTransform().mul(new Matrix4().setToTranslation(0, map.getMainPlayer().getHeight(), -10)).getTranslation(pCam.position);
-		game.customLookAt(pCam, new Matrix4(map.getMainPlayer().getModelInstance().transform).mul(new Matrix4().setToTranslation(0, map.getMainPlayer().getHeight(), 0)).getTranslation(new Vector3()));
-		pCam.update();
+		if (!pause.isActive()) {
+			map.update(delta);
+			// map.getCamera().getMainTrans().getTranslation(pCam.position);
+			map.getMainPlayer().getFocusTransform().mul(new Matrix4().setToTranslation(0, map.getMainPlayer().getHeight(), -10)).getTranslation(pCam.position);
+			game.customLookAt(pCam, new Matrix4(map.getMainPlayer().getModelInstance().transform).mul(new Matrix4().setToTranslation(0, map.getMainPlayer().getHeight(), 0)).getTranslation(new Vector3()));
+			pCam.update();
+		}
 
 		mBatch.begin(pCam);
 		map.render(mBatch, environment);
@@ -113,7 +122,7 @@ public class GameScreen implements Screen, RulesListener {
 		awayScore.render(batch, shape, cam);
 		
 		
-		if (map.isGameRunning()) {
+		if (map.isGameRunning() && !paused()) {
 			int pow = map.getMainPlayer().getShootingPower();
 			
 			power.render(batch, shape, cam);
@@ -148,12 +157,16 @@ public class GameScreen implements Screen, RulesListener {
 			
 		}
 		
-		if(Gdx.input.isKeyJustPressed(Keys.ESCAPE))
-			game.setScreen(game.main);
+		if(pause.isActive() && game.getScreen().equals(this))
+			pause.render(delta);
+		else if(Gdx.input.isKeyJustPressed(Keys.ESCAPE))
+			pause.show();
 	}
 
 	@Override
 	public void resize(int width, int height) {
+		pause.resize(width, height);
+		
 		pCam.viewportWidth = width;
 		pCam.viewportHeight = height;
 		cam.setToOrtho(false, width, height);
@@ -166,7 +179,11 @@ public class GameScreen implements Screen, RulesListener {
 		ruleHeading.setPosAndSize(width / 2 - (width - 10) / 2, height - 80, width - 10);
 		ruleDesc.setPosAndSize(width / 2 - (width - 10) / 2, height - 120, width - 10);
 		clickToCont.setPosAndSize(width / 2 - (width - 10) / 2, height - 160, width - 10);
-		//pCam.update();
+		pCam.update();
+	}
+	
+	public boolean paused() {
+		return pause.isActive();
 	}
 
 	@Override
@@ -178,12 +195,16 @@ public class GameScreen implements Screen, RulesListener {
 	public void resume() {
 
 	}
-
-	@Override
-	public void hide() {
+	
+	public void reset() {
 		map.clear();
 		homeScore.setText(0 + "");
 		awayScore.setText(0 + "");
+	}
+
+	@Override
+	public void hide() {
+		
 	}
 
 	@Override
