@@ -205,12 +205,15 @@ public class Brain {
 		
 		float dst = user.getPosition().dst(targetVec);
 		
-		float farRotation = -dst / 1.5f;
-		float nearRotation = -(1 / dst) * 50;
+		float farRotation = dst / 1.5f;
+		float nearRotation = (1 / dst) * 59;
 		float rotation;
 		if(dst < near)
 			rotation = nearRotation;
 		else rotation = farRotation;
+		
+		if(targetVec.z > 0)
+			rotation = -rotation;
 		
 		returnVec.rotate(rotation, 1, 0, 0);
 		
@@ -220,7 +223,7 @@ public class Brain {
 		System.out.println(returnVec);*/
 		//Modify player shootPower
 		float farShootPower = dst * 0.8f;
-		float nearShootPower = (20 - dst) / 8f;
+		float nearShootPower = (20 - dst) / 8.5f;
 		float shootPower;
 		if(dst < near)
 			shootPower = nearShootPower;
