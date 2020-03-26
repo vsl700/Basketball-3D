@@ -86,21 +86,55 @@ public abstract class GameObject implements Steerable<Vector3>, Proximity<Vector
 	}
 	
 	public void dispose() {
-		model.dispose();
+		if(model != null) { //Camera doesn't have model
+			model.dispose();
+			model = null;
+		}
+		
 		for(btRigidBody o : bodies)
 			o.dispose();
+		bodies.clear();
+		
+		if(invisBodies != null) {
+			for(btRigidBody o : invisBodies)
+				o.dispose();
+			invisBodies.clear();
+		}
+		
+		if (collisionObjects != null) {
+			for (btCollisionObject o : collisionObjects)
+				o.dispose();
+			collisionObjects.clear();
+		}
 		
 		for(btRigidBody.btRigidBodyConstructionInfo constInfo : constructionInfos)
 			constInfo.dispose();
+		constructionInfos.clear();
+		
+		if(invisConstructionInfos != null) {
+			for(btRigidBody.btRigidBodyConstructionInfo constInfo : invisConstructionInfos)
+				constInfo.dispose();
+			invisConstructionInfos.clear();
+		}
 		
 		for(btCollisionShape s : visibleCollShapes)
 			s.dispose();
+		visibleCollShapes.clear();
 		
 		for(btCollisionShape s : invisibleCollShapes)
 			s.dispose();
+		invisibleCollShapes.clear();
 		
 		for(MotionState ms : motionStates)
 			ms.dispose();
+		motionStates.clear();
+		
+		if(invisMotionStates != null) {
+			for(MotionState ms : invisMotionStates)
+				ms.dispose();
+			invisMotionStates.clear();
+		}
+		
 	}
 	
 	protected abstract void createModels();

@@ -492,8 +492,8 @@ public abstract class Player extends Entity {
 	protected abstract Color getPlayerColor();
 	
 	protected void createModels(Vector3 pos) {
-		int divisionU = 10;
-		int divisionV = 10;
+		int divisionU = 8;
+		int divisionV = 8;
 		
 		ModelBuilder mb = new ModelBuilder();
 		ModelBuilder childMB = new ModelBuilder();
@@ -820,7 +820,7 @@ public abstract class Player extends Entity {
 			invTrans.rotate(0, 1, 0, y);
 		}else {
 			invTrans.set(modelInstance.transform.rotate(0, 1, 0, y));
-			setCollisionTransform(true);
+			//setCollisionTransform(true);
 		}
 	}
 	
@@ -849,7 +849,7 @@ public abstract class Player extends Entity {
 		dir.y = 0;
 		
 		modelInstance.transform.trn(dir);
-		setCollisionTransform(true);
+		//setCollisionTransform(true);
 		
 		walking = true;
 		
@@ -875,7 +875,7 @@ public abstract class Player extends Entity {
 			dir.y = 0;
 
 			modelInstance.transform.trn(dir);
-			setCollisionTransform(true);
+			//setCollisionTransform(true);
 
 			running = true;
 			

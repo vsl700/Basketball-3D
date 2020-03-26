@@ -98,23 +98,49 @@ public abstract class Entity implements Proximity<Vector3>, Steerable<Vector3> {
 	
 	public void dispose() {
 		model.dispose();
+		model = null;
+		
 		for(btCollisionObject o : collisionObjects)
 			o.dispose();
+		collisionObjects.clear();
 		
 		for(btRigidBody o : bodies)
 			o.dispose();
+		bodies.clear();
+		
+		if(invisBodies != null) {
+			for(btRigidBody o : invisBodies)
+				o.dispose();
+			invisBodies.clear();
+		}
 		
 		for(btCollisionShape s : collisionShapes)
 			s.dispose();
+		collisionShapes.clear();
 		
 		for(btCollisionShape s : invisCollShapes)
 			s.dispose();
+		invisCollShapes.clear();
 		
 		for(btRigidBody.btRigidBodyConstructionInfo constInfo : constructionInfos)
 			constInfo.dispose();
+		constructionInfos.clear();
+		
+		if(invisConstructionInfos != null) {
+			for(btRigidBody.btRigidBodyConstructionInfo constInfo : invisConstructionInfos)
+				constInfo.dispose();
+			invisConstructionInfos.clear();
+		}
 		
 		for(MotionState ms : motionStates)
 			ms.dispose();
+		motionStates.clear();
+		
+		if(invisMotionStates != null) {
+			for(MotionState ms : invisMotionStates)
+				ms.dispose();
+			invisMotionStates.clear();
+		}
 	}
 	
 	/**
@@ -154,24 +180,29 @@ public abstract class Entity implements Proximity<Vector3>, Steerable<Vector3> {
 	protected abstract void createCollisions();
 	
 	protected void createCollisionObjectAndBodies() {
+		boolean resetting = !motionStates.isEmpty();
+		
 		for (int i = 0; i < collisionShapes.size(); i++) {
 			Vector3 localInertia = new Vector3();
 			
-			if(i == mainBodyIndex)
-				collisionShapes.get(i).calculateLocalInertia(type.getMass(), localInertia);
-			else collisionShapes.get(i).calculateLocalInertia(0, localInertia);
-			
-			motionStates.add(new MotionState());
-			
-			if(i == mainBodyIndex)
-				motionStates.get(i).transform = matrixes.get(i);
-			else motionStates.get(i).transform = calcTransformFromNodesTransform(matrixes.get(i));
-			
-			if(i == mainBodyIndex)
-				constructionInfos.add(new btRigidBody.btRigidBodyConstructionInfo(type.getMass(), motionStates.get(i), collisionShapes.get(i), localInertia));
-			else constructionInfos.add(new btRigidBody.btRigidBodyConstructionInfo(0, motionStates.get(i), collisionShapes.get(i), localInertia));
-			constructionInfos.get(i).setRestitution(1.0f);
-			constructionInfos.get(i).setFriction(0.3f);
+			if (!resetting) {//This is enough to show us if we are creating the objects when we create everything or we just recreate the rigid body
+				if(i == mainBodyIndex)
+					collisionShapes.get(i).calculateLocalInertia(type.getMass(), localInertia);
+				else collisionShapes.get(i).calculateLocalInertia(0, localInertia);
+				
+				motionStates.add(new MotionState());
+
+				if (i == mainBodyIndex)
+					motionStates.get(i).transform = matrixes.get(i);
+				else
+					motionStates.get(i).transform = calcTransformFromNodesTransform(matrixes.get(i));
+				
+				if(i == mainBodyIndex)
+					constructionInfos.add(new btRigidBody.btRigidBodyConstructionInfo(type.getMass(), motionStates.get(i), collisionShapes.get(i), localInertia));
+				else constructionInfos.add(new btRigidBody.btRigidBodyConstructionInfo(0, motionStates.get(i), collisionShapes.get(i), localInertia));
+				constructionInfos.get(i).setRestitution(1.0f);
+				constructionInfos.get(i).setFriction(0.3f);
+			}
 			
 			bodies.add(new btRigidBody(constructionInfos.get(i)));
 		}

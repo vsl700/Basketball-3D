@@ -93,13 +93,18 @@ public class GameScreen implements Screen, RulesListener {
 	public void show() {
 		if(map == null) {
 			game.load3DGraphics();//If the default menus setting is just to show a simple picture of the game instead of the game world
-			map = game.getMap();
+			
+		}else {
+			if(map.getTeammates().size() > 0) {
+				ignorePause = true;
+				return;
+			}
+			
+			map.dispose();
+			game.resetMap();
 		}
 		
-		if(map.getTeammates().size() > 0) {
-			ignorePause = true;
-			return;
-		}
+		map = game.getMap();
 		
 		map.spawnPlayers(amount);
 	}
@@ -207,7 +212,8 @@ public class GameScreen implements Screen, RulesListener {
 	}
 	
 	public void reset() {
-		map.clear();
+		if(map != null)
+			map.clear();
 		homeScore.setText(0 + "");
 		awayScore.setText(0 + "");
 	}

@@ -118,7 +118,7 @@ public class GameMap implements RaycastCollisionDetector<Vector3> {
     boolean ruleTriggeredActing;//Whether the players are currently acting like after a broken rule (for example during a throw-in, until the thrower throws the ball and another player catches it, this boolean stays true)
     boolean playersReady; //Whether the players are in positions
     
-    int index = 0;
+    int index = 0, lastIndex, ballIndex, lastBallIndex;
 	
 	public GameMap(RulesListener rulesListener) {
 		inputs = new InputController();
@@ -139,56 +139,25 @@ public class GameMap implements RaycastCollisionDetector<Vector3> {
 		collObjsInObjectMap = new HashMap<btCollisionObject, GameObject>();
 		collObjsValsMap = new HashMap<Integer, btCollisionObject>();		
 		
-		terrain = (Terrain) ObjectType.createGameObject(ObjectType.TERRAIN.getId(), this, 0, 0, 0);
-		for(btRigidBody co : terrain.getBodies()) {
-			co.setUserValue(index);
-			
-			co.setCollisionFlags(co.getCollisionFlags() | btCollisionObject.CollisionFlags.CF_KINEMATIC_OBJECT);
-			dynamicsWorld.addRigidBody(co, GROUND_FLAG, ALL_FLAG);
-			co.setContactCallbackFlag(GROUND_FLAG);
-			co.setContactCallbackFilter(ENTITY_FLAG);
-			co.setActivationState(Collision.DISABLE_DEACTIVATION);
-			
-			objectsMap.put(index, ObjectType.TERRAIN.getId());
-			collObjsInObjectMap.put(co, terrain);
-			collObjsValsMap.put(index, co);
-			
-			index++;
-		}
+		createMap();
 		
-		for(btRigidBody co : terrain.getInvisBodies()) {
-			co.setUserValue(index);
-			co.setCollisionFlags(co.getCollisionFlags());
-			dynamicsWorld.addRigidBody(co, GROUND_FLAG, ALL_FLAG);
-			co.setContactCallbackFlag(GROUND_FLAG);
-			co.setContactCallbackFilter(ENTITY_FLAG);
-			co.setActivationState(Collision.DISABLE_DEACTIVATION);
-			
-			objectsMap.put(index, ObjectType.TERRAIN.getId());
-			collObjsInObjectMap.put(co, terrain);
-			collObjsValsMap.put(index, co);
-			
-			index++;
-		}
+		createBall();
 		
-		createTerrainLanes();
+		lastIndex = index - 1;
 		
-		camera = (Camera) ObjectType.createGameObject(ObjectType.CAMERA.getId(), this, 0, 0, 0);
-		for(btRigidBody co : camera.getBodies()) {
-			co.setUserValue(index);
-			co.setCollisionFlags(co.getCollisionFlags() | btCollisionObject.CollisionFlags.CF_CUSTOM_MATERIAL_CALLBACK);
-			dynamicsWorld.addRigidBody(co, CAMERA_FLAG, GROUND_FLAG);
-			co.setContactCallbackFlag(CAMERA_FLAG);
-			co.setContactCallbackFilter(GROUND_FLAG);
-			
-			objectsMap.put(index, ObjectType.CAMERA.getId());
-			collObjsInObjectMap.put(co, camera);
-			collObjsValsMap.put(index, co);
-			
-			index++;
-		}
-			
-		basket1 = (Basket) ObjectType.createGameObject(ObjectType.HOMEBASKET.getId(), this, 0.1f, 0, 27);
+		teammates = new ArrayList<Player>(5);
+		opponents = new ArrayList<Player>(5);
+	}
+	
+	private void addCollObjects() {
+		addTerrainCollObjects();
+		
+		addCameraCollObjects();
+		
+		addBasketsCollObjects();
+	}
+	
+	private void addBasketsCollObjects() {
 		for(btRigidBody co : basket1.getBodies()) {
 			co.setUserValue(index);
 			dynamicsWorld.addRigidBody(co, OBJECT_FLAG, ALL_FLAG);
@@ -223,8 +192,6 @@ public class GameMap implements RaycastCollisionDetector<Vector3> {
 			index++;
 		}
 		
-		basket2 = (Basket) ObjectType.createGameObject(ObjectType.AWAYBASKET.getId(), this, 0.1f, 0, -27);
-		basket2.setRotation(0, 1, 0, 180);
 		for(btRigidBody co : basket2.getBodies()) {
 			co.setUserValue(index);
 			dynamicsWorld.addRigidBody(co, OBJECT_FLAG, ALL_FLAG);
@@ -258,12 +225,72 @@ public class GameMap implements RaycastCollisionDetector<Vector3> {
 			
 			index++;
 		}
+	}
+	
+	private void addCameraCollObjects() {
+		for(btRigidBody co : camera.getBodies()) {
+			co.setUserValue(index);
+			co.setCollisionFlags(co.getCollisionFlags() | btCollisionObject.CollisionFlags.CF_CUSTOM_MATERIAL_CALLBACK);
+			dynamicsWorld.addRigidBody(co, CAMERA_FLAG, GROUND_FLAG);
+			co.setContactCallbackFlag(CAMERA_FLAG);
+			co.setContactCallbackFilter(GROUND_FLAG);
+			
+			objectsMap.put(index, ObjectType.CAMERA.getId());
+			collObjsInObjectMap.put(co, camera);
+			collObjsValsMap.put(index, co);
+			
+			index++;
+		}
+	}
+	
+	private void addTerrainCollObjects() {
+		for(btRigidBody co : terrain.getBodies()) {
+			co.setUserValue(index);
+			
+			co.setCollisionFlags(co.getCollisionFlags() | btCollisionObject.CollisionFlags.CF_KINEMATIC_OBJECT);
+			dynamicsWorld.addRigidBody(co, GROUND_FLAG, ALL_FLAG);
+			co.setContactCallbackFlag(GROUND_FLAG);
+			co.setContactCallbackFilter(ENTITY_FLAG);
+			co.setActivationState(Collision.DISABLE_DEACTIVATION);
+			
+			objectsMap.put(index, ObjectType.TERRAIN.getId());
+			collObjsInObjectMap.put(co, terrain);
+			collObjsValsMap.put(index, co);
+			
+			index++;
+		}
 		
-		createBall();
+		for(btRigidBody co : terrain.getInvisBodies()) {
+			co.setUserValue(index);
+			co.setCollisionFlags(co.getCollisionFlags());
+			dynamicsWorld.addRigidBody(co, GROUND_FLAG, ALL_FLAG);
+			co.setContactCallbackFlag(GROUND_FLAG);
+			co.setContactCallbackFilter(ENTITY_FLAG);
+			co.setActivationState(Collision.DISABLE_DEACTIVATION);
+			
+			objectsMap.put(index, ObjectType.TERRAIN.getId());
+			collObjsInObjectMap.put(co, terrain);
+			collObjsValsMap.put(index, co);
+			
+			index++;
+		}
 		
+		createTerrainLanes();
+	}
+	
+	private void createMap() { 
+		terrain = (Terrain) ObjectType.createGameObject(ObjectType.TERRAIN.getId(), this, 0, 0, 0);
+		addTerrainCollObjects();
 		
-		teammates = new ArrayList<Player>(5);
-		opponents = new ArrayList<Player>(5);
+		camera = (Camera) ObjectType.createGameObject(ObjectType.CAMERA.getId(), this, 0, 0, 0);
+		addCameraCollObjects();
+		
+		basket1 = (Basket) ObjectType.createGameObject(ObjectType.HOMEBASKET.getId(), this, 0.1f, 0, 27);
+		
+		basket2 = (Basket) ObjectType.createGameObject(ObjectType.AWAYBASKET.getId(), this, 0.1f, 0, -27);
+		basket2.setRotation(0, 1, 0, 180);
+		
+		addBasketsCollObjects();
 	}
 	
 	public void spawnPlayers(int count) {
@@ -339,6 +366,7 @@ public class GameMap implements RaycastCollisionDetector<Vector3> {
 			}
 			
 			teammate.turnY(180);
+			teammate.setCollisionTransform(true);
 			
 			teammates.add(teammate);
 			
@@ -420,6 +448,8 @@ public class GameMap implements RaycastCollisionDetector<Vector3> {
 			playerIndex++;
 		}
 		
+		lastIndex = index2 - 1;
+		
 		currentPlayerHoldTeam = -1;
 		currentPlayerHoldOpp = -1;
 		
@@ -457,7 +487,19 @@ public class GameMap implements RaycastCollisionDetector<Vector3> {
 	}
 	
 	private void createBall() {
-		ball = (Ball) EntityType.createEntity(EntityType.BALL.getId(), this, new Vector3(0, 0, 0));
+		ballIndex = index;
+		
+		/*if(ball == null)*/
+			ball = (Ball) EntityType.createEntity(EntityType.BALL.getId(), this, new Vector3(0, 0, 0));
+		/*else {
+			Matrix4 temp = new Matrix4().setToTranslation(new Vector3(0, ball.getWidth() / 2, 0));
+			
+			ball.getModelInstance().transform.set(temp);
+			ball.resetRigidBody();
+			ball.setWorldTransform(temp);
+			ball.setCollisionTransform(true);
+			ball.manuallySetCollTransform();
+		}*/
 		for (btRigidBody co : ball.getBodies()) {
 			co.setUserValue(index);
 			co.setCollisionFlags(co.getCollisionFlags() | btCollisionObject.CollisionFlags.CF_CUSTOM_MATERIAL_CALLBACK);
@@ -486,6 +528,8 @@ public class GameMap implements RaycastCollisionDetector<Vector3> {
 			
 			index++;
 		}
+		
+		lastBallIndex = index - 1;
 	}
 	
 	public void clear() {
@@ -503,10 +547,25 @@ public class GameMap implements RaycastCollisionDetector<Vector3> {
 		
 		mainPlayer = null;
 		
+		for(int i = ballIndex; i <= lastIndex; i++) {
+			objectsMap.remove(i);
+			
+			btCollisionObject tempObj = collObjsValsMap.get(i);
+			
+			collObjsInEntityMap.remove(tempObj);
+			collObjsInObjectMap.remove(tempObj);
+			collObjsValsMap.remove(i);
+		}
+		
+		index = ballIndex;
+		//createMap();
+		//addCollObjects();
 		createBall();
 		
 		gameRunning = false;
 		ruleTriggeredActing = false;
+		
+		
 	}
 	
 	public void update(float delta) {
@@ -692,23 +751,40 @@ public class GameMap implements RaycastCollisionDetector<Vector3> {
 		disposePlayers();
 		
 		disposeMap();
+		
+		System.gc();
 	}
 	
 	private void disposeMap() {
 		ball.dispose();
+		ball = null;
 		
 		terrain.dispose();
+		terrain = null;
 		
 		basket1.dispose();
 		basket2.dispose();
+		basket1 = basket2 = null;
 		
-        dynamicsWorld.dispose();		
+        dynamicsWorld.dispose();
+        dynamicsWorld = null;
+        
 		dynDispatcher.dispose();
+		dynDispatcher = null;
+		
         dynCollConfig.dispose();
+        dynCollConfig = null;
+        
         dynBroadphase.dispose();
+        dynBroadphase = null;
+        
         constraintSolver.dispose();
+        constraintSolver = null;
         
         contactListener.dispose();
+        contactListener = null;
+        
+        rules = null;
 	}
 	
 	private void disposePlayers() {

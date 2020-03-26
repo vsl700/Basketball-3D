@@ -56,12 +56,11 @@ public class MyGdxGame extends Game {
 			load3DGraphics();
 		else loadTexture();
 		
-		main = new MainScreen(this);
-		setScreen(main);
-		
+		main = new MainScreen(this);		
 		level = new LevelScreen(this);
 		game = new GameScreen(this);
 		settings = new SettingsScreen(this);
+		setScreen(main);
 	}
 	
 	private void loadTexture() {
@@ -82,6 +81,10 @@ public class MyGdxGame extends Game {
 		pCam.far = 100;
 		pCam.near = 0.1f;
 		
+		map = new GameMap(game);
+	}
+	
+	public void resetMap() {
 		map = new GameMap(game);
 	}
 

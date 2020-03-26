@@ -95,15 +95,24 @@ public class Ball extends Entity {
 	/**
 	 * Try without this method (without method for repeatedly setting the world transform)
 	 */
-	private void manuallySetCollTransform() {
+	public void manuallySetCollTransform() {
 		collisionObjects.get(0).setWorldTransform(matrixes.get(1));
 		collisionObjects.get(1).setWorldTransform(matrixes.get(2));
+	}
+	
+	public void resetRigidBody() {
+		bodies.get(0).dispose();
+		bodies.clear();
+		
+		createCollisionObjectAndBodies();
 	}
 	
 	@Override
 	protected void createCollisionObjectAndBodies() {
 		super.createCollisionObjectAndBodies();
-		modelInstance.transform = getMainBody().getWorldTransform();
+		
+		//if(collisionObjects == null)//If we are only resetting rigid body
+			//modelInstance.transform = getMainBody().getWorldTransform();
 		
 		collisionObjects = new ArrayList<btCollisionObject>();
 		
