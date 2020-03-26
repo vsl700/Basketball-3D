@@ -711,8 +711,7 @@ public class Rules {
 						if(holdingPlayer != null) {
 							recentHolder = holdingPlayer;
 							
-							if(holdingPlayer.isInAwayBasketZone())
-								holderInZone = true;
+							holderInZone = holdingPlayer.isInAwayBasketZone();
 						}
 						
 						if (map.getBall().getLinearVelocity().y < 0) {
