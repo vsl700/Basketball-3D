@@ -116,8 +116,8 @@ public class Brain {
 		
 		pSCustom = new PrioritySteering<Vector3>(user);
 		pSCustom.add(ballSeparate);
-		pSCustom.add(allPlayerSeparate);
 		pSCustom.add(collAvoid);
+		pSCustom.add(allPlayerSeparate);
 		pSCustom.add(customPursue);
 		//mSCoop.add(playerSeparate, 0.9f);
 	}

@@ -2019,13 +2019,13 @@ public abstract class Player extends Entity {
 				if (collAvoidCheck(p) && callback.reportNeighbor(p))
 					count++;
 	
-			if (!isHoldingBall()) {
+			//if (!isHoldingBall()) {
 				if (callback.reportNeighbor(map.getHomeBasket()))
 					count++;
 
 				else if (callback.reportNeighbor(map.getAwayBasket()))
 					count++;
-			}
+			//}
 			
 			return count;
 		}

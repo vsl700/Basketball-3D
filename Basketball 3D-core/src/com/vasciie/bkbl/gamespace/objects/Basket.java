@@ -178,7 +178,7 @@ public abstract class Basket extends GameObject {
 	
 	@Override
 	public float getBoundingRadius() {
-		return 6;
+		return 3;
 	}
 
 	@Override

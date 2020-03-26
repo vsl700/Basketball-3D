@@ -149,14 +149,6 @@ public class GameMap implements RaycastCollisionDetector<Vector3> {
 		opponents = new ArrayList<Player>(5);
 	}
 	
-	private void addCollObjects() {
-		addTerrainCollObjects();
-		
-		addCameraCollObjects();
-		
-		addBasketsCollObjects();
-	}
-	
 	private void addBasketsCollObjects() {
 		for(btRigidBody co : basket1.getBodies()) {
 			co.setUserValue(index);
