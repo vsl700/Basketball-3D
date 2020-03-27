@@ -3,6 +3,7 @@ package com.vasciie.bkbl.gamespace.entities.players.ai;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.math.Quaternion;
 import com.badlogic.gdx.math.Vector3;
+import com.vasciie.bkbl.gamespace.entities.Ball;
 import com.vasciie.bkbl.gamespace.entities.Player;
 import com.vasciie.bkbl.gamespace.entities.players.Opponent;
 import com.vasciie.bkbl.gamespace.entities.players.Teammate;
@@ -240,7 +241,7 @@ public class Brain {
 		float dst = user.getPosition().dst(targetVec);
 		
 		float farRotation = dst / 1.39f;
-		float nearRotation = (1 / dst) * 67;
+		float nearRotation = (1 / dst) * 65;
 		float rotation;
 		if(dst < near)
 			rotation = nearRotation;
@@ -256,7 +257,7 @@ public class Brain {
 		System.out.print(targetVec);
 		System.out.println(returnVec);*/
 		//Modify player shootPower
-		float farShootPower = dst * 0.85f;
+		float farShootPower = dst * 0.89f;
 		float nearShootPower = (20 - dst) / 8.7f;
 		float shootPower;
 		if(dst < near)
@@ -357,6 +358,12 @@ public class Brain {
 		float checkConst = 0.001f;
 		
 		return targetVec.dst(homeBasketPos) <= checkConst || targetVec.dst(awayBasketPos) <= checkConst;
+	}
+	
+	public boolean shouldStopToCatch() {
+		Ball tempBall = user.getMap().getBall();
+		
+		return tempBall.getPosition().dst(user.getPosition()) <= user.getDepth() / 2 + tempBall.getDepth() / 2 + 0.7f && !tempBall.isGrounded();
 	}
 	
 	/*public boolean isAbleToShoot() {

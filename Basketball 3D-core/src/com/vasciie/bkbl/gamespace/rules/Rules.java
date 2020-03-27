@@ -410,13 +410,13 @@ public class Rules {
 
 							@Override
 							public boolean act() {
-								//Make actions that will make the current holding player shoot the ball to the opposite team's basket. After that (eventually) the game continues if there's no score.
 								Player holdingPlayer = map.getHoldingPlayer();
-								
+									
 								if(holdingPlayer.isInAwayBasketZone()) {
 									if(!holdingPlayer.getBrain().updateShooting(1.25f)) {
 										holdingPlayer.getBrain().clearCustomTarget();
 										holdingPlayer.getBrain().performShooting(holdingPlayer.getBrain().makeBasketTargetVec(holdingPlayer.getTargetBasket()));
+										System.out.println("Shoot performed");
 									}else if(!holdingPlayer.getBrain().isShooting()) {
 										for(Player p : map.getAllPlayers()) {
 											if(p.equals(holdingPlayer))

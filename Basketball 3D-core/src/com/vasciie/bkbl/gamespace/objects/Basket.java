@@ -33,7 +33,6 @@ public abstract class Basket extends GameObject {
 	static final float tabCentD = 0.01f;
 	static final float bkHoldW = 0.08f;
 	static final float bkHoldD = 0.2f;
-	static final float basketZone = 8;
 	
 	protected abstract Color getColor();
 	
@@ -143,7 +142,6 @@ public abstract class Basket extends GameObject {
 		visibleCollShapes.add(new btBoxShape(bk24));
 		
 		invisibleCollShapes.add(new btBoxShape(new Vector3(tabCentW / 2, bkHoldW / 2, tabCentW / 2)));
-		invisibleCollShapes.add(new btCylinderShape(new Vector3(basketZone, standH / 2, basketZone)));
 	}
 	
 	public void setRotation(float x, float y, float z, float angle) {
@@ -206,7 +204,6 @@ public abstract class Basket extends GameObject {
 			collisionObjects.get(i).setCollisionShape(invisibleCollShapes.get(i));
 		}
 		
-		collisionObjects.get(1).setUserIndex(2);
 		manuallySetObjects();
 	}
 
@@ -220,8 +217,6 @@ public abstract class Basket extends GameObject {
 		modelInstance.calculateTransforms();
 		
 		collisionObjects.get(0).setWorldTransform(getBasketTargetTrans());
-		collisionObjects.get(1).setWorldTransform(calcTransformFromNodesTransform(modelInstance.getNode("stand").globalTransform.cpy()));
-		
 	}
 
 	@Override

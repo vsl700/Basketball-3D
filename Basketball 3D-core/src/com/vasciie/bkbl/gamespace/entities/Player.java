@@ -32,7 +32,6 @@ import com.vasciie.bkbl.gamespace.entities.players.Opponent;
 import com.vasciie.bkbl.gamespace.entities.players.Teammate;
 import com.vasciie.bkbl.gamespace.entities.players.ai.*;
 import com.vasciie.bkbl.gamespace.objects.Basket;
-import com.vasciie.bkbl.gamespace.objects.ObjectType;
 import com.vasciie.bkbl.gamespace.tools.CustomAnimation;
 import com.vasciie.bkbl.gamespace.tools.GameTools;
 
@@ -86,9 +85,6 @@ public abstract class Player extends Entity {
 	boolean leftHandBall, rightHandBall;
 	boolean leftHandInWorld, rightHandInWorld;
 	boolean downBody;
-	boolean northSurround, southSurround, eastSurround, westSurround;
-	boolean northObstacle, southObstacle, eastObstacle, westObstacle;
-	boolean inBasketZone;
 	//boolean updateBrain;
 	
 	int shootingPower = 10;
@@ -678,21 +674,16 @@ public abstract class Player extends Entity {
 		collisionShapes.add(handShape);
 		matrixes.add(tempHandR);
 		
+		
+		Vector3 collHandVec = handVec.add(0.3f);
 		invisCollShapes = new ArrayList<btCollisionShape>();
-		invisCollShapes.add(new btBoxShape(handVec));
-		invisCollShapes.add(new btBoxShape(handVec));
+		invisCollShapes.add(new btBoxShape(collHandVec));
+		invisCollShapes.add(new btBoxShape(collHandVec));
+		invisCollShapes.add(new btBoxShape(new Vector3(scale2 / 2, getHeight(), getDepth() / 2)));
 		
 		matrixes.add(modelInstance.transform);
 		matrixes.add(tempHandL);
 		matrixes.add(tempHandR);
-		
-		Vector3 poleVec = new Vector3(poleScale, 10, poleScale);
-		
-		invisCollShapes.add(new btBoxShape(poleVec));
-		invisCollShapes.add(new btBoxShape(poleVec));
-		invisCollShapes.add(new btBoxShape(poleVec));
-		invisCollShapes.add(new btBoxShape(poleVec));
-		invisCollShapes.add(new btBoxShape(new Vector3(scale2 / 2, getHeight(), getDepth() / 2)));
 	}
 	
 	private void createCollisionObjects() {
@@ -701,7 +692,7 @@ public abstract class Player extends Entity {
 		manualSetTransformsObj = new ArrayList<btCollisionObject>();
 		
 		btCollisionObject bodyObj = new btCollisionObject();
-		bodyObj.setCollisionShape(invisCollShapes.get(6));
+		bodyObj.setCollisionShape(invisCollShapes.get(2));
 		collObjMap.put("bodyObj", bodyObj);
 		collisionObjects.add(bodyObj);
 		
@@ -714,34 +705,6 @@ public abstract class Player extends Entity {
 		handRObj.setCollisionShape(invisCollShapes.get(1));
 		collObjMap.put("handR", handRObj);
 		collisionObjects.add(handRObj);
-		
-		btCollisionObject poleNObj = new btCollisionObject();
-		poleNObj.setCollisionShape(invisCollShapes.get(2));
-		collObjMap.put("poleNObj", poleNObj);
-		collisionObjects.add(poleNObj);
-		manualSetTransformsObj.add(poleNObj);
-		poleNObj.setUserIndex(10);
-		
-		btCollisionObject poleSObj = new btCollisionObject();
-		poleSObj.setCollisionShape(invisCollShapes.get(3));
-		collObjMap.put("poleSObj", poleSObj);
-		collisionObjects.add(poleSObj);
-		manualSetTransformsObj.add(poleSObj);
-		poleSObj.setUserIndex(20);
-		
-		btCollisionObject poleEObj = new btCollisionObject();
-		poleEObj.setCollisionShape(invisCollShapes.get(4));
-		collObjMap.put("poleEObj", poleEObj);
-		collisionObjects.add(poleEObj);
-		manualSetTransformsObj.add(poleEObj);
-		poleEObj.setUserIndex(30);
-		
-		btCollisionObject poleWObj = new btCollisionObject();
-		poleWObj.setCollisionShape(invisCollShapes.get(5));
-		collObjMap.put("poleWObj", poleWObj);
-		collisionObjects.add(poleWObj);
-		manualSetTransformsObj.add(poleWObj);
-		poleWObj.setUserIndex(40);
 	}
 	
 	private void removeCollisionCheckOnInternals() {
@@ -787,7 +750,7 @@ public abstract class Player extends Entity {
 		bodiesMap.put("arm2R", bodies.get(i++));
 		bodiesMap.put("handR", bodies.get(i));
 		
-		bodiesMap.get("shoulderL").setDeactivationTime(1);
+		/*bodiesMap.get("shoulderL").setDeactivationTime(1);
 		bodiesMap.get("arm1L").setDeactivationTime(1);
 		bodiesMap.get("elbowL").setDeactivationTime(1);
 		bodiesMap.get("arm2L").setDeactivationTime(1);
@@ -797,7 +760,7 @@ public abstract class Player extends Entity {
 		bodiesMap.get("arm1R").setDeactivationTime(1);
 		bodiesMap.get("elbowR").setDeactivationTime(1);
 		bodiesMap.get("arm2R").setDeactivationTime(1);
-		bodiesMap.get("handR").setDeactivationTime(1);
+		bodiesMap.get("handR").setDeactivationTime(1);*/
 		
 	}
 	
@@ -2144,7 +2107,7 @@ public abstract class Player extends Entity {
 				//if(map.getObjectsMap().get(objOutside.getUserValue()).equals(ObjectType.TERRAIN.getId() + "Inv"))
 					//walking = running = false;
 			//}
-		}else if(outId.equals(EntityType.TEAMMATE.getId() + "Obj") || outId.equals(EntityType.OPPONENT.getId() + "Obj")) {
+		/*}else if(outId.equals(EntityType.TEAMMATE.getId() + "Obj") || outId.equals(EntityType.OPPONENT.getId() + "Obj")) {
 			if(objInside.equals(collObjMap.get("poleNObj")))
 				northSurround = true;
 			else if(objInside.equals(collObjMap.get("poleSObj")))
@@ -2162,9 +2125,7 @@ public abstract class Player extends Entity {
 			else if(objInside.equals(collObjMap.get("poleEObj")))
 				eastObstacle = true;
 			else if(objInside.equals(collObjMap.get("poleWObj")))
-				westObstacle = true;
-		}else if(this instanceof Opponent && outId.equals(ObjectType.HOMEBASKET.getId() + "Zone") || this instanceof Teammate && outId.equals(ObjectType.AWAYBASKET.getId() + "Zone")) {
-			inBasketZone = true;
+				westObstacle = true;*/
 		}
 	}
 	
@@ -2185,15 +2146,6 @@ public abstract class Player extends Entity {
 		leftPointBall = false;
 		rightPointBall = false;
 		focus = false;
-		northSurround = false;
-		southSurround = false;
-		eastSurround = false;
-		westSurround = false;
-		northObstacle = false;
-		southObstacle = false;
-		eastObstacle = false;
-		westObstacle = false;
-		inBasketZone = false;
 		
 		if(!leftHoldingBall)
 			leftThrowBall = false;
@@ -2321,7 +2273,7 @@ public abstract class Player extends Entity {
 		return running;
 	}
 	
-	public boolean isNorthSurround() {
+	/*public boolean isNorthSurround() {
 		return northSurround;
 	}
 
@@ -2364,10 +2316,10 @@ public abstract class Player extends Entity {
 	
 	public boolean isWestObstacle() {
 		return westObstacle;
-	}
+	}*/
 	
 	public boolean isInAwayBasketZone() {
-		return inBasketZone;
+		return isProximityColliding(getTargetBasket());
 	}
 	
 	public boolean isBehindBasket() {

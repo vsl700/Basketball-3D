@@ -166,17 +166,11 @@ public class GameMap implements RaycastCollisionDetector<Vector3> {
 		for(btCollisionObject co : basket1.getCollisionObjects()) {
 			co.setUserValue(index);
 			co.setCollisionFlags(co.getCollisionFlags() | btCollisionObject.CollisionFlags.CF_CUSTOM_MATERIAL_CALLBACK);
-			if(co.getUserIndex() == 2) {
-				dynamicsWorld.addCollisionObject(co, ENT_SPECIAL_FLAG, SPECIAL_FLAG);
-				co.setContactCallbackFlag(ENT_SPECIAL_FLAG);
-				co.setContactCallbackFilter(SPECIAL_FLAG);
-				objectsMap.put(index, ObjectType.HOMEBASKET.getId() + "Zone");
-			}else {
-				dynamicsWorld.addCollisionObject(co, SPECIAL_FLAG, ENT_SPECIAL_FLAG);
-				co.setContactCallbackFlag(SPECIAL_FLAG);
-				co.setContactCallbackFilter(ENT_SPECIAL_FLAG);
-				objectsMap.put(index, ObjectType.HOMEBASKET.getId() + "Obj");
-			}
+
+			dynamicsWorld.addCollisionObject(co, SPECIAL_FLAG, ENT_SPECIAL_FLAG);
+			co.setContactCallbackFlag(SPECIAL_FLAG);
+			co.setContactCallbackFilter(ENT_SPECIAL_FLAG);
+			objectsMap.put(index, ObjectType.HOMEBASKET.getId() + "Obj");
 			
 			collObjsInObjectMap.put(co, basket1);
 			collObjsValsMap.put(index, co);
@@ -200,17 +194,11 @@ public class GameMap implements RaycastCollisionDetector<Vector3> {
 		for(btCollisionObject co : basket2.getCollisionObjects()) {
 			co.setUserValue(index);
 			co.setCollisionFlags(co.getCollisionFlags() | btCollisionObject.CollisionFlags.CF_CUSTOM_MATERIAL_CALLBACK);
-			if(co.getUserIndex() == 2) {
-				dynamicsWorld.addCollisionObject(co, ENT_SPECIAL_FLAG, SPECIAL_FLAG);
-				co.setContactCallbackFlag(ENT_SPECIAL_FLAG);
-				co.setContactCallbackFilter(SPECIAL_FLAG);
-				objectsMap.put(index, ObjectType.AWAYBASKET.getId() + "Zone");
-			}else {
-				dynamicsWorld.addCollisionObject(co, SPECIAL_FLAG, ENT_SPECIAL_FLAG);
-				co.setContactCallbackFlag(SPECIAL_FLAG);
-				co.setContactCallbackFilter(ENT_SPECIAL_FLAG);
-				objectsMap.put(index, ObjectType.AWAYBASKET.getId() + "Obj");
-			}
+
+			dynamicsWorld.addCollisionObject(co, SPECIAL_FLAG, ENT_SPECIAL_FLAG);
+			co.setContactCallbackFlag(SPECIAL_FLAG);
+			co.setContactCallbackFilter(ENT_SPECIAL_FLAG);
+			objectsMap.put(index, ObjectType.AWAYBASKET.getId() + "Obj");
 			
 			collObjsInObjectMap.put(co, basket2);
 			collObjsValsMap.put(index, co);
@@ -315,44 +303,14 @@ public class GameMap implements RaycastCollisionDetector<Vector3> {
 				co.setUserValue(index2);
 				co.setCollisionFlags(co.getCollisionFlags() | btCollisionObject.CollisionFlags.CF_CUSTOM_MATERIAL_CALLBACK);
 				
-					if(co.getUserIndex() == 10) {
-						dynamicsWorld.addCollisionObject(co, ENT_SPECIAL_FLAG, ALL_FLAG);
-						co.setContactCallbackFlag(ENT_SPECIAL_FLAG);
-						co.setContactCallbackFilter(ALL_FLAG);
-						
-						objectsMap.put(index2, EntityType.TEAMMATE.getId() + "North");
-					}
-					else if(co.getUserIndex() == 20) {
-						dynamicsWorld.addCollisionObject(co, ENT_SPECIAL_FLAG, ALL_FLAG);
-						co.setContactCallbackFlag(ENT_SPECIAL_FLAG);
-						co.setContactCallbackFilter(ALL_FLAG);
+				dynamicsWorld.addCollisionObject(co, SPECIAL_FLAG, ENT_SPECIAL_FLAG);
+				co.setContactCallbackFlag(SPECIAL_FLAG);
+				co.setContactCallbackFilter(ENT_SPECIAL_FLAG);
+
+				objectsMap.put(index2, EntityType.TEAMMATE.getId() + "Obj");
 					
-						objectsMap.put(index2, EntityType.TEAMMATE.getId() + "South");
-					}
-					else if(co.getUserIndex() == 30) {
-						dynamicsWorld.addCollisionObject(co, ENT_SPECIAL_FLAG, ALL_FLAG);
-						co.setContactCallbackFlag(ENT_SPECIAL_FLAG);
-						co.setContactCallbackFilter(ALL_FLAG);
-						
-						objectsMap.put(index2, EntityType.TEAMMATE.getId() + "East");
-					}
-					else if(co.getUserIndex() == 40) {
-						dynamicsWorld.addCollisionObject(co, ENT_SPECIAL_FLAG, ALL_FLAG);
-						co.setContactCallbackFlag(ENT_SPECIAL_FLAG);
-						co.setContactCallbackFilter(ALL_FLAG);
-						
-						objectsMap.put(index2, EntityType.TEAMMATE.getId() + "West");
-					}
-					else {
-						dynamicsWorld.addCollisionObject(co, SPECIAL_FLAG, ENT_SPECIAL_FLAG);
-						co.setContactCallbackFlag(SPECIAL_FLAG);
-						co.setContactCallbackFilter(ENT_SPECIAL_FLAG);
-						
-						objectsMap.put(index2, EntityType.TEAMMATE.getId() + "Obj");
-					}
-					
-					collObjsInEntityMap.put(co, teammate);
-					collObjsValsMap.put(index2, co);
+				collObjsInEntityMap.put(co, teammate);
+				collObjsValsMap.put(index2, co);
 				
 				index2++;
 			}
@@ -391,44 +349,15 @@ public class GameMap implements RaycastCollisionDetector<Vector3> {
 			for (btCollisionObject co : opponent.getCollisionObjects()) {
 				co.setUserValue(index2);
 				co.setCollisionFlags(co.getCollisionFlags() | btCollisionObject.CollisionFlags.CF_CUSTOM_MATERIAL_CALLBACK);
-					if(co.getUserIndex() == 10) {
-						dynamicsWorld.addCollisionObject(co, ENT_SPECIAL_FLAG, ALL_FLAG);
-						co.setContactCallbackFlag(ENT_SPECIAL_FLAG);
-						co.setContactCallbackFilter(ALL_FLAG);
-						
-						objectsMap.put(index2, EntityType.OPPONENT.getId() + "North");
-					}
-					else if(co.getUserIndex() == 20) {
-						dynamicsWorld.addCollisionObject(co, ENT_SPECIAL_FLAG, ALL_FLAG);
-						co.setContactCallbackFlag(ENT_SPECIAL_FLAG);
-						co.setContactCallbackFilter(ALL_FLAG);
 					
-						objectsMap.put(index2, EntityType.OPPONENT.getId() + "South");
-					}
-					else if(co.getUserIndex() == 30) {
-						dynamicsWorld.addCollisionObject(co, ENT_SPECIAL_FLAG, ALL_FLAG);
-						co.setContactCallbackFlag(ENT_SPECIAL_FLAG);
-						co.setContactCallbackFilter(ALL_FLAG);
-						
-						objectsMap.put(index2, EntityType.OPPONENT.getId() + "East");
-					}
-					else if(co.getUserIndex() == 40) {
-						dynamicsWorld.addCollisionObject(co, ENT_SPECIAL_FLAG, ALL_FLAG);
-						co.setContactCallbackFlag(ENT_SPECIAL_FLAG);
-						co.setContactCallbackFilter(ALL_FLAG);
-						
-						objectsMap.put(index2, EntityType.OPPONENT.getId() + "West");
-					}
-					else {
-						dynamicsWorld.addCollisionObject(co, SPECIAL_FLAG, ENT_SPECIAL_FLAG);
-						co.setContactCallbackFlag(SPECIAL_FLAG);
-						co.setContactCallbackFilter(ENT_SPECIAL_FLAG);
-						
-						objectsMap.put(index2, EntityType.OPPONENT.getId() + "Obj");
-					}
+				dynamicsWorld.addCollisionObject(co, SPECIAL_FLAG, ENT_SPECIAL_FLAG);
+				co.setContactCallbackFlag(SPECIAL_FLAG);
+				co.setContactCallbackFilter(ENT_SPECIAL_FLAG);
+
+				objectsMap.put(index2, EntityType.OPPONENT.getId() + "Obj");
 				
-					collObjsInEntityMap.put(co, opponent);
-					collObjsValsMap.put(index2, co);
+				collObjsInEntityMap.put(co, opponent);
+				collObjsValsMap.put(index2, co);
 				
 				index2++;
 			}
@@ -619,9 +548,7 @@ public class GameMap implements RaycastCollisionDetector<Vector3> {
 			playersReady = rules.getTriggeredRule().arePlayersReady();
 			
 			return;
-		}
-		
-		if(gameRunning || ruleTriggeredActing)
+		}else if(gameRunning)
 			updateFullGame(delta);
 		else updateGameEnvironment(delta);
 		

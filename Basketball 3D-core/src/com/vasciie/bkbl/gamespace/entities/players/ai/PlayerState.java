@@ -139,28 +139,7 @@ public enum PlayerState implements State<Player> {
 		
 		@Override
 		public void enter(Player player) {
-			/*if(!catchersChosen)
-				chooseCatcher(player.getMap());
 			
-			if (player.getBrain().getMemory().isBallChaser() || player.getMap().getTeammates().size() == 1) {
-				player.getBrain().getPursue().setArrivalTolerance(0.1f);
-				//player.getBrain().getPlayerSeparate().setEnabled(false);
-
-				if (player.getMap().getTeammates().size() > 1) {
-					// player.getBrain().getCollAvoid().calculateSteering(Player.steering);
-					player.getBrain().getCollAvoid().setEnabled(true);
-					// player.getMoveVector().add(Player.steering.linear.cpy().scl(0.9f));
-				} else
-					player.getBrain().getCollAvoid().setEnabled(false);
-			}else {
-				//player.getBrain().getPursue().setArrivalTolerance(6);
-				//player.getBrain().getPlayerSeparate().setEnabled(true);
-				player.getBrain().getCollAvoid().setEnabled(false);
-				player.getBrain().getBallSeparate().setEnabled(false);
-			}*/
-			
-			//player.getBrain().getCollAvoid().setEnabled(true);
-			//player.getBrain().getBallSeparate().setEnabled(true);
 		}
 		
 		@Override
@@ -207,7 +186,7 @@ public enum PlayerState implements State<Player> {
 				
 				//System.out.println(tempAvg.x + " ; " + tempAvg.y + " ; " + tempAvg.z);
 				//if(Math.abs(tempAvg.x) + Math.abs(tempAvg.z) > 1.5f || Math.abs(tempBall.getLinearVelocity().x) + Math.abs(tempBall.getLinearVelocity().z) > 3.5f)
-				if(ballVec.dst(player.getPosition()) > player.getDepth() / 2 + tempBall.getDepth() / 2 + 0.7f)
+				if(!player.getBrain().shouldStopToCatch())
 					player.setRunning(); //RUUUN! GO CATCH THAT BALL!
 				
 				
@@ -360,7 +339,7 @@ public enum PlayerState implements State<Player> {
 			AIMemory memory = brain.getMemory();
 			
 			
-			if(!player.isHoldingBall() && player.getMap().getBall().getPosition().y > player.getHeight() * 2 && player.isProximityColliding(player.getMap().getBall())) {
+			if(!player.isHoldingBall() && player.getMap().getBall().getPosition().y > player.getHeight() * 2) {
 				player.getBrain().getBallSeparate().setEnabled(true);
 				//player.getBrain().getBallSeparate().calculateSteering(Player.steering);
 				//player.getMoveVector().nor().add(Player.steering.linear.cpy().scl(2.5f));
@@ -380,8 +359,9 @@ public enum PlayerState implements State<Player> {
 
 			player.setMoveVector(Player.steering.linear);
 
-			if (!player.isRunning() && tempTarget != null && (tempTarget instanceof Entity && !((Entity) tempTarget).getLinearVelocity().isZero(0.1f) || GameTools.getDistanceBetweenLocations(tempTarget, player) >= 3))
-				player.setRunning();
+			if(!(memory.isCatchBall() && brain.shouldStopToCatch()))//If there's no reason to stop and catch the ball
+				if (!player.isRunning() && tempTarget != null && (tempTarget instanceof Entity && !((Entity) tempTarget).getLinearVelocity().isZero(0.1f) || GameTools.getDistanceBetweenLocations(tempTarget, player) >= 3))
+					player.setRunning();
 
 			if (memory.getTargetFacing() != null)
 				player.lookAt(memory.getTargetFacing().getPosition(), false);
