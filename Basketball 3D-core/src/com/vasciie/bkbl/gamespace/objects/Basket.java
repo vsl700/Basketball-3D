@@ -12,6 +12,7 @@ import com.badlogic.gdx.graphics.g3d.model.Node;
 import com.badlogic.gdx.graphics.g3d.utils.ModelBuilder;
 import com.badlogic.gdx.graphics.g3d.utils.shapebuilders.BoxShapeBuilder;
 import com.badlogic.gdx.graphics.g3d.utils.shapebuilders.CylinderShapeBuilder;
+import com.badlogic.gdx.math.Matrix4;
 import com.badlogic.gdx.math.Vector3;
 import com.badlogic.gdx.physics.bullet.collision.btBoxShape;
 import com.badlogic.gdx.physics.bullet.collision.btCollisionObject;
@@ -178,7 +179,15 @@ public abstract class Basket extends GameObject {
 	
 	@Override
 	public float getBoundingRadius() {
-		return 3;
+		return 8;
+	}
+	
+	public float getBasketFrameSize() {
+		return bkHoldW;
+	}
+	
+	public Matrix4 getBasketTargetTrans() {
+		return calcTransformFromNodesTransform(modelInstance.getNode("basket1").globalTransform.cpy().trn(0, 0, -tabCentW / 2));
 	}
 
 	@Override
@@ -210,7 +219,7 @@ public abstract class Basket extends GameObject {
 	protected void manuallySetObjects() {
 		modelInstance.calculateTransforms();
 		
-		collisionObjects.get(0).setWorldTransform(calcTransformFromNodesTransform(modelInstance.getNode("basket1").globalTransform.cpy().trn(0, 0, -tabCentW / 2)));
+		collisionObjects.get(0).setWorldTransform(getBasketTargetTrans());
 		collisionObjects.get(1).setWorldTransform(calcTransformFromNodesTransform(modelInstance.getNode("stand").globalTransform.cpy()));
 		
 	}

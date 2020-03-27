@@ -416,7 +416,7 @@ public class Rules {
 								if(holdingPlayer.isInAwayBasketZone()) {
 									if(!holdingPlayer.getBrain().updateShooting(1.25f)) {
 										holdingPlayer.getBrain().clearCustomTarget();
-										holdingPlayer.getBrain().performShooting(holdingPlayer.getTargetBasket().calcTransformFromNodesTransform(holdingPlayer.getTargetBasket().getMatrixes().get(3)).getTranslation(new Vector3()));
+										holdingPlayer.getBrain().performShooting(holdingPlayer.getBrain().makeBasketTargetVec(holdingPlayer.getTargetBasket()));
 									}else if(!holdingPlayer.getBrain().isShooting()) {
 										for(Player p : map.getAllPlayers()) {
 											if(p.equals(holdingPlayer))

@@ -239,8 +239,8 @@ public class Brain {
 		
 		float dst = user.getPosition().dst(targetVec);
 		
-		float farRotation = dst / 1.35f;
-		float nearRotation = (1 / dst) * 59;
+		float farRotation = dst / 1.39f;
+		float nearRotation = (1 / dst) * 67;
 		float rotation;
 		if(dst < near)
 			rotation = nearRotation;
@@ -256,8 +256,8 @@ public class Brain {
 		System.out.print(targetVec);
 		System.out.println(returnVec);*/
 		//Modify player shootPower
-		float farShootPower = dst * 0.8f;
-		float nearShootPower = (20 - dst) / 8.5f;
+		float farShootPower = dst * 0.85f;
+		float nearShootPower = (20 - dst) / 8.7f;
 		float shootPower;
 		if(dst < near)
 			shootPower = nearShootPower;
@@ -349,10 +349,10 @@ public class Brain {
 		Vector3 targetVec = memory.getTargetVec();
 		
 		Basket homeBasket = user.getMap().getHomeBasket();
-		Vector3 homeBasketPos = homeBasket.calcTransformFromNodesTransform(homeBasket.getMatrixes().get(3)).getTranslation(new Vector3());
+		Vector3 homeBasketPos = makeBasketTargetVec(homeBasket);
 		
 		Basket awayBasket = user.getMap().getAwayBasket();
-		Vector3 awayBasketPos = awayBasket.calcTransformFromNodesTransform(awayBasket.getMatrixes().get(3)).getTranslation(new Vector3());
+		Vector3 awayBasketPos = makeBasketTargetVec(awayBasket);
 		
 		float checkConst = 0.001f;
 		
@@ -399,6 +399,10 @@ public class Brain {
 		customPursue.setTarget(null);
 		memory.setTargetPosition(null);
 		memory.setTargetFacing(null);
+	}
+	
+	public Vector3 makeBasketTargetVec(Basket targetBasket) {
+		return targetBasket.getBasketTargetTrans().getTranslation(new Vector3());
 	}
 
 	public StateMachine<Player, PlayerState> getStateMachine() {

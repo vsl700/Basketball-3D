@@ -35,7 +35,7 @@ public enum PlayerState implements State<Player> {
 					Vector3 tempAimVec;
 
 					if (!player.isBehindBasket())
-						tempAimVec = basket.calcTransformFromNodesTransform(basket.getMatrixes().get(3)).getTranslation(new Vector3());
+						tempAimVec = brain.makeBasketTargetVec(player.getTargetBasket());
 					else {
 						ArrayList<Player> tempTeam;
 						if (player instanceof Teammate)
@@ -181,7 +181,7 @@ public enum PlayerState implements State<Player> {
 
 			Ball tempBall = player.getMap().getBall();
 			
-			Vector3 ballVec = tempBall.getModelInstance().transform.getTranslation(new Vector3());
+			Vector3 ballVec = tempBall.getPosition();
 
 			// player.getBrain().lookAt.setTarget(player.getMap().getBall());
 			// player.getBrain().lookAt.calculateSteering(Player.steering);
@@ -207,7 +207,7 @@ public enum PlayerState implements State<Player> {
 				
 				//System.out.println(tempAvg.x + " ; " + tempAvg.y + " ; " + tempAvg.z);
 				//if(Math.abs(tempAvg.x) + Math.abs(tempAvg.z) > 1.5f || Math.abs(tempBall.getLinearVelocity().x) + Math.abs(tempBall.getLinearVelocity().z) > 3.5f)
-				//if(!tempBall.isProximityColliding(player))
+				if(ballVec.dst(player.getPosition()) > player.getDepth() / 2 + tempBall.getDepth() / 2 + 0.7f)
 					player.setRunning(); //RUUUN! GO CATCH THAT BALL!
 				
 				
