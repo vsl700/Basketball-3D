@@ -128,5 +128,9 @@ public class LevelScreen implements Screen {
 		btnFont.dispose();
 		textFont.dispose();
 	}
+	
+	public int getDifficulty() {
+		return textUpDown.getOption();
+	}
 
 }

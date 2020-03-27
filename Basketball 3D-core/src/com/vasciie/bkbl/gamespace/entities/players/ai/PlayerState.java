@@ -5,6 +5,7 @@ import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.ai.fsm.State;
 import com.badlogic.gdx.ai.msg.Telegram;
 import com.badlogic.gdx.ai.utils.Location;
+import com.badlogic.gdx.math.MathUtils;
 import com.badlogic.gdx.math.Vector3;
 import com.vasciie.bkbl.gamespace.entities.Ball;
 import com.vasciie.bkbl.gamespace.entities.Entity;
@@ -81,9 +82,9 @@ public enum PlayerState implements State<Player> {
 			mem.setSwitchHandTime(mem.getSwitchHandTime() + Gdx.graphics.getDeltaTime());
 
 			// Walking & running mechanism
-			if(player.isBehindBasket()) {
+			/*if(player.isBehindBasket()) {
 				
-			}
+			}*/
 			
 			if(player.isInAwayBasketZone())
 				brain.getPursueBallInHand().setEnabled(false);
@@ -294,6 +295,8 @@ public enum PlayerState implements State<Player> {
 			
 			Ball tempBall = player.getMap().getBall();
 			
+			int difficulty = player.getMap().getDifficulty();
+			
 			//Movement
 			if(player.getPosition().dst(tempBall.getPosition()) > 4.5f || player.getMoveVector().len() > 6) {
 				player.setRunning();
@@ -307,7 +310,7 @@ public enum PlayerState implements State<Player> {
 			player.lookAt(chased.getPosition(), false);
 			
 			//Additional controls
-			if (chased.isDribbling()) {
+			if (chased.isDribbling() || difficulty == 0 && MathUtils.random(1, 100) <= 50 || difficulty == 1 && MathUtils.random(1, 100) <= 25) {
 				Vector3 ballVec = player.getMap().getBall().getModelInstance().transform.getTranslation(new Vector3());
 				ArrayList<Vector3> handVecs = new ArrayList<Vector3>();
 				handVecs.add(player.getShoulderLTrans().getTranslation(new Vector3()));

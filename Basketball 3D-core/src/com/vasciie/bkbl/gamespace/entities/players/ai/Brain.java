@@ -19,10 +19,7 @@ import com.badlogic.gdx.ai.steer.behaviors.CollisionAvoidance;
 import com.badlogic.gdx.ai.steer.behaviors.Interpose;
 import com.badlogic.gdx.ai.steer.behaviors.LookWhereYouAreGoing;
 import com.badlogic.gdx.ai.steer.behaviors.PrioritySteering;
-import com.badlogic.gdx.ai.steer.behaviors.RaycastObstacleAvoidance;
 import com.badlogic.gdx.ai.steer.behaviors.Separation;
-import com.badlogic.gdx.ai.steer.utils.RayConfiguration;
-import com.badlogic.gdx.ai.steer.utils.rays.ParallelSideRayConfiguration;
 import com.badlogic.gdx.ai.utils.Location;
 
 /**
@@ -48,12 +45,12 @@ public class Brain {
 	CollisionAvoidance<Vector3> collAvoid; //For players and basket stands
 	Interpose<Vector3> interpose; //For blocking opponents from getting close to the player holding the ball in co-op state
 	Separation<Vector3> ballSeparate, basketSeparate, playerSeparate, allPlayerSeparate; //For player and basket surroundings and ball distance keeping
-	RaycastObstacleAvoidance<Vector3> obstAvoid; //For invisible user.getMap().getTerrain() walls
+	//RaycastObstacleAvoidance<Vector3> obstAvoid; //For invisible user.getMap().getTerrain() walls
 	PrioritySteering<Vector3> pSBallChasePart, pSCoop, pSSurround, pSCustom;
 	BlendedSteering<Vector3> mSBallChase, mSBallInHand, mSSurround;	//Groups of behaviors for each state
 	
 	
-	RayConfiguration<Vector3> rayConfig;
+	//RayConfiguration<Vector3> rayConfig;
 	
 	public Brain(Player user) {
 		this.user = user;
@@ -77,8 +74,8 @@ public class Brain {
 		playerSeparate = new Separation<Vector3>(user, user);//
 		allPlayerSeparate = new Separation<Vector3>(user, user);
 		
-		rayConfig = new ParallelSideRayConfiguration<Vector3>(user, 3, 0.5f);
-		obstAvoid = new RaycastObstacleAvoidance<Vector3>(user, rayConfig, user.getMap());
+		//rayConfig = new ParallelSideRayConfiguration<Vector3>(user, 3, 0.5f);
+		//obstAvoid = new RaycastObstacleAvoidance<Vector3>(user, rayConfig, user.getMap());
 		
 		//In this steering mechanism if the player needs to ride off a player or players (if playerSeparate returns different from 0) it will ride off instead of getting closer to the ball. 
 		//Otherwise it will just follow it. In other words it follows the ball but also keeps distance from other player so that they can catch it.
@@ -152,7 +149,7 @@ public class Brain {
 		interpose = null;
 		
 		ballSeparate = basketSeparate = playerSeparate = allPlayerSeparate = null;
-		obstAvoid = null;
+		//obstAvoid = null;
 		pSBallChasePart = pSCoop = pSSurround = pSCustom = null;
 		mSBallChase = mSBallInHand = mSSurround = null;
 	}
@@ -462,10 +459,6 @@ public class Brain {
 
 	public Separation<Vector3> getAllPlayerSeparate() {
 		return allPlayerSeparate;
-	}
-
-	public RaycastObstacleAvoidance<Vector3> getObstAvoid() {
-		return obstAvoid;
 	}
 
 	public BlendedSteering<Vector3> getMSBallChase() {

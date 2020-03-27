@@ -106,6 +106,7 @@ public class GameScreen implements Screen, RulesListener {
 		
 		map = game.getMap();
 		
+		map.setDifficulty(game.level.getDifficulty());
 		map.spawnPlayers(amount);
 	}
 

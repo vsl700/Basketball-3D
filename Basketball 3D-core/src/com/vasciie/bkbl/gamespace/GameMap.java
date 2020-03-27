@@ -6,8 +6,6 @@ import java.util.HashMap;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.ai.GdxAI;
 import com.badlogic.gdx.ai.steer.SteerableAdapter;
-import com.badlogic.gdx.ai.utils.Ray;
-import com.badlogic.gdx.ai.utils.RaycastCollisionDetector;
 import com.badlogic.gdx.graphics.g3d.Environment;
 import com.badlogic.gdx.graphics.g3d.ModelBatch;
 import com.badlogic.gdx.math.Matrix4;
@@ -42,7 +40,7 @@ import com.vasciie.bkbl.gamespace.rules.Rules.GameRule;
 import com.vasciie.bkbl.gamespace.rules.Rules.RulesListener;
 import com.vasciie.bkbl.gamespace.tools.InputController;
 
-public class GameMap implements RaycastCollisionDetector<Vector3> {
+public class GameMap {
 	
 	final static float[][] spawnCoords = {{0, 0.1f, 4},
 										  {5, 0.1f, 2},
@@ -110,6 +108,8 @@ public class GameMap implements RaycastCollisionDetector<Vector3> {
     int currentPlayerHoldTeam, currentPlayerHoldOpp;
     
     int teamScore, oppScore;
+    
+    int difficulty;
     
     float startTimer;
     
@@ -924,6 +924,14 @@ public class GameMap implements RaycastCollisionDetector<Vector3> {
 		return camera;
 	}
 	
+	public int getDifficulty() {
+		return difficulty;
+	}
+
+	public void setDifficulty(int difficulty) {
+		this.difficulty = difficulty;
+	}
+
 	public int getCurrentPlayerHoldTeam() {
 		return currentPlayerHoldTeam;
 	}
@@ -1032,18 +1040,6 @@ public class GameMap implements RaycastCollisionDetector<Vector3> {
 		
 		
 		return tempObj;
-	}
-
-	@Override
-	public boolean collides(Ray<Vector3> ray) {
-		
-		return false;
-	}
-
-	@Override
-	public boolean findCollision(com.badlogic.gdx.ai.utils.Collision<Vector3> outputCollision, Ray<Vector3> inputRay) {
-		
-		return false;
 	}
 	
 }
