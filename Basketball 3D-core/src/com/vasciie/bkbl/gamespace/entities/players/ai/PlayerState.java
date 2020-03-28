@@ -286,6 +286,8 @@ public enum PlayerState implements State<Player> {
 			player.getBrain().getMemory().setTargetPlayer(null);
 			player.getBrain().getPursue().setArrivalTolerance(0);
 			player.getBrain().getPlayerSeparate().setEnabled(true);
+			
+			player.getBrain().getMemory().setRandomPointTime(0);
 		}
 
 		@Override
@@ -296,6 +298,17 @@ public enum PlayerState implements State<Player> {
 			Ball tempBall = player.getMap().getBall();
 			
 			int difficulty = player.getMap().getDifficulty();
+			
+			boolean point = false;
+			if(brain.getMemory().isRandomPointTime()) {
+				if(!player.getMap().getHoldingPlayer().isAiming() && !player.getMap().getHoldingPlayer().isShooting() && player.getPosition().dst(tempBall.getPosition()) <= 2 && (difficulty == 0 && MathUtils.random(1, 100) <= 10 || difficulty == 1 && MathUtils.random(1, 100) <= 25)) {
+					point = true;
+				}
+				
+				brain.getMemory().setRandomPointTime(0);
+			}
+			
+			brain.getMemory().setRandomPointTime(brain.getMemory().getRandomPointTime() + Gdx.graphics.getDeltaTime());
 			
 			//Movement
 			if(player.getPosition().dst(tempBall.getPosition()) > 4.5f || player.getMoveVector().len() > 6) {
@@ -310,7 +323,7 @@ public enum PlayerState implements State<Player> {
 			player.lookAt(chased.getPosition(), false);
 			
 			//Additional controls
-			if (chased.isDribbling() || difficulty == 0 && MathUtils.random(1, 100) <= 50 || difficulty == 1 && MathUtils.random(1, 100) <= 25) {
+			if (chased.isDribbling() || point) {
 				Vector3 ballVec = player.getMap().getBall().getModelInstance().transform.getTranslation(new Vector3());
 				ArrayList<Vector3> handVecs = new ArrayList<Vector3>();
 				handVecs.add(player.getShoulderLTrans().getTranslation(new Vector3()));

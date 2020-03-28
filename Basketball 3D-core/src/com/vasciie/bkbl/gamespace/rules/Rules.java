@@ -333,7 +333,7 @@ public class Rules {
 								
 								Player checked = (Player) tempE;
 
-								if (checked != null && !checked.equals(temp) && checked.isPointing() && !temp.isDribbling()) {
+								if (checked != null && !checked.equals(temp) && checked.isCurrentlyPointing() && !temp.isDribbling()) {
 									ruleTriggerer = checked;
 									return true;
 								}

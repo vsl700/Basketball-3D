@@ -78,7 +78,7 @@ public abstract class Player extends Entity {
 	boolean leftHoldingBall, rightHoldingBall;
 	boolean leftAimBall, rightAimBall;
 	boolean leftThrowBall, rightThrowBall, readyBall;
-	boolean leftPointBall, rightPointBall;
+	boolean leftPointBall, rightPointBall, leftCurrentPoint, rightCurrentPoint;
 	boolean focus, avoidInterpose;
 	boolean dribbleL, dribbleR;
 	boolean ballColl; 
@@ -1532,6 +1532,11 @@ public abstract class Player extends Entity {
 		
 		Matrix4 tempLocal = modelInstance.getNode("shoulder" + id).localTransform;
 		modelInstance.getNode("shoulder" + id).isAnimated = true;
+		
+		if(left)
+			leftCurrentPoint = true;
+		else rightCurrentPoint = true;
+		
 		tempLocal.set(tempLocal.getTranslation(new Vector3()), newHandRot).rotate(0, 1, 0, 180);
 		
 		modelInstance.calculateTransforms();
@@ -1793,9 +1798,9 @@ public abstract class Player extends Entity {
 		
 		if(leftPointBall)
 			point(true);
-		
-		if(rightPointBall)
+		else if(rightPointBall)
 			point(false);
+		else leftCurrentPoint = rightCurrentPoint = false;
 		
 		
 		float prevTime = armLController.current.time;
@@ -2251,6 +2256,10 @@ public abstract class Player extends Entity {
 	
 	public boolean isPointing() {
 		return leftPointBall || rightPointBall;
+	}
+	
+	public boolean isCurrentlyPointing() {
+		return leftCurrentPoint || rightCurrentPoint;
 	}
 	
 	public boolean isLeftHolding() {
