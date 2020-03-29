@@ -547,7 +547,7 @@ public class Rules {
 				},
 				
 				new GameRule(this, null, "move_no_dribble", "Dribble Violation!", map) {
-					final float defaultTime = 0.5f;
+					final float defaultTime = 0.75f;
 					float timer = defaultTime;
 					
 					@Override
@@ -558,8 +558,8 @@ public class Rules {
 							return false;
 						}
 						
-						if (!temp.getMoveVector().isZero()) {
-							if (!temp.isDribbling() && !temp.isShooting() && !temp.isAiming()) {
+						if (!temp.getPrevMoveVec().isZero()) {
+							if (!temp.isDribbling() && !temp.isShooting() && !temp.isAiming() && !temp.isCurrentlyAiming()) {
 								if (timer <= 0) {
 									timer = defaultTime;
 
@@ -628,7 +628,7 @@ public class Rules {
 					@Override
 					public String getDescription() {
 						
-						return "The Player That Is Holding The Ball Is Moving Without Dribbling It For A Total Of Half A Second!";
+						return "The Player That Is Holding The Ball Is Moving Without Dribbling It For A Total Of 3/4 Of A Second!";
 					}
 				},
 				

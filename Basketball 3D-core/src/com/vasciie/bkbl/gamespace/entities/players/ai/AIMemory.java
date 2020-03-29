@@ -113,16 +113,16 @@ public class AIMemory {
 		this.catchTime = catchTime;
 	}
 
-	public void setRandomPointTime(float randomPointTime) {
+	public void setRandomFoulTime(float randomPointTime) {
 		this.randomPointTime = randomPointTime;
 	}
 	
-	public float getRandomPointTime() {
+	public float getRandomFoulTime() {
 		return randomPointTime;
 	}
 
-	public boolean isRandomPointTime() {
-		return randomPointTime >= 0.5f;
+	public boolean isRandomFoulTime() {
+		return randomPointTime >= 0.25f;
 	}
 
 	public float getDistDiff() {

@@ -10,6 +10,7 @@ import com.badlogic.gdx.math.Vector3;
 import com.vasciie.bkbl.gamespace.entities.Ball;
 import com.vasciie.bkbl.gamespace.entities.Entity;
 import com.vasciie.bkbl.gamespace.entities.Player;
+import com.vasciie.bkbl.gamespace.entities.players.Opponent;
 import com.vasciie.bkbl.gamespace.entities.players.Teammate;
 import com.vasciie.bkbl.gamespace.objects.Basket;
 import com.vasciie.bkbl.gamespace.tools.GameTools;
@@ -28,11 +29,24 @@ public enum PlayerState implements State<Player> {
 			AIMemory mem = brain.getMemory();
 
 			Basket basket = player.getTargetBasket();
+			
+			int difficulty = player.getMap().getDifficulty();
+			if(mem.isRandomFoulTime()) {
+				if (difficulty == 0 && player instanceof Opponent && MathUtils.random(0, 100) <= 60) {
+					mem.setDribbleTime(mem.getDribbleTime() - Gdx.graphics.getDeltaTime() * 3);
+				}else if(difficulty == 2 && player instanceof Teammate && MathUtils.random(0, 100) <= 60) {
+					mem.setDribbleTime(mem.getDribbleTime() - Gdx.graphics.getDeltaTime() * 3);
+				}
+				
+				mem.setRandomFoulTime(0);
+			}
+			
+			mem.setRandomFoulTime(mem.getRandomFoulTime() + Gdx.graphics.getDeltaTime());
 
 			// Ball behavior mechanism
 			if (!brain.updateShooting(1.25f)) {
 				if (/*player.isSurrounded() && player.getMap().getTeammates().size() > 1 || */player.isInAwayBasketZone()) {
-					Vector3 playerVec = player.getModelInstance().transform.getTranslation(new Vector3());
+					Vector3 playerVec = player.getPosition();
 					Vector3 tempAimVec;
 
 					if (!player.isBehindBasket())
@@ -67,7 +81,7 @@ public enum PlayerState implements State<Player> {
 							player.interactWithBallR();
 							mem.setSwitchHandTime(0);
 						}
-					} else */if (mem.getDribbleTime() > 0.75f) {
+					} else */if (mem.getDribbleTime() > 0.7f) {
 						if (player.isLeftHolding())
 							player.interactWithBallL();
 						else if (player.isRightHolding())
@@ -287,7 +301,11 @@ public enum PlayerState implements State<Player> {
 			player.getBrain().getPursue().setArrivalTolerance(0);
 			player.getBrain().getPlayerSeparate().setEnabled(true);
 			
-			player.getBrain().getMemory().setRandomPointTime(0);
+			player.getBrain().getMemory().setRandomFoulTime(0);
+		}
+		
+		private boolean shouldMakeReachin(Player player, Player holdingPlayer, Ball tempBall) {
+			return !holdingPlayer.isAiming() && !holdingPlayer.isCurrentlyAiming() && !holdingPlayer.isShooting() && player.getPosition().dst(tempBall.getPosition()) <= 2;
 		}
 
 		@Override
@@ -300,15 +318,22 @@ public enum PlayerState implements State<Player> {
 			int difficulty = player.getMap().getDifficulty();
 			
 			boolean point = false;
-			if(brain.getMemory().isRandomPointTime()) {
-				if(!player.getMap().getHoldingPlayer().isAiming() && !player.getMap().getHoldingPlayer().isShooting() && player.getPosition().dst(tempBall.getPosition()) <= 2 && (difficulty == 0 && MathUtils.random(1, 100) <= 10 || difficulty == 1 && MathUtils.random(1, 100) <= 25)) {
-					point = true;
+			if(brain.getMemory().isRandomFoulTime()) {
+				Player holdingPlayer = player.getMap().getHoldingPlayer();
+				if(difficulty == 0 && player instanceof Opponent) {
+					if (shouldMakeReachin(player, holdingPlayer, tempBall) && MathUtils.random(1, 100) <= 75) {
+						point = true;
+					}
+				}else if(difficulty == 2 && player instanceof Teammate) {
+					if (shouldMakeReachin(player, holdingPlayer, tempBall) && MathUtils.random(1, 100) <= 75) {
+						point = true;
+					}
 				}
-				
-				brain.getMemory().setRandomPointTime(0);
+					
+				brain.getMemory().setRandomFoulTime(0);
 			}
 			
-			brain.getMemory().setRandomPointTime(brain.getMemory().getRandomPointTime() + Gdx.graphics.getDeltaTime());
+			brain.getMemory().setRandomFoulTime(brain.getMemory().getRandomFoulTime() + Gdx.graphics.getDeltaTime());
 			
 			//Movement
 			if(player.getPosition().dst(tempBall.getPosition()) > 4.5f || player.getMoveVector().len() > 6) {

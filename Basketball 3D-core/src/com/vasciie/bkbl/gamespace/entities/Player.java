@@ -71,12 +71,11 @@ public abstract class Player extends Entity {
 	static final float scale6 = 0.35f;
 	static final float scale7 = 0.315f;
 	static final float handPercentage = 0.4f;
-	static float poleScale;
 
 	//Player's mechanics
 	boolean walking, running, jumping;
 	boolean leftHoldingBall, rightHoldingBall;
-	boolean leftAimBall, rightAimBall;
+	boolean leftAimBall, rightAimBall, leftCurrentAim, rightCurrentAim;
 	boolean leftThrowBall, rightThrowBall, readyBall;
 	boolean leftPointBall, rightPointBall, leftCurrentPoint, rightCurrentPoint;
 	boolean focus, avoidInterpose;
@@ -102,8 +101,6 @@ public abstract class Player extends Entity {
 	@Override
 	public void create(EntityType type, GameMap map, Vector3 pos) {
 		super.create(type, map, pos);
-		
-		poleScale = 2f;
 		
 		armLController = new AnimationController(modelInstance);
 		armRController = new AnimationController(modelInstance);
@@ -816,7 +813,7 @@ public abstract class Player extends Entity {
 		
 		walking = true;
 		
-		if(isMainPlayer())
+		//if(isMainPlayer())
 			moveVec = dir;
 	}
 	
@@ -842,7 +839,7 @@ public abstract class Player extends Entity {
 
 			running = true;
 			
-			if(isMainPlayer())
+			//if(isMainPlayer())
 				moveVec = dir;
 		}
 		else walk(dir);
@@ -1398,13 +1395,13 @@ public abstract class Player extends Entity {
 			secondaryArmController = armRController;
 			primaryId = "L";
 			secondaryId = "R";
-			aimBall = leftAimBall;
+			aimBall = leftCurrentAim = leftAimBall;
 		}else {
 			primaryArmController = armRController;
 			secondaryArmController = armLController;
 			primaryId = "R";
 			secondaryId = "L";
-			aimBall = rightAimBall;
+			aimBall = rightCurrentAim = rightAimBall;
 		}
 		
 		map.getBall().setWorldTransform(bodiesMap.get("hand" + primaryId).getWorldTransform().cpy());
@@ -2152,10 +2149,10 @@ public abstract class Player extends Entity {
 		rightPointBall = false;
 		focus = false;
 		
-		if(!leftHoldingBall)
+		/*if(!leftHoldingBall)
 			leftThrowBall = false;
 		else if(!rightHoldingBall)
-			rightThrowBall = false;
+			rightThrowBall = false;*/
 		
 		moveVec.setZero();
 	}
@@ -2248,6 +2245,10 @@ public abstract class Player extends Entity {
 	
 	public boolean isAiming() {
 		return leftAimBall || rightAimBall;
+	}
+	
+	public boolean isCurrentlyAiming() {
+		return leftCurrentAim || rightCurrentAim;
 	}
 	
 	public boolean isShooting() {
