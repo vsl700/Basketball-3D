@@ -100,8 +100,7 @@ public class GameScreen implements Screen, RulesListener {
 				return;
 			}
 			
-			map.dispose();
-			game.resetMap();
+			
 		}
 		
 		map = game.getMap();
@@ -217,6 +216,9 @@ public class GameScreen implements Screen, RulesListener {
 			map.clear();
 		homeScore.setText(0 + "");
 		awayScore.setText(0 + "");
+		
+		map.dispose();
+		game.resetMap();
 	}
 
 	@Override

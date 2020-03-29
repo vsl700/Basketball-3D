@@ -387,7 +387,7 @@ public class GameMap {
 		
 		Gdx.input.setInputProcessor(inputs);
 		
-		startTimer = -1;//6
+		startTimer = 5.5f;
 		playersReady = true;
 	}
 	
