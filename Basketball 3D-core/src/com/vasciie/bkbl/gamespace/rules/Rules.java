@@ -329,7 +329,7 @@ public class Rules {
 								// entities and an entity cannot collide with
 								// its own collision objects
 								Entity tempE = map.getCollObjsInEntityMap().get(obj);
-								if(!(tempE instanceof Player)) break;//Well sometimes crashes occur
+								if(!(tempE instanceof Player)) continue;//Well sometimes crashes occur
 								
 								Player checked = (Player) tempE;
 
@@ -558,7 +558,9 @@ public class Rules {
 							return false;
 						}
 						
-						if (!temp.getPrevMoveVec().isZero()) {
+						System.out.println(timer);
+						
+						if (!temp.getPrevMoveVec().isZero() || !temp.getMoveVector().isZero()) {
 							if (!temp.isDribbling() && !temp.isShooting() && !temp.isAiming() && !temp.isCurrentlyAiming()) {
 								if (timer <= 0) {
 									timer = defaultTime;

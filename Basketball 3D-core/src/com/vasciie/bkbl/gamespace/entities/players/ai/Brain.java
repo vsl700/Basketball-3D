@@ -187,6 +187,22 @@ public class Brain {
 		//Regular state updating
 		if(updateAI)
 			stateMachine.update();
+		
+		int difficulty = user.getMap().getDifficulty();
+		if(difficulty < 2 && user.isMainPlayer() && !user.isDribbling() && !user.isAiming() && !user.isShooting() && !stateMachine.isInState(PlayerState.IDLING)) {
+			float dribbleTime = memory.getDribbleTime();
+			if (user.isHoldingBall()) {
+				if (user.isMainPlayer() && dribbleTime >= 0.6f) {
+					if (user.isLeftHolding())
+						user.interactWithBallL();
+					else
+						user.interactWithBallR();
+
+					memory.setDribbleTime(0);
+				}else
+					memory.setDribbleTime(dribbleTime + Gdx.graphics.getDeltaTime());
+			}else memory.setDribbleTime(0);
+		}else if(user.isMainPlayer()) memory.setDribbleTime(0);
 	}
 	
 	public void performShooting(Vector3 tempAimVec) {

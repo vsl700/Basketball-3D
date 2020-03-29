@@ -22,7 +22,7 @@ public class AIMemory {
 	Steerable<Vector3> targetPosition, targetFacing;
 	
 	float dribbleTime, aimingTime, shootTime, switchHandTime, catchTime;
-	float distDiff, resetTime, randomPointTime;
+	float resetTime, randomPointTime;
 	
 	boolean ballJustShot;
 	
@@ -123,14 +123,6 @@ public class AIMemory {
 
 	public boolean isRandomFoulTime() {
 		return randomPointTime >= 0.25f;
-	}
-
-	public float getDistDiff() {
-		return distDiff;
-	}
-
-	public void setDistDiff(float distDiff) {
-		this.distDiff = distDiff;
 	}
 
 	public float getResetTime() {

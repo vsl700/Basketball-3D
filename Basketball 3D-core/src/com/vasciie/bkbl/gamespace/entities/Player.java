@@ -814,7 +814,8 @@ public abstract class Player extends Entity {
 		walking = true;
 		
 		//if(isMainPlayer())
-			moveVec = dir;
+		prevMoveVec.set(moveVec);
+		moveVec = dir;
 	}
 	
 	public void run(Vector3 dir) {
@@ -840,7 +841,8 @@ public abstract class Player extends Entity {
 			running = true;
 			
 			//if(isMainPlayer())
-				moveVec = dir;
+			prevMoveVec.set(moveVec);
+			moveVec = dir;
 		}
 		else walk(dir);
 	}
@@ -1363,13 +1365,14 @@ public abstract class Player extends Entity {
 						map.getBall().setWorldTransform(new Matrix4().set(new Vector3(tempHandVec.x, tempBallVec.y, tempHandVec.z), map.getBall().getMainBody().getWorldTransform().getRotation(new Quaternion())));
 					}
 					//System.out.println(map.getBall().getMainBody().getLinearVelocity().y);
+					int difficulty = map.getDifficulty();
 					if(time > 0.85f) {
 						dribbleL = false;
 						dribbleR = false;
 						readyBall = false;
 						time = 0;
 					}
-					else if (!readyBall && time > 0.15f) {
+					else if (!readyBall && (time > 0.15f && difficulty > 0 || time > 0.4f)) {
 						readyBall = true;
 					} else {
 						time += delta;
@@ -1714,7 +1717,7 @@ public abstract class Player extends Entity {
 			//Vector3 tempVec = moveVec.add(new Vector3(steering.linear.cpy().x, 0, steering.linear.cpy().y)).scl(0.5f);
 			//float tempAng = steering.angular;
 			moveVec.y = 0;
-			prevMoveVec.set(moveVec);
+			//prevMoveVec.set(moveVec);
 			
 			moveVec.nor().scl(Math.min(1, Gdx.graphics.getDeltaTime()));
 			//System.out.println(moveVec.x + " ; " + moveVec.y + " ; " + moveVec.z);
