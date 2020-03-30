@@ -318,6 +318,8 @@ public class Rules {
 				},
 				
 				new GameRule(this, null, "incorrect_ball_steal", "Reached In!", map) {
+					boolean warning;
+					
 					@Override
 					public boolean checkRule() {
 						Player temp = map.getHoldingPlayer();
@@ -334,9 +336,13 @@ public class Rules {
 								Player checked = (Player) tempE;
 
 								if (checked != null && !checked.equals(temp) && checked.isCurrentlyPointing() && !temp.isDribbling()) {
+									if(!warning) {
+										warning = true;//Sometimes when a player catches the ball, the players that are updating after it can't stop the catching process. So I added this thing
+										return false;
+									}
 									ruleTriggerer = checked;
 									return true;
-								}
+								}else warning = false;
 							}
 						}
 						

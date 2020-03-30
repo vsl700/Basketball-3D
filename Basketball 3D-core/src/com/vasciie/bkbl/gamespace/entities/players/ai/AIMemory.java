@@ -28,6 +28,8 @@ public class AIMemory {
 	
 	boolean catchBall;
 	
+	boolean missStealing;
+	
 	public AIMemory() {
 		shootTime = 20;
 	}
@@ -149,6 +151,14 @@ public class AIMemory {
 		this.catchBall = catchBall;
 	}
 	
+	public boolean isMissStealing() {
+		return missStealing;
+	}
+
+	public void setMissStealing(boolean missStealing) {
+		this.missStealing = missStealing;
+	}
+
 	public void clear() {
 		targetPlayer = null;
 		targetVec = shootVec = null;

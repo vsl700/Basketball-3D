@@ -302,6 +302,8 @@ public enum PlayerState implements State<Player> {
 			player.getBrain().getPlayerSeparate().setEnabled(true);
 			
 			player.getBrain().getMemory().setRandomFoulTime(0);
+			
+			player.getBrain().getMemory().setMissStealing(false);
 		}
 		
 		private boolean shouldMakeReachin(Player player, Player holdingPlayer, Ball tempBall) {
@@ -311,14 +313,15 @@ public enum PlayerState implements State<Player> {
 		@Override
 		public void update(Player player) {
 			Brain brain = player.getBrain();
-			Player chased = brain.getMemory().getTargetPlayer();
+			AIMemory mem = brain.getMemory();
+			Player chased = mem.getTargetPlayer();
 			
 			Ball tempBall = player.getMap().getBall();
 			
 			int difficulty = player.getMap().getDifficulty();
 			
 			boolean point = false;
-			if(brain.getMemory().isRandomFoulTime()) {
+			if(mem.isRandomFoulTime()) {
 				Player holdingPlayer = player.getMap().getHoldingPlayer();
 				if(difficulty == 0 && player instanceof Opponent) {
 					if (shouldMakeReachin(player, holdingPlayer, tempBall) && MathUtils.random(1, 100) <= 75) {
@@ -330,10 +333,10 @@ public enum PlayerState implements State<Player> {
 					}
 				}
 					
-				brain.getMemory().setRandomFoulTime(0);
+				mem.setRandomFoulTime(0);
 			}
 			
-			brain.getMemory().setRandomFoulTime(brain.getMemory().getRandomFoulTime() + Gdx.graphics.getDeltaTime());
+			mem.setRandomFoulTime(mem.getRandomFoulTime() + Gdx.graphics.getDeltaTime());
 			
 			//Movement
 			if(player.getPosition().dst(tempBall.getPosition()) > 4.5f || player.getMoveVector().len() > 6) {
@@ -348,7 +351,14 @@ public enum PlayerState implements State<Player> {
 			player.lookAt(chased.getPosition(), false);
 			
 			//Additional controls
-			if (chased.isDribbling() || point) {
+			if (chased.isDribbling() && !mem.isMissStealing() || point) {
+				if(difficulty == 0 && !point) {
+					if(MathUtils.random(1, 100) <= 60) {
+						mem.setMissStealing(true);
+						return;
+					}
+				}
+				
 				Vector3 ballVec = player.getMap().getBall().getModelInstance().transform.getTranslation(new Vector3());
 				ArrayList<Vector3> handVecs = new ArrayList<Vector3>();
 				handVecs.add(player.getShoulderLTrans().getTranslation(new Vector3()));
@@ -360,7 +370,7 @@ public enum PlayerState implements State<Player> {
 					player.interactWithBallL();
 				else if (tempHandVec.idt(handVecs.get(1)))
 					player.interactWithBallR();
-			}
+			}else if(!chased.isDribbling() && !point) mem.setMissStealing(false);
 		}
 	},
 

@@ -91,9 +91,16 @@ public class Brain {
 		mSBallChase.add(pSBallChasePart, 1f);
 		//mSBallChase.add(pursue, 1.2f);
 		
+		PrioritySteering<Vector3> pSBallInHandPart = new PrioritySteering<Vector3>(user);
+		pSBallInHandPart.add(collAvoid);
+		pSBallInHandPart.add(basketSeparate);
+		pSBallInHandPart.add(allPlayerSeparate);
+		
 		mSBallInHand = new BlendedSteering<Vector3>(user);
-		mSBallInHand.add(collAvoid, 1.3f);
+		/*mSBallInHand.add(collAvoid, 1.6f);
 		mSBallInHand.add(basketSeparate, 0.6f);
+		mSBallInHand.add(allPlayerSeparate, 1f);*/
+		mSBallInHand.add(pSBallInHandPart, 1.35f);
 		mSBallInHand.add(pursueBallInHand, 1.3f);
 		
 		pSCoop = new PrioritySteering<Vector3>(user);
