@@ -31,6 +31,8 @@ public class MyGdxGame extends Game {
 	
 	Texture background, logo;
 	
+	public SplashScreen1 spScreen1;
+	public SplashScreen2 spScreen2;
 	public MainScreen main;
 	public LevelScreen level;
 	public GameScreen game;
@@ -52,15 +54,13 @@ public class MyGdxGame extends Game {
 		
 		logo = new Texture(Gdx.files.internal("application/bkbl_logo.png"));
 		
-		if(beautifulBack)
-			load3DGraphics();
-		else loadTexture();
-		
+		spScreen1 = new SplashScreen1(this);
+		spScreen2 = new SplashScreen2(this);
 		main = new MainScreen(this);		
 		level = new LevelScreen(this);
 		game = new GameScreen(this);
 		settings = new SettingsScreen(this);
-		setScreen(main);
+		setScreen(spScreen1);
 	}
 	
 	private void loadTexture() {
@@ -90,10 +90,15 @@ public class MyGdxGame extends Game {
 
 	@Override
 	public void render () {
-		if (!getScreen().equals(game) && !game.paused()) {
+		if (!getScreen().equals(spScreen1) && !getScreen().equals(game) && !game.paused()) {
 			if (beautifulBack) {
 				if (map == null)
 					load3DGraphics();
+				
+				if(getScreen().equals(spScreen2)) {
+					super.render();
+					return;
+				}
 
 				Gdx.gl.glClearColor(0, 0.7f, 0.8f, 1);
 				Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT | GL20.GL_DEPTH_BUFFER_BIT);
@@ -106,6 +111,11 @@ public class MyGdxGame extends Game {
 				pCam.rotateAround(new Vector3(), new Vector3(0, 1, 0), 10 * Gdx.graphics.getDeltaTime());
 				customLookAt(pCam, new Vector3());
 			} else {
+				if(getScreen().equals(spScreen2)) {
+					super.render();
+					return;
+				}
+				
 				Gdx.gl.glClearColor(0, 0, 0, 1);
 				Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT | GL20.GL_DEPTH_BUFFER_BIT);
 
@@ -123,10 +133,12 @@ public class MyGdxGame extends Game {
 		
 		super.render();
 		
-		batch.setProjectionMatrix(cam.combined);
-		batch.begin();
-		font.draw(batch, Gdx.graphics.getFramesPerSecond() + " fps; FULL_DEMO v1.0", 0, 13);
-		batch.end();
+		if (!getScreen().equals(spScreen1) && !getScreen().equals(spScreen2)) {
+			batch.setProjectionMatrix(cam.combined);
+			batch.begin();
+			font.draw(batch, Gdx.graphics.getFramesPerSecond() + " fps; FULL_DEMO v1.0", 0, 13);
+			batch.end();
+		}
 	}
 	
 	/**
@@ -188,7 +200,7 @@ public class MyGdxGame extends Game {
 			mBatch.dispose();
 			map.dispose();
 		}
-		else
+		else if(background != null)
 			background.dispose();
 	}
 	
