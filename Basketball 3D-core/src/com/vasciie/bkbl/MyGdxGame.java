@@ -125,7 +125,7 @@ public class MyGdxGame extends Game {
 		
 		batch.setProjectionMatrix(cam.combined);
 		batch.begin();
-		font.draw(batch, Gdx.graphics.getFramesPerSecond() + " fps; DEMO.0.2 v1.0", 0, 13);
+		font.draw(batch, Gdx.graphics.getFramesPerSecond() + " fps; FULL_DEMO v1.0", 0, 13);
 		batch.end();
 	}
 	
