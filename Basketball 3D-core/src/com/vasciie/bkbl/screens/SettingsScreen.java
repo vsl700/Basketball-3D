@@ -1,7 +1,5 @@
 package com.vasciie.bkbl.screens;
 
-import java.awt.GraphicsDevice;
-import java.awt.GraphicsEnvironment;
 import java.util.ArrayList;
 
 import com.badlogic.gdx.Gdx;
@@ -44,7 +42,7 @@ public class SettingsScreen implements Screen, UpDownListener {
 	public SettingsScreen(MyGdxGame mg) {
 		game = mg;
 		
-		getPossibleRes();
+		//getPossibleRes();
 		
 		cam = new OrthographicCamera();
 		
@@ -59,7 +57,7 @@ public class SettingsScreen implements Screen, UpDownListener {
 		createGui();
 	}
 	
-	private void getPossibleRes() {
+	/*private void getPossibleRes() {
 		res = new ArrayList<String>();
 		
 		//Code for getting possible resolutions taken from StackOverflow.
@@ -79,7 +77,7 @@ public class SettingsScreen implements Screen, UpDownListener {
 		            
 		        }
 		    }
-	}
+	}*/
 	
 	private void createGui() {
 		goBack = new Button("Go Back", font, Color.ORANGE.cpy().sub(0, 0.3f, 0, 1), true, true);
@@ -127,12 +125,12 @@ public class SettingsScreen implements Screen, UpDownListener {
 		
 		if(beautifulGfx.justTouched(cam))
 			game.setBeautifulBack(beautifulGfx.isToggled());
-		else if(goBack.justReleased(cam)) {
+		else if(goBack.justReleased()) {
 			//changeRes();
 			
 			if (fullscreen.isToggled()) {
 				Gdx.graphics.setFullscreenMode(Gdx.graphics.getDisplayMode());
-			}else {
+			}else if(Gdx.graphics.isFullscreen()){
 				Gdx.graphics.setWindowedMode(MyGdxGame.WIDTH, MyGdxGame.HEIGHT);
 			}
 			

@@ -38,10 +38,10 @@ public class LevelScreen implements Screen {
 		batch = new SpriteBatch();
 		
 		btnFont = new BitmapFont();
-		btnFont.getData().setScale(1);
+		btnFont.getData().setScale(MyGdxGame.GUI_SCALE);
 		
 		textFont = new BitmapFont();
-		textFont.getData().setScale(2);
+		textFont.getData().setScale(2 * MyGdxGame.GUI_SCALE);
 		
 		createGui();
 	}
@@ -83,9 +83,9 @@ public class LevelScreen implements Screen {
 		tmPlAmount.render(batch, shape, cam);
 		difficulty.render(batch, shape, cam);
 		
-		if(back.justReleased(cam))
+		if(back.justReleased())
 			game.setScreen(game.main);
-		else if(play.justReleased(cam)) {
+		else if(play.justReleased()) {
 			game.game.setPlayersAmount(numUpDown.getOption());
 			game.setScreen(game.game);
 		}
@@ -94,16 +94,20 @@ public class LevelScreen implements Screen {
 	@Override
 	public void resize(int width, int height) {
 		cam.setToOrtho(false, width, height);
-		
-		play.setPosAndSize(game.pixelXByCurrentSize(149), game.pixelYByCurrentSize(150), game.pixelXByCurrentSize(223), game.pixelYByCurrentSize(30));
-		back.setPosAndSize(game.pixelXByCurrentSize(893), game.pixelYByCurrentSize(150), game.pixelXByCurrentSize(223), game.pixelYByCurrentSize(30));
-		numUpDown.setSize(game.pixelXByCurrentSize(74), game.pixelYByCurrentSize(45));
+
+		int constant = 60;
+
+		play.setSize(game.pixelXByCurrentSize(223 * MyGdxGame.GUI_SCALE), game.pixelYByCurrentSize(30 * MyGdxGame.GUI_SCALE));
+		play.setPos(width / 4 - play.getWidth() / 2 - constant, game.pixelYByCurrentSize(150 / MyGdxGame.GUI_SCALE));
+		back.setSize(game.pixelXByCurrentSize(223 * MyGdxGame.GUI_SCALE), game.pixelYByCurrentSize(30 * MyGdxGame.GUI_SCALE));
+		back.setPos(width * 3 / 4 - play.getWidth() / 2 + constant, game.pixelYByCurrentSize(150 / MyGdxGame.GUI_SCALE));
+		numUpDown.setSize(game.pixelXByCurrentSize(74 * MyGdxGame.GUI_SCALE), game.pixelYByCurrentSize(45 * MyGdxGame.GUI_SCALE));
 		numUpDown.setPos(back.getX() - 90, game.pixelYByCurrentSize(325));
-		textUpDown.setSize(game.pixelXByCurrentSize(104), game.pixelYByCurrentSize(45));
+		textUpDown.setSize(game.pixelXByCurrentSize(104 * MyGdxGame.GUI_SCALE), game.pixelYByCurrentSize(45 * MyGdxGame.GUI_SCALE));
 		textUpDown.setPos(play.getX() + play.getWidth() + 90 - textUpDown.getTotalWidth(), game.pixelYByCurrentSize(325));
 		
-		tmPlAmount.setPosAndSize(numUpDown.getX() + numUpDown.getTotalWidth() / 2 - 164 / 2, numUpDown.getY() + numUpDown.getHeight() + 10, 164);
-		difficulty.setPosAndSize(textUpDown.getX() + textUpDown.getTotalWidth() / 2 - 164 / 2, textUpDown.getY() + textUpDown.getHeight() + 10, 164);
+		tmPlAmount.setPosAndSize(numUpDown.getX() + numUpDown.getTotalWidth() / 2 / MyGdxGame.GUI_SCALE - 164 / 2, numUpDown.getY() + numUpDown.getHeight() + 10, 164 * MyGdxGame.GUI_SCALE);
+		difficulty.setPosAndSize(textUpDown.getX() + textUpDown.getTotalWidth() / 2 / MyGdxGame.GUI_SCALE - 164 / 2, textUpDown.getY() + textUpDown.getHeight() + 10, 164 * MyGdxGame.GUI_SCALE);
 	}
 
 	@Override

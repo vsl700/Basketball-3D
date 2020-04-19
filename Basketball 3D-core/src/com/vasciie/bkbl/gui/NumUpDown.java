@@ -17,35 +17,31 @@ public class NumUpDown extends UpDown implements TextChangeListener {
 	int diff;
 
 	public NumUpDown(BitmapFont btnFont, BitmapFont textFont, Color color, Color fillColor, Color textFillColor, int min, int max) {
-		regularConstructor(btnFont, textFont, color, fillColor, textFillColor, min, max);
-		
-		this.diff = 1;
-	}
-	
-	public NumUpDown(BitmapFont btnFont, BitmapFont textFont, Color color, Color fillColor, Color textFillColor, int min, int max, int diff) {
-		regularConstructor(btnFont, textFont, color, fillColor, textFillColor, min, max);
-		
-		this.diff = diff;
-	}
-	
-	private void regularConstructor(BitmapFont btnFont, BitmapFont textFont, Color color, Color fillColor, Color textFillColor, int min, int max) {
 		this.min = min;
 		this.max = max;
 
 		num = min;
 
 		create(btnFont, fillColor);
-		
+
 		textPanel = new TextPanel(textFont, color, textFillColor, min, max);
 		textPanel.setTextChangeListener(this);
 		textPanel.setText(num);
+		
+		this.diff = 1;
+	}
+	
+	public NumUpDown(BitmapFont btnFont, BitmapFont textFont, Color color, Color fillColor, Color textFillColor, int min, int max, int diff) {
+		this(btnFont, textFont, color, fillColor, textFillColor, min, max);
+		
+		this.diff = diff;
 	}
 
 	@Override
 	public void render(SpriteBatch batch, ShapeRenderer shape, OrthographicCamera cam) {
 		super.render(batch, shape, cam);
 		
-		if (down.justReleased(cam)) {
+		if (down.justReleased()) {
 			
 			if (num - diff >= min) {
 				num-= diff;
@@ -54,7 +50,7 @@ public class NumUpDown extends UpDown implements TextChangeListener {
 				
 				sendSignalToListen();
 			}
-		} else if (up.justReleased(cam)) {
+		} else if (up.justReleased()) {
 			
 			if (num + diff <= max) {
 				num+= diff;
@@ -70,7 +66,7 @@ public class NumUpDown extends UpDown implements TextChangeListener {
 
 	protected void onResize() {
 		super.onResize();
-		textPanel.setPosAndSize(x + 40, y, width, height);
+		textPanel.setPosAndSize(down.getX() + down.getWidth() + 10, y, width, height);
 	}
 
 	public void setOption(int num) {

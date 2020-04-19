@@ -44,7 +44,7 @@ public enum EntityType {
 		EntityType type = entityTypes.get(id); 
 		try {
 			@SuppressWarnings("unchecked")
-			Player player = ClassReflection.newInstance(type.loaderClass);
+			Player player = (Player) ClassReflection.newInstance(type.loaderClass);
 			player.create(type, map, pos);
 			return player;
 		} catch (ReflectionException e) {
@@ -54,10 +54,10 @@ public enum EntityType {
 	}
 	
 	public static Entity createEntity(String id, GameMap map, Vector3 pos){
-		EntityType type = entityTypes.get(id); 
+		EntityType type = entityTypes.get(id);
 		try {
 			@SuppressWarnings("unchecked")
-			Entity entity = ClassReflection.newInstance(type.loaderClass);
+			Entity entity = (Entity) ClassReflection.newInstance(type.loaderClass);
 			entity.create(type, map, pos);
 			return entity;
 		} catch (ReflectionException e) {

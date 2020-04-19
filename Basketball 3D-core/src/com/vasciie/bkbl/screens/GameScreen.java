@@ -1,5 +1,6 @@
 package com.vasciie.bkbl.screens;
 
+import com.badlogic.gdx.Application;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Screen;
 import com.badlogic.gdx.Input.Keys;
@@ -23,7 +24,7 @@ import com.vasciie.bkbl.gamespace.rules.Rules.GameRule;
 import com.vasciie.bkbl.gamespace.rules.Rules.RulesListener;
 import com.vasciie.bkbl.gui.Label;
 
-public class GameScreen implements Screen, RulesListener {
+public class GameScreen implements Screen, RulesListener, GameMap.GUIRenderer {
 
 	ModelBatch mBatch;
 	Environment environment;
@@ -86,7 +87,12 @@ public class GameScreen implements Screen, RulesListener {
 		
 		ruleHeading = new Label("", textFont, true);
 		ruleDesc = new Label("", powFont, true);
-		clickToCont = new Label("Click E To Continue!", powFont, Color.WHITE, true);
+
+		String message;
+		if(Gdx.app.getType().equals(Application.ApplicationType.Android))
+			message = "Tap Anywhere To Continue!";
+		else message = "Click E To Continue!";
+		clickToCont = new Label(message, powFont, Color.WHITE, true);
 	}
 
 	@Override
@@ -122,16 +128,15 @@ public class GameScreen implements Screen, RulesListener {
 			pCam.update();
 		}
 
-		mBatch.begin(pCam);
-		map.render(mBatch, environment);
-		mBatch.end();
-		
 		cam.update();
+
+		map.render(mBatch, environment, pCam, !paused());
+
 		homeScore.render(batch, shape, cam);
 		awayScore.render(batch, shape, cam);
 		
 		if (!paused())
-			if (map.isGameRunning()) {
+			if (map.isGameRunning() && !Gdx.app.getType().equals(Application.ApplicationType.Android)) {
 				int pow = map.getMainPlayer().getShootingPower();
 
 				power.render(batch, shape, cam);
@@ -142,7 +147,7 @@ public class GameScreen implements Screen, RulesListener {
 
 				powerNum.setText(pow + "");
 				powerNum.render(batch, shape, cam);
-			} else {
+			} else if(!map.isGameRunning()) {
 				if (map.getTimer() >= 0 && map.isPlayersReady()) {
 					if ((int) map.getTimer() == 0)
 						timer.setText("GO!");
@@ -161,7 +166,11 @@ public class GameScreen implements Screen, RulesListener {
 					if (contTimer <= 0) {
 						clickToCont.render(batch, shape, cam);
 
-						if (Gdx.input.isKeyJustPressed(Keys.E))
+						if(Gdx.app.getType().equals(Application.ApplicationType.Android)){
+							if(Gdx.input.justTouched())
+								map.onRuleBrokenContinue();
+						}
+						else if (Gdx.input.isKeyJustPressed(Keys.E))
 							map.onRuleBrokenContinue();
 					} else
 						contTimer -= delta;
@@ -172,7 +181,7 @@ public class GameScreen implements Screen, RulesListener {
 		if(paused() && game.getScreen().equals(this)) {
 			pause.render(delta);
 			return;
-		}else if(Gdx.input.isKeyJustPressed(Keys.ESCAPE) && !ignorePause)
+		}else if((Gdx.input.isKeyJustPressed(Keys.ESCAPE) || Gdx.input.isKeyJustPressed(Keys.BACK)) && !ignorePause)
 			pause.show();
 		
 		ignorePause = false;
@@ -203,7 +212,7 @@ public class GameScreen implements Screen, RulesListener {
 
 	@Override
 	public void pause() {
-
+		pause.show();
 	}
 
 	@Override
@@ -251,4 +260,18 @@ public class GameScreen implements Screen, RulesListener {
 		contTimer = 1;
 	}
 
+	@Override
+	public SpriteBatch getSpriteBatch() {
+		return batch;
+	}
+
+	@Override
+	public ShapeRenderer getShapeRenderer() {
+		return shape;
+	}
+
+	@Override
+	public OrthographicCamera getCam() {
+		return cam;
+	}
 }

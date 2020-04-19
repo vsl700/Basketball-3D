@@ -39,6 +39,8 @@ public abstract class Player extends Entity {
 
 	static final float MAX_WALKING_VELOCITY = 4;
 	static final float MAX_RUNNING_VELOCITY = 11;
+	static final float MAX_SHOOTING_POWER = 12;
+	static final float MIN_SHOOTING_POWER = 10;
 	static final float dribbleSpeed = 0.1f;
 	//The node which should be followed by the camera
 	Matrix4 camMatrix;
@@ -847,7 +849,7 @@ public abstract class Player extends Entity {
 		else walk(dir);
 	}
 	
-	private boolean isAbleToInteractWithHands() {
+	private boolean isUnableToInteractWithHands() {
 		return map.getHoldingPlayer() != null && !map.getHoldingPlayer().equals(this) && (this instanceof Teammate && map.getTeammateHolding() != null || this instanceof Opponent && map.getOpponentHolding() != null);
 	}
 	
@@ -855,12 +857,13 @@ public abstract class Player extends Entity {
 	 * When left mouse button is pressed (or button for left hand)
 	 */
 	public void interactWithBallL() {
-		if(isAbleToInteractWithHands())
+		if(isUnableToInteractWithHands())
 			return;
 		
 		if (!isShooting()) {
 			if (leftHoldingBall || rightHoldingBall) {
-				dribbleL = true;
+				if(isAbleToDribble())
+					dribbleL = true;
 			} else if (!map.getBall().isGrounded()) {
 				if (!running)
 					leftPointBall = true;
@@ -873,12 +876,13 @@ public abstract class Player extends Entity {
 	}
 	
 	public void interactWithBallR() {
-		if(isAbleToInteractWithHands())
+		if(isUnableToInteractWithHands())
 			return;
 		
 		if (!isShooting()) {
 			if (rightHoldingBall || leftHoldingBall) {
-				dribbleR = true;
+				if(isAbleToDribble())
+					dribbleR = true;
 			} else if (!map.getBall().isGrounded()) {
 				if (!running)
 					rightPointBall = true;
@@ -925,14 +929,14 @@ public abstract class Player extends Entity {
 	
 	public void shootPowerScroll(float value) {
 		if(value > 0)
-			shootingPower = (int) Math.min(20, shootingPower + value);
+			shootingPower = (int) Math.min(MAX_SHOOTING_POWER, shootingPower + value);
 		
 		else if(value < 0)
-			shootingPower = (int) Math.max(10, shootingPower + value);
+			shootingPower = (int) Math.max(MIN_SHOOTING_POWER, shootingPower + value);
 	}
 	
 	public void setShootPower(float value) {
-		shootingPower = (int) Math.min(20, Math.max(10, value));
+		shootingPower = (int) Math.min(MAX_SHOOTING_POWER, Math.max(MIN_SHOOTING_POWER, value));
 	}
 	
 	private void catchBall(boolean left) {
@@ -2228,7 +2232,12 @@ public abstract class Player extends Entity {
 	public boolean isAbleToCatch() {
 		return leftHandInWorld && rightHandInWorld;
 	}
-	
+
+	public boolean isAbleToDribble(){
+		return leftHoldingBall && armLController.current.animation.id.equals("dribbleIdleArmL") ||
+				rightHoldingBall && armRController.current.animation.id.equals("dribbleIdleArmR");
+	}
+
 	public boolean isHoldingBall() {
 		
 		//System.out.println(map.getCurrentPlayerHoldTeam());
