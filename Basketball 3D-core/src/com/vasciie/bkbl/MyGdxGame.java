@@ -1,6 +1,5 @@
 package com.vasciie.bkbl;
 
-import com.badlogic.gdx.Application;
 import com.badlogic.gdx.Game;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.GL20;
@@ -41,16 +40,11 @@ public class MyGdxGame extends Game {
 	
 	public final static int WIDTH = 848;
 	public final static int HEIGHT = 480;
-	public static float GUI_SCALE;
 	
 	boolean beautifulBack = true;
 	
 	@Override
 	public void create () {
-		if(Gdx.app.getType().equals(Application.ApplicationType.Android))
-			GUI_SCALE = 1.5f;
-		else GUI_SCALE = 1;
-
 		batch = new SpriteBatch();
 		
 		font = new BitmapFont();
@@ -65,9 +59,7 @@ public class MyGdxGame extends Game {
 		main = new MainScreen(this);		
 		level = new LevelScreen(this);
 		game = new GameScreen(this);
-
-		if(!Gdx.app.getType().equals(Application.ApplicationType.Android))
-			settings = new SettingsScreen(this);
+		settings = new SettingsScreen(this);
 		setScreen(spScreen1);
 	}
 	
@@ -89,11 +81,11 @@ public class MyGdxGame extends Game {
 		pCam.far = 100;
 		pCam.near = 0.1f;
 		
-		map = new GameMap(game, game);
+		map = new GameMap(game);
 	}
 	
 	public void resetMap() {
-		map = new GameMap(game, game);
+		map = new GameMap(game);
 	}
 
 	@Override
@@ -112,9 +104,9 @@ public class MyGdxGame extends Game {
 				Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT | GL20.GL_DEPTH_BUFFER_BIT);
 
 				pCam.update();
-				//mBatch.begin(pCam);
-				map.render(mBatch, environment, pCam, false);
-				//mBatch.end();
+				mBatch.begin(pCam);
+				map.render(mBatch, environment);
+				mBatch.end();
 
 				pCam.rotateAround(new Vector3(), new Vector3(0, 1, 0), 10 * Gdx.graphics.getDeltaTime());
 				customLookAt(pCam, new Vector3());
@@ -144,7 +136,7 @@ public class MyGdxGame extends Game {
 		if (!getScreen().equals(spScreen1) && !getScreen().equals(spScreen2)) {
 			batch.setProjectionMatrix(cam.combined);
 			batch.begin();
-			font.draw(batch, Gdx.graphics.getFramesPerSecond() + " fps; FULL_DEMO v1.0", 0, font.getLineHeight());
+			font.draw(batch, Gdx.graphics.getFramesPerSecond() + " fps; FULL_DEMO v1.0", 0, 13);
 			batch.end();
 		}
 	}

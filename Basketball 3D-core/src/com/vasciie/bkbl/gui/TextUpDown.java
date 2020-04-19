@@ -26,13 +26,13 @@ public class TextUpDown extends UpDown {
 	public void render(SpriteBatch batch, ShapeRenderer shape, OrthographicCamera cam) {
 		super.render(batch, shape, cam);
 		
-		if(down.justReleased() && num > 0) {
+		if(down.justReleased(cam) && num > 0) {
 			num--;
 			label.setText(options.get(num));
 			
 			sendSignalToListen();
 		}
-		else if(up.justReleased() && num < options.size() - 1) {
+		else if(up.justReleased(cam) && num < options.size() - 1) {
 			num++;
 			label.setText(options.get(num));
 			
@@ -45,7 +45,7 @@ public class TextUpDown extends UpDown {
 	@Override
 	protected void onResize() {
 		super.onResize();
-		label.setPosAndSize(down.getX() + down.getWidth() + 10, y, width, height);
+		label.setPosAndSize(x + 40, y, width, height);
 	}
 	
 	public void setTextOption(String s) {

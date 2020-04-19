@@ -5,7 +5,6 @@ import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.g2d.BitmapFont;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
-import com.vasciie.bkbl.MyGdxGame;
 
 public abstract class UpDown extends GUI {
 	
@@ -31,8 +30,8 @@ public abstract class UpDown extends GUI {
 	}
 	
 	protected void onResize() {
-		down.setPosAndSize(x, y, 30 * MyGdxGame.GUI_SCALE, height);
-		up.setPosAndSize(x + width + 20 + 30 * MyGdxGame.GUI_SCALE, y, 30 * MyGdxGame.GUI_SCALE, height);
+		down.setPosAndSize(x, y, 30, height);
+		up.setPosAndSize(x + width + 50, y, 30, height);
 	}
 	
 	protected void sendSignalToListen() {
@@ -65,7 +64,7 @@ public abstract class UpDown extends GUI {
 	}
 
 	public float getTotalWidth() {
-		return width + 20 + 2 * 30 * MyGdxGame.GUI_SCALE;
+		return width + 80;
 	}
 	
 }

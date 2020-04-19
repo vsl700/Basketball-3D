@@ -71,9 +71,6 @@ public class CheckButton extends Button {
 		if(justLocalTouched(cam))
 			toggled = !toggled;
 		
-		if(!isLocalTouched(cam))
-			multitouch = -1;
-		
 		renderShapes(shape, cam);
 		renderText(batch, cam);
 		

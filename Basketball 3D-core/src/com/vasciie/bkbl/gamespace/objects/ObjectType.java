@@ -34,10 +34,10 @@ public enum ObjectType {
 	}
 	
 	public static GameObject createGameObject(String id, GameMap map, float x, float y, float z){
-		ObjectType type = objectTypes.get(id);
+		ObjectType type = objectTypes.get(id); 
 		try {
 			@SuppressWarnings("unchecked")
-			GameObject entity = (GameObject) ClassReflection.newInstance(type.loaderClass);
+			GameObject entity = ClassReflection.newInstance(type.loaderClass);
 			entity.create(type, map, x, y, z);
 			return entity;
 		} catch (ReflectionException e) {
