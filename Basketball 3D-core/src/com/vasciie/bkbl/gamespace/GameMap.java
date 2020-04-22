@@ -7,12 +7,9 @@ import com.badlogic.gdx.Application;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.ai.GdxAI;
 import com.badlogic.gdx.ai.steer.SteerableAdapter;
-import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.PerspectiveCamera;
-import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.g3d.Environment;
 import com.badlogic.gdx.graphics.g3d.ModelBatch;
-import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 import com.badlogic.gdx.math.Matrix4;
 import com.badlogic.gdx.math.Quaternion;
 import com.badlogic.gdx.math.Vector3;
@@ -44,6 +41,7 @@ import com.vasciie.bkbl.gamespace.rules.Rules;
 import com.vasciie.bkbl.gamespace.rules.Rules.GameRule;
 import com.vasciie.bkbl.gamespace.rules.Rules.RulesListener;
 import com.vasciie.bkbl.gamespace.tools.InputController;
+import com.vasciie.bkbl.gui.GUIRenderer;
 
 public class GameMap {
 
@@ -486,14 +484,16 @@ public class GameMap {
         }
 
         index = ballIndex;
-        //createMap();
-        //addCollObjects();
         createBall();
 
         gameRunning = false;
         ruleTriggeredActing = false;
 
+        Gdx.input.setInputProcessor(null);
 
+        //TODO When using Android Studio, take the comment marks out of the lines below! Eclipse gives an error on this line!
+        //if (Gdx.app.getType().equals(Application.ApplicationType.Android))
+            //Gdx.input.setCatchKey(Input.Keys.BACK, false);
     }
 
     public void update(float delta) {
@@ -601,7 +601,7 @@ public class GameMap {
             e.onCycleEnd();
     }
 
-    public void render(final ModelBatch mBatch, final Environment environment, PerspectiveCamera pCam, boolean renderController) {
+    public void render(final ModelBatch mBatch, final Environment environment, PerspectiveCamera pCam) {
         mBatch.begin(pCam);
         for (final Player e : getAllPlayers()) {
             e.render(mBatch, environment);
@@ -613,9 +613,16 @@ public class GameMap {
         basket1.render(mBatch, environment);
         basket2.render(mBatch, environment);
         mBatch.end();
+    }
 
-        if (Gdx.app.getType().equals(Application.ApplicationType.Android) && renderController && (gameRunning || !ruleTriggeredActing))
-            inputs.render(this);
+    public void updateController(){
+        if(gameRunning || !ruleTriggeredActing)
+            inputs.update(this);
+    }
+
+    public void renderController(){
+        if(gameRunning || !ruleTriggeredActing)
+            inputs.render();
     }
 
     public void addRigidBody(btRigidBody body, int group, int mask) {
@@ -1071,14 +1078,6 @@ public class GameMap {
 
 
         return tempObj;
-    }
-
-    public interface GUIRenderer {
-        public SpriteBatch getSpriteBatch();
-
-        public ShapeRenderer getShapeRenderer();
-
-        public OrthographicCamera getCam();
     }
 
 }

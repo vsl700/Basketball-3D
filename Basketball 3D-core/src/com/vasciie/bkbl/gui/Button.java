@@ -14,6 +14,8 @@ public class Button extends GUI {
 
     BitmapFont font;
 
+    Color renderColor;
+
     byte multitouch = -1;
 
 
@@ -27,8 +29,9 @@ public class Button extends GUI {
 
     boolean touched;
     boolean toggled;
-    boolean touchable;
     boolean release;
+
+
 
     /**
      * Creates a basic button
@@ -39,7 +42,9 @@ public class Button extends GUI {
      * @param mark
      * @param filled
      */
-    public Button(String text, BitmapFont font, Color color, boolean mark, boolean filled) {
+    public Button(String text, BitmapFont font, Color color, boolean mark, boolean filled, GUIRenderer guiRenderer) {
+        super(guiRenderer);
+
         this.font = font;
         this.text = text;
         if (!Gdx.app.getType().equals(Application.ApplicationType.Android))
@@ -50,6 +55,8 @@ public class Button extends GUI {
         g = color.g;
         b = color.b;
         a = color.a;
+
+
     }
 
     /**
@@ -63,8 +70,8 @@ public class Button extends GUI {
      * @param filled
      * @param toggleFill
      */
-    public Button(String text, BitmapFont font, Color color, Color fillColor, boolean mark, boolean filled, boolean toggleFill) {
-        this(text, font, color, mark, filled);
+    public Button(String text, BitmapFont font, Color color, Color fillColor, boolean mark, boolean filled, boolean toggleFill, GUIRenderer guiRenderer) {
+        this(text, font, color, mark, filled, guiRenderer);
 
         toggle = true;
         this.toggleFill = toggleFill;
@@ -77,52 +84,65 @@ public class Button extends GUI {
     }
 
     @Override
-    public void render(SpriteBatch batch, ShapeRenderer shape, OrthographicCamera cam) {
-        touchable = true;
+    public void update(){
+        super.update();
 
+        if(this instanceof CheckButton || this instanceof Stick)
+            return;
+
+        if (Gdx.app.getType().equals(Application.ApplicationType.Android) || isMouseOn()) {
+            if (justLocalTouched() || isLocalTouched() || toggled)
+                renderColor = markColorClick();
+            else {
+                multitouch = -1;
+                if (mark)
+                    renderColor = markColorMouse();
+                else renderColor = new Color(r, g, b, a);
+            }
+        } else
+            renderColor = new Color(r, g, b, a);
+    }
+
+    @Override
+    public void render() {
+        ShapeRenderer shape = guiRenderer.getShapeRenderer();
+        SpriteBatch batch = guiRenderer.getSpriteBatch();
+        OrthographicCamera cam = guiRenderer.getCam();
+
+        Color tempColor = shape.getColor().cpy();
+
+        shape.setColor(renderColor);
         shape.setProjectionMatrix(cam.combined);
 
         if (filled || toggleFill && toggled)
             shape.begin(ShapeRenderer.ShapeType.Filled);
         else shape.begin(ShapeRenderer.ShapeType.Line);
 
-        float r1 = shape.getColor().r;
-        float g1 = shape.getColor().g;
-        float b1 = shape.getColor().b;
-        float a1 = shape.getColor().a;
-
-
-        if (Gdx.app.getType().equals(Application.ApplicationType.Android) || isMouseOn(cam)) {
-            if (justLocalTouched(cam) || isLocalTouched(cam) || toggled)
-                shape.setColor(markColorClick());
-            else {
-                multitouch = -1;
-                if (mark)
-                    shape.setColor(markColorMouse());
-                else shape.setColor(r, g, b, a);
-            }
-        } else
-            shape.setColor(r, g, b, a);
-
         shape.rect(x, y, width, height);
-        shape.setColor(r1, g1, b1, a1);
         shape.end();
+        shape.setColor(tempColor);
 
         batch.setProjectionMatrix(cam.combined);
         batch.begin();
         font.draw(batch, text, x + width / 2 - textSize(font, text) / 2, y + height / 2 + font.getLineHeight() / 3);
 
         batch.end();
+
+        renderColor = null;
     }
 
-    public boolean isMouseOn(OrthographicCamera cam) {
+    public boolean isMouseOn() {
+        OrthographicCamera cam = guiRenderer.getCam();
+
         Vector3 touchPos = new Vector3(Gdx.input.getX(), Gdx.input.getY(), 0);
         cam.unproject(touchPos);
 
         return touchPos.x >= x && touchPos.x <= x + width && touchPos.y <= y + height && touchPos.y >= y;
     }
 
-    public boolean isLocalTouched(OrthographicCamera cam) {
+    public boolean isLocalTouched() {
+        OrthographicCamera cam = guiRenderer.getCam();
+
         for (int i = 0; i < 5; i++) {
             Vector3 touchPos = new Vector3(Gdx.input.getX(i), Gdx.input.getY(i), 0);
             cam.unproject(touchPos);
@@ -141,13 +161,13 @@ public class Button extends GUI {
     }
 
     public boolean isTouched() {
-        touchable = false;
         return touched;
     }
 
-    public boolean isTouched(OrthographicCamera cam) {
-        if (touchable) {
-            touchable = false;
+    public boolean isTouchedCheck() {
+        OrthographicCamera cam = guiRenderer.getCam();
+
+        if (renderable) {
             for (int i = 0; i < 5; i++) {
                 Vector3 touchPos = new Vector3(Gdx.input.getX(i), Gdx.input.getY(i), 0);
                 cam.unproject(touchPos);
@@ -167,10 +187,8 @@ public class Button extends GUI {
     }
 
     public boolean justReleased() {
-        if(!touchable)
+        if(!renderable)
             return false;
-
-        touchable = false;
 
         if (release && !touched) {
             release = false;
@@ -181,7 +199,9 @@ public class Button extends GUI {
         return false;
     }
 
-    public boolean justLocalTouched(OrthographicCamera cam) {
+    public boolean justLocalTouched() {
+        OrthographicCamera cam = guiRenderer.getCam();
+
         if (multitouch == -1) {
             for (int i = 0; i < 5; i++) {
                 Vector3 touchPos = new Vector3(Gdx.input.getX(i), Gdx.input.getY(i), 0);
@@ -202,9 +222,10 @@ public class Button extends GUI {
         return false;
     }
 
-    public boolean justTouched(OrthographicCamera cam) {
-        if (touchable) {
-            touchable = false;
+    public boolean justTouched() {
+        OrthographicCamera cam = guiRenderer.getCam();
+
+        if (renderable) {
             if (Gdx.input.justTouched())
                 for (int i = 0; i < 5; i++) {
                     Vector3 touchPos = new Vector3(Gdx.input.getX(i), Gdx.input.getY(i), 0);
@@ -228,8 +249,8 @@ public class Button extends GUI {
         this.toggled = toggled;
     }
 
-    public void setTouchable(boolean touchable){
-        this.touchable = touchable;
+    public void setRenderable(boolean renderable){
+        this.renderable = renderable;
     }
 
     protected Color markColorClick() {

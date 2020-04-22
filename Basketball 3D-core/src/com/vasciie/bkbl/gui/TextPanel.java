@@ -31,7 +31,8 @@ public class TextPanel extends Text implements InputProcessor {
 
 	boolean active, cursor, locked;
 
-	public TextPanel(BitmapFont font, Color color, Color fillColor) {
+	public TextPanel(BitmapFont font, Color color, Color fillColor, GUIRenderer guiRenderer) {
+		super(guiRenderer);
 		this.font = font;
 
 		r = color.r;
@@ -50,7 +51,8 @@ public class TextPanel extends Text implements InputProcessor {
 		time = System.currentTimeMillis();
 	}
 	
-	public TextPanel(BitmapFont font, Color color, Color fillColor, int min, int max) {
+	public TextPanel(BitmapFont font, Color color, Color fillColor, int min, int max, GUIRenderer guiRenderer) {
+		super(guiRenderer);
 		this.min = min;
 		this.max = max;
 		this.font = font;
@@ -70,8 +72,31 @@ public class TextPanel extends Text implements InputProcessor {
 		
 		time = System.currentTimeMillis();
 	}
+
+	@Override
+	public void update(){
+		super.update();
+
+		if (justTouched() && !locked) {
+			active = true;
+
+			Gdx.input.setInputProcessor(this);
+		}
+		else if(justTouchedOut()) {
+			deactive();
+		}
+
+		if (active) {
+			if (System.currentTimeMillis() - time >= 500) {
+				cursor = !cursor;
+				time = System.currentTimeMillis();
+			}
+		}
+	}
 	
-	private void renderShapes(ShapeRenderer shape, OrthographicCamera cam) {
+	private void renderShapes() {
+		ShapeRenderer shape = guiRenderer.getShapeRenderer();
+
 		float r1 = shape.getColor().r;
 		float g1 = shape.getColor().g;
 		float b1 = shape.getColor().b;
@@ -79,7 +104,7 @@ public class TextPanel extends Text implements InputProcessor {
 		
 		shape.setColor(fR, fG, fB, fA);
 		
-		shape.setProjectionMatrix(cam.combined);
+		shape.setProjectionMatrix(guiRenderer.getCam().combined);
 		shape.begin(ShapeRenderer.ShapeType.Filled);
 		shape.rect(x, y, width, height);
 
@@ -93,7 +118,9 @@ public class TextPanel extends Text implements InputProcessor {
 		shape.setColor(r1, g1, b1, a1);
 	}
 
-	private void renderText(SpriteBatch batch, OrthographicCamera cam) {
+	private void renderText() {
+		SpriteBatch batch = guiRenderer.getSpriteBatch();
+
 		float r1 = font.getColor().r;
 		float g1 = font.getColor().g;
 		float b1 = font.getColor().b;
@@ -101,7 +128,7 @@ public class TextPanel extends Text implements InputProcessor {
 		
 		font.setColor(r, g, b, a);
 		
-		batch.setProjectionMatrix(cam.combined);
+		batch.setProjectionMatrix(guiRenderer.getCam().combined);
 		batch.begin();
 		font.draw(batch, text, textX, textY);
 		batch.end();
@@ -110,27 +137,10 @@ public class TextPanel extends Text implements InputProcessor {
 	}
 	
 	@Override
-	public void render(SpriteBatch batch, ShapeRenderer shape, OrthographicCamera cam) {
-		
-		if (justTouched(cam) && !locked) {
-			active = true;
-			
-			Gdx.input.setInputProcessor(this);
-		}
-		else if(justTouchedOut(cam)) {
-			deactive();
-		}
+	public void render() {
+		renderShapes();
 
-		if (active) {
-			if (System.currentTimeMillis() - time >= 500) {
-				cursor = !cursor;
-				time = System.currentTimeMillis();
-			}
-		}
-
-		renderShapes(shape, cam);
-
-		renderText(batch, cam);
+		renderText();
 	}
 
 	protected void onResize() {
@@ -149,7 +159,7 @@ public class TextPanel extends Text implements InputProcessor {
 	/**
 	 *  Must be called when a deactivation command is executed
 	 */
-	void deactive() {
+	private void deactive() {
 		if (active) {
 			active = false;
 			cursor = false;
@@ -166,7 +176,9 @@ public class TextPanel extends Text implements InputProcessor {
 		}
 	}
 
-	boolean justTouched(OrthographicCamera cam) {
+	private boolean justTouched() {
+		OrthographicCamera cam = guiRenderer.getCam();
+
 		Vector3 touchPos = new Vector3(Gdx.input.getX(), Gdx.input.getY(), 0);
 		cam.unproject(touchPos);
 
@@ -177,14 +189,16 @@ public class TextPanel extends Text implements InputProcessor {
 	 * 
 	 * @return true if the pointer touches outside of the panel
 	 */
-	boolean justTouchedOut(OrthographicCamera cam) {
+	private boolean justTouchedOut() {
+		OrthographicCamera cam = guiRenderer.getCam();
+
 		Vector3 touchPos = new Vector3(Gdx.input.getX(), Gdx.input.getY(), 0);
 		cam.unproject(touchPos);
 
 		return Gdx.input.justTouched() && (touchPos.x < x || touchPos.x > x + width || touchPos.y > y + height || touchPos.y < y);
 	}
 	
-	boolean isNumeric() {
+	private boolean isNumeric() {
 		return min != 0 || max != 0;
 	}
 	

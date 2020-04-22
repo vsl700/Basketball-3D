@@ -10,8 +10,9 @@ import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 import com.vasciie.bkbl.MyGdxGame;
 import com.vasciie.bkbl.gui.Button;
+import com.vasciie.bkbl.gui.GUIRenderer;
 
-public class MainScreen implements Screen {
+public class MainScreen implements Screen, GUIRenderer {
 	
 	MyGdxGame game;
 	
@@ -32,10 +33,10 @@ public class MainScreen implements Screen {
 		font = new BitmapFont();
 		font.getData().setScale(MyGdxGame.GUI_SCALE);
 		
-		play = new Button("Play", font, Color.ORANGE.cpy().sub(0, 0.3f, 0, 1), true, true);
+		play = new Button("Play", font, Color.ORANGE.cpy().sub(0, 0.3f, 0, 1), true, true, this);
 		if(!Gdx.app.getType().equals(Application.ApplicationType.Android))
-			settings = new Button("Settings", font, Color.ORANGE.cpy().sub(0, 0.3f, 0, 1), true, true);
-		quit = new Button("Quit", font, Color.ORANGE.cpy().sub(0, 0.3f, 0, 1), true, true);
+			settings = new Button("Settings", font, Color.ORANGE.cpy().sub(0, 0.3f, 0, 1), true, true, this);
+		quit = new Button("Quit", font, Color.ORANGE.cpy().sub(0, 0.3f, 0, 1), true, true, this);
 	}
 
 	@Override
@@ -49,12 +50,10 @@ public class MainScreen implements Screen {
 		//batch.begin();
 		cam.update();
 		
-		game.renderLogo(batch, cam);
-		
-		play.render(batch, shape, cam);
+		play.update();
 		if(!Gdx.app.getType().equals(Application.ApplicationType.Android))
-			settings.render(batch, shape, cam);
-		quit.render(batch, shape, cam);
+			settings.update();
+		quit.update();
 		
 		if(quit.justReleased())
 			Gdx.app.exit();
@@ -64,6 +63,14 @@ public class MainScreen implements Screen {
 		}
 		else if(play.justReleased())
 			game.setScreen(game.level);
+
+		game.renderLogo(batch, cam);
+
+		play.draw();
+		if(settings != null)
+			settings.draw();
+
+		quit.draw();
 		//batch.end();
 	}
 
@@ -103,4 +110,18 @@ public class MainScreen implements Screen {
 		font.dispose();
 	}
 
+	@Override
+	public SpriteBatch getSpriteBatch() {
+		return batch;
+	}
+
+	@Override
+	public ShapeRenderer getShapeRenderer() {
+		return shape;
+	}
+
+	@Override
+	public OrthographicCamera getCam() {
+		return cam;
+	}
 }

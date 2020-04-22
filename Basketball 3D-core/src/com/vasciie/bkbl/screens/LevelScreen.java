@@ -10,12 +10,13 @@ import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 import com.vasciie.bkbl.MyGdxGame;
 import com.vasciie.bkbl.gui.Button;
+import com.vasciie.bkbl.gui.GUIRenderer;
 import com.vasciie.bkbl.gui.Label;
 import com.vasciie.bkbl.gui.NumUpDown;
 import com.vasciie.bkbl.gui.TextUpDown;
 
 
-public class LevelScreen implements Screen {
+public class LevelScreen implements Screen, GUIRenderer {
 
 	MyGdxGame game;
 	
@@ -47,21 +48,21 @@ public class LevelScreen implements Screen {
 	}
 	
 	private void createGui() {
-		numUpDown = new NumUpDown(btnFont, textFont, Color.WHITE, Color.BROWN, new Color().set(0.8f, 0.4f, 0, 1), 1, 5);
+		numUpDown = new NumUpDown(btnFont, textFont, Color.WHITE, Color.BROWN, new Color().set(0.8f, 0.4f, 0, 1), 1, 5, this);
 		numUpDown.setOption(3);
 		
 		ArrayList<String> choices = new ArrayList<String>();
 		choices.add("Easy");
 		choices.add("Hard");
 		choices.add("Very Hard");
-		textUpDown = new TextUpDown(btnFont, textFont, Color.WHITE, Color.BROWN, new Color().set(0.8f, 0.4f, 0, 1), choices, true);
+		textUpDown = new TextUpDown(btnFont, textFont, Color.WHITE, Color.BROWN, new Color().set(0.8f, 0.4f, 0, 1), choices, true, this);
 		
-		play = new Button("Play", btnFont, Color.ORANGE.cpy().sub(0, 0.3f, 0, 1), true, true);
-		back = new Button("Go Back", btnFont, Color.ORANGE.cpy().sub(0, 0.3f, 0, 1), true, true);
+		play = new Button("Play", btnFont, Color.ORANGE.cpy().sub(0, 0.3f, 0, 1), true, true, this);
+		back = new Button("Go Back", btnFont, Color.ORANGE.cpy().sub(0, 0.3f, 0, 1), true, true, this);
 		
-		tmPlAmount = new Label("THE AMOUNT OF PLAYERS PER TEAM", btnFont, Color.BROWN, true);
+		tmPlAmount = new Label("THE AMOUNT OF PLAYERS PER TEAM", btnFont, Color.BROWN, true, this);
 		
-		difficulty = new Label("THE DIFFICULTY OF THE GAME", btnFont, Color.BROWN, true);
+		difficulty = new Label("THE DIFFICULTY OF THE GAME", btnFont, Color.BROWN, true, this);
 	}
 	
 	@Override
@@ -72,16 +73,14 @@ public class LevelScreen implements Screen {
 	@Override
 	public void render(float delta) {
 		cam.update();
+
+		numUpDown.update();
+		textUpDown.update();
+		play.update();
+		back.update();
 		
-		game.renderLogo(batch, cam);
-		
-		numUpDown.render(batch, shape, cam);
-		textUpDown.render(batch, shape, cam);
-		play.render(batch, shape, cam);
-		back.render(batch, shape, cam);
-		
-		tmPlAmount.render(batch, shape, cam);
-		difficulty.render(batch, shape, cam);
+		tmPlAmount.update();
+		difficulty.update();
 		
 		if(back.justReleased())
 			game.setScreen(game.main);
@@ -89,6 +88,16 @@ public class LevelScreen implements Screen {
 			game.game.setPlayersAmount(numUpDown.getOption());
 			game.setScreen(game.game);
 		}
+
+		game.renderLogo(batch, cam);
+
+		numUpDown.draw();
+		textUpDown.draw();
+		play.draw();
+		back.draw();
+
+		tmPlAmount.draw();
+		difficulty.draw();
 	}
 
 	@Override
@@ -137,4 +146,18 @@ public class LevelScreen implements Screen {
 		return textUpDown.getOption();
 	}
 
+	@Override
+	public SpriteBatch getSpriteBatch() {
+		return batch;
+	}
+
+	@Override
+	public ShapeRenderer getShapeRenderer() {
+		return shape;
+	}
+
+	@Override
+	public OrthographicCamera getCam() {
+		return cam;
+	}
 }

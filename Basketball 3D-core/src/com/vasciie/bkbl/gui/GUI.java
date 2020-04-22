@@ -1,15 +1,29 @@
 package com.vasciie.bkbl.gui;
 
-import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.g2d.BitmapFont;
-import com.badlogic.gdx.graphics.g2d.SpriteBatch;
-import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 
 public abstract class GUI {
 
+	GUIRenderer guiRenderer;
+
 	float x, y, width, height;
+	boolean renderable;
+
+	public GUI(GUIRenderer guiRenderer){
+		this.guiRenderer = guiRenderer;
+	}
+
+	public void update(){
+		renderable = true;
+	}
 	
-	public abstract void render(SpriteBatch batch, ShapeRenderer shape, OrthographicCamera cam);
+	public abstract void render();
+
+	public void draw(){
+		if(renderable) render();
+
+		renderable = false;
+	}
 	
 	protected float textSize(BitmapFont font, String t) {
 		float textW = 0;

@@ -113,7 +113,7 @@ public class MyGdxGame extends Game {
 
 				pCam.update();
 				//mBatch.begin(pCam);
-				map.render(mBatch, environment, pCam, false);
+				map.render(mBatch, environment, pCam);
 				//mBatch.end();
 
 				pCam.rotateAround(new Vector3(), new Vector3(0, 1, 0), 10 * Gdx.graphics.getDeltaTime());

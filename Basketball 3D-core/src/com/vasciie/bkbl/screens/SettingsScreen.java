@@ -12,12 +12,13 @@ import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 import com.vasciie.bkbl.MyGdxGame;
 import com.vasciie.bkbl.gui.Button;
 import com.vasciie.bkbl.gui.CheckButton;
+import com.vasciie.bkbl.gui.GUIRenderer;
 import com.vasciie.bkbl.gui.Label;
 import com.vasciie.bkbl.gui.NumUpDown;
 import com.vasciie.bkbl.gui.UpDown;
 import com.vasciie.bkbl.gui.UpDownListener;
 
-public class SettingsScreen implements Screen, UpDownListener {
+public class SettingsScreen implements Screen, UpDownListener, GUIRenderer {
 
 	MyGdxGame game;
 	
@@ -80,11 +81,11 @@ public class SettingsScreen implements Screen, UpDownListener {
 	}*/
 	
 	private void createGui() {
-		goBack = new Button("Go Back", font, Color.ORANGE.cpy().sub(0, 0.3f, 0, 1), true, true);
-		beautifulGfx = new CheckButton("Beautiful Background", font, Color.ORANGE.cpy().sub(0, 0.3f, 0, 1), true, true);
-		fullscreen = new CheckButton("Fullscreen", font, Color.ORANGE.cpy().sub(0, 0.3f, 0, 1), true, true);
+		goBack = new Button("Go Back", font, Color.ORANGE.cpy().sub(0, 0.3f, 0, 1), true, true, this);
+		beautifulGfx = new CheckButton("Beautiful Background", font, Color.ORANGE.cpy().sub(0, 0.3f, 0, 1), true, true, this);
+		fullscreen = new CheckButton("Fullscreen", font, Color.ORANGE.cpy().sub(0, 0.3f, 0, 1), true, true, this);
 		
-		fpsUpDown = new NumUpDown(font, font2, Color.WHITE, Color.BROWN, new Color().set(0.8f, 0.4f, 0, 1), 0, 240, 10);
+		fpsUpDown = new NumUpDown(font, font2, Color.WHITE, Color.BROWN, new Color().set(0.8f, 0.4f, 0, 1), 0, 240, 10, this);
 		fpsUpDown.addException(0, "Inf.");
 		fpsUpDown.setListener(this);
 		//fpsUpDown.setOption(60);
@@ -92,7 +93,7 @@ public class SettingsScreen implements Screen, UpDownListener {
 		//resUpDown = new TextUpDown(font, font, Color.WHITE, Color.BROWN, new Color().set(0.8f, 0.4f, 0, 1), res, false);
 		//resUpDown.setListener(this);
 		
-		fpsLabel = new Label("THE MAXIMUM FRAMES PER SECOND", font, Color.BROWN, true);
+		fpsLabel = new Label("THE MAXIMUM FRAMES PER SECOND", font, Color.BROWN, true, this);
 		//resLabel = new Label("THE RESOLUTION OF THE WINDOW", font, Color.BROWN, true);
 		
 		beautifulGfx.setToggled(game.isBeautifulBack());
@@ -110,20 +111,18 @@ public class SettingsScreen implements Screen, UpDownListener {
 	public void render(float delta) {
 		cam.update();
 		
-		game.renderLogo(batch, cam);
+		goBack.update();
 		
-		goBack.render(batch, shape, cam);
+		beautifulGfx.update();
+		fullscreen.update();
 		
-		beautifulGfx.render(batch, shape, cam);
-		fullscreen.render(batch, shape, cam);
-		
-		fpsUpDown.render(batch, shape, cam);
-		fpsLabel.render(batch, shape, cam);
+		fpsUpDown.update();
+		fpsLabel.update();
 		
 		//resUpDown.render(batch, shape, cam);
 		//resLabel.render(batch, shape, cam);
 		
-		if(beautifulGfx.justTouched(cam))
+		if(beautifulGfx.justTouched())
 			game.setBeautifulBack(beautifulGfx.isToggled());
 		else if(goBack.justReleased()) {
 			//changeRes();
@@ -136,6 +135,16 @@ public class SettingsScreen implements Screen, UpDownListener {
 			
 			game.setScreen(prevScreen);
 		}
+
+		game.renderLogo(batch, cam);
+
+		goBack.draw();
+
+		beautifulGfx.draw();
+		fullscreen.draw();
+
+		fpsUpDown.draw();
+		fpsLabel.draw();
 	}
 	
 	/*private void changeRes() {
@@ -220,6 +229,21 @@ public class SettingsScreen implements Screen, UpDownListener {
 	public void onOptionChanged(UpDown upDown, int newValue) {
 		if(fpsUpDown.equals(upDown))
 			game.setForegroundFps(newValue);
+	}
+
+	@Override
+	public SpriteBatch getSpriteBatch() {
+		return batch;
+	}
+
+	@Override
+	public ShapeRenderer getShapeRenderer() {
+		return shape;
+	}
+
+	@Override
+	public OrthographicCamera getCam() {
+		return cam;
 	}
 
 }

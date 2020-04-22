@@ -11,8 +11,9 @@ import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 import com.vasciie.bkbl.MyGdxGame;
 import com.vasciie.bkbl.gui.Button;
+import com.vasciie.bkbl.gui.GUIRenderer;
 
-public class PauseScreen implements Screen {
+public class PauseScreen implements Screen, GUIRenderer {
 
 	MyGdxGame game;
 	
@@ -35,11 +36,11 @@ public class PauseScreen implements Screen {
 		font = new BitmapFont();
 		font.getData().setScale(MyGdxGame.GUI_SCALE);
 		
-		resume = new Button("Resume", font, Color.ORANGE.cpy().sub(0, 0.3f, 0, 1), true, true);
-		newGame = new Button("New Game", font, Color.ORANGE.cpy().sub(0, 0.3f, 0, 1), true, true);
+		resume = new Button("Resume", font, Color.ORANGE.cpy().sub(0, 0.3f, 0, 1), true, true, this);
+		newGame = new Button("New Game", font, Color.ORANGE.cpy().sub(0, 0.3f, 0, 1), true, true, this);
 		if(!Gdx.app.getType().equals(Application.ApplicationType.Android))
-			settings = new Button("Settings", font, Color.ORANGE.cpy().sub(0, 0.3f, 0, 1), true, true);
-		quit = new Button("Quit", font, Color.ORANGE.cpy().sub(0, 0.3f, 0, 1), true, true);
+			settings = new Button("Settings", font, Color.ORANGE.cpy().sub(0, 0.3f, 0, 1), true, true, this);
+		quit = new Button("Quit", font, Color.ORANGE.cpy().sub(0, 0.3f, 0, 1), true, true, this);
 	}
 	
 	@Override
@@ -49,13 +50,11 @@ public class PauseScreen implements Screen {
 	
 	@Override
 	public void render(float delta) {
-		game.renderLogo(batch, cam);
-		
-		resume.render(batch, shape, cam);
-		newGame.render(batch, shape, cam);
+		resume.update();
+		newGame.update();
 		if(!Gdx.app.getType().equals(Application.ApplicationType.Android))
-			settings.render(batch, shape, cam);
-		quit.render(batch, shape, cam);
+			settings.update();
+		quit.update();
 		
 		if(Gdx.input.isKeyJustPressed(Keys.ESCAPE) || Gdx.input.isKeyJustPressed(Keys.BACK) || resume.justReleased()) {
 			exit();
@@ -74,6 +73,14 @@ public class PauseScreen implements Screen {
 			game.game.reset();
 			game.setScreen(game.main);
 		}
+
+		game.renderLogo(batch, cam);
+
+		resume.draw();
+		newGame.draw();
+		if(settings != null)
+			settings.draw();
+		quit.draw();
 			
 	}
 	
@@ -131,5 +138,19 @@ public class PauseScreen implements Screen {
 		shape.dispose();
 		font.dispose();
 	}
-	
+
+	@Override
+	public SpriteBatch getSpriteBatch() {
+		return batch;
+	}
+
+	@Override
+	public ShapeRenderer getShapeRenderer() {
+		return shape;
+	}
+
+	@Override
+	public OrthographicCamera getCam() {
+		return cam;
+	}
 }

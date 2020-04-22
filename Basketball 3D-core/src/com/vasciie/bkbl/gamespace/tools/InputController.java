@@ -10,11 +10,10 @@ import com.badlogic.gdx.graphics.g2d.BitmapFont;
 import com.badlogic.gdx.math.Vector3;
 import com.vasciie.bkbl.gamespace.GameMap;
 import com.vasciie.bkbl.gui.Button;
+import com.vasciie.bkbl.gui.GUIRenderer;
 import com.vasciie.bkbl.gui.Stick;
 
 public class InputController implements InputProcessor {
-
-    GameMap.GUIRenderer guiRenderer;
 
     static final int forward = Keys.W, backward = Keys.S, strafeRight = Keys.D, strafeLeft = Keys.A;
     static final int sprint = Keys.SHIFT_LEFT;
@@ -45,11 +44,9 @@ public class InputController implements InputProcessor {
     boolean cameraRot;
     boolean dribble;
 
-    public InputController(GameMap.GUIRenderer guiRenderer) {
+    public InputController(GUIRenderer guiRenderer) {
         if (Gdx.app.getType().equals(Application.ApplicationType.Android)) {
-            this.guiRenderer = guiRenderer;
-
-            movementStick = new Stick(Color.BLACK);
+            movementStick = new Stick(Color.BLACK, guiRenderer);
             movementStick.setSize(300, 300);
             movementStick.setPos(140, 70);
 
@@ -57,18 +54,21 @@ public class InputController implements InputProcessor {
             font.getData().setScale(1);
             font.setColor(Color.BLACK);
 
-            l = new Button("L", font, Color.BLACK, false, false);
-            r = new Button("R", font, Color.BLACK, false, false);
+            //In order to make a pause button create and set it up above the dribble ones as their positions and sizes will depend on it
+
+            l = new Button("L", font, Color.BLACK, false, false, guiRenderer);
+            r = new Button("R", font, Color.BLACK, false, false, guiRenderer);
 
             float width = Gdx.graphics.getWidth(), height = Gdx.graphics.getHeight();
-            l.setSize(width / 2 - 45, 200 * height / 1280);
-            l.setPos(0, height - l.getHeight());
-
-            r.setSize(l.getWidth(), l.getHeight());
+            float buttonSpace = 20;
+            r.setSize(width / 4 - buttonSpace, 220 * height / 1280);
             r.setPos(width - r.getWidth(), height - r.getHeight());
 
-            shootBtn = new Button("Shoot", font, Color.BLACK, Color.BLACK, false, false, true);
-            focusBtn = new Button("Focus", font, Color.BLACK, Color.BLACK, false, false, true);
+            l.setSize(r.getWidth(), r.getHeight());
+            l.setPos(r.getX() - l.getWidth() - buttonSpace, r.getY());
+
+            shootBtn = new Button("Shoot", font, Color.BLACK, Color.BLACK, false, false, true, guiRenderer);
+            focusBtn = new Button("Focus", font, Color.BLACK, Color.BLACK, false, false, true, guiRenderer);
 
             shootBtn.setSize(120, 80);
             shootBtn.setPos(width - shootBtn.getWidth() * 1.5f, height / 2 - shootBtn.getHeight() / 2);
@@ -108,46 +108,35 @@ public class InputController implements InputProcessor {
         }
     }
 
-    public void reset(){
-        dX = dY = 0;
+    public void update(GameMap map){
+        movementStick.update();
 
-        dribbleRPressed = dribbleLPressed = false;
-        shootPressed = focusPressed = false;
-        sprintPressed = false;
-
-        shootBtn.setToggled(false);
-        focusBtn.setToggled(false);
-    }
-
-    public void render(GameMap map) {
-        movementStick.render(guiRenderer.getSpriteBatch(), guiRenderer.getShapeRenderer(), guiRenderer.getCam());
-
-        l.render(guiRenderer.getSpriteBatch(), guiRenderer.getShapeRenderer(), guiRenderer.getCam());
-        r.render(guiRenderer.getSpriteBatch(), guiRenderer.getShapeRenderer(), guiRenderer.getCam());
+        l.update();
+        r.update();
 
         if (map.getMainPlayer().isHoldingBall()) {
-            shootBtn.render(guiRenderer.getSpriteBatch(), guiRenderer.getShapeRenderer(), guiRenderer.getCam());
+            shootBtn.update();
             if(map.getTeammates().size() > 1)
-                focusBtn.render(guiRenderer.getSpriteBatch(), guiRenderer.getShapeRenderer(), guiRenderer.getCam());
+                focusBtn.update();
 
             shootPressed = shootBtn.isToggled();
             focusPressed = focusBtn.isToggled();
 
             if (dribble && !map.getMainPlayer().isDribbling()) {
-                dribbleLPressed = l.isTouched(guiRenderer.getCam());
-                dribbleRPressed = r.isTouched(guiRenderer.getCam());
+                dribbleLPressed = l.isTouchedCheck();
+                dribbleRPressed = r.isTouchedCheck();
 
                 if(dribbleLPressed || dribbleRPressed)
                     dribble = false;
             } else {
-                if (!l.isTouched(guiRenderer.getCam()) && !r.isTouched(guiRenderer.getCam()))
+                if (!l.isTouchedCheck() && !r.isTouchedCheck())
                     dribble = true;
 
                 dribbleLPressed = dribbleRPressed = false;
             }
         } else {
-            dribbleLPressed = l.isTouched(guiRenderer.getCam());
-            dribbleRPressed = r.isTouched(guiRenderer.getCam());
+            dribbleLPressed = l.isTouchedCheck();
+            dribbleRPressed = r.isTouchedCheck();
             dribble = false;
 
             focusPressed = false;
@@ -159,6 +148,27 @@ public class InputController implements InputProcessor {
         else sprintPressed = movementStick.isSprintPressed();
 
         updateRotation();
+    }
+
+    public void reset(){
+        dX = dY = 0;
+
+        dribbleRPressed = dribbleLPressed = false;
+        shootPressed = focusPressed = false;
+        sprintPressed = false;
+
+        shootBtn.setToggled(false);
+        focusBtn.setToggled(false);
+    }
+
+    public void render() {
+        movementStick.draw();
+
+        l.draw();
+        r.draw();
+
+        shootBtn.draw();
+        focusBtn.draw();
     }
 
     public void updateRotation(){

@@ -3,7 +3,6 @@ package com.vasciie.bkbl.gui;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.g2d.BitmapFont;
-import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 import com.badlogic.gdx.math.Vector2;
 
@@ -11,27 +10,28 @@ public class Stick extends Button {
     Button sprint;
     Vector2 stickPos;
 
-    public Stick(Color color) {
-        super("", null, color, false, false);
+    public Stick(Color color, GUIRenderer guiRenderer) {
+        super("", null, color, false, false, guiRenderer);
 
         BitmapFont font = new BitmapFont();
         font.setColor(color);
 
-        sprint = new Button("Shift", font, color, false, false);
+        sprint = new Button("Shift", font, color, false, false, guiRenderer);
     }
 
     @Override
-    public void render(SpriteBatch batch, ShapeRenderer shape, OrthographicCamera cam){
-        touchable = true;
-        sprint.setTouchable(true);
+    public void update(){
+        super.update();
 
-        if(sprint.isTouched(cam)){
+        sprint.update();
+
+        if(sprint.isTouched()){
             stickPos.set(x + width / 2, y + width);
             multitouch = -1;
         }
-        else if(isLocalTouched(cam)){
+        else if(isLocalTouched()){
             float tX = getTouchX(multitouch);
-            float tY = cam.viewportHeight - getTouchY(multitouch);
+            float tY = guiRenderer.getCam().viewportHeight - getTouchY(multitouch);
             /*float normalPosX = x + width - width / 2;
             float normalPosY = y + width - width / 2;
 
@@ -55,28 +55,28 @@ public class Stick extends Button {
             stickPos.set(x + width / 2, y + width / 2);
             multitouch = -1;
         }
+    }
 
+    @Override
+    public void render(){
+        OrthographicCamera cam = guiRenderer.getCam();
+        ShapeRenderer shape = guiRenderer.getShapeRenderer();
 
-        float r1 = shape.getColor().r;
-        float g1 = shape.getColor().g;
-        float b1 = shape.getColor().b;
-        float a1 = shape.getColor().a;
+        Color tempColor = shape.getColor().cpy();
 
         shape.setProjectionMatrix(cam.combined);
         shape.begin(ShapeRenderer.ShapeType.Line);
         shape.setColor(r, g, b, a);
         shape.circle(x + width / 2, y + width / 2, width / 2);
-        shape.setAutoShapeType(true);
 
         //Stick
         shape.set(ShapeRenderer.ShapeType.Filled);
         shape.circle(stickPos.x, stickPos.y, width / 4);
 
         shape.end();
+        shape.setColor(tempColor);
 
-        shape.setColor(r1, g1, b1, a1);
-
-        sprint.render(batch, shape, cam);
+        sprint.render();
     }
 
     public byte getSprintMultitouch(){
