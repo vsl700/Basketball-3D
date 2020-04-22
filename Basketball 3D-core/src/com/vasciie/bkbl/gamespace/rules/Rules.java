@@ -74,8 +74,7 @@ public class Rules {
 								if (map.getTerrain().getInvisBodies().contains(obj)) {
 									ruleTriggerer = recentHolder;
 									occurPlace.set(map.getBall().getPosition()).add(occurPlace.cpy().scl(-1).nor().scl(3)).y = recentHolder.getPosition().y;
-									if(!recentHolder.isAiming() && !recentHolder.isShooting())
-										map.playerReleaseBall();
+									map.playerReleaseBall();
 									return true;
 								}
 							}
@@ -485,8 +484,7 @@ public class Rules {
 								timer = defaultTime;
 
 								ruleTriggerer = temp;
-								if(!temp.isAiming() && !temp.isShooting())
-									map.playerReleaseBall();
+								map.playerReleaseBall();
 								
 								ArrayList<Vector3> wallPositions = new ArrayList<Vector3>(8);
 								Terrain terrain = map.getTerrain();
@@ -574,8 +572,7 @@ public class Rules {
 									timer = defaultTime;
 
 									ruleTriggerer = temp;
-									if(!temp.isAiming() && !temp.isShooting())
-										map.playerReleaseBall();
+									map.playerReleaseBall();
 									
 									ArrayList<Vector3> wallPositions = new ArrayList<Vector3>(8);
 									Terrain terrain = map.getTerrain();
