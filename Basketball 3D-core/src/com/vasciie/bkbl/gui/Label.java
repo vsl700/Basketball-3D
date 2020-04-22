@@ -1,7 +1,6 @@
 package com.vasciie.bkbl.gui;
 
 import com.badlogic.gdx.graphics.Color;
-import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.g2d.BitmapFont;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
@@ -12,16 +11,16 @@ public class Label extends Text {
 
 	boolean multiline, textShorten;
 
-	public Label(String text, BitmapFont font, boolean multiline) {
+	public Label(String text, BitmapFont font, boolean multiline, GUIRenderer guiRenderer) {
+		super(guiRenderer);
+
 		this.text = text;
 		this.font = font;
 		this.multiline = multiline;
 	}
 	
-	public Label(String text, BitmapFont font, Color color, boolean multiline) {
-		this.text = text;
-		this.font = font;
-		this.multiline = multiline;
+	public Label(String text, BitmapFont font, Color color, boolean multiline, GUIRenderer guiRenderer) {
+		this(text, font, multiline, guiRenderer);
 
 		r = color.r;
 		g = color.g;
@@ -29,15 +28,10 @@ public class Label extends Text {
 		a = color.a;
 	}
 	
-	public Label(String text, BitmapFont font, Color color, Color fillColor, boolean textShorten) {
-		this.text = text;
-		this.font = font;
+	public Label(String text, BitmapFont font, Color color, Color fillColor, boolean textShorten, GUIRenderer guiRenderer) {
+		this(text, font, color, false, guiRenderer);
+
 		this.textShorten = textShorten;
-
-		r = color.r;
-		g = color.g;
-		b = color.b;
-		a = color.a;
 		
 		fR = fillColor.r;
 		fG = fillColor.g;
@@ -45,25 +39,26 @@ public class Label extends Text {
 		fA = fillColor.a;
 	}
 	
-	private void renderShapes(ShapeRenderer shape, OrthographicCamera cam) {
+	private void renderShapes() {
+		ShapeRenderer shape = guiRenderer.getShapeRenderer();
+
 		if (shape != null) {
-			float r1 = shape.getColor().r;
-			float g1 = shape.getColor().g;
-			float b1 = shape.getColor().b;
-			float a1 = shape.getColor().a;
+			Color tempColor = shape.getColor().cpy();
 			
 			shape.setColor(fR, fG, fB, fA);
 			
-			shape.setProjectionMatrix(cam.combined);
+			shape.setProjectionMatrix(guiRenderer.getCam().combined);
 			shape.begin(ShapeRenderer.ShapeType.Filled);
 			shape.rect(x, y, width, height);
 			shape.end();
 
-			shape.setColor(r1, g1, b1, a1);
+			shape.setColor(tempColor);
 		}
 	}
 	
-	private void renderText(SpriteBatch batch, OrthographicCamera cam) {
+	private void renderText() {
+		SpriteBatch batch = guiRenderer.getSpriteBatch();
+
 		float r1 = font.getColor().r;
 		float g1 = font.getColor().g;
 		float b1 = font.getColor().b;
@@ -71,7 +66,7 @@ public class Label extends Text {
 		
 		font.setColor(r, g, b, a);
 
-		batch.setProjectionMatrix(cam.combined);
+		batch.setProjectionMatrix(guiRenderer.getCam().combined);
 		batch.begin();
 
 		if (multiline) {
@@ -106,10 +101,10 @@ public class Label extends Text {
 	}
 
 	@Override
-	public void render(SpriteBatch batch, ShapeRenderer shape, OrthographicCamera cam) {
-		renderShapes(shape, cam);
+	public void render() {
+		renderShapes();
 		
-		renderText(batch, cam);
+		renderText();
 	}
 
 	protected void onResize() {

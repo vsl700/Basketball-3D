@@ -12,7 +12,11 @@ public abstract class Text extends GUI {
 	protected String text;
 	
 	protected float r, g, b, a;
-	
+
+	public Text(GUIRenderer guiRenderer) {
+		super(guiRenderer);
+	}
+
 	protected boolean containsDiffFromLetter(String text) {
 		for(int i = 0; i < text.length(); i++) {
 			if(!Character.isLetter(text.charAt(i)))

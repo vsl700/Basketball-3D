@@ -10,12 +10,13 @@ import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 import com.vasciie.bkbl.MyGdxGame;
 import com.vasciie.bkbl.gui.Button;
+import com.vasciie.bkbl.gui.GUIRenderer;
 import com.vasciie.bkbl.gui.Label;
 import com.vasciie.bkbl.gui.NumUpDown;
 import com.vasciie.bkbl.gui.TextUpDown;
 
 
-public class LevelScreen implements Screen {
+public class LevelScreen implements Screen, GUIRenderer {
 
 	MyGdxGame game;
 	
@@ -38,30 +39,30 @@ public class LevelScreen implements Screen {
 		batch = new SpriteBatch();
 		
 		btnFont = new BitmapFont();
-		btnFont.getData().setScale(1);
+		btnFont.getData().setScale(MyGdxGame.GUI_SCALE);
 		
 		textFont = new BitmapFont();
-		textFont.getData().setScale(2);
+		textFont.getData().setScale(2 * MyGdxGame.GUI_SCALE);
 		
 		createGui();
 	}
 	
 	private void createGui() {
-		numUpDown = new NumUpDown(btnFont, textFont, Color.WHITE, Color.BROWN, new Color().set(0.8f, 0.4f, 0, 1), 1, 5);
+		numUpDown = new NumUpDown(btnFont, textFont, Color.WHITE, Color.BROWN, new Color().set(0.8f, 0.4f, 0, 1), 1, 5, this);
 		numUpDown.setOption(3);
 		
 		ArrayList<String> choices = new ArrayList<String>();
 		choices.add("Easy");
 		choices.add("Hard");
 		choices.add("Very Hard");
-		textUpDown = new TextUpDown(btnFont, textFont, Color.WHITE, Color.BROWN, new Color().set(0.8f, 0.4f, 0, 1), choices, true);
+		textUpDown = new TextUpDown(btnFont, textFont, Color.WHITE, Color.BROWN, new Color().set(0.8f, 0.4f, 0, 1), choices, true, this);
 		
-		play = new Button("Play", btnFont, Color.ORANGE.cpy().sub(0, 0.3f, 0, 1), true, true);
-		back = new Button("Go Back", btnFont, Color.ORANGE.cpy().sub(0, 0.3f, 0, 1), true, true);
+		play = new Button("Play", btnFont, Color.ORANGE.cpy().sub(0, 0.3f, 0, 1), true, true, this);
+		back = new Button("Go Back", btnFont, Color.ORANGE.cpy().sub(0, 0.3f, 0, 1), true, true, this);
 		
-		tmPlAmount = new Label("THE AMOUNT OF PLAYERS PER TEAM", btnFont, Color.BROWN, true);
+		tmPlAmount = new Label("THE AMOUNT OF PLAYERS PER TEAM", btnFont, Color.BROWN, true, this);
 		
-		difficulty = new Label("THE DIFFICULTY OF THE GAME", btnFont, Color.BROWN, true);
+		difficulty = new Label("THE DIFFICULTY OF THE GAME", btnFont, Color.BROWN, true, this);
 	}
 	
 	@Override
@@ -72,38 +73,50 @@ public class LevelScreen implements Screen {
 	@Override
 	public void render(float delta) {
 		cam.update();
+
+		numUpDown.update();
+		textUpDown.update();
+		play.update();
+		back.update();
 		
-		game.renderLogo(batch, cam);
+		tmPlAmount.update();
+		difficulty.update();
 		
-		numUpDown.render(batch, shape, cam);
-		textUpDown.render(batch, shape, cam);
-		play.render(batch, shape, cam);
-		back.render(batch, shape, cam);
-		
-		tmPlAmount.render(batch, shape, cam);
-		difficulty.render(batch, shape, cam);
-		
-		if(back.justReleased(cam))
+		if(back.justReleased())
 			game.setScreen(game.main);
-		else if(play.justReleased(cam)) {
+		else if(play.justReleased()) {
 			game.game.setPlayersAmount(numUpDown.getOption());
 			game.setScreen(game.game);
 		}
+
+		game.renderLogo(batch, cam);
+
+		numUpDown.draw();
+		textUpDown.draw();
+		play.draw();
+		back.draw();
+
+		tmPlAmount.draw();
+		difficulty.draw();
 	}
 
 	@Override
 	public void resize(int width, int height) {
 		cam.setToOrtho(false, width, height);
-		
-		play.setPosAndSize(game.pixelXByCurrentSize(149), game.pixelYByCurrentSize(150), game.pixelXByCurrentSize(223), game.pixelYByCurrentSize(30));
-		back.setPosAndSize(game.pixelXByCurrentSize(893), game.pixelYByCurrentSize(150), game.pixelXByCurrentSize(223), game.pixelYByCurrentSize(30));
-		numUpDown.setSize(game.pixelXByCurrentSize(74), game.pixelYByCurrentSize(45));
+
+		int constant = 60;
+
+		play.setSize(game.pixelXByCurrentSize(223 * MyGdxGame.GUI_SCALE), game.pixelYByCurrentSize(30 * MyGdxGame.GUI_SCALE));
+		play.setPos(width / 4 - play.getWidth() / 2 - constant, game.pixelYByCurrentSize(150 / MyGdxGame.GUI_SCALE));
+		back.setSize(game.pixelXByCurrentSize(223 * MyGdxGame.GUI_SCALE), game.pixelYByCurrentSize(30 * MyGdxGame.GUI_SCALE));
+		back.setPos(width * 3 / 4 - play.getWidth() / 2 + constant, game.pixelYByCurrentSize(150 / MyGdxGame.GUI_SCALE));
+		numUpDown.setSize(game.pixelXByCurrentSize(74 * MyGdxGame.GUI_SCALE), game.pixelYByCurrentSize(45 * MyGdxGame.GUI_SCALE));
 		numUpDown.setPos(back.getX() - 90, game.pixelYByCurrentSize(325));
-		textUpDown.setSize(game.pixelXByCurrentSize(104), game.pixelYByCurrentSize(45));
+		textUpDown.setSize(game.pixelXByCurrentSize(104 * MyGdxGame.GUI_SCALE), game.pixelYByCurrentSize(45 * MyGdxGame.GUI_SCALE));
 		textUpDown.setPos(play.getX() + play.getWidth() + 90 - textUpDown.getTotalWidth(), game.pixelYByCurrentSize(325));
 		
-		tmPlAmount.setPosAndSize(numUpDown.getX() + numUpDown.getTotalWidth() / 2 - 164 / 2, numUpDown.getY() + numUpDown.getHeight() + 10, 164);
-		difficulty.setPosAndSize(textUpDown.getX() + textUpDown.getTotalWidth() / 2 - 164 / 2, textUpDown.getY() + textUpDown.getHeight() + 10, 164);
+		tmPlAmount.setPosAndSize(numUpDown.getX() + numUpDown.getTotalWidth() / 2 / MyGdxGame.GUI_SCALE - 164 / 2, numUpDown.getY() + numUpDown.getHeight() + 10, 164 * MyGdxGame.GUI_SCALE);
+		difficulty.setPosAndSize(textUpDown.getX() + textUpDown.getTotalWidth() / 2 / MyGdxGame.GUI_SCALE - 164 / 2, textUpDown.getY() + textUpDown.getHeight() + 10, 164 * MyGdxGame.GUI_SCALE);
 	}
 
 	@Override
@@ -133,4 +146,18 @@ public class LevelScreen implements Screen {
 		return textUpDown.getOption();
 	}
 
+	@Override
+	public SpriteBatch getSpriteBatch() {
+		return batch;
+	}
+
+	@Override
+	public ShapeRenderer getShapeRenderer() {
+		return shape;
+	}
+
+	@Override
+	public OrthographicCamera getCam() {
+		return cam;
+	}
 }

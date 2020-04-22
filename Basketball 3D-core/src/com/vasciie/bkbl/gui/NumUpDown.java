@@ -3,10 +3,7 @@ package com.vasciie.bkbl.gui;
 import java.util.HashMap;
 
 import com.badlogic.gdx.graphics.Color;
-import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.g2d.BitmapFont;
-import com.badlogic.gdx.graphics.g2d.SpriteBatch;
-import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 
 public class NumUpDown extends UpDown implements TextChangeListener {
 
@@ -16,61 +13,64 @@ public class NumUpDown extends UpDown implements TextChangeListener {
 	int min, max;
 	int diff;
 
-	public NumUpDown(BitmapFont btnFont, BitmapFont textFont, Color color, Color fillColor, Color textFillColor, int min, int max) {
-		regularConstructor(btnFont, textFont, color, fillColor, textFillColor, min, max);
-		
-		this.diff = 1;
-	}
-	
-	public NumUpDown(BitmapFont btnFont, BitmapFont textFont, Color color, Color fillColor, Color textFillColor, int min, int max, int diff) {
-		regularConstructor(btnFont, textFont, color, fillColor, textFillColor, min, max);
-		
-		this.diff = diff;
-	}
-	
-	private void regularConstructor(BitmapFont btnFont, BitmapFont textFont, Color color, Color fillColor, Color textFillColor, int min, int max) {
+	public NumUpDown(BitmapFont btnFont, BitmapFont textFont, Color color, Color fillColor, Color textFillColor, int min, int max, GUIRenderer guiRenderer) {
+		super(guiRenderer);
 		this.min = min;
 		this.max = max;
 
 		num = min;
 
 		create(btnFont, fillColor);
-		
-		textPanel = new TextPanel(textFont, color, textFillColor, min, max);
+
+		textPanel = new TextPanel(textFont, color, textFillColor, min, max, guiRenderer);
 		textPanel.setTextChangeListener(this);
 		textPanel.setText(num);
+		
+		this.diff = 1;
+	}
+	
+	public NumUpDown(BitmapFont btnFont, BitmapFont textFont, Color color, Color fillColor, Color textFillColor, int min, int max, int diff, GUIRenderer guiRenderer) {
+		this(btnFont, textFont, color, fillColor, textFillColor, min, max, guiRenderer);
+		
+		this.diff = diff;
 	}
 
 	@Override
-	public void render(SpriteBatch batch, ShapeRenderer shape, OrthographicCamera cam) {
-		super.render(batch, shape, cam);
-		
-		if (down.justReleased(cam)) {
-			
+	public void update(){
+		super.update();
+
+		if (down.justReleased()) {
+
 			if (num - diff >= min) {
 				num-= diff;
-				
+
 				checkForExceptions(num);
-				
+
 				sendSignalToListen();
 			}
-		} else if (up.justReleased(cam)) {
-			
+		} else if (up.justReleased()) {
+
 			if (num + diff <= max) {
 				num+= diff;
-				
+
 				checkForExceptions(num);
-				
+
 				sendSignalToListen();
 			}
 		}
 
-		textPanel.render(batch, shape, cam);
+		textPanel.update();
+	}
+
+	@Override
+	public void render() {
+		super.render();
+		textPanel.draw();
 	}
 
 	protected void onResize() {
 		super.onResize();
-		textPanel.setPosAndSize(x + 40, y, width, height);
+		textPanel.setPosAndSize(down.getX() + down.getWidth() + 10, y, width, height);
 	}
 
 	public void setOption(int num) {

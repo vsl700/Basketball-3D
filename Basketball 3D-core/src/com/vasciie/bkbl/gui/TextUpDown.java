@@ -3,10 +3,7 @@ package com.vasciie.bkbl.gui;
 import java.util.ArrayList;
 
 import com.badlogic.gdx.graphics.Color;
-import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.g2d.BitmapFont;
-import com.badlogic.gdx.graphics.g2d.SpriteBatch;
-import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 
 public class TextUpDown extends UpDown {
 	
@@ -14,38 +11,46 @@ public class TextUpDown extends UpDown {
 	
 	ArrayList<String> options;
 	
-	public TextUpDown(BitmapFont btnFont, BitmapFont textFont, Color color, Color fillColor, Color textFillColor, ArrayList<String> options, boolean textShorten) {
+	public TextUpDown(BitmapFont btnFont, BitmapFont textFont, Color color, Color fillColor, Color textFillColor, ArrayList<String> options, boolean textShorten, GUIRenderer guiRenderer) {
+		super(guiRenderer);
+
 		this.options = options;
 		
 		create(btnFont, fillColor);
 		
-		label = new Label(options.get(0), textFont, color, textFillColor, textShorten);
+		label = new Label(options.get(0), textFont, color, textFillColor, textShorten, guiRenderer);
 	}
 
 	@Override
-	public void render(SpriteBatch batch, ShapeRenderer shape, OrthographicCamera cam) {
-		super.render(batch, shape, cam);
-		
-		if(down.justReleased(cam) && num > 0) {
+	public void update(){
+		super.update();
+
+		if(down.justReleased() && num > 0) {
 			num--;
 			label.setText(options.get(num));
-			
+
 			sendSignalToListen();
 		}
-		else if(up.justReleased(cam) && num < options.size() - 1) {
+		else if(up.justReleased() && num < options.size() - 1) {
 			num++;
 			label.setText(options.get(num));
-			
+
 			sendSignalToListen();
 		}
-		
-		label.render(batch, shape, cam);
+
+		label.update();
+	}
+
+	@Override
+	public void render() {
+		super.render();
+		label.draw();
 	}
 	
 	@Override
 	protected void onResize() {
 		super.onResize();
-		label.setPosAndSize(x + 40, y, width, height);
+		label.setPosAndSize(down.getX() + down.getWidth() + 10, y, width, height);
 	}
 	
 	public void setTextOption(String s) {

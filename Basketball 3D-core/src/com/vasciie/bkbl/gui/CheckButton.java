@@ -1,62 +1,79 @@
 package com.vasciie.bkbl.gui;
 
 import com.badlogic.gdx.graphics.Color;
-import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.g2d.BitmapFont;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 
 public class CheckButton extends Button {
-	
+
+	Color toggleColor;
+
 	boolean toggled;
 	
-	public CheckButton(String text, BitmapFont font, Color color, boolean mark, boolean filled) {
-		super(text, font, color, mark, filled);
+	public CheckButton(String text, BitmapFont font, Color color, boolean mark, boolean filled, GUIRenderer guiRenderer) {
+		super(text, font, color, mark, filled, guiRenderer);
+	}
+
+	@Override
+	public void update(){
+		super.update();
+
+		if(isMouseOn() && mark) {
+			renderColor = markColorMouse();
+		}
+		else renderColor = new Color(r, g, b, a);
+
+		if(justLocalTouched())
+			toggled = !toggled;
+
+		if(!isLocalTouched())
+			multitouch = -1;
+
+		if(toggled && filled)
+			toggleColor = new Color(1, 1, 1, 1).sub(renderColor);
 	}
 	
-	private void renderShapes(ShapeRenderer shape, OrthographicCamera cam) {
-		shape.setProjectionMatrix(cam.combined);
+	private void renderShapes() {
+		ShapeRenderer shape = guiRenderer.getShapeRenderer();
+
+		shape.setProjectionMatrix(guiRenderer.getCam().combined);
 		
 		if(filled)
 			shape.begin(ShapeRenderer.ShapeType.Filled);
 		else shape.begin(ShapeRenderer.ShapeType.Line);
 
-		float r1 = shape.getColor().r;
-		float g1 = shape.getColor().g;
-		float b1 = shape.getColor().b;
-		float a1 = shape.getColor().a;
+		Color tempColor = shape.getColor().cpy();
 		
 		font.setColor(shape.getColor().cpy());
-		
-		if(isMouseOn(cam) && mark) {
-			 shape.setColor(markColorMouse());
-		}
-		else shape.setColor(r, g, b, a);
-		
+
+		shape.setColor(renderColor);
 		shape.rect(x, y, width, height);
 		
 		if(toggled) {
-			if(filled) {
-				Color temp = shape.getColor();
-				shape.setColor(1 - temp.r, 1 - temp.g, 1 - temp.b, 1 - temp.a);
-			}
-			shape.setAutoShapeType(true);
+			if(filled)
+				shape.setColor(toggleColor);
+
 			shape.set(ShapeRenderer.ShapeType.Filled);
 			
 			float markScale = 20;
 			shape.rect(x + width / 2 - markScale / 2, y + height / 2 - markScale / 2, markScale, markScale);
 		}
 		shape.end();
-		shape.setColor(r1, g1, b1, a1);
+		shape.setColor(tempColor);
+
+		renderColor = toggleColor = null;
 	}
 	
-	private void renderText(SpriteBatch batch, OrthographicCamera cam) {
+	private void renderText() {
+		SpriteBatch batch = guiRenderer.getSpriteBatch();
+
 		float r2 = font.getColor().r;
 		float g2 = font.getColor().g;
 		float b2 = font.getColor().b;
 		float a2 = font.getColor().a;
 		
-		batch.setProjectionMatrix(cam.combined);
+		batch.setProjectionMatrix(guiRenderer.getCam().combined);
 		batch.begin();
 		font.draw(batch, text, x + width + 13, y + height / 2 + font.getLineHeight() / 3);
 		batch.end();
@@ -65,15 +82,9 @@ public class CheckButton extends Button {
 	}
 	
 	@Override
-	public void render(SpriteBatch batch, ShapeRenderer shape, OrthographicCamera cam) {
-		touchable = true;
-		
-		if(justLocalTouched(cam))
-			toggled = !toggled;
-		
-		renderShapes(shape, cam);
-		renderText(batch, cam);
-		
+	public void render() {
+		renderShapes();
+		renderText();
 	}
 	
 	public void setToggled(boolean toggled) {

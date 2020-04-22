@@ -228,8 +228,7 @@ public class Brain {
 	 * Calculates shooting vector according to the location of the player, shooting target
 	 * and distance between the player and the target. It also modifies player's shooting 
 	 * power.
-	 * 
-	 * @param player - the shooting player
+	 *
 	 * @param targetVec - the target of the player
 	 * @return
 	 */
