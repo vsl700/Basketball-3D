@@ -26,7 +26,6 @@ public class MyGdxGame extends Game {
 	OrthographicCamera cam;
 	
 	ModelBatch mBatch;
-	ModelCache mCache;
 	Environment environment;
 	PerspectiveCamera pCam;
 	
@@ -79,7 +78,6 @@ public class MyGdxGame extends Game {
 	
 	public void load3DGraphics() {
 		mBatch = new ModelBatch();
-		mCache = new ModelCache();
 
 		environment = new Environment();
 		environment.set(new ColorAttribute(ColorAttribute.AmbientLight, 0.4f, 0.4f, 0.4f, 1f));
@@ -116,7 +114,7 @@ public class MyGdxGame extends Game {
 
 				pCam.update();
 				//mBatch.begin(pCam);
-				map.render(mBatch, mCache, environment, pCam);
+				map.render(mBatch, environment, pCam);
 				//mBatch.end();
 
 				pCam.rotateAround(new Vector3(), new Vector3(0, 1, 0), 10 * Gdx.graphics.getDeltaTime());

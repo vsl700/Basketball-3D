@@ -31,7 +31,6 @@ public class GameScreen implements Screen, RulesListener, GUIRenderer {
 	Runnable updateThread;
 	
 	ModelBatch mBatch;
-	ModelCache mCache;
 	Environment environment;
 	PerspectiveCamera pCam;
 	
@@ -57,22 +56,21 @@ public class GameScreen implements Screen, RulesListener, GUIRenderer {
 
 	public GameScreen(MyGdxGame mg) {
 		game = mg;
-		
+
 		updateThread = new Runnable() {
 
 			@Override
 			public void run() {
 				if(Gdx.app.getType().equals(Application.ApplicationType.Android))
 					map.updateController();
-				
+
 				map.update(Gdx.graphics.getDeltaTime());
-				
+
 			}
-			
+
 		};
 
 		mBatch = new ModelBatch();
-		mCache = new ModelCache();
 
 		environment = new Environment();
 		environment.set(new ColorAttribute(ColorAttribute.AmbientLight, 0.4f, 0.4f, 0.4f, 1f));
@@ -166,7 +164,7 @@ public class GameScreen implements Screen, RulesListener, GUIRenderer {
 		map.getMainPlayer().getFocusTransform().mul(new Matrix4().setToTranslation(0, map.getMainPlayer().getHeight(), -10)).getTranslation(pCam.position);
 		game.customLookAt(pCam, new Matrix4(map.getMainPlayer().getModelInstance().transform).mul(new Matrix4().setToTranslation(0, map.getMainPlayer().getHeight(), 0)).getTranslation(new Vector3()));
 		pCam.update();
-		map.render(mBatch, mCache, environment, pCam);
+		map.render(mBatch, environment, pCam);
 
 		homeScore.update();
 		awayScore.update();
@@ -277,7 +275,6 @@ public class GameScreen implements Screen, RulesListener, GUIRenderer {
 	@Override
 	public void dispose() {
 		mBatch.dispose();
-		mCache.dispose();
 	}
 	
 	public void setPlayersAmount(int amount) {

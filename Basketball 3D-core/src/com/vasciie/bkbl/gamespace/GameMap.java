@@ -5,6 +5,7 @@ import java.util.HashMap;
 
 import com.badlogic.gdx.Application;
 import com.badlogic.gdx.Gdx;
+import com.badlogic.gdx.Input;
 import com.badlogic.gdx.ai.GdxAI;
 import com.badlogic.gdx.ai.steer.SteerableAdapter;
 import com.badlogic.gdx.graphics.PerspectiveCamera;
@@ -81,7 +82,7 @@ public class GameMap {
             return true;
         }
     }
-    
+
     Runnable dynamicsWorldThread;
 
     Rules rules;
@@ -133,9 +134,9 @@ public class GameMap {
 			public void run() {
 				dynamicsWorld.stepSimulation(Gdx.graphics.getDeltaTime(), 5, 1f / 60f);
 			}
-        	
+
         };
-    	
+
         inputs = new InputController(guiRenderer);
 
         rules = new Rules(this, rulesListener);
@@ -401,8 +402,8 @@ public class GameMap {
         Gdx.input.setInputProcessor(inputs);
 
         //TODO When using Android Studio, take the comment marks out of the lines below! Eclipse gives an error on this line!
-        //if (Gdx.app.getType().equals(Application.ApplicationType.Android))
-            //Gdx.input.setCatchKey(Input.Keys.BACK, true);
+        if (Gdx.app.getType().equals(Application.ApplicationType.Android))
+            Gdx.input.setCatchKey(Input.Keys.BACK, true);
 
         startTimer = 5.5f;
         playersReady = true;
@@ -504,8 +505,8 @@ public class GameMap {
         Gdx.input.setInputProcessor(null);
 
         //TODO When using Android Studio, take the comment marks out of the lines below! Eclipse gives an error on this line!
-        //if (Gdx.app.getType().equals(Application.ApplicationType.Android))
-            //Gdx.input.setCatchKey(Input.Keys.BACK, false);
+        if (Gdx.app.getType().equals(Application.ApplicationType.Android))
+            Gdx.input.setCatchKey(Input.Keys.BACK, false);
     }
 
     public void update(final float delta) {
@@ -613,19 +614,15 @@ public class GameMap {
             e.onCycleEnd();
     }
 
-    public void render(ModelBatch mBatch, ModelCache mCache, Environment environment, PerspectiveCamera pCam) {
-        mCache.begin(pCam);
-        mCache.add(ball.getModelInstance());
-        mCache.add(terrain.getModelInstance());
-        mCache.add(basket1.getModelInstance());
-        mCache.add(basket2.getModelInstance());
-        for(Player e : getAllPlayers())
-        	mCache.add(e.getModelInstance());
-        
-        mCache.end();
-    	
+    public void render(ModelBatch mBatch, Environment environment, PerspectiveCamera pCam) {
     	mBatch.begin(pCam);
-        mBatch.render(mCache, environment);
+        ball.render(mBatch, environment);
+        terrain.render(mBatch, environment);
+        basket1.render(mBatch, environment);
+        basket2.render(mBatch, environment);
+        for(Player e : getAllPlayers())
+            e.render(mBatch, environment);
+
         mBatch.end();
     }
 
