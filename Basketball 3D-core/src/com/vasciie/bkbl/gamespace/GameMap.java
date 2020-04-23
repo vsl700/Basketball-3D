@@ -496,7 +496,7 @@ public class GameMap {
             //Gdx.input.setCatchKey(Input.Keys.BACK, false);
     }
 
-    public void update(float delta) {
+    public void update(final float delta) {
         Player currentHolder = getHoldingPlayer();
         //camera.setWorldTransform(new Matrix4(mainPlayer.getModelInstance().transform).mul(mainPlayer.getCamMatrix()).mul(new Matrix4().setToTranslation(0, mainPlayer.getHeight(), -10)));
 
@@ -504,7 +504,15 @@ public class GameMap {
         // because the AI might sometimes make mistakes and if
         // players go one through another that wouldn't be very funny (for me)
         //float delta2 = Math.min(1f / 30f, delta);
-        dynamicsWorld.stepSimulation(delta, 5, 1f / 60f);
+        Gdx.app.postRunnable(new Runnable() {
+
+			@Override
+			public void run() {
+				// TODO Auto-generated method stub
+				dynamicsWorld.stepSimulation(delta, 5, 1f / 60f);
+			}
+        	
+        });
 
         //if(gameRunning)
         if (!gameRunning) {
