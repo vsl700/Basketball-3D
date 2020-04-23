@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <classpath>
 	<classpathentry kind="src" path="src"/>
-	<classpathentry kind="src" path="assets1"/>
+	<classpathentry kind="src" path="assets"/>
 	<classpathentry exported="true" kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER"/>
 	<classpathentry exported="true" kind="src" path="/Basketball 3D-core"/>
 	<classpathentry exported="true" kind="lib" path="C:/Users/studi/.gradle/caches/modules-2/files-2.1/com.badlogicgames.gdx/gdx-backend-lwjgl/1.9.3/88bc98f6155e1f63462ba03622ffaf25557dccc0/gdx-backend-lwjgl-1.9.3.jar" sourcepath="C:/Users/studi/.gradle/caches/modules-2/files-2.1/com.badlogicgames.gdx/gdx-backend-lwjgl/1.9.3/7b68e24f28daece0760c36360cfa9da18057a443/gdx-backend-lwjgl-1.9.3-sources.jar"/>
@@ -31,6 +31,5 @@
 	<classpathentry exported="true" kind="lib" path="C:/Users/studi/.gradle/caches/modules-2/files-2.1/net.java.jinput/jinput-platform/2.0.5/7ff832a6eb9ab6a767f1ade2b548092d0fa64795/jinput-platform-2.0.5-natives-linux.jar"/>
 	<classpathentry exported="true" kind="lib" path="C:/Users/studi/.gradle/caches/modules-2/files-2.1/net.java.jinput/jinput-platform/2.0.5/385ee093e01f587f30ee1c8a2ee7d408fd732e16/jinput-platform-2.0.5-natives-windows.jar"/>
 	<classpathentry exported="true" kind="lib" path="C:/Users/studi/.gradle/caches/modules-2/files-2.1/net.java.jinput/jinput-platform/2.0.5/53f9c919f34d2ca9de8c51fc4e1e8282029a9232/jinput-platform-2.0.5-natives-osx.jar"/>
-	<classpathentry kind="src" path="assets"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>
