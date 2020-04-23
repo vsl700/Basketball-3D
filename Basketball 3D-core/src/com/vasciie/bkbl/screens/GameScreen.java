@@ -12,6 +12,7 @@ import com.badlogic.gdx.graphics.g2d.BitmapFont;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.g3d.Environment;
 import com.badlogic.gdx.graphics.g3d.ModelBatch;
+import com.badlogic.gdx.graphics.g3d.ModelCache;
 import com.badlogic.gdx.graphics.g3d.attributes.ColorAttribute;
 import com.badlogic.gdx.graphics.g3d.environment.DirectionalLight;
 import com.badlogic.gdx.graphics.g3d.environment.PointLight;
@@ -28,6 +29,7 @@ import com.vasciie.bkbl.gui.Label;
 public class GameScreen implements Screen, RulesListener, GUIRenderer {
 
 	ModelBatch mBatch;
+	ModelCache mCache;
 	Environment environment;
 	PerspectiveCamera pCam;
 	
@@ -55,6 +57,7 @@ public class GameScreen implements Screen, RulesListener, GUIRenderer {
 		game = mg;
 
 		mBatch = new ModelBatch();
+		mCache = new ModelCache();
 
 		environment = new Environment();
 		environment.set(new ColorAttribute(ColorAttribute.AmbientLight, 0.4f, 0.4f, 0.4f, 1f));
@@ -160,7 +163,7 @@ public class GameScreen implements Screen, RulesListener, GUIRenderer {
 		map.getMainPlayer().getFocusTransform().mul(new Matrix4().setToTranslation(0, map.getMainPlayer().getHeight(), -10)).getTranslation(pCam.position);
 		game.customLookAt(pCam, new Matrix4(map.getMainPlayer().getModelInstance().transform).mul(new Matrix4().setToTranslation(0, map.getMainPlayer().getHeight(), 0)).getTranslation(new Vector3()));
 		pCam.update();
-		map.render(mBatch, environment, pCam);
+		map.render(mBatch, mCache, environment, pCam);
 
 		homeScore.update();
 		awayScore.update();
@@ -255,6 +258,7 @@ public class GameScreen implements Screen, RulesListener, GUIRenderer {
 	public void reset() {
 		if(map != null)
 			map.clear();
+		
 		homeScore.setText(0 + "");
 		awayScore.setText(0 + "");
 		
@@ -270,6 +274,7 @@ public class GameScreen implements Screen, RulesListener, GUIRenderer {
 	@Override
 	public void dispose() {
 		mBatch.dispose();
+		mCache.dispose();
 	}
 	
 	public void setPlayersAmount(int amount) {

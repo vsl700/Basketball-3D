@@ -10,6 +10,7 @@ import com.badlogic.gdx.ai.steer.SteerableAdapter;
 import com.badlogic.gdx.graphics.PerspectiveCamera;
 import com.badlogic.gdx.graphics.g3d.Environment;
 import com.badlogic.gdx.graphics.g3d.ModelBatch;
+import com.badlogic.gdx.graphics.g3d.ModelCache;
 import com.badlogic.gdx.math.Matrix4;
 import com.badlogic.gdx.math.Quaternion;
 import com.badlogic.gdx.math.Vector3;
@@ -609,17 +610,19 @@ public class GameMap {
             e.onCycleEnd();
     }
 
-    public void render(final ModelBatch mBatch, final Environment environment, PerspectiveCamera pCam) {
-        mBatch.begin(pCam);
-        for (final Player e : getAllPlayers()) {
-            e.render(mBatch, environment);
-        }
-
-        ball.render(mBatch, environment);
-
-        terrain.render(mBatch, environment);
-        basket1.render(mBatch, environment);
-        basket2.render(mBatch, environment);
+    public void render(ModelBatch mBatch, ModelCache mCache, Environment environment, PerspectiveCamera pCam) {
+        mCache.begin(pCam);
+        mCache.add(ball.getModelInstance());
+        mCache.add(terrain.getModelInstance());
+        mCache.add(basket1.getModelInstance());
+        mCache.add(basket2.getModelInstance());
+        for(Player e : getAllPlayers())
+        	mCache.add(e.getModelInstance());
+        
+        mCache.end();
+    	
+    	mBatch.begin(pCam);
+        mBatch.render(mCache, environment);
         mBatch.end();
     }
 
