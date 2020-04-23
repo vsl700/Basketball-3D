@@ -28,6 +28,8 @@ import com.vasciie.bkbl.gui.Label;
 
 public class GameScreen implements Screen, RulesListener, GUIRenderer {
 
+	Runnable updateThread;
+	
 	ModelBatch mBatch;
 	ModelCache mCache;
 	Environment environment;
@@ -55,6 +57,19 @@ public class GameScreen implements Screen, RulesListener, GUIRenderer {
 
 	public GameScreen(MyGdxGame mg) {
 		game = mg;
+		
+		updateThread = new Runnable() {
+
+			@Override
+			public void run() {
+				if(Gdx.app.getType().equals(Application.ApplicationType.Android))
+					map.updateController();
+				
+				map.update(Gdx.graphics.getDeltaTime());
+				
+			}
+			
+		};
 
 		mBatch = new ModelBatch();
 		mCache = new ModelCache();
@@ -143,19 +158,7 @@ public class GameScreen implements Screen, RulesListener, GUIRenderer {
 		Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT | GL20.GL_DEPTH_BUFFER_BIT);
 		
 		if (!pause.isActive()) {
-			Gdx.app.postRunnable(new Runnable() {
-
-				@Override
-				public void run() {
-					if(Gdx.app.getType().equals(Application.ApplicationType.Android))
-						map.updateController();
-					
-					map.update(delta);
-					
-					// map.getCamera().getMainTrans().getTranslation(pCam.position);
-				}
-				
-			});
+			Gdx.app.postRunnable(updateThread);
 		}
 
 		cam.update();

@@ -81,6 +81,8 @@ public class GameMap {
             return true;
         }
     }
+    
+    Runnable dynamicsWorldThread;
 
     Rules rules;
 
@@ -125,6 +127,15 @@ public class GameMap {
     int index = 0, lastIndex, ballIndex, lastBallIndex;
 
     public GameMap(RulesListener rulesListener, GUIRenderer guiRenderer) {
+    	dynamicsWorldThread = new Runnable() {
+
+			@Override
+			public void run() {
+				dynamicsWorld.stepSimulation(Gdx.graphics.getDeltaTime(), 5, 1f / 60f);
+			}
+        	
+        };
+    	
         inputs = new InputController(guiRenderer);
 
         rules = new Rules(this, rulesListener);
@@ -505,15 +516,7 @@ public class GameMap {
         // because the AI might sometimes make mistakes and if
         // players go one through another that wouldn't be very funny (for me)
         //float delta2 = Math.min(1f / 30f, delta);
-        Gdx.app.postRunnable(new Runnable() {
-
-			@Override
-			public void run() {
-				// TODO Auto-generated method stub
-				dynamicsWorld.stepSimulation(delta, 5, 1f / 60f);
-			}
-        	
-        });
+        Gdx.app.postRunnable(dynamicsWorldThread);
 
         //if(gameRunning)
         if (!gameRunning) {
