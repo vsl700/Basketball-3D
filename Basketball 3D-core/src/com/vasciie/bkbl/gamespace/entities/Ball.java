@@ -39,7 +39,7 @@ public class Ball extends Entity {
 		
 		Material material = new Material(TextureAttribute.createDiffuse(ballTexture));
 		
-		model = mb.createSphere(1, 1, 1, 25, 25, material, VertexAttributes.Usage.Position | VertexAttributes.Usage.Normal | VertexAttributes.Usage.TextureCoordinates);
+		model = mb.createSphere(1, 1, 1, 20, 20, material, VertexAttributes.Usage.Position | VertexAttributes.Usage.Normal | VertexAttributes.Usage.TextureCoordinates);
 		model.manageDisposable(ballTexture);
 		
 		modelInstance = new ModelInstance(model, pos.add(0, 0.5f, 0));

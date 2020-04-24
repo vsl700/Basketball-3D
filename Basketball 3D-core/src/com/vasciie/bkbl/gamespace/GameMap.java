@@ -5,13 +5,11 @@ import java.util.HashMap;
 
 import com.badlogic.gdx.Application;
 import com.badlogic.gdx.Gdx;
-import com.badlogic.gdx.Input;
 import com.badlogic.gdx.ai.GdxAI;
 import com.badlogic.gdx.ai.steer.SteerableAdapter;
 import com.badlogic.gdx.graphics.PerspectiveCamera;
 import com.badlogic.gdx.graphics.g3d.Environment;
 import com.badlogic.gdx.graphics.g3d.ModelBatch;
-import com.badlogic.gdx.graphics.g3d.ModelCache;
 import com.badlogic.gdx.math.Matrix4;
 import com.badlogic.gdx.math.Quaternion;
 import com.badlogic.gdx.math.Vector3;
@@ -402,8 +400,8 @@ public class GameMap {
         Gdx.input.setInputProcessor(inputs);
 
         //TODO When using Android Studio, take the comment marks out of the lines below! Eclipse gives an error on this line!
-        if (Gdx.app.getType().equals(Application.ApplicationType.Android))
-            Gdx.input.setCatchKey(Input.Keys.BACK, true);
+        //if (Gdx.app.getType().equals(Application.ApplicationType.Android))
+            //Gdx.input.setCatchKey(com.badlogic.gdx.Input.Keys.BACK, true);
 
         startTimer = 5.5f;
         playersReady = true;
@@ -505,8 +503,12 @@ public class GameMap {
         Gdx.input.setInputProcessor(null);
 
         //TODO When using Android Studio, take the comment marks out of the lines below! Eclipse gives an error on this line!
-        if (Gdx.app.getType().equals(Application.ApplicationType.Android))
-            Gdx.input.setCatchKey(Input.Keys.BACK, false);
+        //if (Gdx.app.getType().equals(Application.ApplicationType.Android))
+            //Gdx.input.setCatchKey(com.badlogic.gdx.Input.Keys.BACK, false);
+    }
+
+    public void updatePhysics(){
+        new Thread(dynamicsWorldThread).start();
     }
 
     public void update(final float delta) {
@@ -517,6 +519,7 @@ public class GameMap {
         // because the AI might sometimes make mistakes and if
         // players go one through another that wouldn't be very funny (for me)
         //float delta2 = Math.min(1f / 30f, delta);
+        if(!Gdx.app.getType().equals(Application.ApplicationType.Android))
         Gdx.app.postRunnable(dynamicsWorldThread);
 
         //if(gameRunning)

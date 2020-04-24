@@ -487,8 +487,12 @@ public abstract class Player extends Entity {
 	protected abstract Color getPlayerColor();
 	
 	protected void createModels(Vector3 pos) {
+		int divisionUHead = 8;
+		int divisionVHead = 8;
 		int divisionU = 8;
 		int divisionV = 8;
+		int divisionU2 = 4;
+		int divisionV2 = 4;
 		
 		ModelBuilder mb = new ModelBuilder();
 		ModelBuilder childMB = new ModelBuilder();
@@ -500,7 +504,7 @@ public abstract class Player extends Entity {
 		Node head = childMB.node();
 		head.id = "head";
 		head.translation.set(0, scale1 / 2 + scale3 / 2 + 0.1f, 0);
-		SphereShapeBuilder.build(childMB.part(head.id, GL20.GL_TRIANGLES, VertexAttributes.Usage.Position | VertexAttributes.Usage.Normal, material), scale1, scale1, scale1, divisionU, divisionV);
+		SphereShapeBuilder.build(childMB.part(head.id, GL20.GL_TRIANGLES, VertexAttributes.Usage.Position | VertexAttributes.Usage.Normal, material), scale1, scale1, scale1, divisionUHead, divisionVHead);
 		camMatrix = head.globalTransform;
 		
 		Node spine1 = childMB.node();
@@ -536,7 +540,7 @@ public abstract class Player extends Entity {
 		elbowL.id = "elbowL";
 		arm1L.addChild(elbowL);
 		elbowL.translation.set(0, -scale5 / 2 - scale3 / 2, -scale3 * scale5);
-		SphereShapeBuilder.build(childMB.part(elbowL.id, GL20.GL_TRIANGLES, VertexAttributes.Usage.Position | VertexAttributes.Usage.Normal, material), scale3, scale3, scale3, divisionU, divisionV);
+		SphereShapeBuilder.build(childMB.part(elbowL.id, GL20.GL_TRIANGLES, VertexAttributes.Usage.Position | VertexAttributes.Usage.Normal, material), scale3, scale3, scale3, divisionU2, divisionV2);
 		
 		Node arm2L = childMB.node();
 		arm2L.id = "arm2L";
@@ -566,7 +570,7 @@ public abstract class Player extends Entity {
 		elbowR.id = "elbowR";
 		arm1R.addChild(elbowR);
 		elbowR.translation.set(0, -scale5 / 2 - scale3 / 2, -scale3 * scale5);
-		SphereShapeBuilder.build(childMB.part(elbowR.id, GL20.GL_TRIANGLES, VertexAttributes.Usage.Position | VertexAttributes.Usage.Normal, material), scale3, scale3, scale3, divisionU, divisionV);
+		SphereShapeBuilder.build(childMB.part(elbowR.id, GL20.GL_TRIANGLES, VertexAttributes.Usage.Position | VertexAttributes.Usage.Normal, material), scale3, scale3, scale3, divisionU2, divisionV2);
 		
 		Node arm2R = childMB.node();
 		arm2R.id = "arm2R";
@@ -596,7 +600,7 @@ public abstract class Player extends Entity {
 		kneeL.id = "kneeL";
 		leg1L.addChild(kneeL);
 		kneeL.translation.set(0, -scale5 / 2 - scale3 / 2, scale3 * scale5);
-		SphereShapeBuilder.build(childMB.part(kneeL.id, GL20.GL_TRIANGLES, VertexAttributes.Usage.Position | VertexAttributes.Usage.Normal, material), scale3, scale3, scale3, divisionU, divisionV);
+		SphereShapeBuilder.build(childMB.part(kneeL.id, GL20.GL_TRIANGLES, VertexAttributes.Usage.Position | VertexAttributes.Usage.Normal, material), scale3, scale3, scale3, divisionU2, divisionV2);
 		
 		Node leg2L = childMB.node();
 		leg2L.id = "leg2L";
@@ -620,7 +624,7 @@ public abstract class Player extends Entity {
 		kneeR.id = "kneeR";
 		leg1R.addChild(kneeR);
 		kneeR.translation.set(0, -scale5 / 2 - scale3 / 2, scale3 * scale5);
-		SphereShapeBuilder.build(childMB.part(kneeR.id, GL20.GL_TRIANGLES, VertexAttributes.Usage.Position | VertexAttributes.Usage.Normal, material), scale3, scale3, scale3, divisionU, divisionV);
+		SphereShapeBuilder.build(childMB.part(kneeR.id, GL20.GL_TRIANGLES, VertexAttributes.Usage.Position | VertexAttributes.Usage.Normal, material), scale3, scale3, scale3, divisionU2, divisionV2);
 		
 		Node leg2R = childMB.node();
 		leg2R.id = "leg2R";

@@ -45,7 +45,7 @@ public abstract class Basket extends GameObject {
 		Material material = new Material(ColorAttribute.createDiffuse(Color.WHITE));
 		Material centerMaterial = new Material(ColorAttribute.createDiffuse(getColor()));
 		
-		int divisions = 20;
+		int divisions = 10;
 		
 		mb.begin();
 		childMB.begin();

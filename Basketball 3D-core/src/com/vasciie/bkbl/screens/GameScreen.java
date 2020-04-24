@@ -12,7 +12,6 @@ import com.badlogic.gdx.graphics.g2d.BitmapFont;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.g3d.Environment;
 import com.badlogic.gdx.graphics.g3d.ModelBatch;
-import com.badlogic.gdx.graphics.g3d.ModelCache;
 import com.badlogic.gdx.graphics.g3d.attributes.ColorAttribute;
 import com.badlogic.gdx.graphics.g3d.environment.DirectionalLight;
 import com.badlogic.gdx.graphics.g3d.environment.PointLight;
@@ -154,9 +153,11 @@ public class GameScreen implements Screen, RulesListener, GUIRenderer {
 	public void render(final float delta) {
 		Gdx.gl.glClearColor(0, 0.7f, 0.8f, 1);
 		Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT | GL20.GL_DEPTH_BUFFER_BIT);
-		
-		if (!pause.isActive()) {
-			Gdx.app.postRunnable(updateThread);
+
+		if(!paused()) {
+			if(Gdx.app.getType().equals(Application.ApplicationType.Android))
+				map.updatePhysics();
+			
 		}
 
 		cam.update();
@@ -165,6 +166,10 @@ public class GameScreen implements Screen, RulesListener, GUIRenderer {
 		game.customLookAt(pCam, new Matrix4(map.getMainPlayer().getModelInstance().transform).mul(new Matrix4().setToTranslation(0, map.getMainPlayer().getHeight(), 0)).getTranslation(new Vector3()));
 		pCam.update();
 		map.render(mBatch, environment, pCam);
+
+		if (!paused()) {
+			Gdx.app.postRunnable(updateThread);
+		}
 
 		homeScore.update();
 		awayScore.update();
