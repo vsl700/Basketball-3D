@@ -130,6 +130,8 @@ public class GameScreen implements Screen, RulesListener, GUIRenderer {
 		
 		map.setDifficulty(game.level.getDifficulty());
 		map.spawnPlayers(amount);
+		
+		map.manageRenderables(pCam);
 	}
 
 	private void renderGUI(){
@@ -166,8 +168,19 @@ public class GameScreen implements Screen, RulesListener, GUIRenderer {
 		game.customLookAt(pCam, new Matrix4(map.getMainPlayer().getModelInstance().transform).mul(new Matrix4().setToTranslation(0, map.getMainPlayer().getHeight(), 0)).getTranslation(new Vector3()));
 		pCam.update();
 		map.render(mBatch, environment, pCam);
+		
+		
 
 		if (!paused()) {
+			Gdx.app.postRunnable(new Runnable() {
+
+				@Override
+				public void run() {
+					map.manageRenderables(pCam);
+				}
+				
+			});
+			
 			Gdx.app.postRunnable(updateThread);
 		}
 

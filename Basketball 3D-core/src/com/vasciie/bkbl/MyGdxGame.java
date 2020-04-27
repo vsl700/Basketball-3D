@@ -11,7 +11,6 @@ import com.badlogic.gdx.graphics.g2d.BitmapFont;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.g3d.Environment;
 import com.badlogic.gdx.graphics.g3d.ModelBatch;
-import com.badlogic.gdx.graphics.g3d.ModelCache;
 import com.badlogic.gdx.graphics.g3d.attributes.ColorAttribute;
 import com.badlogic.gdx.graphics.g3d.environment.DirectionalLight;
 import com.badlogic.gdx.graphics.g3d.environment.PointLight;
@@ -91,10 +90,12 @@ public class MyGdxGame extends Game {
 		pCam.near = 0.1f;
 		
 		map = new GameMap(game, game);
+		map.manageRenderables(pCam);
 	}
 	
 	public void resetMap() {
 		map = new GameMap(game, game);
+		map.manageRenderables(pCam);
 	}
 
 	@Override
@@ -115,6 +116,16 @@ public class MyGdxGame extends Game {
 				pCam.update();
 				//mBatch.begin(pCam);
 				map.render(mBatch, environment, pCam);
+				
+				Gdx.app.postRunnable(new Runnable() {
+
+					@Override
+					public void run() {
+						map.manageRenderables(pCam);
+						
+					}
+					
+				});
 				//mBatch.end();
 
 				pCam.rotateAround(new Vector3(), new Vector3(0, 1, 0), 10 * Gdx.graphics.getDeltaTime());
