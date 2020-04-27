@@ -48,6 +48,8 @@ public abstract class Entity implements Proximity<Vector3>, Steerable<Vector3> {
 	
 	protected boolean grounded; //We need this because of the ball, which should be caught even if it collides with other parts of the body only when it's on ground!
 	
+	protected boolean renderable;
+	
 	float timeout;
 	
 	
@@ -93,6 +95,9 @@ public abstract class Entity implements Proximity<Vector3>, Steerable<Vector3> {
 	public abstract void update(float delta);
 	
 	public void render(ModelBatch mBatch, Environment e) {
+		if(!renderable)
+			return;
+		
 		mBatch.render(modelInstance, e);
 	}
 	
@@ -260,6 +265,10 @@ public abstract class Entity implements Proximity<Vector3>, Steerable<Vector3> {
 				}
 			}
 		
+	}
+	
+	public void setRenderable(boolean renderable) {
+		this.renderable = renderable;
 	}
 	
 	public void setWorldTransform(Matrix4 trans) {

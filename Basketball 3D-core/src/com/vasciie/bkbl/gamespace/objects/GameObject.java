@@ -44,6 +44,7 @@ public abstract class GameObject implements Steerable<Vector3>, Proximity<Vector
 	protected int mainBodyIndex;
 	
 	protected float x, y, z;
+	protected boolean renderable;
 	//protected float rX, rY, rZ, rA;
 	
 	public void create(ObjectType type, GameMap map, float x, float y, float z) {
@@ -82,6 +83,9 @@ public abstract class GameObject implements Steerable<Vector3>, Proximity<Vector
 	}
 	
 	public void render(ModelBatch mBatch, Environment e) {
+		if(!renderable)
+			return;
+		
 		mBatch.render(modelInstance, e);
 	}
 	
@@ -227,6 +231,10 @@ public abstract class GameObject implements Steerable<Vector3>, Proximity<Vector
 	 */
 	protected abstract void specialFunction();
 		
+	public void setRenderable(boolean renderable) {
+		this.renderable = renderable;
+	}
+	
 	public void setWorldTransform(Matrix4 trans) {
 		mainTrans = trans;
 		

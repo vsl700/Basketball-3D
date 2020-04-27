@@ -285,6 +285,8 @@ public class GameMap {
         basket2.setRotation(0, 1, 0, 180);
 
         addBasketsCollObjects();
+        
+        terrain.setRenderable(true);
     }
 
     public void spawnPlayers(int count) {
@@ -616,6 +618,14 @@ public class GameMap {
         for (Player e : getAllPlayers())
             e.onCycleEnd();
     }
+    
+    public void manageRenderables(PerspectiveCamera pCam) {
+    	manageRenderableObject(pCam, basket1);
+    	manageRenderableObject(pCam, basket2);
+    	manageRenderableEntity(pCam, ball);
+    	for(Player p : getAllPlayers())
+    		manageRenderableEntity(pCam, p);
+    }
 
     public void render(ModelBatch mBatch, Environment environment, PerspectiveCamera pCam) {
     	mBatch.begin(pCam);
@@ -627,6 +637,36 @@ public class GameMap {
             e.render(mBatch, environment);
 
         mBatch.end();
+    }
+    
+    private void manageRenderableEntity(PerspectiveCamera pCam, Entity e) {
+    	if(getCamDirAndPosDst(pCam, e.getPosition().add(e.getWidth() / 2, 0, 0)) <= getConditionDst() || 
+    			getCamDirAndPosDst(pCam, e.getPosition().add(0, e.getHeight() / 2, 0)) <= getConditionDst() || 
+    			getCamDirAndPosDst(pCam, e.getPosition().add(0, 0, e.getDepth() / 2)) <= getConditionDst() ||
+    			getCamDirAndPosDst(pCam, e.getPosition().sub(e.getWidth() / 2, 0, 0)) <= getConditionDst() || 
+    			getCamDirAndPosDst(pCam, e.getPosition().sub(0, e.getHeight() / 2, 0)) <= getConditionDst() || 
+    			getCamDirAndPosDst(pCam, e.getPosition().sub(0, 0, e.getDepth() / 2)) <= getConditionDst())
+    		e.setRenderable(true);
+    	else e.setRenderable(false);
+    }
+    
+    private void manageRenderableObject(PerspectiveCamera pCam, GameObject e) {
+    	if(getCamDirAndPosDst(pCam, e.getPosition().add(e.getWidth() / 2, 0, 0)) <= getConditionDst() || 
+    			getCamDirAndPosDst(pCam, e.getPosition().add(0, e.getHeight() / 2, 0)) <= getConditionDst() || 
+    			getCamDirAndPosDst(pCam, e.getPosition().add(0, 0, e.getDepth() / 2)) <= getConditionDst() ||
+    			getCamDirAndPosDst(pCam, e.getPosition().sub(e.getWidth() / 2, 0, 0)) <= getConditionDst() || 
+    			getCamDirAndPosDst(pCam, e.getPosition().sub(0, e.getHeight() / 2, 0)) <= getConditionDst() || 
+    			getCamDirAndPosDst(pCam, e.getPosition().sub(0, 0, e.getDepth() / 2)) <= getConditionDst())
+    		e.setRenderable(true);
+    	else e.setRenderable(false);
+    }
+    
+    private float getConditionDst() {
+    	return 0.7f;
+    }
+    
+    private float getCamDirAndPosDst(PerspectiveCamera pCam, Vector3 pos) {
+    	return pCam.direction.dst(pos.sub(pCam.position).nor());
     }
 
     public void updateController(){
