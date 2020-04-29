@@ -102,8 +102,10 @@ public class MyGdxGame extends Game {
 	public void render () {
 		if (!getScreen().equals(spScreen1) && !getScreen().equals(game) && !game.paused()) {
 			if (beautifulBack) {
-				if (map == null)
+				if (map == null) {
 					load3DGraphics();
+					return;
+				}
 				
 				if(getScreen().equals(spScreen2)) {
 					super.render();
@@ -131,6 +133,11 @@ public class MyGdxGame extends Game {
 				pCam.rotateAround(new Vector3(), new Vector3(0, 1, 0), 10 * Gdx.graphics.getDeltaTime());
 				customLookAt(pCam, new Vector3());
 			} else {
+				if (background == null) {
+					loadTexture();
+					return;
+				}
+				
 				if(getScreen().equals(spScreen2)) {
 					super.render();
 					return;
@@ -141,11 +148,7 @@ public class MyGdxGame extends Game {
 
 				batch.setProjectionMatrix(cam.combined);
 				batch.begin();
-				if (!beautifulBack) {
-					if (background == null)
-						loadTexture();
-					batch.draw(background, WIDTH / 2 - background.getWidth() / 2, HEIGHT / 2 - background.getHeight() / 2);
-				}
+				batch.draw(background, cam.viewportWidth / 2 - background.getWidth() / 2, cam.viewportHeight / 2 - background.getHeight() / 2);
 				batch.end();
 			}
 		}
@@ -153,9 +156,9 @@ public class MyGdxGame extends Game {
 		
 		super.render();
 		
-		System.out.println();
+		/*System.out.println();
 		System.out.println(Gdx.graphics.getFramesPerSecond() + " fps");
-		System.out.println();
+		System.out.println();*/
 		
 		/*if (!getScreen().equals(spScreen1) && !getScreen().equals(spScreen2) && !game.paused()) {
 			batch.setProjectionMatrix(cam.combined);
