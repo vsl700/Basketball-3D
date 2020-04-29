@@ -45,6 +45,7 @@ public class PauseScreen implements Screen, GUIRenderer {
 	
 	@Override
 	public void show() {
+		Gdx.graphics.setContinuousRendering(false);
 		active = true;
 	}
 	
@@ -90,6 +91,7 @@ public class PauseScreen implements Screen, GUIRenderer {
 	}
 	
 	public void exit() {
+		Gdx.graphics.setContinuousRendering(true);
 		active = false;
 	}
 	
