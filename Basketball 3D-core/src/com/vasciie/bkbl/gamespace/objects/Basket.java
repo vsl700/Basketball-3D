@@ -5,7 +5,9 @@ import java.util.ArrayList;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.VertexAttributes;
+import com.badlogic.gdx.graphics.g3d.Environment;
 import com.badlogic.gdx.graphics.g3d.Material;
+import com.badlogic.gdx.graphics.g3d.ModelBatch;
 import com.badlogic.gdx.graphics.g3d.ModelInstance;
 import com.badlogic.gdx.graphics.g3d.attributes.ColorAttribute;
 import com.badlogic.gdx.graphics.g3d.model.Node;
@@ -20,6 +22,8 @@ import com.badlogic.gdx.physics.bullet.collision.btCylinderShape;
 import com.badlogic.gdx.physics.bullet.dynamics.btRigidBody;
 
 public abstract class Basket extends GameObject {
+	
+	ModelInstance tabCenter, tab;
 
 	static final float standW = 1;
 	static final float standH = 9;
@@ -91,10 +95,17 @@ public abstract class Basket extends GameObject {
 		BoxShapeBuilder.build(childMB.part(basket4.id, GL20.GL_TRIANGLES, VertexAttributes.Usage.Position | VertexAttributes.Usage.Normal, material), bkHoldW, bkHoldW, tabCentW);
 		basket4.translation.set(tabCentW / 2 - bkHoldW / 2, 0, -tabCentW / 2);
 		
-		Node tabCenter1 = childMB.node();
+		childMB.end();
+		model = mb.end();
+		model.calculateTransforms();
+		
+		modelInstance = new ModelInstance(model, x, y, z);
+		
+		mb.begin();
+		childMB.begin();
+		Node tabCenter1 = mb.node();
 		tabCenter1.id = "tabCent1";
-		tab.addChild(tabCenter1);
-		BoxShapeBuilder.build(childMB.part(tabCenter1.id, GL20.GL_TRIANGLES, VertexAttributes.Usage.Position | VertexAttributes.Usage.Normal, centerMaterial), tabCentW, tabCentH, tabCentD);
+		BoxShapeBuilder.build(mb.part(tabCenter1.id, GL20.GL_TRIANGLES, VertexAttributes.Usage.Position | VertexAttributes.Usage.Normal, centerMaterial), tabCentW, tabCentH, tabCentD);
 		tabCenter1.translation.set(0, -tabH / 2 + tabCentH1, -tabD / 2 - tabCentD / 2);
 		
 		Node tabCenter2 = childMB.node();
@@ -110,10 +121,7 @@ public abstract class Basket extends GameObject {
 		tabCenter3.translation.set(tabCentW / 2 - tabCentH / 2, -tabCentH1 / 2, 0);
 		
 		childMB.end();
-		model = mb.end();
-		model.calculateTransforms();
-		
-		modelInstance = new ModelInstance(model, x, y, z);
+		tabCenter = new ModelInstance(mb.end(), getTabCenterTrans());
 		
 		matrixes.add(modelInstance.getNode(stand.id).globalTransform);
 		matrixes.add(modelInstance.getNode(tab.id).globalTransform);
@@ -122,9 +130,20 @@ public abstract class Basket extends GameObject {
 		matrixes.add(modelInstance.getNode(basket2.id).globalTransform);
 		matrixes.add(modelInstance.getNode(basket3.id).globalTransform);
 		matrixes.add(modelInstance.getNode(basket4.id).globalTransform);
-		matrixes.add(modelInstance.getNode(tabCenter1.id).globalTransform);
+		/*matrixes.add(modelInstance.getNode(tabCenter1.id).globalTransform);
 		matrixes.add(modelInstance.getNode(tabCenter2.id).globalTransform);
-		matrixes.add(modelInstance.getNode(tabCenter3.id).globalTransform);
+		matrixes.add(modelInstance.getNode(tabCenter3.id).globalTransform);*/
+	}
+	
+	private Matrix4 getTabCenterTrans() {
+		return calcTransformFromNodesTransform(modelInstance.getNode("tab").globalTransform.trn(0, 0, tabCentD));
+	}
+	
+	@Override
+	public void render(ModelBatch mBatch, Environment e) {
+		super.render(mBatch, e);
+		mBatch.flush();
+		mBatch.render(tabCenter, e);
 	}
 
 	@Override
@@ -217,6 +236,8 @@ public abstract class Basket extends GameObject {
 		modelInstance.calculateTransforms();
 		
 		collisionObjects.get(0).setWorldTransform(getBasketTargetTrans());
+		
+		tabCenter.transform.set(getTabCenterTrans());
 	}
 
 	@Override
