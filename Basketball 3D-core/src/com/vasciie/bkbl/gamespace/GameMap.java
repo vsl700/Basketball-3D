@@ -633,6 +633,7 @@ public class GameMap {
         terrain.render(mBatch, environment);
         basket1.render(mBatch, environment);
         basket2.render(mBatch, environment);
+
         for(Player e : getAllPlayers())
             e.render(mBatch, environment);
 

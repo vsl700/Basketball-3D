@@ -12,9 +12,6 @@ import com.badlogic.gdx.graphics.g2d.BitmapFont;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.g3d.Environment;
 import com.badlogic.gdx.graphics.g3d.ModelBatch;
-import com.badlogic.gdx.graphics.g3d.attributes.ColorAttribute;
-import com.badlogic.gdx.graphics.g3d.environment.DirectionalLight;
-import com.badlogic.gdx.graphics.g3d.environment.PointLight;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 import com.badlogic.gdx.math.Matrix4;
 import com.badlogic.gdx.math.Vector3;
@@ -71,11 +68,11 @@ public class GameScreen implements Screen, RulesListener, GUIRenderer {
 
 		mBatch = new ModelBatch();
 
-		environment = new Environment();
+		/*environment = new Environment();
 		environment.set(new ColorAttribute(ColorAttribute.AmbientLight, 0.4f, 0.4f, 0.4f, 1f));
 		environment.add(new DirectionalLight().set(0.6f, 0.6f, 0.6f, 0, -10, 0));
 		environment.add(new PointLight().set(1, 1, 1, 0, 9, -15, 40));
-		environment.add(new PointLight().set(1, 1, 1, 0, 9, 15, 40));
+		environment.add(new PointLight().set(1, 1, 1, 0, 9, 15, 40));*/
 
 		pCam = new PerspectiveCamera(40, Gdx.graphics.getWidth(), Gdx.graphics.getHeight());
 		pCam.position.set(3, 1, 0);
@@ -127,6 +124,7 @@ public class GameScreen implements Screen, RulesListener, GUIRenderer {
 		}
 		
 		map = game.getMap();
+		environment = game.getEnvironment();
 		
 		map.setDifficulty(game.level.getDifficulty());
 		map.spawnPlayers(amount);
@@ -184,9 +182,10 @@ public class GameScreen implements Screen, RulesListener, GUIRenderer {
 			Gdx.app.postRunnable(updateThread);
 		}
 
+		
 		homeScore.update();
 		awayScore.update();
-		
+
 		if (!paused())
 			if (map.isGameRunning() && !Gdx.app.getType().equals(Application.ApplicationType.Android)) {
 				int pow = map.getMainPlayer().getShootingPower();
@@ -199,7 +198,7 @@ public class GameScreen implements Screen, RulesListener, GUIRenderer {
 
 				powerNum.setText(pow + "");
 				powerNum.update();
-			} else if(!map.isGameRunning()) {
+			} else if (!map.isGameRunning()) {
 				if (map.getTimer() >= 0 && map.isPlayersReady()) {
 					if ((int) map.getTimer() == 0)
 						timer.setText("GO!");
@@ -210,19 +209,18 @@ public class GameScreen implements Screen, RulesListener, GUIRenderer {
 
 					timer.update();
 				} else if (map.isRuleTriggered()) { // If the game is not
-													// running and there is no
-													// timer counting down
+					// running and there is no
+					// timer counting down
 					ruleHeading.update();
 					ruleDesc.update();
 
 					if (contTimer <= 0) {
 						clickToCont.update();
 
-						if(Gdx.app.getType().equals(Application.ApplicationType.Android)){
-							if(Gdx.input.justTouched())
+						if (Gdx.app.getType().equals(Application.ApplicationType.Android)) {
+							if (Gdx.input.justTouched())
 								map.onRuleBrokenContinue();
-						}
-						else if (Gdx.input.isKeyJustPressed(Keys.E))
+						} else if (Gdx.input.isKeyJustPressed(Keys.E))
 							map.onRuleBrokenContinue();
 					} else
 						contTimer -= delta;

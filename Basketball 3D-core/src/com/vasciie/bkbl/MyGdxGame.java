@@ -81,8 +81,7 @@ public class MyGdxGame extends Game {
 		environment = new Environment();
 		environment.set(new ColorAttribute(ColorAttribute.AmbientLight, 0.4f, 0.4f, 0.4f, 1f));
 		environment.add(new DirectionalLight().set(0.6f, 0.6f, 0.6f, 0, -10, 0));
-		environment.add(new PointLight().set(1, 1, 1, 0, 9, -15, 40));
-		environment.add(new PointLight().set(1, 1, 1, 0, 9, 15, 40));
+		environment.add(new PointLight().set(1, 1, 1, 0, 13, 0, 150));
 
 		pCam = new PerspectiveCamera(40, Gdx.graphics.getWidth(), Gdx.graphics.getHeight());
 		pCam.position.set(0, 9, 25);
@@ -233,6 +232,10 @@ public class MyGdxGame extends Game {
 	
 	public GameMap getMap() {
 		return map;
+	}
+	
+	public Environment getEnvironment() {
+		return environment;
 	}
 	
 	public boolean isBeautifulBack() {

@@ -48,7 +48,7 @@ public class InputController implements InputProcessor {
         if (Gdx.app.getType().equals(Application.ApplicationType.Android)) {
             movementStick = new Stick(Color.BLACK, guiRenderer);
             movementStick.setSize(300, 300);
-            movementStick.setPos(140, 70);
+            movementStick.setPos(100, 70);
 
             BitmapFont font = new BitmapFont();
             font.getData().setScale(1);
