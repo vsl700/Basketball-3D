@@ -138,10 +138,11 @@ public class GameMap {
         };
         
         physicsThread = new Thread() {
-    		
+    		boolean run = true;
+
     		@Override
     		public void run() {
-    			while(isAlive()) {
+    			while(run) {
     				dynamicsWorld.stepSimulation(Gdx.graphics.getDeltaTime(), 5, 1f / 60f);
     				
     				synchronized(this) {
@@ -164,6 +165,14 @@ public class GameMap {
     				}
     			}
     		}
+
+    		@Override
+            public void interrupt(){
+    		    run = false;
+                synchronized(this) {
+                    notify();
+                }
+            }
     	};
 
         inputs = new InputController(guiRenderer);
@@ -501,6 +510,9 @@ public class GameMap {
     }
 
     public void clear() {
+        physicsThread.interrupt();
+        physicsThread = null;
+
         disposePlayers();
         teammates.clear();
         opponents.clear();
@@ -515,7 +527,7 @@ public class GameMap {
 
         mainPlayer = null;
 
-        for (int i = ballIndex; i <= lastIndex; i++) {
+        for (int i = 0; i <= lastIndex; i++) {
             objectsMap.remove(i);
 
             btCollisionObject tempObj = collObjsValsMap.get(i);
@@ -525,8 +537,10 @@ public class GameMap {
             collObjsValsMap.remove(i);
         }
 
-        index = ballIndex;
-        createBall();
+        dynamicsWorldThread = null;
+
+        //index = ballIndex;
+        //createBall();
 
         gameRunning = false;
         ruleTriggeredActing = false;
