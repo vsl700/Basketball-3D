@@ -1,5 +1,6 @@
 package com.vasciie.bkbl.gamespace;
 
+import java.lang.Thread.State;
 import java.util.ArrayList;
 import java.util.HashMap;
 
@@ -81,6 +82,7 @@ public class GameMap {
         }
     }
 
+    private Thread physicsThread;
     Runnable dynamicsWorldThread;
 
     Rules rules;
@@ -134,6 +136,35 @@ public class GameMap {
 			}
 
         };
+        
+        physicsThread = new Thread() {
+    		
+    		@Override
+    		public void run() {
+    			while(isAlive()) {
+    				dynamicsWorld.stepSimulation(Gdx.graphics.getDeltaTime(), 5, 1f / 60f);
+    				
+    				synchronized(this) {
+						try {
+							wait();
+						} catch (InterruptedException e) {
+							e.printStackTrace();
+						}
+    				}
+    			}
+    		}
+    		
+    		@Override
+    		public void start() {
+    			if(getState().equals(State.NEW))
+    				super.start();
+    			else {
+    				synchronized(this) {
+    					notify();
+    				}
+    			}
+    		}
+    	};
 
         inputs = new InputController(guiRenderer);
 
@@ -507,15 +538,22 @@ public class GameMap {
             //Gdx.input.setCatchKey(com.badlogic.gdx.Input.Keys.BACK, false);
     }
 
+    private void updatePhysics() {
+    	
+    	physicsThread.start();
+    }
+    
     public void update(float delta) {
-        Player currentHolder = getHoldingPlayer();
         //camera.setWorldTransform(new Matrix4(mainPlayer.getModelInstance().transform).mul(mainPlayer.getCamMatrix()).mul(new Matrix4().setToTranslation(0, mainPlayer.getHeight(), -10)));
 
         // We're leaving dynamics world outside of the check below
         // because the AI might sometimes make mistakes and if
         // players go one through another that wouldn't be very funny (for me)
         //float delta2 = Math.min(1f / 30f, delta);
-        dynamicsWorld.stepSimulation(delta, 5, 1f / 60f);
+        if(physicsThread.getState().equals(State.NEW))
+        	physicsThread.start();
+        else while(!physicsThread.getState().equals(State.WAITING));
+        
 
         //if(gameRunning)
         if (!gameRunning) {
@@ -559,22 +597,28 @@ public class GameMap {
                     gameRunning = true;
                 }
                 //rules.clearBrokenRuleWRuleBreaker();
-
+                updatePhysics();
                 return;
             }
 
             playersReady = rules.getTriggeredRule().arePlayersReady();
 
+            updatePhysics();
             return;
         } else if (gameRunning)
             updateFullGame(delta);
         else updateGameEnvironment(delta);
 
-        if (Gdx.app.getType().equals(Application.ApplicationType.Android))
+        
+        if (Gdx.app.getType().equals(Application.ApplicationType.Android)) {
+        	Player currentHolder = getHoldingPlayer();
             if (currentHolder != null && getHoldingPlayer() != null && !currentHolder.equals(getHoldingPlayer()) ||
                     currentHolder != null && getHoldingPlayer() == null ||
                     currentHolder == null && getHoldingPlayer() != null)
                 inputs.reset();//To prevent from some rare glitches over the controller
+        }
+        
+        updatePhysics();
     }
 
     private void updateGameEnvironment(float delta) {
