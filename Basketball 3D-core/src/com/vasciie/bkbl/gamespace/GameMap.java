@@ -42,6 +42,7 @@ import com.vasciie.bkbl.gamespace.rules.Rules;
 import com.vasciie.bkbl.gamespace.rules.Rules.GameRule;
 import com.vasciie.bkbl.gamespace.rules.Rules.RulesListener;
 import com.vasciie.bkbl.gamespace.tools.InputController;
+import com.vasciie.bkbl.gamespace.tools.VEThread;
 import com.vasciie.bkbl.gui.GUIRenderer;
 
 public class GameMap {
@@ -83,7 +84,7 @@ public class GameMap {
     }
 
     private Thread physicsThread;
-    Runnable dynamicsWorldThread;
+    Runnable dynamicsWorldRunnable;
 
     Rules rules;
 
@@ -128,7 +129,7 @@ public class GameMap {
     int index = 0, lastIndex, ballIndex, lastBallIndex;
 
     public GameMap(RulesListener rulesListener, GUIRenderer guiRenderer) {
-    	dynamicsWorldThread = new Runnable() {
+    	dynamicsWorldRunnable = new Runnable() {
 
 			@Override
 			public void run() {
@@ -137,43 +138,7 @@ public class GameMap {
 
         };
         
-        physicsThread = new Thread() {
-    		boolean run = true;
-
-    		@Override
-    		public void run() {
-    			while(run) {
-    				dynamicsWorld.stepSimulation(Gdx.graphics.getDeltaTime(), 5, 1f / 60f);
-    				
-    				synchronized(this) {
-						try {
-							wait();
-						} catch (InterruptedException e) {
-							e.printStackTrace();
-						}
-    				}
-    			}
-    		}
-    		
-    		@Override
-    		public void start() {
-    			if(getState().equals(State.NEW))
-    				super.start();
-    			else {
-    				synchronized(this) {
-    					notify();
-    				}
-    			}
-    		}
-
-    		@Override
-            public void interrupt(){
-    		    run = false;
-                synchronized(this) {
-                    notify();
-                }
-            }
-    	};
+        physicsThread = new VEThread(dynamicsWorldRunnable);
 
         inputs = new InputController(guiRenderer);
 
@@ -537,7 +502,7 @@ public class GameMap {
             collObjsValsMap.remove(i);
         }
 
-        dynamicsWorldThread = null;
+        dynamicsWorldRunnable = null;
 
         //index = ballIndex;
         //createBall();
@@ -555,6 +520,11 @@ public class GameMap {
     private void updatePhysics() {
     	
     	physicsThread.start();
+    }
+    
+    public void updatePlayerAnimations(float delta) {
+    	for(Player p : getAllPlayers())
+    		p.updateAnimations(delta);
     }
     
     public void update(float delta) {
@@ -633,6 +603,8 @@ public class GameMap {
         }
         
         updatePhysics();
+
+
     }
 
     private void updateGameEnvironment(float delta) {
@@ -662,6 +634,12 @@ public class GameMap {
 
         for (Player e : getAllPlayers()) {
             e.update(delta);
+        }
+
+        try {
+            updatePlayerAnimations(delta);
+        }catch(Exception e){
+            e.printStackTrace();
         }
     }
 
