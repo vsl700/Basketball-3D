@@ -1493,6 +1493,7 @@ public abstract class Player extends Entity {
 
 	}
 	
+	final Quaternion tempHandRot = new Quaternion();
  	private void point(final boolean left) {
 		AnimationController primary;
 		
@@ -1533,21 +1534,15 @@ public abstract class Player extends Entity {
 		
 		//System.out.println(newHandRotVec.z);
 		
-		Quaternion newHandRot = new Quaternion().setFromAxis(newHandRotVec, 180);
+		tempHandRot.setFromAxis(newHandRotVec, 180).setEulerAngles(tempHandRot.getYaw(), Math.max(0, tempHandRot.getPitch()), tempHandRot.getRoll());
 		//System.out.println(Math.min(0, newHandRot.getRoll()));
 		
-		newHandRot.setEulerAngles(newHandRot.getYaw(), Math.max(0, newHandRot.getPitch()), newHandRot.getRoll());
 		
-		Matrix4 tempLocal = modelInstance.getNode("shoulder" + id).localTransform;
-		modelInstance.getNode("shoulder" + id).isAnimated = true;
 		
 		if(left)
 			leftCurrentPoint = true;
 		else rightCurrentPoint = true;
 		
-		tempLocal.set(tempLocal.getTranslation(new Vector3()), newHandRot).rotate(0, 1, 0, 180);
-		
-		modelInstance.calculateTransforms();
 		
 		//setCollisionTransform();
 	}
@@ -1702,6 +1697,28 @@ public abstract class Player extends Entity {
 		if(!rotDifference || !focusTarget.equals(prevTarget)/* || change && !tempTarget.equals(prevTarget)*/) {
 			invTrans.set(modelInstance.transform);
 			rotDifference = true;
+		}
+	}
+	
+	public void updateAnimations(float delta) {
+		armLController.update(delta);
+		armRController.update(delta);
+		legLController.update(delta);
+		legRController.update(delta);
+		bodyController.update(delta);
+		
+		if(leftCurrentPoint) {
+			Matrix4 tempLocal = modelInstance.getNode("shoulderL").localTransform;
+			modelInstance.getNode("shoulderL").isAnimated = true;
+			
+			tempLocal.set(tempLocal.getTranslation(new Vector3()), tempHandRot).rotate(0, 1, 0, 180);
+			modelInstance.calculateTransforms();
+		}else if(rightCurrentPoint) {
+			Matrix4 tempLocal = modelInstance.getNode("shoulderR").localTransform;
+			modelInstance.getNode("shoulderR").isAnimated = true;
+			
+			tempLocal.set(tempLocal.getTranslation(new Vector3()), tempHandRot).rotate(0, 1, 0, 180);
+			modelInstance.calculateTransforms();
 		}
 	}
 	
@@ -1931,12 +1948,6 @@ public abstract class Player extends Entity {
 			legRController.animate("idle", 0.15f);
 			stopLegsAnim();
 		}
-		
-		armLController.update(delta);
-		armRController.update(delta);
-		legLController.update(delta);
-		legRController.update(delta);
-		bodyController.update(delta);
 		
 		prevTrans.set(modelInstance.transform);
 		

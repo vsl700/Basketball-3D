@@ -1,5 +1,7 @@
 package com.vasciie.bkbl.screens;
 
+import java.lang.Thread.State;
+
 import com.badlogic.gdx.Application;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Screen;
@@ -19,12 +21,15 @@ import com.vasciie.bkbl.MyGdxGame;
 import com.vasciie.bkbl.gamespace.GameMap;
 import com.vasciie.bkbl.gamespace.rules.Rules.GameRule;
 import com.vasciie.bkbl.gamespace.rules.Rules.RulesListener;
+import com.vasciie.bkbl.gamespace.tools.VEThread;
 import com.vasciie.bkbl.gui.GUIRenderer;
 import com.vasciie.bkbl.gui.Label;
 
 public class GameScreen implements Screen, RulesListener, GUIRenderer {
 
-	Runnable updateThread;
+	VEThread updateThread;
+	
+	Runnable updateRunnable;
 	
 	ModelBatch mBatch;
 	Environment environment;
@@ -53,7 +58,7 @@ public class GameScreen implements Screen, RulesListener, GUIRenderer {
 	public GameScreen(MyGdxGame mg) {
 		game = mg;
 
-		updateThread = new Runnable() {
+		updateRunnable = new Runnable() {
 
 			@Override
 			public void run() {
@@ -65,6 +70,8 @@ public class GameScreen implements Screen, RulesListener, GUIRenderer {
 			}
 
 		};
+		
+		updateThread = new VEThread(updateRunnable);
 
 		mBatch = new ModelBatch();
 
@@ -129,7 +136,7 @@ public class GameScreen implements Screen, RulesListener, GUIRenderer {
 		map.setDifficulty(game.level.getDifficulty());
 		map.spawnPlayers(amount);
 		
-		Gdx.app.postRunnable(updateThread);
+		Gdx.app.postRunnable(updateRunnable);
 	}
 
 	private void renderGUI(){
@@ -155,16 +162,20 @@ public class GameScreen implements Screen, RulesListener, GUIRenderer {
 		Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT | GL20.GL_DEPTH_BUFFER_BIT);
 
 		cam.update();
+		
+		while(!updateThread.getState().equals(State.NEW) && !updateThread.getState().equals(State.WAITING));
 
+		if(!paused())
+			map.updatePlayerAnimations(delta);
+		
 		map.getMainPlayer().getFocusTransform().mul(new Matrix4().setToTranslation(0, map.getMainPlayer().getHeight(), -10)).getTranslation(pCam.position);
 		game.customLookAt(pCam, new Matrix4(map.getMainPlayer().getModelInstance().transform).mul(new Matrix4().setToTranslation(0, map.getMainPlayer().getHeight(), 0)).getTranslation(new Vector3()));
 		pCam.update();
 		map.render(mBatch, environment, pCam);
 		
 		
-
 		if (!paused()) {
-			Gdx.app.postRunnable(updateThread);
+			updateThread.start();
 		}
 
 		
@@ -276,6 +287,8 @@ public class GameScreen implements Screen, RulesListener, GUIRenderer {
 	@Override
 	public void dispose() {
 		mBatch.dispose();
+		
+		updateThread.interrupt();
 	}
 	
 	public void setPlayersAmount(int amount) {
