@@ -603,6 +603,8 @@ public class GameMap {
         }
         
         updatePhysics();
+
+
     }
 
     private void updateGameEnvironment(float delta) {
@@ -632,6 +634,12 @@ public class GameMap {
 
         for (Player e : getAllPlayers()) {
             e.update(delta);
+        }
+
+        try {
+            updatePlayerAnimations(delta);
+        }catch(Exception e){
+            e.printStackTrace();
         }
     }
 

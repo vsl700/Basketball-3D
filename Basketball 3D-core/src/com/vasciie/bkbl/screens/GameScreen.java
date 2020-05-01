@@ -16,6 +16,7 @@ import com.badlogic.gdx.graphics.g3d.Environment;
 import com.badlogic.gdx.graphics.g3d.ModelBatch;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 import com.badlogic.gdx.math.Matrix4;
+import com.badlogic.gdx.math.Vector;
 import com.badlogic.gdx.math.Vector3;
 import com.vasciie.bkbl.MyGdxGame;
 import com.vasciie.bkbl.gamespace.GameMap;
@@ -62,8 +63,7 @@ public class GameScreen implements Screen, RulesListener, GUIRenderer {
 
 			@Override
 			public void run() {
-				if(Gdx.app.getType().equals(Application.ApplicationType.Android))
-					map.updateController();
+
 
 				map.update(Gdx.graphics.getDeltaTime());
 
@@ -156,29 +156,7 @@ public class GameScreen implements Screen, RulesListener, GUIRenderer {
 		timer.draw();
 	}
 
-	@Override
-	public void render(final float delta) {
-		Gdx.gl.glClearColor(0, 0.7f, 0.8f, 1);
-		Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT | GL20.GL_DEPTH_BUFFER_BIT);
-
-		cam.update();
-		
-		while(!updateThread.getState().equals(State.NEW) && !updateThread.getState().equals(State.WAITING));
-
-		if(!paused())
-			map.updatePlayerAnimations(delta);
-		
-		map.getMainPlayer().getFocusTransform().mul(new Matrix4().setToTranslation(0, map.getMainPlayer().getHeight(), -10)).getTranslation(pCam.position);
-		game.customLookAt(pCam, new Matrix4(map.getMainPlayer().getModelInstance().transform).mul(new Matrix4().setToTranslation(0, map.getMainPlayer().getHeight(), 0)).getTranslation(new Vector3()));
-		pCam.update();
-		map.render(mBatch, environment, pCam);
-		
-		
-		if (!paused()) {
-			updateThread.start();
-		}
-
-		
+	private void updateGUI(float delta){
 		homeScore.update();
 		awayScore.update();
 
@@ -223,6 +201,34 @@ public class GameScreen implements Screen, RulesListener, GUIRenderer {
 				}
 
 			}
+	}
+
+	private static final Matrix4 tempMatrix = new Matrix4();
+	private static final Matrix4 tempMatrix2 = new Matrix4();
+	private static final Vector3 tempVec = new Vector3();
+	@Override
+	public void render(final float delta) {
+		Gdx.gl.glClearColor(0, 0.7f, 0.8f, 1);
+		Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT | GL20.GL_DEPTH_BUFFER_BIT);
+
+		cam.update();
+		
+		while(!updateThread.getState().equals(State.NEW) && !updateThread.getState().equals(State.WAITING));
+
+		map.getMainPlayer().getFocusTransform().mul(tempMatrix.setToTranslation(0, map.getMainPlayer().getHeight(), -10)).getTranslation(pCam.position);
+		game.customLookAt(pCam, tempMatrix.set(map.getMainPlayer().getModelInstance().transform).mul(tempMatrix2.setToTranslation(0, map.getMainPlayer().getHeight(), 0)).getTranslation(tempVec));
+		pCam.update();
+		map.render(mBatch, environment, pCam);
+
+		if (!paused()) {
+			if(Gdx.app.getType().equals(Application.ApplicationType.Android))
+				map.updateController();
+
+
+			updateThread.start();
+		}
+
+		updateGUI(delta);
 
 		renderGUI();
 		
@@ -252,6 +258,9 @@ public class GameScreen implements Screen, RulesListener, GUIRenderer {
 		ruleDesc.setPosAndSize(width / 2 - (width - 10) / 2, height - 120, width - 10);
 		clickToCont.setPosAndSize(width / 2 - (width - 10) / 2, height - 160, width - 10);
 		pCam.update();
+
+		if(paused())
+			Gdx.graphics.requestRendering();
 	}
 	
 	public boolean paused() {
