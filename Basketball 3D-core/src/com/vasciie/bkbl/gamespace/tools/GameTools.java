@@ -6,6 +6,8 @@ package com.vasciie.bkbl.gamespace.tools;
 import java.util.ArrayList;
 
 import com.badlogic.gdx.ai.utils.Location;
+import com.badlogic.gdx.graphics.Camera;
+import com.badlogic.gdx.graphics.g3d.ModelInstance;
 import com.badlogic.gdx.math.Vector3;
 import com.vasciie.bkbl.gamespace.entities.Player;
 
@@ -16,6 +18,12 @@ import com.vasciie.bkbl.gamespace.entities.Player;
  *
  */
 public final class GameTools {
+	
+	private static Vector3 tempVec = new Vector3();
+	public static boolean isObjectVisibleToScreen(Camera cam, ModelInstance instance, Vector3 dimensions) {
+		instance.transform.getTranslation(tempVec);
+		return cam.frustum.boundsInFrustum(tempVec, dimensions);
+	}
 	
 	public static float getDistanceBetweenLocations(Location<Vector3> st1, Location<Vector3> st2) {
 		return st1.getPosition().dst(st2.getPosition());

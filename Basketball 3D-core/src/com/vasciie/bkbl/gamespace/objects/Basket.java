@@ -4,6 +4,7 @@ import java.util.ArrayList;
 
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.GL20;
+import com.badlogic.gdx.graphics.PerspectiveCamera;
 import com.badlogic.gdx.graphics.VertexAttributes;
 import com.badlogic.gdx.graphics.g3d.Environment;
 import com.badlogic.gdx.graphics.g3d.Material;
@@ -20,10 +21,11 @@ import com.badlogic.gdx.physics.bullet.collision.btBoxShape;
 import com.badlogic.gdx.physics.bullet.collision.btCollisionObject;
 import com.badlogic.gdx.physics.bullet.collision.btCylinderShape;
 import com.badlogic.gdx.physics.bullet.dynamics.btRigidBody;
+import com.vasciie.bkbl.gamespace.tools.GameTools;
 
 public abstract class Basket extends GameObject {
 	
-	ModelInstance tabCenter, tab;
+	ModelInstance tabCenter;
 
 	static final float standW = 1;
 	static final float standH = 9;
@@ -130,6 +132,8 @@ public abstract class Basket extends GameObject {
 		matrixes.add(modelInstance.getNode(basket2.id).globalTransform);
 		matrixes.add(modelInstance.getNode(basket3.id).globalTransform);
 		matrixes.add(modelInstance.getNode(basket4.id).globalTransform);
+		
+		tabCenterDimensions.set(tabCentW, tabCentH, tabCentD);
 		/*matrixes.add(modelInstance.getNode(tabCenter1.id).globalTransform);
 		matrixes.add(modelInstance.getNode(tabCenter2.id).globalTransform);
 		matrixes.add(modelInstance.getNode(tabCenter3.id).globalTransform);*/
@@ -139,11 +143,15 @@ public abstract class Basket extends GameObject {
 		return calcTransformFromNodesTransform(modelInstance.getNode("tab").globalTransform.trn(0, 0, tabCentD));
 	}
 	
+	private Vector3 tabCenterDimensions = new Vector3();
 	@Override
-	public void render(ModelBatch mBatch, Environment e) {
-		super.render(mBatch, e);
-		mBatch.flush();
-		mBatch.render(tabCenter, e);
+	public void render(ModelBatch mBatch, Environment e, PerspectiveCamera pCam) {
+		super.render(mBatch, e, pCam);
+		
+		if (GameTools.isObjectVisibleToScreen(pCam, tabCenter, tabCenterDimensions)) {
+			mBatch.flush();
+			mBatch.render(tabCenter, e);
+		}
 	}
 
 	@Override

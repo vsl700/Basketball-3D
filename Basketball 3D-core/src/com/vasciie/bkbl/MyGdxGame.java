@@ -89,12 +89,10 @@ public class MyGdxGame extends Game {
 		pCam.near = 0.1f;
 		
 		map = new GameMap(game, game);
-		map.manageRenderables(pCam);
 	}
 	
 	public void resetMap() {
 		map = new GameMap(game, game);
-		map.manageRenderables(pCam);
 	}
 
 	@Override
@@ -118,15 +116,6 @@ public class MyGdxGame extends Game {
 				//mBatch.begin(pCam);
 				map.render(mBatch, environment, pCam);
 				
-				Gdx.app.postRunnable(new Runnable() {
-
-					@Override
-					public void run() {
-						map.manageRenderables(pCam);
-						
-					}
-					
-				});
 				//mBatch.end();
 
 				pCam.rotateAround(new Vector3(), new Vector3(0, 1, 0), 10 * Gdx.graphics.getDeltaTime());

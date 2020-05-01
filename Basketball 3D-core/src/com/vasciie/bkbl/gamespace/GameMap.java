@@ -285,8 +285,6 @@ public class GameMap {
         basket2.setRotation(0, 1, 0, 180);
 
         addBasketsCollObjects();
-        
-        terrain.setRenderable(true);
     }
 
     public void spawnPlayers(int count) {
@@ -509,11 +507,7 @@ public class GameMap {
             //Gdx.input.setCatchKey(com.badlogic.gdx.Input.Keys.BACK, false);
     }
 
-    public void updatePhysics(){
-        new Thread(dynamicsWorldThread).start();
-    }
-
-    public void update(final float delta) {
+    public void update(float delta) {
         Player currentHolder = getHoldingPlayer();
         //camera.setWorldTransform(new Matrix4(mainPlayer.getModelInstance().transform).mul(mainPlayer.getCamMatrix()).mul(new Matrix4().setToTranslation(0, mainPlayer.getHeight(), -10)));
 
@@ -521,8 +515,7 @@ public class GameMap {
         // because the AI might sometimes make mistakes and if
         // players go one through another that wouldn't be very funny (for me)
         //float delta2 = Math.min(1f / 30f, delta);
-        if(!Gdx.app.getType().equals(Application.ApplicationType.Android))
-        Gdx.app.postRunnable(dynamicsWorldThread);
+        dynamicsWorld.stepSimulation(delta, 5, 1f / 60f);
 
         //if(gameRunning)
         if (!gameRunning) {
@@ -618,56 +611,18 @@ public class GameMap {
         for (Player e : getAllPlayers())
             e.onCycleEnd();
     }
-    
-    public void manageRenderables(PerspectiveCamera pCam) {
-    	manageRenderableObject(pCam, basket1);
-    	manageRenderableObject(pCam, basket2);
-    	manageRenderableEntity(pCam, ball);
-    	for(Player p : getAllPlayers())
-    		manageRenderableEntity(pCam, p);
-    }
 
     public void render(ModelBatch mBatch, Environment environment, PerspectiveCamera pCam) {
     	mBatch.begin(pCam);
-        ball.render(mBatch, environment);
-        terrain.render(mBatch, environment);
-        basket1.render(mBatch, environment);
-        basket2.render(mBatch, environment);
+        ball.render(mBatch, environment, pCam);
+        terrain.render(mBatch, environment, pCam);
+        basket1.render(mBatch, environment, pCam);
+        basket2.render(mBatch, environment, pCam);
 
         for(Player e : getAllPlayers())
-            e.render(mBatch, environment);
+            e.render(mBatch, environment, pCam);
 
         mBatch.end();
-    }
-    
-    private void manageRenderableEntity(PerspectiveCamera pCam, Entity e) {
-    	if(getCamDirAndPosDst(pCam, e.getPosition().add(e.getWidth() / 2, 0, 0)) <= getConditionDst() || 
-    			getCamDirAndPosDst(pCam, e.getPosition().add(0, e.getHeight() / 2, 0)) <= getConditionDst() || 
-    			getCamDirAndPosDst(pCam, e.getPosition().add(0, 0, e.getDepth() / 2)) <= getConditionDst() ||
-    			getCamDirAndPosDst(pCam, e.getPosition().sub(e.getWidth() / 2, 0, 0)) <= getConditionDst() || 
-    			getCamDirAndPosDst(pCam, e.getPosition().sub(0, e.getHeight() / 2, 0)) <= getConditionDst() || 
-    			getCamDirAndPosDst(pCam, e.getPosition().sub(0, 0, e.getDepth() / 2)) <= getConditionDst())
-    		e.setRenderable(true);
-    	else e.setRenderable(false);
-    }
-    
-    private void manageRenderableObject(PerspectiveCamera pCam, GameObject e) {
-    	if(getCamDirAndPosDst(pCam, e.getPosition().add(e.getWidth() / 2, 0, 0)) <= getConditionDst() || 
-    			getCamDirAndPosDst(pCam, e.getPosition().add(0, e.getHeight() / 2, 0)) <= getConditionDst() || 
-    			getCamDirAndPosDst(pCam, e.getPosition().add(0, 0, e.getDepth() / 2)) <= getConditionDst() ||
-    			getCamDirAndPosDst(pCam, e.getPosition().sub(e.getWidth() / 2, 0, 0)) <= getConditionDst() || 
-    			getCamDirAndPosDst(pCam, e.getPosition().sub(0, e.getHeight() / 2, 0)) <= getConditionDst() || 
-    			getCamDirAndPosDst(pCam, e.getPosition().sub(0, 0, e.getDepth() / 2)) <= getConditionDst())
-    		e.setRenderable(true);
-    	else e.setRenderable(false);
-    }
-    
-    private float getConditionDst() {
-    	return 0.7f;
-    }
-    
-    private float getCamDirAndPosDst(PerspectiveCamera pCam, Vector3 pos) {
-    	return pCam.direction.dst(pos.sub(pCam.position).nor());
     }
 
     public void updateController(){

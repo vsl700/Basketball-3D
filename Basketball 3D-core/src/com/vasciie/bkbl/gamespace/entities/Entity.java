@@ -5,6 +5,7 @@ import java.util.ArrayList;
 import com.badlogic.gdx.ai.steer.Proximity;
 import com.badlogic.gdx.ai.steer.Steerable;
 import com.badlogic.gdx.ai.utils.Location;
+import com.badlogic.gdx.graphics.PerspectiveCamera;
 import com.badlogic.gdx.graphics.g3d.Environment;
 import com.badlogic.gdx.graphics.g3d.Model;
 import com.badlogic.gdx.graphics.g3d.ModelBatch;
@@ -18,6 +19,7 @@ import com.badlogic.gdx.physics.bullet.dynamics.btRigidBody;
 import com.vasciie.bkbl.gamespace.GameMap;
 import com.vasciie.bkbl.gamespace.MotionState;
 import com.vasciie.bkbl.gamespace.objects.ObjectType;
+import com.vasciie.bkbl.gamespace.tools.GameTools;
 
 public abstract class Entity implements Proximity<Vector3>, Steerable<Vector3> {
 	
@@ -41,14 +43,14 @@ public abstract class Entity implements Proximity<Vector3>, Steerable<Vector3> {
 	
 	protected ArrayList<btCollisionObject> outsideColliders;
 	
+	protected final Vector3 dimensions = new Vector3(); 
+	
 	protected int mainBodyIndex;
 	
 	protected float maxLinAccel;
 	protected float boundRadius;
 	
 	protected boolean grounded; //We need this because of the ball, which should be caught even if it collides with other parts of the body only when it's on ground!
-	
-	protected boolean renderable;
 	
 	float timeout;
 	
@@ -75,6 +77,8 @@ public abstract class Entity implements Proximity<Vector3>, Steerable<Vector3> {
 		removeCollCheckOnInternals();
 		
 		boundRadius = Math.max(getWidth() / 2, getDepth() / 2);
+		
+		dimensions.set(getWidth(), getHeight(), getDepth());
 	}
 	
 	private void removeCollCheckOnInternals() {
@@ -94,10 +98,8 @@ public abstract class Entity implements Proximity<Vector3>, Steerable<Vector3> {
 	
 	public abstract void update(float delta);
 	
-	public void render(ModelBatch mBatch, Environment e) {
-		if(!renderable)
-			return;
-		
+	public void render(ModelBatch mBatch, Environment e, PerspectiveCamera pCam) {
+		if(GameTools.isObjectVisibleToScreen(pCam, modelInstance, dimensions))
 		mBatch.render(modelInstance, e);
 	}
 	
@@ -265,10 +267,6 @@ public abstract class Entity implements Proximity<Vector3>, Steerable<Vector3> {
 				}
 			}
 		
-	}
-	
-	public void setRenderable(boolean renderable) {
-		this.renderable = renderable;
 	}
 	
 	public void setWorldTransform(Matrix4 trans) {

@@ -129,7 +129,7 @@ public class GameScreen implements Screen, RulesListener, GUIRenderer {
 		map.setDifficulty(game.level.getDifficulty());
 		map.spawnPlayers(amount);
 		
-		map.manageRenderables(pCam);
+		Gdx.app.postRunnable(updateThread);
 	}
 
 	private void renderGUI(){
@@ -154,12 +154,6 @@ public class GameScreen implements Screen, RulesListener, GUIRenderer {
 		Gdx.gl.glClearColor(0, 0.7f, 0.8f, 1);
 		Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT | GL20.GL_DEPTH_BUFFER_BIT);
 
-		if(!paused()) {
-			if(Gdx.app.getType().equals(Application.ApplicationType.Android))
-				map.updatePhysics();
-			
-		}
-
 		cam.update();
 
 		map.getMainPlayer().getFocusTransform().mul(new Matrix4().setToTranslation(0, map.getMainPlayer().getHeight(), -10)).getTranslation(pCam.position);
@@ -170,15 +164,6 @@ public class GameScreen implements Screen, RulesListener, GUIRenderer {
 		
 
 		if (!paused()) {
-			Gdx.app.postRunnable(new Runnable() {
-
-				@Override
-				public void run() {
-					map.manageRenderables(pCam);
-				}
-				
-			});
-			
 			Gdx.app.postRunnable(updateThread);
 		}
 

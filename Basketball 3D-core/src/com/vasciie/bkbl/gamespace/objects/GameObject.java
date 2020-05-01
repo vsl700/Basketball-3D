@@ -6,6 +6,7 @@ import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.ai.steer.Proximity;
 import com.badlogic.gdx.ai.steer.Steerable;
 import com.badlogic.gdx.ai.utils.Location;
+import com.badlogic.gdx.graphics.PerspectiveCamera;
 import com.badlogic.gdx.graphics.g3d.Environment;
 import com.badlogic.gdx.graphics.g3d.Model;
 import com.badlogic.gdx.graphics.g3d.ModelBatch;
@@ -18,6 +19,7 @@ import com.badlogic.gdx.physics.bullet.collision.btCollisionShape;
 import com.badlogic.gdx.physics.bullet.dynamics.btRigidBody;
 import com.vasciie.bkbl.gamespace.GameMap;
 import com.vasciie.bkbl.gamespace.MotionState;
+import com.vasciie.bkbl.gamespace.tools.GameTools;
 
 public abstract class GameObject implements Steerable<Vector3>, Proximity<Vector3> {
 
@@ -40,11 +42,11 @@ public abstract class GameObject implements Steerable<Vector3>, Proximity<Vector
 	protected ArrayList<btRigidBody.btRigidBodyConstructionInfo> invisConstructionInfos;
 	protected Matrix4 mainTrans;
 	protected static final Vector3 localInertia = new Vector3(0, 0, 0);
+	protected final Vector3 dimensions = new Vector3();
 	
 	protected int mainBodyIndex;
 	
 	protected float x, y, z;
-	protected boolean renderable;
 	//protected float rX, rY, rZ, rA;
 	
 	public void create(ObjectType type, GameMap map, float x, float y, float z) {
@@ -78,15 +80,15 @@ public abstract class GameObject implements Steerable<Vector3>, Proximity<Vector
 		//motionState.transform = modelInstance.transform;
 		
 		setCollisions();
+		
+		dimensions.set(getWidth(), getHeight(), getDepth());
 		//manuallySetCollisions();
 		
 	}
 	
-	public void render(ModelBatch mBatch, Environment e) {
-		if(!renderable)
-			return;
-		
-		mBatch.render(modelInstance, e);
+	public void render(ModelBatch mBatch, Environment e, PerspectiveCamera pCam) {
+		if(GameTools.isObjectVisibleToScreen(pCam, modelInstance, dimensions))
+			mBatch.render(modelInstance, e);
 	}
 	
 	public void dispose() {
@@ -230,10 +232,6 @@ public abstract class GameObject implements Steerable<Vector3>, Proximity<Vector
 	 * Contains functions which are done when a collision at a specified place occurs
 	 */
 	protected abstract void specialFunction();
-		
-	public void setRenderable(boolean renderable) {
-		this.renderable = renderable;
-	}
 	
 	public void setWorldTransform(Matrix4 trans) {
 		mainTrans = trans;
