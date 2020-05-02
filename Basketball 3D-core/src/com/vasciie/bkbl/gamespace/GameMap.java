@@ -767,6 +767,9 @@ public class GameMap {
         basket2.dispose();
         basket1 = basket2 = null;
 
+        mCache.dispose();
+        mCache = null;
+
         dynamicsWorld.dispose();
         dynamicsWorld = null;
 

@@ -134,8 +134,6 @@ public class GameScreen implements Screen, RulesListener, GUIRenderer {
 		
 		map.setDifficulty(game.level.getDifficulty());
 		map.spawnPlayers(amount);
-		
-		Gdx.app.postRunnable(updateRunnable);
 	}
 
 	private void renderGUI(){
