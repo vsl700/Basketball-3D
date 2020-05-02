@@ -1,6 +1,7 @@
 package com.vasciie.bkbl.screens;
 
 import com.badlogic.gdx.Application;
+import com.badlogic.gdx.Application.ApplicationType;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input.Keys;
 import com.badlogic.gdx.Screen;
@@ -45,7 +46,8 @@ public class PauseScreen implements Screen, GUIRenderer {
 	
 	@Override
 	public void show() {
-		Gdx.graphics.setContinuousRendering(false);
+		if(Gdx.app.getType().equals(ApplicationType.Android))
+			Gdx.graphics.setContinuousRendering(false);
 		active = true;
 	}
 	
@@ -91,7 +93,8 @@ public class PauseScreen implements Screen, GUIRenderer {
 	}
 	
 	public void exit() {
-		Gdx.graphics.setContinuousRendering(true);
+		if(Gdx.app.getType().equals(ApplicationType.Android))
+			Gdx.graphics.setContinuousRendering(true);
 		active = false;
 	}
 	

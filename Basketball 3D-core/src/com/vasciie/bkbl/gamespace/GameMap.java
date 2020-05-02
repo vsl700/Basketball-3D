@@ -11,6 +11,7 @@ import com.badlogic.gdx.ai.steer.SteerableAdapter;
 import com.badlogic.gdx.graphics.PerspectiveCamera;
 import com.badlogic.gdx.graphics.g3d.Environment;
 import com.badlogic.gdx.graphics.g3d.ModelBatch;
+import com.badlogic.gdx.graphics.g3d.ModelCache;
 import com.badlogic.gdx.math.Matrix4;
 import com.badlogic.gdx.math.Quaternion;
 import com.badlogic.gdx.math.Vector3;
@@ -63,7 +64,7 @@ public class GameMap {
     public final static short ENTITY_FLAG = 1 << 9;
     public final static short ALL_FLAG = -1;
 
-    class ObjectContactListener extends ContactListener {
+    private class ObjectContactListener extends ContactListener {
         @Override
         public boolean onContactAdded(int userValue0, int partId0, int index0, int userValue1, int partId1, int index1) {
             //if(objectsMap.get(userValue0).equals(ObjectType.TERRAIN.getId() + "Team") || objectsMap.get(userValue1).equals(ObjectType.TERRAIN.getId() + "Team"))
@@ -96,6 +97,8 @@ public class GameMap {
     Terrain terrain;
     Basket basket1, basket2;
     Camera camera;
+    
+    ModelCache mCache;
 
     btCollisionConfiguration dynCollConfig;
     btDispatcher dynDispatcher;
@@ -144,6 +147,8 @@ public class GameMap {
 
         rules = new Rules(this, rulesListener);
 
+        mCache = new ModelCache();
+        
         Bullet.init();
         dynCollConfig = new btDefaultCollisionConfiguration();
         dynDispatcher = new btCollisionDispatcher(dynCollConfig);
@@ -290,6 +295,12 @@ public class GameMap {
         basket2.setRotation(0, 1, 0, 180);
 
         addBasketsCollObjects();
+        
+        mCache.begin();
+        terrain.render(mCache);
+        basket1.render(mCache);
+        basket2.render(mCache);
+        mCache.end();
     }
 
     public void spawnPlayers(int count) {
@@ -650,10 +661,8 @@ public class GameMap {
 
     public void render(ModelBatch mBatch, Environment environment, PerspectiveCamera pCam) {
     	mBatch.begin(pCam);
+    	mBatch.render(mCache, environment);
         ball.render(mBatch, environment, pCam);
-        terrain.render(mBatch, environment, pCam);
-        basket1.render(mBatch, environment, pCam);
-        basket2.render(mBatch, environment, pCam);
 
         for(Player e : getAllPlayers())
             e.render(mBatch, environment, pCam);
@@ -757,6 +766,9 @@ public class GameMap {
         basket1.dispose();
         basket2.dispose();
         basket1 = basket2 = null;
+
+        mCache.dispose();
+        mCache = null;
 
         dynamicsWorld.dispose();
         dynamicsWorld = null;

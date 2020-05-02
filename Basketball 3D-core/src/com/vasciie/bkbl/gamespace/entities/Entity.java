@@ -100,7 +100,7 @@ public abstract class Entity implements Proximity<Vector3>, Steerable<Vector3> {
 	
 	public void render(ModelBatch mBatch, Environment e, PerspectiveCamera pCam) {
 		if(GameTools.isObjectVisibleToScreen(pCam, modelInstance, dimensions))
-		mBatch.render(modelInstance, e);
+			mBatch.render(modelInstance, e);
 	}
 	
 	public void dispose() {

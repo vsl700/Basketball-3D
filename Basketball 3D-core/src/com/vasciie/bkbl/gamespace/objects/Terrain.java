@@ -3,12 +3,9 @@ package com.vasciie.bkbl.gamespace.objects;
 import java.util.ArrayList;
 
 import com.badlogic.gdx.Gdx;
-import com.badlogic.gdx.graphics.PerspectiveCamera;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.VertexAttributes;
-import com.badlogic.gdx.graphics.g3d.Environment;
 import com.badlogic.gdx.graphics.g3d.Material;
-import com.badlogic.gdx.graphics.g3d.ModelBatch;
 import com.badlogic.gdx.graphics.g3d.ModelInstance;
 import com.badlogic.gdx.graphics.g3d.attributes.TextureAttribute;
 import com.badlogic.gdx.graphics.g3d.utils.ModelBuilder;
@@ -45,11 +42,6 @@ public class Terrain extends GameObject {
 		matrixes.add(new Matrix4());
 		matrixes.add(new Matrix4());
 		matrixes.add(new Matrix4());
-	}
-	
-	@Override
-	public void render(ModelBatch mBatch, Environment e, PerspectiveCamera pCam) {
-		mBatch.render(modelInstance, e);
 	}
 
 	@Override

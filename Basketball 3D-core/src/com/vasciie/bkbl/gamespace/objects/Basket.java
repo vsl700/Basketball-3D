@@ -4,11 +4,9 @@ import java.util.ArrayList;
 
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.GL20;
-import com.badlogic.gdx.graphics.PerspectiveCamera;
 import com.badlogic.gdx.graphics.VertexAttributes;
-import com.badlogic.gdx.graphics.g3d.Environment;
 import com.badlogic.gdx.graphics.g3d.Material;
-import com.badlogic.gdx.graphics.g3d.ModelBatch;
+import com.badlogic.gdx.graphics.g3d.ModelCache;
 import com.badlogic.gdx.graphics.g3d.ModelInstance;
 import com.badlogic.gdx.graphics.g3d.attributes.ColorAttribute;
 import com.badlogic.gdx.graphics.g3d.model.Node;
@@ -21,7 +19,6 @@ import com.badlogic.gdx.physics.bullet.collision.btBoxShape;
 import com.badlogic.gdx.physics.bullet.collision.btCollisionObject;
 import com.badlogic.gdx.physics.bullet.collision.btCylinderShape;
 import com.badlogic.gdx.physics.bullet.dynamics.btRigidBody;
-import com.vasciie.bkbl.gamespace.tools.GameTools;
 
 public abstract class Basket extends GameObject {
 	
@@ -145,13 +142,13 @@ public abstract class Basket extends GameObject {
 	
 	private Vector3 tabCenterDimensions = new Vector3();
 	@Override
-	public void render(ModelBatch mBatch, Environment e, PerspectiveCamera pCam) {
-		super.render(mBatch, e, pCam);
+	public void render(ModelCache mCache) {
+		super.render(mCache);
 		
-		if (GameTools.isObjectVisibleToScreen(pCam, tabCenter, tabCenterDimensions)) {
-			mBatch.flush();
-			mBatch.render(tabCenter, e);
-		}
+		//if (GameTools.isObjectVisibleToScreen(pCam, tabCenter, tabCenterDimensions)) {
+			//mBatch.flush();
+			mCache.add(tabCenter);
+		//}
 	}
 
 	@Override
