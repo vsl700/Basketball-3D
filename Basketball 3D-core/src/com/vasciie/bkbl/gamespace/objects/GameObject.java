@@ -6,10 +6,8 @@ import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.ai.steer.Proximity;
 import com.badlogic.gdx.ai.steer.Steerable;
 import com.badlogic.gdx.ai.utils.Location;
-import com.badlogic.gdx.graphics.PerspectiveCamera;
-import com.badlogic.gdx.graphics.g3d.Environment;
 import com.badlogic.gdx.graphics.g3d.Model;
-import com.badlogic.gdx.graphics.g3d.ModelBatch;
+import com.badlogic.gdx.graphics.g3d.ModelCache;
 import com.badlogic.gdx.graphics.g3d.ModelInstance;
 import com.badlogic.gdx.math.Matrix4;
 import com.badlogic.gdx.math.Quaternion;
@@ -19,7 +17,6 @@ import com.badlogic.gdx.physics.bullet.collision.btCollisionShape;
 import com.badlogic.gdx.physics.bullet.dynamics.btRigidBody;
 import com.vasciie.bkbl.gamespace.GameMap;
 import com.vasciie.bkbl.gamespace.MotionState;
-import com.vasciie.bkbl.gamespace.tools.GameTools;
 
 public abstract class GameObject implements Steerable<Vector3>, Proximity<Vector3> {
 
@@ -86,9 +83,9 @@ public abstract class GameObject implements Steerable<Vector3>, Proximity<Vector
 		
 	}
 	
-	public void render(ModelBatch mBatch, Environment e, PerspectiveCamera pCam) {
-		if(GameTools.isObjectVisibleToScreen(pCam, modelInstance, dimensions))
-			mBatch.render(modelInstance, e);
+	public void render(ModelCache mBatch) {
+		//if(GameTools.isObjectVisibleToScreen(pCam, modelInstance, dimensions))
+			mBatch.add(modelInstance);
 	}
 	
 	public void dispose() {

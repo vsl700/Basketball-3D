@@ -257,9 +257,6 @@ public class GameScreen implements Screen, RulesListener, GUIRenderer {
 		ruleDesc.setPosAndSize(width / 2 - (width - 10) / 2, height - 120, width - 10);
 		clickToCont.setPosAndSize(width / 2 - (width - 10) / 2, height - 160, width - 10);
 		pCam.update();
-
-		if(paused())
-			Gdx.graphics.requestRendering();
 	}
 	
 	public boolean paused() {
@@ -273,7 +270,7 @@ public class GameScreen implements Screen, RulesListener, GUIRenderer {
 
 	@Override
 	public void resume() {
-
+		
 	}
 	
 	public void reset() {
