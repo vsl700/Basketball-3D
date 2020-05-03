@@ -1,12 +1,13 @@
 package com.vasciie.bkbl.gamespace.objects;
 
-import java.util.HashMap;
-
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.utils.reflect.ClassReflection;
 import com.badlogic.gdx.utils.reflect.ReflectionException;
 import com.vasciie.bkbl.gamespace.GameMap;
-import com.vasciie.bkbl.gamespace.objects.baskets.*;
+import com.vasciie.bkbl.gamespace.objects.baskets.Away;
+import com.vasciie.bkbl.gamespace.objects.baskets.Home;
+
+import java.util.HashMap;
 
 public enum ObjectType {
 
@@ -35,15 +36,33 @@ public enum ObjectType {
 	
 	public static GameObject createGameObject(String id, GameMap map, float x, float y, float z){
 		ObjectType type = objectTypes.get(id);
+		GameObject entity = null;
 		try {
-			@SuppressWarnings("unchecked")
-			GameObject entity = (GameObject) ClassReflection.newInstance(type.loaderClass);
-			entity.create(type, map, x, y, z);
-			return entity;
-		} catch (ReflectionException e) {
+			entity = (GameObject) ClassReflection.newInstance(type.loaderClass);
+		}catch(ReflectionException e){
 			Gdx.app.error("Entity Loader", "Could not load entity of type " + type.id);
 			return null;
 		}
+
+
+		entity.create(type, map, x, y, z);
+		return entity;
+	}
+
+	public static Basket createBasket(String id, GameMap map, float x, float y, float z){
+		ObjectType type = objectTypes.get(id);
+
+		Basket basket = null;
+		try {
+			basket = (Basket) ClassReflection.newInstance(type.loaderClass);
+		}catch(ReflectionException e){
+			Gdx.app.error("Entity Loader", "Could not load entity of type " + type.id);
+			return null;
+		}
+
+
+		basket.create(type, map, x, y, z);
+		return basket;
 	}
 
 	private static HashMap<String, ObjectType> objectTypes;

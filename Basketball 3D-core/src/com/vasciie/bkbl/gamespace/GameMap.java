@@ -289,9 +289,9 @@ public class GameMap {
         camera = (Camera) ObjectType.createGameObject(ObjectType.CAMERA.getId(), this, 0, 0, 0);
         addCameraCollObjects();
 
-        basket1 = (Basket) ObjectType.createGameObject(ObjectType.HOMEBASKET.getId(), this, 0.1f, 0, 27);
+        basket1 = ObjectType.createBasket(ObjectType.HOMEBASKET.getId(), this, 0.1f, 0, 27);
 
-        basket2 = (Basket) ObjectType.createGameObject(ObjectType.AWAYBASKET.getId(), this, 0.1f, 0, -27);
+        basket2 = ObjectType.createBasket(ObjectType.AWAYBASKET.getId(), this, 0.1f, 0, -27);
         basket2.setRotation(0, 1, 0, 180);
 
         addBasketsCollObjects();

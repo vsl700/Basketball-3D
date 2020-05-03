@@ -22,28 +22,29 @@ import com.badlogic.gdx.physics.bullet.dynamics.btRigidBody;
 
 public abstract class Basket extends GameObject {
 	
-	ModelInstance tabCenter;
+	private ModelInstance tabCenter;
 
-	static final float standW = 1;
-	static final float standH = 9;
-	static final float standD = 1;
-	static final float tabW = 5.5f;
-	static final float tabH = 3;
-	static final float tabD = 0.115f;
-	static final float tabCentW = 2.3f;
-	static final float tabCentH = 0.15f;
-	static final float tabCentH1 = 1.2f;
-	static final float tabCentD = 0.01f;
-	static final float bkHoldW = 0.08f;
-	static final float bkHoldD = 0.2f;
+	private static final float standW = 1;
+	private static final float standH = 9;
+	private static final float standD = 1;
+	private static final float tabW = 5.5f;
+	private static final float tabH = 3;
+	private static final float tabD = 0.115f;
+	private static final float tabCentW = 2.3f;
+	private static final float tabCentH = 0.15f;
+	private static final float tabCentH1 = 1.2f;
+	private static final float tabCentD = 0.01f;
+	private static final float bkHoldW = 0.08f;
+	private static final float bkHoldD = 0.2f;
 	
 	protected abstract Color getColor();
-	
+
+	private static final ModelBuilder mb = new ModelBuilder();
+	private static final ModelBuilder childMB = new ModelBuilder();
 	@Override
 	protected void createModels() {
 		
-		ModelBuilder mb = new ModelBuilder();
-		ModelBuilder childMB = new ModelBuilder();
+
 		
 		Material material = new Material(ColorAttribute.createDiffuse(Color.WHITE));
 		Material centerMaterial = new Material(ColorAttribute.createDiffuse(getColor()));
@@ -140,7 +141,7 @@ public abstract class Basket extends GameObject {
 		return calcTransformFromNodesTransform(modelInstance.getNode("tab").globalTransform.trn(0, 0, tabCentD));
 	}
 	
-	private Vector3 tabCenterDimensions = new Vector3();
+	private final Vector3 tabCenterDimensions = new Vector3();
 	@Override
 	public void render(ModelCache mCache) {
 		super.render(mCache);
@@ -203,11 +204,7 @@ public abstract class Basket extends GameObject {
 	public float getBoundingRadius() {
 		return 8;
 	}
-	
-	public float getBasketFrameSize() {
-		return bkHoldW;
-	}
-	
+
 	public Matrix4 getBasketTargetTrans() {
 		return calcTransformFromNodesTransform(modelInstance.getNode("basket1").globalTransform.cpy().trn(0, 0, -tabCentW / 2));
 	}
