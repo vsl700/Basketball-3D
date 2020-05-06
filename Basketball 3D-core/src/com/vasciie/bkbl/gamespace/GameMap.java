@@ -664,8 +664,10 @@ public class GameMap {
     	mBatch.render(mCache, environment);
         ball.render(mBatch, environment, pCam);
 
-        for(Player e : getAllPlayers())
+        for(Player e : getAllPlayers()) {
+            mBatch.flush();
             e.render(mBatch, environment, pCam);
+        }
 
         mBatch.end();
     }

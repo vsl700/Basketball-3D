@@ -5,9 +5,13 @@ public class VEThread extends Thread {
 	Runnable runnable;
 	
 	boolean run = true;
+
+	public static int uses = 0;
 	
 	public VEThread(Runnable runnable) {
 		this.runnable = runnable;
+
+		uses++;
 	}
 
 	@Override
