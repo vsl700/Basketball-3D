@@ -104,6 +104,16 @@ public class Button extends GUI {
     }
 
     @Override
+    public void draw(){
+        if(!renderable){
+            touched = release = false;
+            multitouch = -1;
+        }
+
+        super.draw();
+    }
+
+    @Override
     public void render() {
         ShapeRenderer shape = guiRenderer.getShapeRenderer();
         SpriteBatch batch = guiRenderer.getSpriteBatch();
@@ -143,7 +153,7 @@ public class Button extends GUI {
     public boolean isLocalTouched() {
         OrthographicCamera cam = guiRenderer.getCam();
 
-        for (int i = 0; i < 5; i++) {
+        for (int i = 0; i < 3; i++) {
             Vector3 touchPos = new Vector3(Gdx.input.getX(i), Gdx.input.getY(i), 0);
             cam.unproject(touchPos);
 
@@ -168,7 +178,7 @@ public class Button extends GUI {
         OrthographicCamera cam = guiRenderer.getCam();
 
         if (renderable) {
-            for (int i = 0; i < 5; i++) {
+            for (int i = 0; i < 3; i++) {
                 Vector3 touchPos = new Vector3(Gdx.input.getX(i), Gdx.input.getY(i), 0);
                 cam.unproject(touchPos);
 
@@ -203,7 +213,7 @@ public class Button extends GUI {
         OrthographicCamera cam = guiRenderer.getCam();
 
         if (multitouch == -1) {
-            for (int i = 0; i < 5; i++) {
+            for (int i = 0; i < 3; i++) {
                 Vector3 touchPos = new Vector3(Gdx.input.getX(i), Gdx.input.getY(i), 0);
                 cam.unproject(touchPos);
 
@@ -227,7 +237,7 @@ public class Button extends GUI {
 
         if (renderable) {
             if (Gdx.input.justTouched())
-                for (int i = 0; i < 5; i++) {
+                for (int i = 0; i < 3; i++) {
                     Vector3 touchPos = new Vector3(Gdx.input.getX(i), Gdx.input.getY(i), 0);
                     cam.unproject(touchPos);
 

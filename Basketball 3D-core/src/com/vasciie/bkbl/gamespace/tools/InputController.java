@@ -41,7 +41,6 @@ public class InputController implements InputProcessor {
 
     float dX, dY;
     int multitouch = -1;
-    boolean cameraRot;
     boolean dribble;
 
     public InputController(GUIRenderer guiRenderer) {
@@ -141,6 +140,9 @@ public class InputController implements InputProcessor {
 
             focusPressed = false;
             focusBtn.setToggled(false);
+
+            shootPressed = false;
+            shootBtn.setToggled(false);
         }
 
         if(shootPressed)
@@ -172,8 +174,8 @@ public class InputController implements InputProcessor {
     }
 
     public void updateRotation(){
-        if (Gdx.input.justTouched())//If a new pointer comes
-            for (int i = 0; i < 5; i++) {
+        if (Gdx.input.justTouched())//If a new pointer comes or the controller is not being updated
+            for (int i = 0; i < 3; i++) {
                 if (!isTouchPointerUsed(i)) {//If no buttons are working on this pointer
                     //We set the touch pointer to the new one, update the deltas and break the cycle
                     multitouch = i;

@@ -84,7 +84,7 @@ public class GameMap {
         }
     }
 
-    private Thread physicsThread;
+    private VEThread physicsThread;
     Runnable dynamicsWorldRunnable;
 
     Rules rules;
@@ -545,9 +545,7 @@ public class GameMap {
         // because the AI might sometimes make mistakes and if
         // players go one through another that wouldn't be very funny (for me)
         //float delta2 = Math.min(1f / 30f, delta);
-        if(physicsThread.getState().equals(State.NEW))
-        	physicsThread.start();
-        else while(!physicsThread.getState().equals(State.WAITING));
+        physicsThread.waitToFinish();
         
 
         //if(gameRunning)
@@ -647,11 +645,7 @@ public class GameMap {
             e.update(delta);
         }
 
-        try {
-            updatePlayerAnimations(delta);
-        }catch(Exception e){
-            e.printStackTrace();
-        }
+        updatePlayerAnimations(delta);
     }
 
     private void endPlayersCycle() {
@@ -678,8 +672,7 @@ public class GameMap {
     }
 
     public void renderController(){
-        if(gameRunning || !ruleTriggeredActing)
-            inputs.render();
+        inputs.render();
     }
 
     public void addRigidBody(btRigidBody body, int group, int mask) {

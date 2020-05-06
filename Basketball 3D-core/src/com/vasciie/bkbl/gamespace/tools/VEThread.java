@@ -4,7 +4,7 @@ public class VEThread extends Thread {
 
 	Runnable runnable;
 	
-	boolean run = true;
+	boolean run = true, working;
 
 	public static int uses = 0;
 	
@@ -18,7 +18,8 @@ public class VEThread extends Thread {
 	public void run() {
 		while(run) {
 			runnable.run();
-			
+
+			working = false;
 			synchronized(this) {
 				try {
 					wait();
@@ -31,6 +32,8 @@ public class VEThread extends Thread {
 	
 	@Override
 	public void start() {
+		working = true;
+
 		if(getState().equals(State.NEW))
 			super.start();
 		else {
@@ -47,5 +50,9 @@ public class VEThread extends Thread {
             notify();
         }
     }
+
+    public void waitToFinish(){
+		while(working);
+	}
 	
 }

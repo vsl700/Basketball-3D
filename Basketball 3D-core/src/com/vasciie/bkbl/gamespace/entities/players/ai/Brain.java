@@ -284,7 +284,7 @@ public class Brain {
 		else shootPower = farShootPower;
 		
 		user.setShootPower(shootPower);
-		System.out.println(farShootPower + " ; " + nearShootPower + ": " + shootPower + "; dst: " + dst);
+		//System.out.println(farShootPower + " ; " + nearShootPower + ": " + shootPower + "; dst: " + dst);
 		
 		return returnVec;
 	}

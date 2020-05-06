@@ -203,14 +203,20 @@ public class GameScreen implements Screen, RulesListener, GUIRenderer {
 	private static final Matrix4 tempMatrix = new Matrix4();
 	private static final Matrix4 tempMatrix2 = new Matrix4();
 	private static final Vector3 tempVec = new Vector3();
+	boolean recentlyPaused;
 	@Override
-	public void render(final float delta) {
+	public void render(float delta) {
+		if(recentlyPaused && !paused()) {//After the pause the delta is big, which causes troubles
+			recentlyPaused = false;
+			return;
+		}
+
 		Gdx.gl.glClearColor(0, 0.7f, 0.8f, 1);
 		Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT | GL20.GL_DEPTH_BUFFER_BIT);
 
 		cam.update();
 		
-		while(!updateThread.getState().equals(State.NEW) && !updateThread.getState().equals(State.WAITING));
+		updateThread.waitToFinish();
 
 		map.getMainPlayer().getFocusTransform().mul(tempMatrix.setToTranslation(0, map.getMainPlayer().getHeight(), -10)).getTranslation(pCam.position);
 		game.customLookAt(pCam, tempMatrix.set(map.getMainPlayer().getModelInstance().transform).mul(tempMatrix2.setToTranslation(0, map.getMainPlayer().getHeight(), 0)).getTranslation(tempVec));
@@ -232,8 +238,10 @@ public class GameScreen implements Screen, RulesListener, GUIRenderer {
 		if(paused() && game.getScreen().equals(this)) {
 			pause.render(delta);
 			return;
-		}else if((Gdx.input.isKeyJustPressed(Keys.ESCAPE) || Gdx.input.isKeyJustPressed(Keys.BACK)) && !ignorePause)
+		}else if((Gdx.input.isKeyJustPressed(Keys.ESCAPE) || Gdx.input.isKeyJustPressed(Keys.BACK)) && !ignorePause) {
 			pause.show();
+			recentlyPaused = true;
+		}
 		
 		ignorePause = false;
 	}
