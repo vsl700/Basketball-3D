@@ -52,7 +52,7 @@ public class VEThread extends Thread {
     }
 
     public void waitToFinish(){
-		while(working);
+		while(working){System.out.println("Waiting");}//An empty while loop freezes the game for some reason
 	}
 	
 }
