@@ -270,6 +270,7 @@ public class GameScreen implements Screen, RulesListener, GUIRenderer {
 	@Override
 	public void pause() {
 		pause.show();
+		recentlyPaused = true;
 	}
 
 	@Override

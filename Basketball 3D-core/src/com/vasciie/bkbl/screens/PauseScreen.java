@@ -46,8 +46,6 @@ public class PauseScreen implements Screen, GUIRenderer {
 	
 	@Override
 	public void show() {
-		if(Gdx.app.getType().equals(ApplicationType.Android))
-			Gdx.graphics.setContinuousRendering(false);
 		active = true;
 	}
 	
@@ -62,10 +60,12 @@ public class PauseScreen implements Screen, GUIRenderer {
 		if(Gdx.input.isKeyJustPressed(Keys.ESCAPE) || Gdx.input.isKeyJustPressed(Keys.BACK) || resume.justReleased()) {
 			exit();
 			game.setScreen(game.game);
+			return;
 		}else if(newGame.justReleased()) {
 			game.game.reset();
 			game.game.show();
 			exit();
+			return;
 		}
 		else if(!Gdx.app.getType().equals(Application.ApplicationType.Android) && settings.justReleased()) {
 			game.settings.setPreviousScreen(this);
@@ -75,6 +75,7 @@ public class PauseScreen implements Screen, GUIRenderer {
 			exit();
 			game.game.reset();
 			game.setScreen(game.main);
+			return;
 		}
 
 		game.renderLogo(batch, cam);
@@ -84,7 +85,9 @@ public class PauseScreen implements Screen, GUIRenderer {
 		if(settings != null)
 			settings.draw();
 		quit.draw();
-			
+
+		if(Gdx.app.getType().equals(ApplicationType.Android))
+			Gdx.graphics.setContinuousRendering(false);
 	}
 	
 	@Override

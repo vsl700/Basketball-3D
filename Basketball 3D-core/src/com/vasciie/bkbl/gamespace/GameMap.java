@@ -417,7 +417,7 @@ public class GameMap {
 
         //TODO When using Android Studio, take the comment marks out of the lines below! Eclipse gives an error on this line!
         //if (Gdx.app.getType().equals(Application.ApplicationType.Android))
-            //Gdx.input.setCatchKey(com.badlogic.gdx.Input.Keys.BACK, true);
+           //Gdx.input.setCatchKey(com.badlogic.gdx.Input.Keys.BACK, true);
 
         startTimer = 5.5f;
         playersReady = true;
@@ -541,14 +541,9 @@ public class GameMap {
     public void update(float delta) {
         //camera.setWorldTransform(new Matrix4(mainPlayer.getModelInstance().transform).mul(mainPlayer.getCamMatrix()).mul(new Matrix4().setToTranslation(0, mainPlayer.getHeight(), -10)));
 
-        // We're leaving dynamics world outside of the check below
-        // because the AI might sometimes make mistakes and if
-        // players go one through another that wouldn't be very funny (for me)
         //float delta2 = Math.min(1f / 30f, delta);
         physicsThread.waitToFinish();
-        
 
-        //if(gameRunning)
         if (!gameRunning) {
             turnPlayer(delta);
             updateInputs();
@@ -563,24 +558,6 @@ public class GameMap {
         }
         if (ruleTriggeredActing) {
             updateFullGame(delta);
-			
-			/*//If players are not ready it means they are not in their target positions. So we should go through each one and check
-			ArrayList<Player> allPlayers = getAllPlayers();
-			boolean flag = true;
-			for(Player p : allPlayers) {
-				if(!p.getMoveVector().isZero()) { //We use player velocities for checking if they are in their places
-					flag = false;
-					break;
-				}
-			}
-			
-			if(flag) {
-				playersReady = true;
-				actionOver();
-				rules.clearBrokenRuleWRuleBreaker();
-			}
-			
-			return;*/
 
             if (rules.getTriggeredRule() == null) {
                 actionOver();
