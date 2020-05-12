@@ -83,8 +83,8 @@ public class GameMap {
         }
     }
 
-    private static VEThread physicsThread;
-    private static Runnable dynamicsWorldRunnable;
+    private VEThread physicsThread;
+    Runnable dynamicsWorldRunnable;
 
     Rules rules;
 
@@ -129,20 +129,20 @@ public class GameMap {
     boolean playersReady; //Whether the players are in positions
 
     int index = 0, lastIndex, ballIndex, lastBallIndex;
+    
+    static boolean loadedBullet;
 
     public GameMap(RulesListener rulesListener, GUIRenderer guiRenderer) {
-    	if(dynamicsWorldRunnable == null)
-			dynamicsWorldRunnable = new Runnable() {
+    	dynamicsWorldRunnable = new Runnable() {
 
-				@Override
-				public void run() {
-					dynamicsWorld.stepSimulation(Gdx.graphics.getDeltaTime(), 5, 1f / 60f);
-				}
+			@Override
+			public void run() {
+				dynamicsWorld.stepSimulation(Gdx.graphics.getDeltaTime(), 5, 1f / 60f);
+			}
 
-			};
+        };
         
-		if(physicsThread == null)
-			physicsThread = new VEThread(dynamicsWorldRunnable);
+        physicsThread = new VEThread(dynamicsWorldRunnable);
 
         inputs = new InputController(guiRenderer);
 
@@ -150,7 +150,11 @@ public class GameMap {
 
         mCache = new ModelCache();
         
-        Bullet.init();
+		if (!loadedBullet) {
+			Bullet.init();
+			loadedBullet = true;
+		}
+        
         dynCollConfig = new btDefaultCollisionConfiguration();
         dynDispatcher = new btCollisionDispatcher(dynCollConfig);
         dynBroadphase = new btDbvtBroadphase();
@@ -418,7 +422,7 @@ public class GameMap {
 
         //TODO When using Android Studio, take the comment marks out of the lines below! Eclipse gives an error on this line!
         //if (Gdx.app.getType().equals(Application.ApplicationType.Android))
-           //Gdx.input.setCatchKey(com.badlogic.gdx.Input.Keys.BACK, true);
+            //Gdx.input.setCatchKey(com.badlogic.gdx.Input.Keys.BACK, true);
 
         startTimer = 5.5f;
         playersReady = true;
@@ -487,8 +491,8 @@ public class GameMap {
     }
 
     public void clear() {
-        /*physicsThread.interrupt();
-        physicsThread = null;*/
+        physicsThread.interrupt();
+        //physicsThread = null;
 
         disposePlayers();
         teammates.clear();
@@ -743,8 +747,8 @@ public class GameMap {
         mCache.dispose();
         mCache = null;
 
-        //dynamicsWorld.dispose(); //FIXME ERROR!
-        //dynamicsWorld = null;
+        dynamicsWorld.dispose();
+        dynamicsWorld = null;
 
         dynDispatcher.dispose();
         dynDispatcher = null;
