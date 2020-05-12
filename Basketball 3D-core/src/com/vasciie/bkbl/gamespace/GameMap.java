@@ -1,6 +1,5 @@
 package com.vasciie.bkbl.gamespace;
 
-import java.lang.Thread.State;
 import java.util.ArrayList;
 import java.util.HashMap;
 
@@ -84,8 +83,8 @@ public class GameMap {
         }
     }
 
-    private VEThread physicsThread;
-    Runnable dynamicsWorldRunnable;
+    private static VEThread physicsThread;
+    private static Runnable dynamicsWorldRunnable;
 
     Rules rules;
 
@@ -132,16 +131,18 @@ public class GameMap {
     int index = 0, lastIndex, ballIndex, lastBallIndex;
 
     public GameMap(RulesListener rulesListener, GUIRenderer guiRenderer) {
-    	dynamicsWorldRunnable = new Runnable() {
+    	if(dynamicsWorldRunnable == null)
+			dynamicsWorldRunnable = new Runnable() {
 
-			@Override
-			public void run() {
-				dynamicsWorld.stepSimulation(Gdx.graphics.getDeltaTime(), 5, 1f / 60f);
-			}
+				@Override
+				public void run() {
+					dynamicsWorld.stepSimulation(Gdx.graphics.getDeltaTime(), 5, 1f / 60f);
+				}
 
-        };
+			};
         
-        physicsThread = new VEThread(dynamicsWorldRunnable);
+		if(physicsThread == null)
+			physicsThread = new VEThread(dynamicsWorldRunnable);
 
         inputs = new InputController(guiRenderer);
 
@@ -486,8 +487,8 @@ public class GameMap {
     }
 
     public void clear() {
-        physicsThread.interrupt();
-        physicsThread = null;
+        /*physicsThread.interrupt();
+        physicsThread = null;*/
 
         disposePlayers();
         teammates.clear();
@@ -513,7 +514,7 @@ public class GameMap {
             collObjsValsMap.remove(i);
         }
 
-        dynamicsWorldRunnable = null;
+        //dynamicsWorldRunnable = null;
 
         //index = ballIndex;
         //createBall();
@@ -742,8 +743,8 @@ public class GameMap {
         mCache.dispose();
         mCache = null;
 
-        dynamicsWorld.dispose();
-        dynamicsWorld = null;
+        //dynamicsWorld.dispose(); //FIXME ERROR!
+        //dynamicsWorld = null;
 
         dynDispatcher.dispose();
         dynDispatcher = null;
