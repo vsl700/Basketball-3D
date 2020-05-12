@@ -492,7 +492,7 @@ public class GameMap {
 
     public void clear() {
         physicsThread.interrupt();
-        //physicsThread = null;
+        physicsThread = null;
 
         disposePlayers();
         teammates.clear();
@@ -518,7 +518,7 @@ public class GameMap {
             collObjsValsMap.remove(i);
         }
 
-        //dynamicsWorldRunnable = null;
+        dynamicsWorldRunnable = null;
 
         //index = ballIndex;
         //createBall();
