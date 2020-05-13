@@ -534,7 +534,6 @@ public class GameMap {
     }
 
     private void updatePhysics() {
-    	
     	physicsThread.start();
     }
     
@@ -734,7 +733,10 @@ public class GameMap {
     }
 
     private void disposeMap() {
-        ball.dispose();
+    	dynamicsWorld.dispose();
+        dynamicsWorld = null;
+    	
+    	ball.dispose();
         ball = null;
 
         terrain.dispose();
@@ -746,9 +748,6 @@ public class GameMap {
 
         mCache.dispose();
         mCache = null;
-
-        dynamicsWorld.dispose();
-        dynamicsWorld = null;
 
         dynDispatcher.dispose();
         dynDispatcher = null;
