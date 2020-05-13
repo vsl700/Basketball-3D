@@ -34,6 +34,7 @@ public enum ObjectType {
 		return id;
 	}
 	
+	@SuppressWarnings("unchecked")
 	public static GameObject createGameObject(String id, GameMap map, float x, float y, float z){
 		ObjectType type = objectTypes.get(id);
 		GameObject entity = null;
@@ -49,6 +50,7 @@ public enum ObjectType {
 		return entity;
 	}
 
+	@SuppressWarnings("unchecked")
 	public static Basket createBasket(String id, GameMap map, float x, float y, float z){
 		ObjectType type = objectTypes.get(id);
 
