@@ -1,5 +1,7 @@
 package com.vasciie.bkbl.screens;
 
+import java.lang.Thread.State;
+
 import com.badlogic.gdx.Application;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input.Keys;
@@ -213,7 +215,8 @@ public class GameScreen implements Screen, RulesListener, GUIRenderer {
 
 		cam.update();
 		
-		updateThread.waitToFinish();
+		if(SettingsScreen.multithreadOption)
+			updateThread.waitToFinish();
 
 		map.getMainPlayer().getFocusTransform().mul(tempMatrix.setToTranslation(0, map.getMainPlayer().getHeight(), -10)).getTranslation(pCam.position);
 		game.customLookAt(pCam, tempMatrix.set(map.getMainPlayer().getModelInstance().transform).mul(tempMatrix2.setToTranslation(0, map.getMainPlayer().getHeight(), 0)).getTranslation(tempVec));
@@ -224,8 +227,9 @@ public class GameScreen implements Screen, RulesListener, GUIRenderer {
 			if(Gdx.app.getType().equals(Application.ApplicationType.Android))
 				map.updateController();
 
-
-			updateThread.start();
+			if(SettingsScreen.multithreadOption)
+				updateThread.start();
+			else updateRunnable.run();
 		}
 
 		updateGUI(delta);
@@ -297,7 +301,8 @@ public class GameScreen implements Screen, RulesListener, GUIRenderer {
 	public void dispose() {
 		mBatch.dispose();
 		
-		updateThread.interrupt();
+		if(!updateThread.getState().equals(State.NEW))
+			updateThread.interrupt();
 	}
 	
 	public void setPlayersAmount(int amount) {

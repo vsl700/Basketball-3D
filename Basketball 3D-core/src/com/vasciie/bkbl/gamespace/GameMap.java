@@ -1,5 +1,6 @@
 package com.vasciie.bkbl.gamespace;
 
+import java.lang.Thread.State;
 import java.util.ArrayList;
 import java.util.HashMap;
 
@@ -44,6 +45,7 @@ import com.vasciie.bkbl.gamespace.rules.Rules.RulesListener;
 import com.vasciie.bkbl.gamespace.tools.InputController;
 import com.vasciie.bkbl.gamespace.tools.VEThread;
 import com.vasciie.bkbl.gui.GUIRenderer;
+import com.vasciie.bkbl.screens.SettingsScreen;
 
 public class GameMap {
 
@@ -129,6 +131,8 @@ public class GameMap {
     boolean playersReady; //Whether the players are in positions
 
     int index = 0, lastIndex, ballIndex, lastBallIndex;
+    
+    boolean interrupted = false;
 
     public GameMap(RulesListener rulesListener, GUIRenderer guiRenderer) {
     	dynamicsWorldRunnable = new Runnable() {
@@ -490,7 +494,11 @@ public class GameMap {
     }
 
     public void clear() {
-    	physicsThread.interrupt();
+    	
+    	if(!physicsThread.getState().equals(State.NEW)) {
+    		physicsThread.interrupt();
+    		interrupted = true;
+    	}
     	
         disposePlayers();
         teammates.clear();
@@ -532,7 +540,10 @@ public class GameMap {
         //index = ballIndex;
         createBall();
         
-        physicsThread = new VEThread(dynamicsWorldRunnable);
+        if(interrupted) {
+        	physicsThread = new VEThread(dynamicsWorldRunnable);
+        	interrupted = false;
+        }
 
         gameRunning = false;
         ruleTriggeredActing = false;
@@ -545,7 +556,8 @@ public class GameMap {
     }
 
     private void updatePhysics() {
-    	physicsThread.start();
+    	if(SettingsScreen.multithreadOption)
+    		physicsThread.start();
     }
     
     public void updatePlayerAnimations(float delta) {
@@ -557,7 +569,9 @@ public class GameMap {
         //camera.setWorldTransform(new Matrix4(mainPlayer.getModelInstance().transform).mul(mainPlayer.getCamMatrix()).mul(new Matrix4().setToTranslation(0, mainPlayer.getHeight(), -10)));
 
         //float delta2 = Math.min(1f / 30f, delta);
-        physicsThread.waitToFinish();
+    	if(SettingsScreen.multithreadOption)
+    		physicsThread.waitToFinish();
+    	else dynamicsWorldRunnable.run();
 
         if (!gameRunning) {
             turnPlayer(delta);
@@ -749,7 +763,10 @@ public class GameMap {
     	if(dynamicsWorld == null)
     		return;
     	
-    	physicsThread.interrupt();
+    	if(!interrupted) {
+    		physicsThread.interrupt();
+    		interrupted = true;
+    	}
         physicsThread = null;
     	
     	dynamicsWorld.dispose();
