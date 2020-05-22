@@ -33,13 +33,14 @@ public class SettingsScreen implements Screen, UpDownListener, GUIRenderer {
 	Button goBack;
 	CheckButton beautifulGfx, fullscreen;
 	CheckButton invX, invY;
+	CheckButton multithread;
 	NumUpDown fpsUpDown;
 	//TextUpDown resUpDown;
-	Label fpsLabel, camRotLabel;
+	Label fpsLabel, camRotLabel, mthLabel;
 	
 	Screen prevScreen;
 	
-	public static boolean invertX, invertY;
+	public static boolean invertX, invertY, multithreadOption;
 	
 	//boolean checkForFSCN; //Check for fullscreen
 	
@@ -87,8 +88,9 @@ public class SettingsScreen implements Screen, UpDownListener, GUIRenderer {
 		goBack = new Button("Go Back", font, Color.ORANGE.cpy().sub(0, 0.3f, 0, 1), true, true, this);
 		beautifulGfx = new CheckButton("Beautiful Background", font, Color.ORANGE.cpy().sub(0, 0.3f, 0, 1), true, true, this);
 		fullscreen = new CheckButton("Fullscreen", font, Color.ORANGE.cpy().sub(0, 0.3f, 0, 1), true, true, this);
-		invX = new CheckButton("Invert X", font, Color.ORANGE.cpy().sub(0, 0.3f, 0, 1), true, true, this);
-		invY = new CheckButton("Invert Y", font, Color.ORANGE.cpy().sub(0, 0.3f, 0, 1), true, true, this);
+		invX = new CheckButton("Invert camera X", font, Color.ORANGE.cpy().sub(0, 0.3f, 0, 1), true, true, this);
+		invY = new CheckButton("Invert camera Y", font, Color.ORANGE.cpy().sub(0, 0.3f, 0, 1), true, true, this);
+		multithread = new CheckButton("Multithreaded Update", font, Color.ORANGE.cpy().sub(0, 0.3f, 0, 1), true, true, this);
 		
 		fpsUpDown = new NumUpDown(font, font2, Color.WHITE, Color.BROWN, new Color().set(0.8f, 0.4f, 0, 1), 0, 240, 10, this);
 		fpsUpDown.addException(0, "Inf.");
@@ -100,11 +102,14 @@ public class SettingsScreen implements Screen, UpDownListener, GUIRenderer {
 		
 		fpsLabel = new Label("THE MAXIMUM FRAMES PER SECOND", font, Color.BROWN, true, this);
 		camRotLabel = new Label("WHETHER TO INVERT THE CAMERA ROTATION", font, Color.BROWN, true, this);
+		mthLabel = new Label("INCREASES PERFORMANCE, BUT MIGHT DECREASE QUALITY", font, Color.BROWN, true, this);
 		//resLabel = new Label("THE RESOLUTION OF THE WINDOW", font, Color.BROWN, true);
 		
 		beautifulGfx.setToggled(game.isBeautifulBack());
 		fullscreen.setToggled(Gdx.graphics.isFullscreen());
 		fpsUpDown.setOption(game.getForegroundFps());
+		multithread.setToggled(true);
+		multithreadOption = true;
 	}
 	
 	@Override
@@ -123,10 +128,15 @@ public class SettingsScreen implements Screen, UpDownListener, GUIRenderer {
 		fullscreen.update();
 		invX.update();
 		invY.update();
+		multithread.update();
 		
 		fpsUpDown.update();
-		fpsLabel.update();
-		camRotLabel.update();
+		
+		if (cam.viewportHeight >= 814) {
+			fpsLabel.update();
+			camRotLabel.update();
+			mthLabel.update();
+		}
 		
 		//resUpDown.render(batch, shape, cam);
 		//resLabel.render(batch, shape, cam);
@@ -149,6 +159,8 @@ public class SettingsScreen implements Screen, UpDownListener, GUIRenderer {
 			invertX = invX.isToggled();
 		if(invY.justTouched())
 			invertY = invY.isToggled();
+		if(multithread.justTouched())
+			multithreadOption = multithread.isToggled();
 
 		game.renderLogo(batch, cam);
 
@@ -158,10 +170,12 @@ public class SettingsScreen implements Screen, UpDownListener, GUIRenderer {
 		fullscreen.draw();
 		invX.draw();
 		invY.draw();
+		multithread.draw();
 
 		fpsUpDown.draw();
 		fpsLabel.draw();
 		camRotLabel.draw();
+		mthLabel.draw();
 	}
 	
 	/*private void changeRes() {
@@ -189,7 +203,7 @@ public class SettingsScreen implements Screen, UpDownListener, GUIRenderer {
 
 	@Override
 	public void resize(int width, int height) {
-		
+		System.out.println(height);
 		cam.setToOrtho(false, width, height);
 		
 		goBack.setSize(game.pixelXByCurrentSize(223), game.pixelYByCurrentSize(30));
@@ -197,6 +211,9 @@ public class SettingsScreen implements Screen, UpDownListener, GUIRenderer {
 		
 		//resUpDown.setSize(game.pixelXByCurrentSize(74), game.pixelYByCurrentSize(45));
 		//resUpDown.setPos(width / 2 - resUpDown.getTotalWidth() / 2, height / 2 - resUpDown.getHeight() / 2);
+		
+		multithread.setSize(40, 40);
+		multithread.setPos(width / 2 - multithread.getTotalWidth() / 2, game.pixelYByCurrentSize(425));
 		
 		fpsUpDown.setSize(game.pixelXByCurrentSize(74), game.pixelYByCurrentSize(45));
 		//fpsUpDown.setPos(width / 2 - fpsUpDown.getTotalWidth() / 2, height / 2 - fpsUpDown.getHeight() / 2 - resUpDown.getHeight() * 3);
@@ -213,6 +230,8 @@ public class SettingsScreen implements Screen, UpDownListener, GUIRenderer {
 		invY.setPos(width / 2 + invX.getWidth() + 20, invX.getY());
 		
 		camRotLabel.setPosAndSize(fpsUpDown.getX() + fpsUpDown.getTotalWidth() / 2 - 194 / 2, invY.getY() + invY.getHeight(), 194);
+		
+		mthLabel.setPosAndSize(fpsUpDown.getX() + fpsUpDown.getTotalWidth() / 2 - 194 / 2, multithread.getY() + invY.getHeight(), 194);
 		
 		fpsLabel.setPosAndSize(fpsUpDown.getX() + fpsUpDown.getTotalWidth() / 2 - 164 / 2, fpsUpDown.getY() + fpsUpDown.getHeight() + 10, 164);
 		//resLabel.setPosAndSize(resUpDown.getX() + resUpDown.getTotalWidth() / 2 - 164 / 2, resUpDown.getY() + resUpDown.getHeight() + 10, 164);
