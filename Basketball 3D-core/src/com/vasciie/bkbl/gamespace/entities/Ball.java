@@ -125,6 +125,14 @@ public class Ball extends Entity {
 		manuallySetCollTransform();
 		
 	}
+	
+	@Override
+	public void dispose() {
+		super.dispose();
+		
+		neighborPlayers.clear();
+		neighborPlayers = null;
+	}
 
 	@Override
 	public float getWidth() {
