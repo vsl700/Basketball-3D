@@ -6,6 +6,7 @@ import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.VertexAttributes;
 import com.badlogic.gdx.graphics.g3d.Material;
+import com.badlogic.gdx.graphics.g3d.ModelCache;
 import com.badlogic.gdx.graphics.g3d.ModelInstance;
 import com.badlogic.gdx.graphics.g3d.attributes.TextureAttribute;
 import com.badlogic.gdx.graphics.g3d.utils.ModelBuilder;
@@ -19,29 +20,55 @@ import com.vasciie.bkbl.gamespace.MotionState;
 
 public class Terrain extends GameObject {
 	
+	TerrainThemes theme;
+	
 	static final float wallDepth = 5f;
 
 	@Override
 	protected void createModels() {
-		ModelBuilder mb = new ModelBuilder();
+		theme = chooseTheme();
 		
-		Texture court = new Texture(Gdx.files.internal("game/basketball_court.jpg"));
-		court.setWrap(Texture.TextureWrap.ClampToEdge, Texture.TextureWrap.ClampToEdge);
-		court.setFilter(Texture.TextureFilter.Linear, Texture.TextureFilter.Linear);
-		
-		Material material = new Material(TextureAttribute.createDiffuse(court));
-		long attribs = VertexAttributes.Usage.Position | VertexAttributes.Usage.Normal | VertexAttributes.Usage.TextureCoordinates;
-		
-		model = mb.createBox(getWidth(), getHeight(), getDepth(), material, attribs);
-		model.manageDisposable(court);
-		
-		modelInstance = new ModelInstance(model, x, y - getHeight() / 2, z);
+		if(theme != null) {//Tutorial gamemode doesn't have any theme
+			theme.createModels(this);
+			
+			if (!theme.hasOwnTerrain()) {
+				ModelBuilder mb = new ModelBuilder();
+
+				Texture court = new Texture(Gdx.files.internal("game/basketball_court.jpg"));
+				court.setWrap(Texture.TextureWrap.ClampToEdge, Texture.TextureWrap.ClampToEdge);
+				court.setFilter(Texture.TextureFilter.Linear, Texture.TextureFilter.Linear);
+
+				Material material = new Material(TextureAttribute.createDiffuse(court));
+				long attribs = VertexAttributes.Usage.Position | VertexAttributes.Usage.Normal | VertexAttributes.Usage.TextureCoordinates;
+
+				model = mb.createBox(getWidth(), getHeight(), getDepth(), material, attribs);
+				model.manageDisposable(court);
+
+				modelInstance = new ModelInstance(model, x, y - getHeight() / 2, z);
+			}
+		}
 		
 		matrixes.add(modelInstance.transform);
 		matrixes.add(new Matrix4());//Walls
 		matrixes.add(new Matrix4());
 		matrixes.add(new Matrix4());
 		matrixes.add(new Matrix4());
+	}
+	
+	private TerrainThemes chooseTheme() {
+		switch(map.getDifficulty()) {
+			case 0: return TerrainThemes.EASY;
+			case 1: return TerrainThemes.HARD;
+			case 2: return TerrainThemes.VERYHARD;
+			default: return null;
+		}
+	}
+	
+	@Override
+	public void render(ModelCache mCache) {
+		super.render(mCache);
+		
+		mCache.add(theme.getModelInstance());
 	}
 
 	@Override

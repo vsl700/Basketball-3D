@@ -83,9 +83,10 @@ public abstract class GameObject implements Steerable<Vector3>, Proximity<Vector
 		
 	}
 	
-	public void render(ModelCache mBatch) {
+	public void render(ModelCache mCache) {
 		//if(GameTools.isObjectVisibleToScreen(pCam, modelInstance, dimensions))
-			mBatch.add(modelInstance);
+		if(modelInstance != null)
+			mCache.add(modelInstance);
 	}
 	
 	public void dispose() {

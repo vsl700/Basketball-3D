@@ -38,6 +38,7 @@ public class MyGdxGame extends Game {
 	public LevelScreen level;
 	public GameScreen game;
 	public SettingsScreen settings;
+	public TestScreen tester;
 	
 	public final static int WIDTH = 848;
 	public final static int HEIGHT = 480;
@@ -65,10 +66,16 @@ public class MyGdxGame extends Game {
 		main = new MainScreen(this);		
 		level = new LevelScreen(this);
 		game = new GameScreen(this);
+		
+		//GAME MODELS TEST ONLY//////////////////////////////////////////////////////////
+		load3DGraphics();
+		tester = new TestScreen(this, pCam);
+		setScreen(tester);
+		//GAME MODELS TEST ONLY//////////////////////////////////////////////////////////
 
 		if(!Gdx.app.getType().equals(Application.ApplicationType.Android))
 			settings = new SettingsScreen(this);
-		setScreen(spScreen1);
+		//setScreen(spScreen1);
 	}
 	
 	private void loadTexture() {
@@ -118,6 +125,11 @@ public class MyGdxGame extends Game {
 				
 				//mBatch.end();
 
+				if(getScreen().equals(tester)) {
+					super.render();
+					return;
+				}
+				
 				pCam.rotateAround(new Vector3(), new Vector3(0, 1, 0), 10 * Gdx.graphics.getDeltaTime());
 				customLookAt(pCam, new Vector3());
 			} else {
