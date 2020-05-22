@@ -506,7 +506,7 @@ public class GameMap {
 
         mainPlayer = null;
 
-        for (int i = ballIndex; i <= lastIndex; i++) {
+        /*for (int i = 0; i <= lastIndex; i++) {
             objectsMap.remove(i);
 
             btCollisionObject tempObj = collObjsValsMap.get(i);
@@ -514,12 +514,12 @@ public class GameMap {
             collObjsInEntityMap.remove(tempObj);
             collObjsInObjectMap.remove(tempObj);
             collObjsValsMap.remove(i);
-        }
+        }*/
         
-        /*objectsMap.clear();
+        objectsMap.clear();
         collObjsInEntityMap.clear();
         collObjsInObjectMap.clear();
-        collObjsValsMap.clear();*/
+        collObjsValsMap.clear();
 
         disposePhysics();
         createPhysics();
