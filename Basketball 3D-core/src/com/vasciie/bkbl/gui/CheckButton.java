@@ -9,6 +9,8 @@ public class CheckButton extends Button {
 
 	Color toggleColor;
 
+	private static final float textFromBtnSpace = 13;
+	
 	boolean toggled;
 	
 	public CheckButton(String text, BitmapFont font, Color color, boolean mark, boolean filled, GUIRenderer guiRenderer) {
@@ -75,7 +77,7 @@ public class CheckButton extends Button {
 		
 		batch.setProjectionMatrix(guiRenderer.getCam().combined);
 		batch.begin();
-		font.draw(batch, text, x + width + 13, y + height / 2 + font.getLineHeight() / 3);
+		font.draw(batch, text, x + width + textFromBtnSpace, y + height / 2 + font.getLineHeight() / 3);
 		batch.end();
 		
 		font.setColor(r2, g2, b2, a2);
@@ -93,6 +95,10 @@ public class CheckButton extends Button {
 	
 	public boolean isToggled() {
 		return toggled;
+	}
+	
+	public float getTotalWidth() {
+		return width + textFromBtnSpace + textSize(font, text);
 	}
 
 }

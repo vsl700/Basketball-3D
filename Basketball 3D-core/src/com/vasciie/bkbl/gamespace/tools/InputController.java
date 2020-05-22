@@ -12,6 +12,7 @@ import com.vasciie.bkbl.gamespace.GameMap;
 import com.vasciie.bkbl.gui.Button;
 import com.vasciie.bkbl.gui.GUIRenderer;
 import com.vasciie.bkbl.gui.Stick;
+import com.vasciie.bkbl.screens.SettingsScreen;
 
 public class InputController implements InputProcessor {
 
@@ -206,23 +207,37 @@ public class InputController implements InputProcessor {
     }
 
     public float getDeltaX() {
+    	float returnDx;
+    	
         if (Gdx.app.getType().equals(Application.ApplicationType.Android)) {
             float temp = dX;
             dX = 0;
-            return temp;
+            returnDx = temp;
         }
 
-        return Gdx.input.getDeltaX();
+        returnDx = -Gdx.input.getDeltaX();
+        
+        if(SettingsScreen.invertX)
+        	returnDx = -returnDx;
+        
+        return returnDx;
     }
 
     public float getDeltaY() {
+    	float returnDy;
+    	
         if (Gdx.app.getType().equals(Application.ApplicationType.Android)) {
             float temp = dY;
             dY = 0;
-            return temp;
+            returnDy = temp;
         }
 
-        return Gdx.input.getDeltaY();
+        returnDy = Gdx.input.getDeltaY();
+        
+        if(SettingsScreen.invertY)
+        	returnDy = -returnDy;
+        
+        return returnDy;
     }
 
     public Vector3 getMovementVec() {
