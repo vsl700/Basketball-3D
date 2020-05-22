@@ -117,7 +117,7 @@ public class GameScreen implements Screen, RulesListener, GUIRenderer {
 	public void show() {
 		if(map == null) {
 			game.load3DGraphics();//If the default menus setting is just to show a simple picture of the game instead of the game world
-			
+			map = game.getMap();
 		}else {
 			if(map.getTeammates().size() > 0) {
 				ignorePause = true;
@@ -127,7 +127,6 @@ public class GameScreen implements Screen, RulesListener, GUIRenderer {
 			
 		}
 		
-		map = game.getMap();
 		environment = game.getEnvironment();
 		
 		map.setDifficulty(game.level.getDifficulty());
@@ -285,8 +284,8 @@ public class GameScreen implements Screen, RulesListener, GUIRenderer {
 		homeScore.setText(0 + "");
 		awayScore.setText(0 + "");
 		
-		map.dispose();
-		game.resetMap();
+		//map.dispose();
+		//game.resetMap();
 	}
 
 	@Override

@@ -129,8 +129,6 @@ public class GameMap {
     boolean playersReady; //Whether the players are in positions
 
     int index = 0, lastIndex, ballIndex, lastBallIndex;
-    
-    static boolean loadedBullet;
 
     public GameMap(RulesListener rulesListener, GUIRenderer guiRenderer) {
     	dynamicsWorldRunnable = new Runnable() {
@@ -150,18 +148,9 @@ public class GameMap {
 
         mCache = new ModelCache();
         
-		if (!loadedBullet) {
-			Bullet.init();
-			loadedBullet = true;
-		}
+		Bullet.init();
         
-        dynCollConfig = new btDefaultCollisionConfiguration();
-        dynDispatcher = new btCollisionDispatcher(dynCollConfig);
-        dynBroadphase = new btDbvtBroadphase();
-        constraintSolver = new btSequentialImpulseConstraintSolver();
-        dynamicsWorld = new btDiscreteDynamicsWorld(dynDispatcher, dynBroadphase, constraintSolver, dynCollConfig);
-        dynamicsWorld.setGravity(new Vector3(0, -9.8f, 0));
-        contactListener = new ObjectContactListener();
+        createPhysics();
 
         objectsMap = new HashMap<Integer, String>();
         collObjsInEntityMap = new HashMap<btCollisionObject, Entity>();
@@ -176,6 +165,16 @@ public class GameMap {
 
         teammates = new ArrayList<Player>(5);
         opponents = new ArrayList<Player>(5);
+    }
+    
+    private void createPhysics() {
+    	dynCollConfig = new btDefaultCollisionConfiguration();
+        dynDispatcher = new btCollisionDispatcher(dynCollConfig);
+        dynBroadphase = new btDbvtBroadphase();
+        constraintSolver = new btSequentialImpulseConstraintSolver();
+        dynamicsWorld = new btDiscreteDynamicsWorld(dynDispatcher, dynBroadphase, constraintSolver, dynCollConfig);
+        dynamicsWorld.setGravity(new Vector3(0, -9.8f, 0));
+        contactListener = new ObjectContactListener();
     }
 
     private void addBasketsCollObjects() {
@@ -491,9 +490,8 @@ public class GameMap {
     }
 
     public void clear() {
-        physicsThread.interrupt();
-        physicsThread = null;
-
+    	physicsThread.interrupt();
+    	
         disposePlayers();
         teammates.clear();
         opponents.clear();
@@ -508,7 +506,7 @@ public class GameMap {
 
         mainPlayer = null;
 
-        for (int i = 0; i <= lastIndex; i++) {
+        /*for (int i = 0; i <= lastIndex; i++) {
             objectsMap.remove(i);
 
             btCollisionObject tempObj = collObjsValsMap.get(i);
@@ -516,12 +514,25 @@ public class GameMap {
             collObjsInEntityMap.remove(tempObj);
             collObjsInObjectMap.remove(tempObj);
             collObjsValsMap.remove(i);
-        }
+        }*/
+        
+        objectsMap.clear();
+        collObjsInEntityMap.clear();
+        collObjsInObjectMap.clear();
+        collObjsValsMap.clear();
 
-        dynamicsWorldRunnable = null;
+        disposePhysics();
+        createPhysics();
+        
+        index = 0;
+        addTerrainCollObjects();
+        addCameraCollObjects();
+        addBasketsCollObjects();
 
         //index = ballIndex;
-        //createBall();
+        createBall();
+        
+        physicsThread = new VEThread(dynamicsWorldRunnable);
 
         gameRunning = false;
         ruleTriggeredActing = false;
@@ -726,29 +737,24 @@ public class GameMap {
 
     public void dispose() {
         disposePlayers();
+        
+        disposePhysics();
 
         disposeMap();
 
         System.gc();
     }
-
-    private void disposeMap() {
+    
+    private void disposePhysics() {
+    	if(dynamicsWorld == null)
+    		return;
+    	
+    	physicsThread.interrupt();
+        physicsThread = null;
+    	
     	dynamicsWorld.dispose();
         dynamicsWorld = null;
-    	
-    	ball.dispose();
-        ball = null;
-
-        terrain.dispose();
-        terrain = null;
-
-        basket1.dispose();
-        basket2.dispose();
-        basket1 = basket2 = null;
-
-        mCache.dispose();
-        mCache = null;
-
+        
         dynDispatcher.dispose();
         dynDispatcher = null;
 
@@ -763,6 +769,21 @@ public class GameMap {
 
         contactListener.dispose();
         contactListener = null;
+    }
+
+    private void disposeMap() {
+    	ball.dispose();
+        ball = null;
+
+        terrain.dispose();
+        terrain = null;
+
+        basket1.dispose();
+        basket2.dispose();
+        basket1 = basket2 = null;
+
+        mCache.dispose();
+        mCache = null;
 
         rules = null;
     }
