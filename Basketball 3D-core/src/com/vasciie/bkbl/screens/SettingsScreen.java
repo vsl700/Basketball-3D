@@ -32,11 +32,14 @@ public class SettingsScreen implements Screen, UpDownListener, GUIRenderer {
 	
 	Button goBack;
 	CheckButton beautifulGfx, fullscreen;
+	CheckButton invX, invY;
 	NumUpDown fpsUpDown;
 	//TextUpDown resUpDown;
-	Label fpsLabel;
+	Label fpsLabel, camRotLabel;
 	
 	Screen prevScreen;
+	
+	public static boolean invertX, invertY;
 	
 	//boolean checkForFSCN; //Check for fullscreen
 	
@@ -84,6 +87,8 @@ public class SettingsScreen implements Screen, UpDownListener, GUIRenderer {
 		goBack = new Button("Go Back", font, Color.ORANGE.cpy().sub(0, 0.3f, 0, 1), true, true, this);
 		beautifulGfx = new CheckButton("Beautiful Background", font, Color.ORANGE.cpy().sub(0, 0.3f, 0, 1), true, true, this);
 		fullscreen = new CheckButton("Fullscreen", font, Color.ORANGE.cpy().sub(0, 0.3f, 0, 1), true, true, this);
+		invX = new CheckButton("Invert X", font, Color.ORANGE.cpy().sub(0, 0.3f, 0, 1), true, true, this);
+		invY = new CheckButton("Invert Y", font, Color.ORANGE.cpy().sub(0, 0.3f, 0, 1), true, true, this);
 		
 		fpsUpDown = new NumUpDown(font, font2, Color.WHITE, Color.BROWN, new Color().set(0.8f, 0.4f, 0, 1), 0, 240, 10, this);
 		fpsUpDown.addException(0, "Inf.");
@@ -94,6 +99,7 @@ public class SettingsScreen implements Screen, UpDownListener, GUIRenderer {
 		//resUpDown.setListener(this);
 		
 		fpsLabel = new Label("THE MAXIMUM FRAMES PER SECOND", font, Color.BROWN, true, this);
+		camRotLabel = new Label("WHETHER TO INVERT THE CAMERA ROTATION", font, Color.BROWN, true, this);
 		//resLabel = new Label("THE RESOLUTION OF THE WINDOW", font, Color.BROWN, true);
 		
 		beautifulGfx.setToggled(game.isBeautifulBack());
@@ -115,9 +121,12 @@ public class SettingsScreen implements Screen, UpDownListener, GUIRenderer {
 		
 		beautifulGfx.update();
 		fullscreen.update();
+		invX.update();
+		invY.update();
 		
 		fpsUpDown.update();
 		fpsLabel.update();
+		camRotLabel.update();
 		
 		//resUpDown.render(batch, shape, cam);
 		//resLabel.render(batch, shape, cam);
@@ -135,6 +144,11 @@ public class SettingsScreen implements Screen, UpDownListener, GUIRenderer {
 			
 			game.setScreen(prevScreen);
 		}
+		
+		if(invX.justTouched())
+			invertX = invX.isToggled();
+		if(invY.justTouched())
+			invertY = invY.isToggled();
 
 		game.renderLogo(batch, cam);
 
@@ -142,9 +156,12 @@ public class SettingsScreen implements Screen, UpDownListener, GUIRenderer {
 
 		beautifulGfx.draw();
 		fullscreen.draw();
+		invX.draw();
+		invY.draw();
 
 		fpsUpDown.draw();
 		fpsLabel.draw();
+		camRotLabel.draw();
 	}
 	
 	/*private void changeRes() {
@@ -188,6 +205,14 @@ public class SettingsScreen implements Screen, UpDownListener, GUIRenderer {
 		beautifulGfx.setPosAndSize(fpsUpDown.getX() + fpsUpDown.getTotalWidth() + 90, game.pixelYByCurrentSize(325), 40, 40);
 		fullscreen.setSize(40, 40);
 		fullscreen.setPos(fpsUpDown.getX() - 230, game.pixelYByCurrentSize(325));
+		
+		invX.setSize(40, 40);
+		invX.setPos(width / 2 - invX.getTotalWidth() - 20, game.pixelYByCurrentSize(225));
+		
+		invY.setSize(40, 40);
+		invY.setPos(width / 2 + invX.getWidth() + 20, invX.getY());
+		
+		camRotLabel.setPosAndSize(fpsUpDown.getX() + fpsUpDown.getTotalWidth() / 2 - 194 / 2, invY.getY() + invY.getHeight(), 194);
 		
 		fpsLabel.setPosAndSize(fpsUpDown.getX() + fpsUpDown.getTotalWidth() / 2 - 164 / 2, fpsUpDown.getY() + fpsUpDown.getHeight() + 10, 164);
 		//resLabel.setPosAndSize(resUpDown.getX() + resUpDown.getTotalWidth() / 2 - 164 / 2, resUpDown.getY() + resUpDown.getHeight() + 10, 164);

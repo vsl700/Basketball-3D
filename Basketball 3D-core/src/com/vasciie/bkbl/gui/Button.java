@@ -290,6 +290,10 @@ public class Button extends GUI {
     public float getHeight() {
         return height;
     }
+    
+    public float getTextSize() {
+    	return textSize(font, text);
+    }
 
     public float getTouchX() {
         return Gdx.input.getX();
