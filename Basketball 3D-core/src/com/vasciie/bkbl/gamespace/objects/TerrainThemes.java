@@ -27,22 +27,96 @@ public enum TerrainThemes {
 
 		@Override
 		public void createModels(Terrain terrain) {
-			float wireSpace = 0.1f;
-			float wireThickness = 0.01f;
+			float wallHeight = 15;
+			float wallDepth = 0.1f, wallDepth2 = 0.05f;
+			float wallSpace = 2.5f, wallSpace2 = 4;
 			
 			ModelBuilder mb = new ModelBuilder();
 			
-			Material material = new Material(ColorAttribute.createDiffuse(Color.BLACK));
+			Material material = new Material(ColorAttribute.createDiffuse(Color.GRAY.cpy().add(0.3f, 0.3f, 0.3f, 0)));
 			
 			
 			mb.begin();
 			float temp;
-			for(int i = 0; (temp = i * (wireSpace + wireThickness)) < terrain.getWidth(); i++) {
-				Node node = mb.node();
-				node.id = "fence" + i;
-				node.translation.set(temp, (i + 1) * 1.1f, terrain.getDepth() / 2);
-				BoxShapeBuilder.build(mb.part("", GL20.GL_TRIANGLES, VertexAttributes.Usage.Position | VertexAttributes.Usage.Normal, material), 1, wireThickness, wireThickness);
+			for (int i = 0; (temp = -terrain.getWidth() / 2 + i * wallSpace) <= terrain.getWidth() / 2; i++) {
+				Node wall = mb.node();
+				wall.id = "fenceWall1." + i;
+				wall.translation.set(temp, terrain.getHeight() / 2 + wallHeight / 2, terrain.getDepth() / 2);
+				BoxShapeBuilder.build(mb.part(wall.id, GL20.GL_TRIANGLES, VertexAttributes.Usage.Position | VertexAttributes.Usage.Normal, material), wallDepth, wallHeight, wallDepth);
 			}
+			
+			for (int i = 1; (temp = terrain.getHeight() / 2 + wallHeight - i * wallSpace2) >= terrain.getHeight() / 2; i++) {
+				Node wall = mb.node();
+				wall.id = "fenceWallH1." + i;
+				wall.translation.set(0, temp, terrain.getDepth() / 2);
+				BoxShapeBuilder.build(mb.part(wall.id, GL20.GL_TRIANGLES, VertexAttributes.Usage.Position | VertexAttributes.Usage.Normal, material), terrain.getWidth(), wallDepth2, wallDepth2);
+			}
+			
+			Node wallUpper = mb.node();
+			wallUpper.id = "fenceWall1.Upper";
+			wallUpper.translation.set(0, terrain.getHeight() / 2 + wallHeight, terrain.getDepth() / 2);
+			BoxShapeBuilder.build(mb.part(wallUpper.id, GL20.GL_TRIANGLES, VertexAttributes.Usage.Position | VertexAttributes.Usage.Normal, material), terrain.getWidth(), wallDepth, wallDepth);
+			
+			
+			for (int i = 0; (temp = -terrain.getDepth() / 2 + i * wallSpace) <= terrain.getDepth() / 2; i++) {
+				Node wall = mb.node();
+				wall.id = "fenceWall2." + i;
+				wall.translation.set(terrain.getWidth() / 2, terrain.getHeight() / 2 + wallHeight / 2, temp);
+				BoxShapeBuilder.build(mb.part(wall.id, GL20.GL_TRIANGLES, VertexAttributes.Usage.Position | VertexAttributes.Usage.Normal, material), wallDepth, wallHeight, wallDepth);
+			}
+			
+			for (int i = 1; (temp = terrain.getHeight() / 2 + wallHeight - i * wallSpace2) >= terrain.getHeight() / 2; i++) {
+				Node wall = mb.node();
+				wall.id = "fenceWallH2." + i;
+				wall.translation.set(terrain.getWidth() / 2, temp, 0);
+				BoxShapeBuilder.build(mb.part(wall.id, GL20.GL_TRIANGLES, VertexAttributes.Usage.Position | VertexAttributes.Usage.Normal, material), wallDepth2, wallDepth2, terrain.getDepth());
+			}
+			
+			Node wallUpper2 = mb.node();
+			wallUpper2.id = "fenceWall2.Upper";
+			wallUpper2.translation.set(terrain.getWidth() / 2, terrain.getHeight() / 2 + wallHeight, 0);
+			BoxShapeBuilder.build(mb.part(wallUpper2.id, GL20.GL_TRIANGLES, VertexAttributes.Usage.Position | VertexAttributes.Usage.Normal, material), wallDepth, wallDepth, terrain.getDepth());
+			
+			
+			for (int i = 0; (temp = -terrain.getWidth() / 2 + i * wallSpace) <= terrain.getWidth() / 2; i++) {
+				Node wall = mb.node();
+				wall.id = "fenceWall3." + i;
+				wall.translation.set(temp, terrain.getHeight() / 2 + wallHeight / 2, -terrain.getDepth() / 2);
+				BoxShapeBuilder.build(mb.part(wall.id, GL20.GL_TRIANGLES, VertexAttributes.Usage.Position | VertexAttributes.Usage.Normal, material), wallDepth, wallHeight, wallDepth);
+			}
+			
+			for (int i = 1; (temp = terrain.getHeight() / 2 + wallHeight - i * wallSpace2) >= terrain.getHeight() / 2; i++) {
+				Node wall = mb.node();
+				wall.id = "fenceWallH3." + i;
+				wall.translation.set(0, temp, -terrain.getDepth() / 2);
+				BoxShapeBuilder.build(mb.part(wall.id, GL20.GL_TRIANGLES, VertexAttributes.Usage.Position | VertexAttributes.Usage.Normal, material), terrain.getWidth(), wallDepth2, wallDepth2);
+			}
+			
+			Node wallUpper3 = mb.node();
+			wallUpper3.id = "fenceWall3.Upper";
+			wallUpper3.translation.set(0, terrain.getHeight() / 2 + wallHeight, -terrain.getDepth() / 2);
+			BoxShapeBuilder.build(mb.part(wallUpper3.id, GL20.GL_TRIANGLES, VertexAttributes.Usage.Position | VertexAttributes.Usage.Normal, material), terrain.getWidth(), wallDepth, wallDepth);
+			
+			
+			for (int i = 0; (temp = -terrain.getDepth() / 2 + i * wallSpace) <= terrain.getDepth() / 2; i++) {
+				Node wall = mb.node();
+				wall.id = "fenceWall4." + i;
+				wall.translation.set(-terrain.getWidth() / 2, terrain.getHeight() / 2 + wallHeight / 2, temp);
+				BoxShapeBuilder.build(mb.part(wall.id, GL20.GL_TRIANGLES, VertexAttributes.Usage.Position | VertexAttributes.Usage.Normal, material), wallDepth, wallHeight, wallDepth);
+			}
+			
+			for (int i = 1; (temp = terrain.getHeight() / 2 + wallHeight - i * wallSpace2) >= terrain.getHeight() / 2; i++) {
+				Node wall = mb.node();
+				wall.id = "fenceWallH4." + i;
+				wall.translation.set(-terrain.getWidth() / 2, temp, 0);
+				BoxShapeBuilder.build(mb.part(wall.id, GL20.GL_TRIANGLES, VertexAttributes.Usage.Position | VertexAttributes.Usage.Normal, material), wallDepth2, wallDepth2, terrain.getDepth());
+			}
+			
+			Node wallUpper4 = mb.node();
+			wallUpper4.id = "fenceWall4.Upper";
+			wallUpper4.translation.set(-terrain.getWidth() / 2, terrain.getHeight() / 2 + wallHeight, 0);
+			BoxShapeBuilder.build(mb.part(wallUpper4.id, GL20.GL_TRIANGLES, VertexAttributes.Usage.Position | VertexAttributes.Usage.Normal, material), wallDepth, wallDepth, terrain.getDepth());
+			
 			model = mb.end();
 			
 		}
@@ -130,8 +204,8 @@ public enum TerrainThemes {
 		model.dispose();
 	}
 	
-	public ModelInstance getModelInstance() {
-		return new ModelInstance(model);
+	public ModelInstance getModelInstance(Terrain terrain) {
+		return new ModelInstance(model, terrain.getPosition());
 	}
 	
 }
