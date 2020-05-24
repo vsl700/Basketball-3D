@@ -3,6 +3,7 @@ package com.vasciie.bkbl;
 import com.badlogic.gdx.Application;
 import com.badlogic.gdx.Game;
 import com.badlogic.gdx.Gdx;
+import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.PerspectiveCamera;
@@ -19,6 +20,8 @@ import com.vasciie.bkbl.gamespace.GameMap;
 import com.vasciie.bkbl.screens.*;
 
 public class MyGdxGame extends Game {
+	
+	public static Color defaultColor = new Color(0, 0.7f, 0.8f, 1), currentColor;
 	
 	SpriteBatch batch;
 	BitmapFont font;
@@ -83,6 +86,8 @@ public class MyGdxGame extends Game {
 	}
 	
 	public void load3DGraphics() {
+		currentColor = defaultColor.cpy();
+		
 		mBatch = new ModelBatch();
 
 		environment = new Environment();
@@ -98,8 +103,8 @@ public class MyGdxGame extends Game {
 		map = new GameMap(game, game);
 	}
 	
-	public void resetMap() {
-		map = new GameMap(game, game);
+	public static void clearColor() {
+		currentColor = defaultColor.cpy();
 	}
 
 	@Override
@@ -116,7 +121,8 @@ public class MyGdxGame extends Game {
 					return;
 				}
 
-				Gdx.gl.glClearColor(0, 0.7f, 0.8f, 1);
+				Gdx.gl.glClearColor(0, 0.7f, 0.8f, 1);//TODO Comment this and uncomment the line below after you finish the themes mechanism
+				//Gdx.gl.glClearColor(currentColor.r, currentColor.g, currentColor.b, currentColor.a);
 				Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT | GL20.GL_DEPTH_BUFFER_BIT);
 
 				pCam.update();

@@ -210,7 +210,7 @@ public class GameScreen implements Screen, RulesListener, GUIRenderer {
 			return;
 		}
 
-		Gdx.gl.glClearColor(0, 0.7f, 0.8f, 1);
+		Gdx.gl.glClearColor(MyGdxGame.currentColor.r, MyGdxGame.currentColor.g, MyGdxGame.currentColor.b, MyGdxGame.currentColor.a);
 		Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT | GL20.GL_DEPTH_BUFFER_BIT);
 
 		cam.update();

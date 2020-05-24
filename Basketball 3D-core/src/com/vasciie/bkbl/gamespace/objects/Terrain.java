@@ -212,5 +212,9 @@ public class Terrain extends GameObject {
 	public btCollisionObject getTeamzone() {
 		return collisionObjects.get(0);
 	}
+	
+	public TerrainThemes getTheme() {
+		return theme;
+	}
 
 }

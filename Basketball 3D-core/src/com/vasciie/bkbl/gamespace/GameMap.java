@@ -8,6 +8,7 @@ import com.badlogic.gdx.Application;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.ai.GdxAI;
 import com.badlogic.gdx.ai.steer.SteerableAdapter;
+import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.PerspectiveCamera;
 import com.badlogic.gdx.graphics.g3d.Environment;
 import com.badlogic.gdx.graphics.g3d.ModelBatch;
@@ -30,6 +31,7 @@ import com.badlogic.gdx.physics.bullet.dynamics.btDiscreteDynamicsWorld;
 import com.badlogic.gdx.physics.bullet.dynamics.btDynamicsWorld;
 import com.badlogic.gdx.physics.bullet.dynamics.btRigidBody;
 import com.badlogic.gdx.physics.bullet.dynamics.btSequentialImpulseConstraintSolver;
+import com.vasciie.bkbl.MyGdxGame;
 import com.vasciie.bkbl.gamespace.entities.Ball;
 import com.vasciie.bkbl.gamespace.entities.Entity;
 import com.vasciie.bkbl.gamespace.entities.EntityType;
@@ -304,7 +306,8 @@ public class GameMap {
 
         addBasketsCollObjects();
         
-        terrain.createTheme();//TODO Get this line out of here when you finish all the themes
+        terrain.createTheme();//TODO Get this line AND THE ONE BELOW out of here when you finish all the themes
+        MyGdxGame.currentColor = terrain.getTheme().getThemeColor();
         createCache();
     }
     
@@ -436,6 +439,10 @@ public class GameMap {
         playersReady = true;
         
         terrain.createTheme();
+        Color tempColor = terrain.getTheme().getThemeColor();
+        if(tempColor != null)
+        	MyGdxGame.currentColor = tempColor;
+        
         createCache();
     }
 
@@ -514,6 +521,8 @@ public class GameMap {
         
         terrain.clearTheme();
         createCache();
+        
+        MyGdxGame.clearColor();
 
         teamScore = oppScore = 0;
 
