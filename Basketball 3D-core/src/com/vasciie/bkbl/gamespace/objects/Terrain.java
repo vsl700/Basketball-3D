@@ -20,39 +20,51 @@ import com.vasciie.bkbl.gamespace.MotionState;
 
 public class Terrain extends GameObject {
 	
+	ModelInstance customPlate;
+	
 	TerrainThemes theme;
 	
 	static final float wallDepth = 5f;
 
 	@Override
 	protected void createModels() {
-		theme = chooseTheme();
-		
-		if(theme != null) {//Tutorial gamemode doesn't have any theme
-			theme.createModels(this);
-			
-			if (!theme.hasOwnTerrain()) {
-				ModelBuilder mb = new ModelBuilder();
 
-				Texture court = new Texture(Gdx.files.internal("game/basketball_court.jpg"));
-				court.setWrap(Texture.TextureWrap.ClampToEdge, Texture.TextureWrap.ClampToEdge);
-				court.setFilter(Texture.TextureFilter.Linear, Texture.TextureFilter.Linear);
+		ModelBuilder mb = new ModelBuilder();
 
-				Material material = new Material(TextureAttribute.createDiffuse(court));
-				long attribs = VertexAttributes.Usage.Position | VertexAttributes.Usage.Normal | VertexAttributes.Usage.TextureCoordinates;
+		Texture court = new Texture(Gdx.files.internal("game/basketball_court.jpg"));
+		court.setWrap(Texture.TextureWrap.ClampToEdge, Texture.TextureWrap.ClampToEdge);
+		court.setFilter(Texture.TextureFilter.Linear, Texture.TextureFilter.Linear);
 
-				model = mb.createBox(getWidth(), getHeight(), getDepth(), material, attribs);
-				model.manageDisposable(court);
+		Material material = new Material(TextureAttribute.createDiffuse(court));
+		long attribs = VertexAttributes.Usage.Position | VertexAttributes.Usage.Normal | VertexAttributes.Usage.TextureCoordinates;
 
-				modelInstance = new ModelInstance(model, x, y - getHeight() / 2, z);
-			}
-		}
+		model = mb.createBox(getWidth(), getHeight(), getDepth(), material, attribs);
+		model.manageDisposable(court);
+
+		modelInstance = new ModelInstance(model, x, y - getHeight() / 2, z);
 		
 		matrixes.add(modelInstance.transform);
 		matrixes.add(new Matrix4());//Walls
 		matrixes.add(new Matrix4());
 		matrixes.add(new Matrix4());
 		matrixes.add(new Matrix4());
+	}
+	
+	public void createTheme() {
+		theme = chooseTheme();
+		
+		if(theme != null) {
+			theme.createModels(this);
+			
+			customPlate = theme.getCustomTerrainModelInstance();
+		}
+	}
+	
+	public void clearTheme() {
+		theme.dispose();
+		theme = null;
+		
+		customPlate = null;
 	}
 	
 	private TerrainThemes chooseTheme() {
@@ -68,7 +80,12 @@ public class Terrain extends GameObject {
 	public void render(ModelCache mCache) {
 		super.render(mCache);
 		
-		mCache.add(theme.getModelInstance(this));
+		if(theme != null) {
+			mCache.add(theme.getModelInstance());
+			
+			if(customPlate != null)
+				mCache.add(customPlate);
+		}
 	}
 
 	@Override
@@ -88,6 +105,14 @@ public class Terrain extends GameObject {
 	protected void specialFunction() {
 		
 
+	}
+	
+	@Override 
+	public void dispose() {
+		super.dispose();
+		
+		if(theme != null)
+			theme.dispose();
 	}
 
 	@Override

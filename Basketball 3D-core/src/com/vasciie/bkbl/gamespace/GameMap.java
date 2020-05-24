@@ -304,7 +304,12 @@ public class GameMap {
 
         addBasketsCollObjects();
         
-        mCache.begin();
+        terrain.createTheme();//TODO Get this line out of here when you finish all the themes
+        createCache();
+    }
+    
+    private void createCache() {
+    	mCache.begin();
         terrain.render(mCache);
         basket1.render(mCache);
         basket2.render(mCache);
@@ -429,6 +434,9 @@ public class GameMap {
 
         startTimer = 5.5f;
         playersReady = true;
+        
+        terrain.createTheme();
+        createCache();
     }
 
     private void createTerrainLanes() {
@@ -503,6 +511,9 @@ public class GameMap {
         disposePlayers();
         teammates.clear();
         opponents.clear();
+        
+        terrain.clearTheme();
+        createCache();
 
         teamScore = oppScore = 0;
 
