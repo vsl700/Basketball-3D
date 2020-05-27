@@ -35,7 +35,7 @@ public enum TerrainThemes {
 			float wallSpace = 2.5f, wallSpace2 = 4;
 			
 			ModelBuilder mb = new ModelBuilder();
-			
+			//PLAYGROUND
 			Material material = new Material(ColorAttribute.createDiffuse(Color.GRAY.cpy().add(0.3f, 0.3f, 0.3f, 0)));
 			
 			
@@ -126,7 +126,7 @@ public enum TerrainThemes {
 			cityPlate.translation.set(0, -0.001f, 0);
 			BoxShapeBuilder.build(mb.part(wallUpper4.id, GL20.GL_TRIANGLES, VertexAttributes.Usage.Position | VertexAttributes.Usage.Normal, material), terrain.getWidth() * 2, 0.01f, terrain.getDepth() * 2);
 			
-			
+			//STREETS
 			float streetWidth = 11f, streetMarkWidth = 1f, streetMarkDepth = 4.5f, streetMarkSpace = 3;
 			
 			Material materialStreet = new Material(ColorAttribute.createDiffuse(Color.GRAY));
@@ -134,47 +134,84 @@ public enum TerrainThemes {
 			
 			Node street1 = mb.node();
 			street1.translation.set(terrain.getWidth() + streetWidth / 2, cityPlate.translation.y, 0);
-			BoxShapeBuilder.build(mb.part(street1.id, GL20.GL_TRIANGLES, VertexAttributes.Usage.Position | VertexAttributes.Usage.Normal, materialStreet), streetWidth, 0.01f, terrain.getDepth() * 2 + streetWidth * 2);
+			BoxShapeBuilder.build(mb.part(street1.id, GL20.GL_TRIANGLES, VertexAttributes.Usage.Position | VertexAttributes.Usage.Normal, materialStreet), streetWidth, 0.01f, terrain.getDepth() * 8 + streetWidth * 2);
 			
 			for(int i = 0; (temp = -terrain.getDepth() + streetMarkSpace + i * (streetMarkDepth + streetMarkSpace)) <= terrain.getDepth() - streetMarkSpace; i++) {
 				Node streetMark = mb.node();
 				streetMark.translation.set(terrain.getWidth() + streetWidth / 2, cityPlate.translation.y, temp);
 				BoxShapeBuilder.build(mb.part(streetMark.id, GL20.GL_TRIANGLES, VertexAttributes.Usage.Position | VertexAttributes.Usage.Normal, materialStreetMark), streetMarkWidth, 0.05f, streetMarkDepth);
+			
+				Node streetMark1 = mb.node();
+				streetMark1.translation.set(-(terrain.getWidth() + streetWidth / 2), cityPlate.translation.y, temp);
+				BoxShapeBuilder.build(mb.part(streetMark1.id, GL20.GL_TRIANGLES, VertexAttributes.Usage.Position | VertexAttributes.Usage.Normal, materialStreetMark), streetMarkWidth, 0.05f, streetMarkDepth);
 			}
 			
 			Node street2 = mb.node();
 			street2.translation.set(0, cityPlate.translation.y, terrain.getDepth() + streetWidth / 2);
-			BoxShapeBuilder.build(mb.part(street2.id, GL20.GL_TRIANGLES, VertexAttributes.Usage.Position | VertexAttributes.Usage.Normal, materialStreet), terrain.getWidth() * 2 + streetWidth * 2, 0.01f, streetWidth);
+			BoxShapeBuilder.build(mb.part(street2.id, GL20.GL_TRIANGLES, VertexAttributes.Usage.Position | VertexAttributes.Usage.Normal, materialStreet), terrain.getWidth() * 8 + streetWidth * 2, 0.01f, streetWidth);
 			
 			for(int i = 0; (temp = -terrain.getWidth() + streetMarkSpace + i * (streetMarkDepth + streetMarkSpace)) <= terrain.getWidth() - streetMarkSpace; i++) {
 				Node streetMark = mb.node();
 				streetMark.translation.set(temp, cityPlate.translation.y, terrain.getDepth() + streetWidth / 2);
 				BoxShapeBuilder.build(mb.part(streetMark.id, GL20.GL_TRIANGLES, VertexAttributes.Usage.Position | VertexAttributes.Usage.Normal, materialStreetMark), streetMarkDepth, 0.05f, streetMarkWidth);
+				
+				Node streetMark1 = mb.node();
+				streetMark1.translation.set(temp, cityPlate.translation.y, -(terrain.getDepth() + streetWidth / 2));
+				BoxShapeBuilder.build(mb.part(streetMark1.id, GL20.GL_TRIANGLES, VertexAttributes.Usage.Position | VertexAttributes.Usage.Normal, materialStreetMark), streetMarkDepth, 0.05f, streetMarkWidth);
 			}
 			
 			Node street3 = mb.node();
 			street3.translation.set(-(terrain.getWidth() + streetWidth / 2), cityPlate.translation.y, 0);
-			BoxShapeBuilder.build(mb.part(street3.id, GL20.GL_TRIANGLES, VertexAttributes.Usage.Position | VertexAttributes.Usage.Normal, materialStreet), streetWidth, 0.01f, terrain.getDepth() * 2 + streetWidth * 2);
-			
-			for(int i = 0; (temp = -terrain.getDepth() + streetMarkSpace + i * (streetMarkDepth + streetMarkSpace)) <= terrain.getDepth() - streetMarkSpace; i++) {
-				Node streetMark = mb.node();
-				streetMark.translation.set(-(terrain.getWidth() + streetWidth / 2), cityPlate.translation.y, temp);
-				BoxShapeBuilder.build(mb.part(streetMark.id, GL20.GL_TRIANGLES, VertexAttributes.Usage.Position | VertexAttributes.Usage.Normal, materialStreetMark), streetMarkWidth, 0.05f, streetMarkDepth);
-			}
+			BoxShapeBuilder.build(mb.part(street3.id, GL20.GL_TRIANGLES, VertexAttributes.Usage.Position | VertexAttributes.Usage.Normal, materialStreet), streetWidth, 0.01f, terrain.getDepth() * 8 + streetWidth * 2);
 			
 			Node street4 = mb.node();
 			street4.translation.set(0, cityPlate.translation.y, -(terrain.getDepth() + streetWidth / 2));
-			BoxShapeBuilder.build(mb.part(street4.id, GL20.GL_TRIANGLES, VertexAttributes.Usage.Position | VertexAttributes.Usage.Normal, materialStreet), terrain.getWidth() * 2 + streetWidth * 2, 0.01f, streetWidth);
+			BoxShapeBuilder.build(mb.part(street4.id, GL20.GL_TRIANGLES, VertexAttributes.Usage.Position | VertexAttributes.Usage.Normal, materialStreet), terrain.getWidth() * 8 + streetWidth * 2, 0.01f, streetWidth);
 			
-			for(int i = 0; (temp = -terrain.getWidth() + streetMarkSpace + i * (streetMarkDepth + streetMarkSpace)) <= terrain.getWidth() - streetMarkSpace; i++) {
+			
+			for(int i = 0; (temp = terrain.getDepth() + streetWidth + streetMarkSpace + i * (streetMarkDepth + streetMarkSpace)) <= terrain.getDepth() * 4 - streetMarkSpace; i++) {
 				Node streetMark = mb.node();
-				streetMark.translation.set(temp, cityPlate.translation.y, -(terrain.getDepth() + streetWidth / 2));
+				streetMark.translation.set(terrain.getWidth() + streetWidth / 2, cityPlate.translation.y, temp);
+				BoxShapeBuilder.build(mb.part(streetMark.id, GL20.GL_TRIANGLES, VertexAttributes.Usage.Position | VertexAttributes.Usage.Normal, materialStreetMark), streetMarkWidth, 0.05f, streetMarkDepth);
+				
+				Node streetMark1 = mb.node();
+				streetMark1.translation.set(-(terrain.getWidth() + streetWidth / 2), cityPlate.translation.y, temp);
+				BoxShapeBuilder.build(mb.part(streetMark1.id, GL20.GL_TRIANGLES, VertexAttributes.Usage.Position | VertexAttributes.Usage.Normal, materialStreetMark), streetMarkWidth, 0.05f, streetMarkDepth);
+			}
+			
+			for(int i = 0; (temp = terrain.getWidth() + streetWidth + streetMarkSpace + i * (streetMarkDepth + streetMarkSpace)) <= terrain.getWidth() * 4 - streetMarkSpace; i++) {
+				Node streetMark = mb.node();
+				streetMark.translation.set(temp, cityPlate.translation.y, terrain.getDepth() + streetWidth / 2);
 				BoxShapeBuilder.build(mb.part(streetMark.id, GL20.GL_TRIANGLES, VertexAttributes.Usage.Position | VertexAttributes.Usage.Normal, materialStreetMark), streetMarkDepth, 0.05f, streetMarkWidth);
+				
+				Node streetMark1 = mb.node();
+				streetMark1.translation.set(temp, cityPlate.translation.y, -(terrain.getDepth() + streetWidth / 2));
+				BoxShapeBuilder.build(mb.part(streetMark1.id, GL20.GL_TRIANGLES, VertexAttributes.Usage.Position | VertexAttributes.Usage.Normal, materialStreetMark), streetMarkDepth, 0.05f, streetMarkWidth);
+			}
+			
+			for(int i = 0; (temp = -(terrain.getDepth() + streetWidth + streetMarkSpace + i * (streetMarkDepth + streetMarkSpace))) >= -terrain.getDepth() * 4 - streetMarkSpace; i++) {
+				Node streetMark = mb.node();
+				streetMark.translation.set(terrain.getWidth() + streetWidth / 2, cityPlate.translation.y, temp);
+				BoxShapeBuilder.build(mb.part(streetMark.id, GL20.GL_TRIANGLES, VertexAttributes.Usage.Position | VertexAttributes.Usage.Normal, materialStreetMark), streetMarkWidth, 0.05f, streetMarkDepth);
+				
+				Node streetMark1 = mb.node();
+				streetMark1.translation.set(-(terrain.getWidth() + streetWidth / 2), cityPlate.translation.y, temp);
+				BoxShapeBuilder.build(mb.part(streetMark1.id, GL20.GL_TRIANGLES, VertexAttributes.Usage.Position | VertexAttributes.Usage.Normal, materialStreetMark), streetMarkWidth, 0.05f, streetMarkDepth);
+			}
+			
+			for(int i = 0; (temp = -(terrain.getWidth() + streetWidth + streetMarkSpace + i * (streetMarkDepth + streetMarkSpace))) >= -terrain.getWidth() * 4 - streetMarkSpace; i++) {
+				Node streetMark = mb.node();
+				streetMark.translation.set(temp, cityPlate.translation.y, terrain.getDepth() + streetWidth / 2);
+				BoxShapeBuilder.build(mb.part(streetMark.id, GL20.GL_TRIANGLES, VertexAttributes.Usage.Position | VertexAttributes.Usage.Normal, materialStreetMark), streetMarkDepth, 0.05f, streetMarkWidth);
+				
+				Node streetMark1 = mb.node();
+				streetMark1.translation.set(temp, cityPlate.translation.y, -(terrain.getDepth() + streetWidth / 2));
+				BoxShapeBuilder.build(mb.part(streetMark1.id, GL20.GL_TRIANGLES, VertexAttributes.Usage.Position | VertexAttributes.Usage.Normal, materialStreetMark), streetMarkDepth, 0.05f, streetMarkWidth);
 			}
 			
 			model = mb.end();
 			
-			
+			//NEW TERRAIN
 			Texture court = new Texture(Gdx.files.internal("game/basketball_court_easy.jpg"));
 			court.setWrap(Texture.TextureWrap.ClampToEdge, Texture.TextureWrap.ClampToEdge);
 			court.setFilter(Texture.TextureFilter.Linear, Texture.TextureFilter.Linear);

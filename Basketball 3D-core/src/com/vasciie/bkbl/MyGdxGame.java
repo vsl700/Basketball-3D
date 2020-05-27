@@ -97,7 +97,7 @@ public class MyGdxGame extends Game {
 
 		pCam = new PerspectiveCamera(40, Gdx.graphics.getWidth(), Gdx.graphics.getHeight());
 		pCam.position.set(0, 9, 25);
-		pCam.far = 100;
+		pCam.far = 200;
 		pCam.near = 0.1f;
 		
 		map = new GameMap(game, game);

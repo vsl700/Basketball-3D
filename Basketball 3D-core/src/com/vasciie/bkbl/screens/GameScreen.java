@@ -82,7 +82,7 @@ public class GameScreen implements Screen, RulesListener, GUIRenderer {
 
 		pCam = new PerspectiveCamera(40, Gdx.graphics.getWidth(), Gdx.graphics.getHeight());
 		pCam.position.set(3, 1, 0);
-		pCam.far = 100;
+		pCam.far = 200;
 		pCam.near = 0.1f;
 		
 		cam = new OrthographicCamera();
