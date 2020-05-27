@@ -78,14 +78,13 @@ public class Terrain extends GameObject {
 	
 	@Override
 	public void render(ModelCache mCache) {
-		super.render(mCache);
-		
 		if(theme != null) {
 			mCache.add(theme.getModelInstance());
 			
 			if(customPlate != null)
 				mCache.add(customPlate);
-		}
+			else mCache.add(modelInstance);
+		}else mCache.add(modelInstance);
 	}
 
 	@Override
