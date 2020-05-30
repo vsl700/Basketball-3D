@@ -211,7 +211,24 @@ public enum TerrainThemes {
 			
 			
 			//BUILDINGS
+			Material[] buildingMaterials = new Material[] {
+					new Material(ColorAttribute.createDiffuse(Color.PINK)),
+					new Material(ColorAttribute.createDiffuse(Color.DARK_GRAY)),
+					new Material(ColorAttribute.createDiffuse(Color.BLACK)),
+					new Material(ColorAttribute.createDiffuse(Color.FIREBRICK)),
+					new Material(ColorAttribute.createDiffuse(Color.RED)),
+					new Material(ColorAttribute.createDiffuse(Color.BLUE))
+			};
 			
+			Material windowMaterial = new Material(ColorAttribute.createDiffuse(Color.YELLOW));
+			
+			ModelBuilder childMB = new ModelBuilder();
+			
+			childMB.begin();
+			
+			createBuilding(terrain.getWidth() / 2, 0, 80, 8, 6, 8, 0, buildingMaterials[4], windowMaterial, mb, childMB);
+			
+			childMB.end();
 			
 			model = mb.end();
 			
@@ -231,16 +248,33 @@ public enum TerrainThemes {
 			customTerrainModel.manageDisposable(court);
 		}
 		
-		private void createBuilding(float x, float y, float z, float w, float h, float d, Material material, Material windowMaterial, ModelBuilder mb) {
-			Node building = mb.node();
-			building.translation.set(x, y, z);
-			BoxShapeBuilder.build(mb.part(building.id, GL20.GL_TRIANGLES, VertexAttributes.Usage.Position | VertexAttributes.Usage.Normal, material), w, h, d);
+		private void createBuildingsGroup(float x, float z, float w, float d, float rotation, Material[] materials, ModelBuilder mb, ModelBuilder childMB) {
+			float tempX, tempZ;
+			float end = x;
+			for(int i = 0; i < end; i++) {
+				
+			}
+		}
+		
+		private void createBuilding(float x, float y, float z, int w, int h, float d, float rotation, Material material, Material windowMaterial, ModelBuilder mb, ModelBuilder childMB) {
+			float buildingHeight = 6;
 			
-			float windowSize = 3, windowSpace = 1.5f;
-			float temp;
-			for(int i = 0; (temp = x + i * windowSpace) < w - windowSize; i++) {
-				Node window = mb.node();
-				window.translation.set(temp, y, z);//Continue with this!!!
+			for (int i = 0; i < h; i++) {
+				float realY = (y + buildingHeight / 2) * (i + 1);
+				
+				Node building = mb.node();
+				building.translation.set(x, realY, z);
+				building.rotation.setEulerAngles(rotation, 0, 0);
+				BoxShapeBuilder.build(mb.part(building.id, GL20.GL_TRIANGLES, VertexAttributes.Usage.Position | VertexAttributes.Usage.Normal, material), w, buildingHeight, d);
+				
+				float windowSize = buildingHeight / 6, windowSpace = 3, windowDepth = 0.01f;
+				float temp;
+				for (int j = 0; (temp = -windowSize - windowSpace + (j + 1) * (windowSpace / 2 + windowSize / 2)) <= w - windowSize * 1.5f - windowSpace; j++) {
+					Node window = childMB.node();
+					window.translation.set(temp, 0, -d / 2 - windowDepth * 2);
+					BoxShapeBuilder.build(childMB.part(window.id, GL20.GL_TRIANGLES, VertexAttributes.Usage.Position | VertexAttributes.Usage.Normal, windowMaterial), windowSize, windowSize, windowDepth);
+					building.addChild(window);
+				}
 			}
 		}
 
