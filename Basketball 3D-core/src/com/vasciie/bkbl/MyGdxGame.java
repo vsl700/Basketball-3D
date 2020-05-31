@@ -73,12 +73,12 @@ public class MyGdxGame extends Game {
 		//GAME MODELS TEST ONLY//////////////////////////////////////////////////////////
 		load3DGraphics();
 		tester = new TestScreen(this, pCam);
-		setScreen(tester);
+		//setScreen(tester);
 		//GAME MODELS TEST ONLY//////////////////////////////////////////////////////////
 
 		if(!Gdx.app.getType().equals(Application.ApplicationType.Android))
 			settings = new SettingsScreen(this);
-		//setScreen(spScreen1);
+		setScreen(spScreen1);
 	}
 	
 	private void loadTexture() {

@@ -16,6 +16,7 @@ import com.badlogic.gdx.graphics.g3d.attributes.TextureAttribute;
 import com.badlogic.gdx.graphics.g3d.model.Node;
 import com.badlogic.gdx.graphics.g3d.utils.ModelBuilder;
 import com.badlogic.gdx.graphics.g3d.utils.shapebuilders.BoxShapeBuilder;
+import com.badlogic.gdx.math.MathUtils;
 
 /**
  * Themes for the terrain for each specific gamemode
@@ -123,7 +124,7 @@ public enum TerrainThemes {
 			
 			Node cityPlate = mb.node();
 			cityPlate.id = "cityPlate";
-			cityPlate.translation.set(0, -0.001f, 0);
+			cityPlate.translation.set(0, -0.1f, 0);
 			BoxShapeBuilder.build(mb.part(wallUpper4.id, GL20.GL_TRIANGLES, VertexAttributes.Usage.Position | VertexAttributes.Usage.Normal, material), terrain.getWidth() * 8, 0.01f, terrain.getDepth() * 8);
 			
 			//STREETS
@@ -214,7 +215,6 @@ public enum TerrainThemes {
 			Material[] buildingMaterials = new Material[] {
 					new Material(ColorAttribute.createDiffuse(Color.PINK)),
 					new Material(ColorAttribute.createDiffuse(Color.DARK_GRAY)),
-					new Material(ColorAttribute.createDiffuse(Color.BLACK)),
 					new Material(ColorAttribute.createDiffuse(Color.FIREBRICK)),
 					new Material(ColorAttribute.createDiffuse(Color.RED)),
 					new Material(ColorAttribute.createDiffuse(Color.BLUE))
@@ -226,7 +226,17 @@ public enum TerrainThemes {
 			
 			childMB.begin();
 			
-			createBuilding(terrain.getWidth() / 2, 0, 80, 8, 6, 8, 0, buildingMaterials[4], windowMaterial, mb, childMB);
+			createBuildingsGroup(-terrain.getWidth() + 8, 80, 8, 8, 6, 4, buildingMaterials, windowMaterial, mb, childMB);
+			createBuildingsGroup(terrain.getWidth() + 19, 80, 8, 8, 4, 4, buildingMaterials, windowMaterial, mb, childMB);
+			createBuildingsGroup(-terrain.getWidth()*2 - 34 + 17, 80, 8, 8, 4, 4, buildingMaterials, windowMaterial, mb, childMB);
+			
+			createBuildingsGroup(48, -terrain.getDepth() - 117 + 53 + 18, 8, 8, 4, 4, buildingMaterials, windowMaterial, mb, childMB);
+			createBuildingsGroup(48, -terrain.getDepth() + 11, 8, 8, 4, 12, buildingMaterials, windowMaterial, mb, childMB);
+			
+			createBuildingsGroup(-(terrain.getWidth() - 8), -107, 8, 8, 6, 4, buildingMaterials, windowMaterial, mb, childMB);
+			createBuildingsGroup(-(terrain.getWidth()*2 + 34 - 18), -125 + 18, 8, 8, 4, 4, buildingMaterials, windowMaterial, mb, childMB);
+			
+			createBuildingsGroup(-76, -terrain.getDepth() + 11, 8, 8, 4, 12, buildingMaterials, windowMaterial, mb, childMB);
 			
 			childMB.end();
 			
@@ -242,17 +252,43 @@ public enum TerrainThemes {
 
 			mb.begin();
 			Node terrainNode = mb.node();
-			terrainNode.translation.set(0, 0.01f, 0);
-			BoxShapeBuilder.build(mb.part(terrainNode.id, GL20.GL_TRIANGLES, attribs, materialCourt), terrain.getWidth(), 0.01f, terrain.getDepth());
+			terrainNode.translation.set(0, -0.001f, 0);
+			BoxShapeBuilder.build(mb.part(terrainNode.id, GL20.GL_TRIANGLES, attribs, materialCourt), terrain.getWidth(), 0.001f, terrain.getDepth());
 			customTerrainModel = mb.end();
 			customTerrainModel.manageDisposable(court);
 		}
 		
-		private void createBuildingsGroup(float x, float z, float w, float d, float rotation, Material[] materials, ModelBuilder mb, ModelBuilder childMB) {
-			float tempX, tempZ;
-			float end = x;
-			for(int i = 0; i < end; i++) {
-				
+		private void createBuildingsGroup(float x, float z, int w, int d, int timesX, int timesZ, Material[] materials, Material windowMaterial, ModelBuilder mb, ModelBuilder childMB) {
+			int minSize = 2, maxSize = 6;
+			float buildingSpace = 1;
+			for(int i = 0; i < timesX; i++) {
+				if(i == timesX - 1)
+					createAngleBuilding(x + (buildingSpace + w) * i, 0, z, w, MathUtils.random(minSize, maxSize), d, -90, materials[MathUtils.random(materials.length - 1)], windowMaterial, mb, childMB);
+				else if(i == 0) 
+					createAngleBuilding(x + (buildingSpace + w) * i, 0, z, w, MathUtils.random(minSize, maxSize), d, 0, materials[MathUtils.random(materials.length - 1)], windowMaterial, mb, childMB);
+				else 
+					createBuilding(x + (buildingSpace + w) * i, 0, z, w, MathUtils.random(minSize, maxSize), d, 0, materials[MathUtils.random(materials.length - 1)], windowMaterial, mb, childMB);
+			}
+			
+			for(int i = 0; i < timesX; i++) {
+				if(i == timesX - 1)
+					createAngleBuilding(x + (buildingSpace + w) * i, 0, z + (d + buildingSpace) * (timesZ - 1), w, MathUtils.random(minSize, maxSize), d, 180, materials[MathUtils.random(materials.length - 1)], windowMaterial, mb, childMB);
+				else if(i == 0)
+					createAngleBuilding(x + (buildingSpace + w) * i, 0, z + (d + buildingSpace) * (timesZ - 1), w, MathUtils.random(minSize, maxSize), d, 90, materials[MathUtils.random(materials.length - 1)], windowMaterial, mb, childMB);
+				else 
+					createBuilding(x + (buildingSpace + w) * i, 0, z + (d + buildingSpace) * (timesZ - 1), w, MathUtils.random(minSize, maxSize), d, 180, materials[MathUtils.random(materials.length - 1)], windowMaterial, mb, childMB);
+			}
+			
+			for(int i = 1; i < timesZ - 1; i++) {
+				if(i == timesZ - 2 || i == 1)
+					createAngleBuilding(x, 0, z + (buildingSpace + d) * i, w, MathUtils.random(minSize, maxSize), d, 90, materials[MathUtils.random(materials.length - 1)], windowMaterial, mb, childMB);
+				else createBuilding(x, 0, z + (buildingSpace + d) * i, w, MathUtils.random(minSize, maxSize), d, 90, materials[MathUtils.random(materials.length - 1)], windowMaterial, mb, childMB);
+			}
+			
+			for(int i = 1; i < timesZ - 1; i++) {
+				if(i == timesZ - 2 || i == 1)
+					createBuilding(x + (w + buildingSpace) * (timesX - 1), 0, z + (buildingSpace + d) * i, w, MathUtils.random(minSize, maxSize), d, -90, materials[MathUtils.random(materials.length - 1)], windowMaterial, mb, childMB);
+				else createBuilding(x + (w + buildingSpace) * (timesX - 1), 0, z + (buildingSpace + d) * i, w, MathUtils.random(minSize, maxSize), d, -90, materials[MathUtils.random(materials.length - 1)], windowMaterial, mb, childMB);
 			}
 		}
 		
@@ -273,6 +309,35 @@ public enum TerrainThemes {
 					Node window = childMB.node();
 					window.translation.set(temp, 0, -d / 2 - windowDepth * 2);
 					BoxShapeBuilder.build(childMB.part(window.id, GL20.GL_TRIANGLES, VertexAttributes.Usage.Position | VertexAttributes.Usage.Normal, windowMaterial), windowSize, windowSize, windowDepth);
+					building.addChild(window);
+				}
+			}
+		}
+		
+		private void createAngleBuilding(float x, float y, float z, int w, int h, float d, float rotation, Material material, Material windowMaterial, ModelBuilder mb, ModelBuilder childMB) {
+			float buildingHeight = 6;
+			
+			for (int i = 0; i < h; i++) {
+				float realY = (y + buildingHeight / 2) * (i + 1);
+				
+				Node building = mb.node();
+				building.translation.set(x, realY, z);
+				building.rotation.setEulerAngles(rotation, 0, 0);
+				BoxShapeBuilder.build(mb.part(building.id, GL20.GL_TRIANGLES, VertexAttributes.Usage.Position | VertexAttributes.Usage.Normal, material), w, buildingHeight, d);
+				
+				float windowSize = buildingHeight / 6, windowSpace = 3, windowDepth = 0.01f;
+				float temp;
+				for (int j = 0; (temp = -windowSize - windowSpace + (j + 1) * (windowSpace / 2 + windowSize / 2)) <= w - windowSize * 1.5f - windowSpace; j++) {
+					Node window = childMB.node();
+					window.translation.set(temp, 0, -d / 2 - windowDepth * 2);
+					BoxShapeBuilder.build(childMB.part(window.id, GL20.GL_TRIANGLES, VertexAttributes.Usage.Position | VertexAttributes.Usage.Normal, windowMaterial), windowSize, windowSize, windowDepth);
+					building.addChild(window);
+				}
+				
+				for (int j = 0; (temp = -windowSize - windowSpace + (j + 1) * (windowSpace / 2 + windowSize / 2)) <= d - windowSize * 1.5f - windowSpace; j++) {
+					Node window = childMB.node();
+					window.translation.set(-w / 2 - windowDepth * 2, 0, temp);
+					BoxShapeBuilder.build(childMB.part(window.id, GL20.GL_TRIANGLES, VertexAttributes.Usage.Position | VertexAttributes.Usage.Normal, windowMaterial), windowDepth, windowSize, windowSize);
 					building.addChild(window);
 				}
 			}
@@ -392,9 +457,12 @@ public enum TerrainThemes {
 	
 	public void dispose() {
 		model.dispose();
+		model = null;
 		
-		if(customTerrainModel != null)
+		if(customTerrainModel != null) {
 			customTerrainModel.dispose();
+			customTerrainModel = null;
+		}
 	}
 	
 	public ModelInstance getModelInstance() {

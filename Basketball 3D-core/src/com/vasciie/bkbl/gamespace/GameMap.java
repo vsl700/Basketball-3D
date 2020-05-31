@@ -306,8 +306,8 @@ public class GameMap {
 
         addBasketsCollObjects();
         
-        terrain.createTheme();//TODO Get this line AND THE ONE BELOW out of here when you finish all the themes
-        MyGdxGame.currentColor = terrain.getTheme().getThemeColor();
+        //terrain.createTheme();//TODO Get this line AND THE ONE BELOW out of here when you finish all the themes
+        //MyGdxGame.currentColor = terrain.getTheme().getThemeColor();
         createCache();
     }
     
