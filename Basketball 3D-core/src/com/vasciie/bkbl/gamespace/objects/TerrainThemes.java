@@ -303,11 +303,11 @@ public enum TerrainThemes {
 				building.rotation.setEulerAngles(rotation, 0, 0);
 				BoxShapeBuilder.build(mb.part(building.id, GL20.GL_TRIANGLES, VertexAttributes.Usage.Position | VertexAttributes.Usage.Normal, material), w, buildingHeight, d);
 				
-				float windowSize = buildingHeight / 6, windowSpace = 3, windowDepth = 0.01f;
+				float windowSize = buildingHeight / 6, windowSpace = 3, windowDepth = 0.1f;
 				float temp;
 				for (int j = 0; (temp = -windowSize - windowSpace + (j + 1) * (windowSpace / 2 + windowSize / 2)) <= w - windowSize * 1.5f - windowSpace; j++) {
 					Node window = childMB.node();
-					window.translation.set(temp, 0, -d / 2 - windowDepth * 2);
+					window.translation.set(temp, 0, -d / 2 - windowDepth * 3);
 					BoxShapeBuilder.build(childMB.part(window.id, GL20.GL_TRIANGLES, VertexAttributes.Usage.Position | VertexAttributes.Usage.Normal, windowMaterial), windowSize, windowSize, windowDepth);
 					building.addChild(window);
 				}
@@ -325,11 +325,11 @@ public enum TerrainThemes {
 				building.rotation.setEulerAngles(rotation, 0, 0);
 				BoxShapeBuilder.build(mb.part(building.id, GL20.GL_TRIANGLES, VertexAttributes.Usage.Position | VertexAttributes.Usage.Normal, material), w, buildingHeight, d);
 				
-				float windowSize = buildingHeight / 6, windowSpace = 3, windowDepth = 0.01f;
+				float windowSize = buildingHeight / 6, windowSpace = 3, windowDepth = 0.1f;
 				float temp;
 				for (int j = 0; (temp = -windowSize - windowSpace + (j + 1) * (windowSpace / 2 + windowSize / 2)) <= w - windowSize * 1.5f - windowSpace; j++) {
 					Node window = childMB.node();
-					window.translation.set(temp, 0, -d / 2 - windowDepth * 2);
+					window.translation.set(temp, 0, -d / 2 - windowDepth * 3);
 					BoxShapeBuilder.build(childMB.part(window.id, GL20.GL_TRIANGLES, VertexAttributes.Usage.Position | VertexAttributes.Usage.Normal, windowMaterial), windowSize, windowSize, windowDepth);
 					building.addChild(window);
 				}
