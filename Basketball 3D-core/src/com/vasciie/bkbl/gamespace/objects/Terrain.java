@@ -20,7 +20,7 @@ import com.vasciie.bkbl.gamespace.MotionState;
 
 public class Terrain extends GameObject {
 	
-	ModelInstance customMap, customPlate;
+	ModelInstance customPlate;
 	
 	TerrainThemes theme;
 	
@@ -55,7 +55,6 @@ public class Terrain extends GameObject {
 		
 		if(theme != null) {
 			theme.createModels(this);
-			customMap = theme.getModelInstance();
 			
 			customPlate = theme.getCustomTerrainModelInstance();
 		}
@@ -65,7 +64,6 @@ public class Terrain extends GameObject {
 		theme.dispose();
 		theme = null;
 		
-		customMap = null;
 		customPlate = null;
 	}
 	
@@ -81,7 +79,9 @@ public class Terrain extends GameObject {
 	@Override
 	public void render(ModelCache mCache) {
 		if(theme != null) {
-			mCache.add(customMap);
+			for(ModelInstance m : TerrainThemes.modelInstances) {
+				mCache.add(m);
+			}
 			
 			if(customPlate != null)
 				mCache.add(customPlate);

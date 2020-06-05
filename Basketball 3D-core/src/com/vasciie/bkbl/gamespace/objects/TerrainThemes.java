@@ -3,6 +3,8 @@
  */
 package com.vasciie.bkbl.gamespace.objects;
 
+import java.util.ArrayList;
+
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.GL20;
@@ -210,6 +212,8 @@ public enum TerrainThemes {
 				BoxShapeBuilder.build(mb.part(streetMark1.id, GL20.GL_TRIANGLES, VertexAttributes.Usage.Position | VertexAttributes.Usage.Normal, materialStreetMark), streetMarkDepth, streetHeight, streetMarkWidth);
 			}
 			
+			modelInstances.add(new ModelInstance(mb.end()));
+			
 			
 			//BUILDINGS
 			Material[] buildingMaterials = new Material[] {
@@ -224,7 +228,8 @@ public enum TerrainThemes {
 			
 			ModelBuilder childMB = new ModelBuilder();
 			
-			childMB.begin();
+			//mb.begin();
+			//childMB.begin();
 			
 			createBuildingsGroup(-terrain.getWidth() + 8, 80, 8, 8, 6, 4, buildingMaterials, windowMaterial, mb, childMB);
 			createBuildingsGroup(terrain.getWidth() + 19, 80, 8, 8, 4, 4, buildingMaterials, windowMaterial, mb, childMB);
@@ -238,9 +243,9 @@ public enum TerrainThemes {
 			
 			createBuildingsGroup(-76, -terrain.getDepth() + 11, 8, 8, 4, 12, buildingMaterials, windowMaterial, mb, childMB);
 			
-			childMB.end();
+			//childMB.end();
 			
-			model = mb.end();
+			//model = mb.end();
 			
 			//NEW TERRAIN
 			Texture court = new Texture(Gdx.files.internal("game/basketball_court_easy.jpg"));
@@ -262,37 +267,58 @@ public enum TerrainThemes {
 			int minSize = 2, maxSize = 6;
 			float buildingSpace = 1;
 			for(int i = 0; i < timesX; i++) {
+				Model temp;
+				
 				if(i == timesX - 1)
-					createAngleBuilding(x + (buildingSpace + w) * i, 0, z, w, MathUtils.random(minSize, maxSize), d, -90, materials[MathUtils.random(materials.length - 1)], windowMaterial, mb, childMB);
+					temp = createAngleBuilding(x + (buildingSpace + w) * i, 0, z, w, MathUtils.random(minSize, maxSize), d, -90, materials[MathUtils.random(materials.length - 1)], windowMaterial, mb, childMB);
 				else if(i == 0) 
-					createAngleBuilding(x + (buildingSpace + w) * i, 0, z, w, MathUtils.random(minSize, maxSize), d, 0, materials[MathUtils.random(materials.length - 1)], windowMaterial, mb, childMB);
+					temp = createAngleBuilding(x + (buildingSpace + w) * i, 0, z, w, MathUtils.random(minSize, maxSize), d, 0, materials[MathUtils.random(materials.length - 1)], windowMaterial, mb, childMB);
 				else 
-					createBuilding(x + (buildingSpace + w) * i, 0, z, w, MathUtils.random(minSize, maxSize), d, 0, materials[MathUtils.random(materials.length - 1)], windowMaterial, mb, childMB);
+					temp = createBuilding(x + (buildingSpace + w) * i, 0, z, w, MathUtils.random(minSize, maxSize), d, 0, materials[MathUtils.random(materials.length - 1)], windowMaterial, mb, childMB);
+				
+				modelInstances.add(new ModelInstance(temp));
 			}
 			
 			for(int i = 0; i < timesX; i++) {
+				Model temp;
+				
 				if(i == timesX - 1)
-					createAngleBuilding(x + (buildingSpace + w) * i, 0, z + (d + buildingSpace) * (timesZ - 1), w, MathUtils.random(minSize, maxSize), d, 180, materials[MathUtils.random(materials.length - 1)], windowMaterial, mb, childMB);
+					temp = createAngleBuilding(x + (buildingSpace + w) * i, 0, z + (d + buildingSpace) * (timesZ - 1), w, MathUtils.random(minSize, maxSize), d, 180, materials[MathUtils.random(materials.length - 1)], windowMaterial, mb, childMB);
 				else if(i == 0)
-					createAngleBuilding(x + (buildingSpace + w) * i, 0, z + (d + buildingSpace) * (timesZ - 1), w, MathUtils.random(minSize, maxSize), d, 90, materials[MathUtils.random(materials.length - 1)], windowMaterial, mb, childMB);
+					temp = createAngleBuilding(x + (buildingSpace + w) * i, 0, z + (d + buildingSpace) * (timesZ - 1), w, MathUtils.random(minSize, maxSize), d, 90, materials[MathUtils.random(materials.length - 1)], windowMaterial, mb, childMB);
 				else 
-					createBuilding(x + (buildingSpace + w) * i, 0, z + (d + buildingSpace) * (timesZ - 1), w, MathUtils.random(minSize, maxSize), d, 180, materials[MathUtils.random(materials.length - 1)], windowMaterial, mb, childMB);
+					temp = createBuilding(x + (buildingSpace + w) * i, 0, z + (d + buildingSpace) * (timesZ - 1), w, MathUtils.random(minSize, maxSize), d, 180, materials[MathUtils.random(materials.length - 1)], windowMaterial, mb, childMB);
+				
+				modelInstances.add(new ModelInstance(temp));
 			}
 			
 			for(int i = 1; i < timesZ - 1; i++) {
+				Model temp;
+				
 				if(i == timesZ - 2 || i == 1)
-					createAngleBuilding(x, 0, z + (buildingSpace + d) * i, w, MathUtils.random(minSize, maxSize), d, 90, materials[MathUtils.random(materials.length - 1)], windowMaterial, mb, childMB);
-				else createBuilding(x, 0, z + (buildingSpace + d) * i, w, MathUtils.random(minSize, maxSize), d, 90, materials[MathUtils.random(materials.length - 1)], windowMaterial, mb, childMB);
+					temp = createAngleBuilding(x, 0, z + (buildingSpace + d) * i, w, MathUtils.random(minSize, maxSize), d, 90, materials[MathUtils.random(materials.length - 1)], windowMaterial, mb, childMB);
+				else 
+					temp = createBuilding(x, 0, z + (buildingSpace + d) * i, w, MathUtils.random(minSize, maxSize), d, 90, materials[MathUtils.random(materials.length - 1)], windowMaterial, mb, childMB);
+				
+				modelInstances.add(new ModelInstance(temp));
 			}
 			
 			for(int i = 1; i < timesZ - 1; i++) {
+				Model temp;
+				
 				if(i == timesZ - 2 || i == 1)
-					createBuilding(x + (w + buildingSpace) * (timesX - 1), 0, z + (buildingSpace + d) * i, w, MathUtils.random(minSize, maxSize), d, -90, materials[MathUtils.random(materials.length - 1)], windowMaterial, mb, childMB);
-				else createBuilding(x + (w + buildingSpace) * (timesX - 1), 0, z + (buildingSpace + d) * i, w, MathUtils.random(minSize, maxSize), d, -90, materials[MathUtils.random(materials.length - 1)], windowMaterial, mb, childMB);
+					temp = createBuilding(x + (w + buildingSpace) * (timesX - 1), 0, z + (buildingSpace + d) * i, w, MathUtils.random(minSize, maxSize), d, -90, materials[MathUtils.random(materials.length - 1)], windowMaterial, mb, childMB);
+				else 
+					temp = createBuilding(x + (w + buildingSpace) * (timesX - 1), 0, z + (buildingSpace + d) * i, w, MathUtils.random(minSize, maxSize), d, -90, materials[MathUtils.random(materials.length - 1)], windowMaterial, mb, childMB);
+				
+				modelInstances.add(new ModelInstance(temp));
 			}
 		}
 		
-		private void createBuilding(float x, float y, float z, int w, int h, float d, float rotation, Material material, Material windowMaterial, ModelBuilder mb, ModelBuilder childMB) {
+		private Model createBuilding(float x, float y, float z, int w, int h, float d, float rotation, Material material, Material windowMaterial, ModelBuilder mb, ModelBuilder childMB) {
+			mb.begin();
+			childMB.begin();
+			
 			float buildingHeight = 6;
 			
 			for (int i = 0; i < h; i++) {
@@ -312,9 +338,16 @@ public enum TerrainThemes {
 					building.addChild(window);
 				}
 			}
+			
+			childMB.end();
+			
+			return mb.end();
 		}
 		
-		private void createAngleBuilding(float x, float y, float z, int w, int h, float d, float rotation, Material material, Material windowMaterial, ModelBuilder mb, ModelBuilder childMB) {
+		private Model createAngleBuilding(float x, float y, float z, int w, int h, float d, float rotation, Material material, Material windowMaterial, ModelBuilder mb, ModelBuilder childMB) {
+			mb.begin();
+			childMB.begin();
+			
 			float buildingHeight = 6;
 			
 			for (int i = 0; i < h; i++) {
@@ -341,6 +374,10 @@ public enum TerrainThemes {
 					building.addChild(window);
 				}
 			}
+			
+			childMB.end();
+			
+			return mb.end();
 		}
 
 		@Override
@@ -447,6 +484,7 @@ public enum TerrainThemes {
 	};
 	
 	private static Model model, customTerrainModel;
+	public static final ArrayList<ModelInstance> modelInstances = new ArrayList<ModelInstance>();;
 	
 	
 	public abstract void createModels(Terrain terrain);
@@ -456,17 +494,15 @@ public enum TerrainThemes {
 	public abstract boolean hasOwnTerrain();
 	
 	public void dispose() {
-		model.dispose();
-		model = null;
-		
 		if(customTerrainModel != null) {
 			customTerrainModel.dispose();
 			customTerrainModel = null;
 		}
-	}
-	
-	public ModelInstance getModelInstance() {
-		return new ModelInstance(model, 0, 0, 0);
+		
+		for(int i = 0; i < modelInstances.size(); i++) {
+			modelInstances.get(i).model.dispose();
+			modelInstances.remove(i);
+		}
 	}
 	
 	public ModelInstance getCustomTerrainModelInstance() {
