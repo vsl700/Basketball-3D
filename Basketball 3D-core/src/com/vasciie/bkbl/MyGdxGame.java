@@ -22,6 +22,7 @@ import com.vasciie.bkbl.screens.*;
 public class MyGdxGame extends Game {
 	
 	public static Color defaultColor = new Color(0, 0.7f, 0.8f, 1), currentColor;
+	public static final boolean TESTING = true;
 	
 	SpriteBatch batch;
 	BitmapFont font;
@@ -51,6 +52,14 @@ public class MyGdxGame extends Game {
 	
 	@Override
 	public void create () {
+		if (TESTING) {
+			load3DGraphics();
+			tester = new TestScreen(this, pCam);
+			setScreen(tester);
+			
+			return;
+		}
+		
 		if(Gdx.app.getType().equals(Application.ApplicationType.Android))
 			GUI_SCALE = 1.5f;
 		else GUI_SCALE = 1;
@@ -70,11 +79,8 @@ public class MyGdxGame extends Game {
 		level = new LevelScreen(this);
 		game = new GameScreen(this);
 		
-		//GAME MODELS TEST ONLY//////////////////////////////////////////////////////////
-		load3DGraphics();
-		tester = new TestScreen(this, pCam);
-		//setScreen(tester);
-		//GAME MODELS TEST ONLY//////////////////////////////////////////////////////////
+		
+		
 
 		if(!Gdx.app.getType().equals(Application.ApplicationType.Android))
 			settings = new SettingsScreen(this);
@@ -109,6 +115,16 @@ public class MyGdxGame extends Game {
 
 	@Override
 	public void render () {
+		if(getScreen().equals(tester)) {
+			pCam.update();
+			Gdx.gl.glClearColor(currentColor.r, currentColor.g, currentColor.b, currentColor.a);
+			Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT | GL20.GL_DEPTH_BUFFER_BIT);
+			map.render(mBatch, environment, pCam);
+			
+			super.render();
+			return;
+		}
+		
 		if (!getScreen().equals(spScreen1) && !getScreen().equals(game) && !game.paused()) {
 			if (beautifulBack) {
 				if (map == null) {
@@ -121,8 +137,7 @@ public class MyGdxGame extends Game {
 					return;
 				}
 
-				Gdx.gl.glClearColor(0, 0.7f, 0.8f, 1);//TODO Comment this and uncomment the line below after you finish the themes mechanism
-				//Gdx.gl.glClearColor(currentColor.r, currentColor.g, currentColor.b, currentColor.a);
+				Gdx.gl.glClearColor(currentColor.r, currentColor.g, currentColor.b, currentColor.a);
 				Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT | GL20.GL_DEPTH_BUFFER_BIT);
 
 				pCam.update();
@@ -130,11 +145,6 @@ public class MyGdxGame extends Game {
 				map.render(mBatch, environment, pCam);
 				
 				//mBatch.end();
-
-				if(getScreen().equals(tester)) {
-					super.render();
-					return;
-				}
 				
 				pCam.rotateAround(new Vector3(), new Vector3(0, 1, 0), 10 * Gdx.graphics.getDeltaTime());
 				customLookAt(pCam, new Vector3());
@@ -172,6 +182,12 @@ public class MyGdxGame extends Game {
 			font.draw(batch, Gdx.graphics.getFramesPerSecond() + " fps; SN:13/05/20-v1.0", 0, font.getLineHeight());
 			batch.end();
 		}
+	}
+	
+	public static void setColor(Color color) {
+		if(color == null)
+			currentColor = defaultColor;
+		else currentColor = color;
 	}
 	
 	/**
@@ -212,7 +228,9 @@ public class MyGdxGame extends Game {
 	
 	@Override
 	public void resize(int width, int height) {
-		cam.setToOrtho(false, width, height);
+		if(!MyGdxGame.TESTING)
+			cam.setToOrtho(false, width, height);
+		
 		if(pCam != null) {
 			pCam.viewportWidth = width;
 			pCam.viewportHeight = height;
@@ -220,14 +238,17 @@ public class MyGdxGame extends Game {
 		
 		getScreen().resize(width, height); //That method doesn't automatically call in the screen so we have to call it manually
 		
-		if(game.paused())
-			game.resize(width, height);
+		if(!MyGdxGame.TESTING)
+			if (game.paused())
+				game.resize(width, height);
 	}
 	
 	@Override
 	public void dispose () {
-		batch.dispose();
-		logo.dispose();
+		if (!TESTING) {
+			batch.dispose();
+			logo.dispose();
+		}
 		
 		if(map != null) {
 			mBatch.dispose();

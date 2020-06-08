@@ -137,32 +137,37 @@ public class GameMap {
     boolean interrupted = false;
 
     public GameMap(RulesListener rulesListener, GUIRenderer guiRenderer) {
-    	dynamicsWorldRunnable = new Runnable() {
+		if (!MyGdxGame.TESTING) {
+			dynamicsWorldRunnable = new Runnable() {
 
-			@Override
-			public void run() {
-				dynamicsWorld.stepSimulation(Gdx.graphics.getDeltaTime(), 5, 1f / 60f);
-			}
+				@Override
+				public void run() {
+					dynamicsWorld.stepSimulation(Gdx.graphics.getDeltaTime(), 5, 1f / 60f);
+				}
 
-        };
-        
-        physicsThread = new VEThread(dynamicsWorldRunnable);
+			};
 
+			physicsThread = new VEThread(dynamicsWorldRunnable);
+		}
+		
         inputs = new InputController(guiRenderer);
 
         rules = new Rules(this, rulesListener);
 
         mCache = new ModelCache();
         
-		Bullet.init();
+        Bullet.init();
         
-        createPhysics();
+		if (!MyGdxGame.TESTING) {
+			createPhysics();
+		
 
         objectsMap = new HashMap<Integer, String>();
         collObjsInEntityMap = new HashMap<btCollisionObject, Entity>();
         collObjsInObjectMap = new HashMap<btCollisionObject, GameObject>();
         collObjsValsMap = new HashMap<Integer, btCollisionObject>();
-
+		}
+		
         createMap();
 
         createBall();
@@ -294,20 +299,26 @@ public class GameMap {
 
     private void createMap() {
         terrain = (Terrain) ObjectType.createGameObject(ObjectType.TERRAIN.getId(), this, 0, 0, 0);
-        addTerrainCollObjects();
+        if(!MyGdxGame.TESTING)
+        	addTerrainCollObjects();
 
-        camera = (Camera) ObjectType.createGameObject(ObjectType.CAMERA.getId(), this, 0, 0, 0);
-        addCameraCollObjects();
+		if (!MyGdxGame.TESTING) {
+			camera = (Camera) ObjectType.createGameObject(ObjectType.CAMERA.getId(), this, 0, 0, 0);
+			addCameraCollObjects();
+		}
 
         basket1 = ObjectType.createBasket(ObjectType.HOMEBASKET.getId(), this, 0.1f, 0, 27);
 
         basket2 = ObjectType.createBasket(ObjectType.AWAYBASKET.getId(), this, 0.1f, 0, -27);
         basket2.setRotation(0, 1, 0, 180);
 
-        addBasketsCollObjects();
+        if(!MyGdxGame.TESTING)
+        	addBasketsCollObjects();
         
-        //terrain.createTheme();//TODO Get this line AND THE ONE BELOW out of here when you finish all the themes
-        //MyGdxGame.currentColor = terrain.getTheme().getThemeColor();
+		if (MyGdxGame.TESTING) {
+			terrain.createTheme();
+			MyGdxGame.setColor(terrain.getTheme().getThemeColor());
+		}
         createCache();
     }
     
@@ -476,6 +487,13 @@ public class GameMap {
 			ball.setCollisionTransform(true);
 			ball.manuallySetCollTransform();
 		}*/
+        
+        lastBallIndex = index - 1;
+        
+        if(MyGdxGame.TESTING)
+        	return;
+        
+        
         for (btRigidBody co : ball.getBodies()) {
             co.setUserValue(index);
             co.setCollisionFlags(co.getCollisionFlags() | btCollisionObject.CollisionFlags.CF_CUSTOM_MATERIAL_CALLBACK);
@@ -504,8 +522,6 @@ public class GameMap {
 
             index++;
         }
-
-        lastBallIndex = index - 1;
     }
 
     public void clear() {
