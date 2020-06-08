@@ -51,7 +51,20 @@ public class Terrain extends GameObject {
 	}
 	
 	public void createTheme() {
-		theme = chooseTheme();
+		if(theme != null) {
+			TerrainThemes temp = chooseTheme();
+			
+			if(!temp.equals(theme)) {
+				clearTheme();
+				
+				loadTheme(temp);
+			}
+		}else loadTheme(chooseTheme());
+
+	}
+	
+	private void loadTheme(TerrainThemes newTheme) {
+		theme = newTheme;
 		
 		if(theme != null) {
 			theme.createModels(this);

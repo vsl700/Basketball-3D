@@ -218,9 +218,9 @@ public enum TerrainThemes {
 			//BUILDINGS
 			Material[] buildingMaterials = new Material[] {
 					new Material(ColorAttribute.createDiffuse(Color.PINK)),
-					new Material(ColorAttribute.createDiffuse(Color.DARK_GRAY)),
-					new Material(ColorAttribute.createDiffuse(Color.FIREBRICK)),
+					new Material(ColorAttribute.createDiffuse(Color.CYAN)),
 					new Material(ColorAttribute.createDiffuse(Color.RED)),
+					new Material(ColorAttribute.createDiffuse(Color.ORANGE)),
 					new Material(ColorAttribute.createDiffuse(Color.BLUE))
 			};
 			
@@ -483,7 +483,7 @@ public enum TerrainThemes {
 		
 	};
 	
-	private static Model model, customTerrainModel;
+	private static Model customTerrainModel;
 	public static final ArrayList<ModelInstance> modelInstances = new ArrayList<ModelInstance>();;
 	
 	
@@ -499,9 +499,11 @@ public enum TerrainThemes {
 			customTerrainModel = null;
 		}
 		
-		for(int i = 0; i < modelInstances.size(); i++) {
-			modelInstances.get(i).model.dispose();
-			modelInstances.remove(i);
+		while(modelInstances.size() > 0) {
+			int index = modelInstances.size() - 1;
+			
+			modelInstances.get(index).model.dispose();
+			modelInstances.remove(index);
 		}
 	}
 	
