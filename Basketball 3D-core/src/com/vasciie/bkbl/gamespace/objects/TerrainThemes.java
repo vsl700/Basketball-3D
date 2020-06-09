@@ -399,6 +399,7 @@ public enum TerrainThemes {
 		
 	},
 	
+	
 	HARD{
 
 		@Override
@@ -418,9 +419,9 @@ public enum TerrainThemes {
 			texture.setWrap(Texture.TextureWrap.Repeat, Texture.TextureWrap.Repeat);
 			texture.setFilter(Texture.TextureFilter.Linear, Texture.TextureFilter.Linear);
 			
-			Material wallsMaterial1 = new Material(ColorAttribute.createDiffuse(Color.YELLOW));
+			Material wallsMaterial1 = new Material(ColorAttribute.createDiffuse(Color.GOLD));
 			
-			Material ladderMaterial = new Material(ColorAttribute.createDiffuse(Color.GOLD));
+			Material ladderMaterial = new Material(ColorAttribute.createDiffuse(Color.ORANGE));
 			
 			Material material = new Material(ColorAttribute.createDiffuse(Color.GRAY.cpy().add(0.3f, 0.3f, 0.3f, 0)));
 			
@@ -499,11 +500,90 @@ public enum TerrainThemes {
 				}
 			}
 			
-			Model temp = mb.end();
+			Model tempModel = mb.end();
 			
-			modelInstances.add(new ModelInstance(temp));
-			modelInstances.add(new ModelInstance(temp, 0, 0, -ladderWidth / 2 - startLadderZ));
+			modelInstances.add(new ModelInstance(tempModel));
+			modelInstances.add(new ModelInstance(tempModel, 0, 0, -ladderWidth / 2 - startLadderZ));
 			
+			wallHeight = 5;
+			wallDepth = 0.1f;
+			float wallDepth2 = 0.05f;
+			float wallSpace = 2.5f, wallSpace2 = 4;
+			
+			mb.begin();
+			float temp;
+			for (int i = 0; (temp = -terrain.getWidth() * 3 + i * wallSpace) <= terrain.getWidth() * 3; i++) {
+				Node wall = mb.node();
+				wall.translation.set(temp, wallHeight / 2, terrain.getDepth() * 1.5f);
+				BoxShapeBuilder.build(mb.part(wall.id, GL20.GL_TRIANGLES, VertexAttributes.Usage.Position | VertexAttributes.Usage.Normal, material), wallDepth, wallHeight, wallDepth);
+			}
+			
+			for (int i = 1; (temp = wallHeight - i * wallSpace2) >= 0; i++) {
+				Node wall = mb.node();
+				wall.translation.set(0, temp, terrain.getDepth() * 1.5f);
+				BoxShapeBuilder.build(mb.part(wall.id, GL20.GL_TRIANGLES, VertexAttributes.Usage.Position | VertexAttributes.Usage.Normal, material), terrain.getWidth() * 6, wallDepth2, wallDepth2);
+			}
+			
+			Node wallUpper = mb.node();
+			wallUpper.translation.set(0, wallHeight, terrain.getDepth() * 1.5f);
+			BoxShapeBuilder.build(mb.part(wallUpper.id, GL20.GL_TRIANGLES, VertexAttributes.Usage.Position | VertexAttributes.Usage.Normal, material), terrain.getWidth() * 6, wallDepth, wallDepth);
+			
+			
+			for (int i = 0; (temp = -terrain.getDepth() * 1.5f + i * wallSpace) <= terrain.getDepth() * 1.5f; i++) {
+				Node wall = mb.node();
+				wall.translation.set(terrain.getWidth() * 3, wallHeight / 2, temp);
+				BoxShapeBuilder.build(mb.part(wall.id, GL20.GL_TRIANGLES, VertexAttributes.Usage.Position | VertexAttributes.Usage.Normal, material), wallDepth, wallHeight, wallDepth);
+			}
+			
+			for (int i = 1; (temp = wallHeight - i * wallSpace2) >= 0; i++) {
+				Node wall = mb.node();
+				wall.translation.set(terrain.getWidth() * 3, temp, 0);
+				BoxShapeBuilder.build(mb.part(wall.id, GL20.GL_TRIANGLES, VertexAttributes.Usage.Position | VertexAttributes.Usage.Normal, material), wallDepth2, wallDepth2, terrain.getDepth() * 3);
+			}
+			
+			Node wallUpper2 = mb.node();
+			wallUpper2.translation.set(terrain.getWidth() * 3, wallHeight, 0);
+			BoxShapeBuilder.build(mb.part(wallUpper2.id, GL20.GL_TRIANGLES, VertexAttributes.Usage.Position | VertexAttributes.Usage.Normal, material), wallDepth, wallDepth, terrain.getDepth() * 3);
+			
+			
+			for (int i = 0; (temp = -terrain.getWidth() * 3 + i * wallSpace) <= terrain.getWidth() * 3; i++) {
+				Node wall = mb.node();
+				wall.translation.set(temp, wallHeight / 2, -terrain.getDepth() * 1.5f);
+				BoxShapeBuilder.build(mb.part(wall.id, GL20.GL_TRIANGLES, VertexAttributes.Usage.Position | VertexAttributes.Usage.Normal, material), wallDepth, wallHeight, wallDepth);
+			}
+			
+			for (int i = 1; (temp = wallHeight - i * wallSpace2) >= 0; i++) {
+				Node wall = mb.node();
+				wall.translation.set(0, temp, -terrain.getDepth() * 1.5f);
+				BoxShapeBuilder.build(mb.part(wall.id, GL20.GL_TRIANGLES, VertexAttributes.Usage.Position | VertexAttributes.Usage.Normal, material), terrain.getWidth() * 6, wallDepth2, wallDepth2);
+			}
+			
+			Node wallUpper3 = mb.node();
+			wallUpper3.translation.set(0, wallHeight, -terrain.getDepth() * 1.5f);
+			BoxShapeBuilder.build(mb.part(wallUpper3.id, GL20.GL_TRIANGLES, VertexAttributes.Usage.Position | VertexAttributes.Usage.Normal, material), terrain.getWidth() * 6, wallDepth, wallDepth);
+			
+			modelInstances.add(new ModelInstance(mb.end()));
+			
+			float grassPlateWidth = terrain.getWidth() * 2.17f, grassPlateHeight = 0.01f, grassPlateDepth = terrain.getDepth() * 3;
+			float grassPlateWidth1 = terrain.getWidth() * 1.83f, grassPlateDepth1 = terrain.getDepth();
+			
+			Material grassMaterial = new Material(ColorAttribute.createDiffuse(Color.GREEN.cpy().sub(0, 0.6f, 0, 0)));
+			
+			mb.begin();
+			
+			Node grassPlate = mb.node();
+			grassPlate.translation.set(grassPlateWidth / 2 + terrain.getWidth() / 2 + 10, 0.01f, 0);
+			BoxShapeBuilder.build(mb.part(grassPlate.id, GL20.GL_TRIANGLES, VertexAttributes.Usage.Position | VertexAttributes.Usage.Normal, grassMaterial), grassPlateWidth, grassPlateHeight, grassPlateDepth);
+			
+			Node grassPlate1 = mb.node();
+			grassPlate1.translation.set(0, 0.01f, terrain.getDepth() / 2 + grassPlateWidth / 2);
+			BoxShapeBuilder.build(mb.part(grassPlate1.id, GL20.GL_TRIANGLES, VertexAttributes.Usage.Position | VertexAttributes.Usage.Normal, grassMaterial), grassPlateDepth1, grassPlateHeight, grassPlateWidth1);
+			
+			Node grassPlate2 = mb.node();
+			grassPlate2.translation.set(0, 0.01f, -(terrain.getDepth() / 2 + grassPlateWidth / 2));
+			BoxShapeBuilder.build(mb.part(grassPlate2.id, GL20.GL_TRIANGLES, VertexAttributes.Usage.Position | VertexAttributes.Usage.Normal, grassMaterial), grassPlateDepth1, grassPlateHeight, grassPlateWidth1);
+			
+			modelInstances.add(new ModelInstance(mb.end()));
 		}
 		
 		private MeshPartBuilder part(MeshPartBuilder input, float width, float height) {
