@@ -405,9 +405,9 @@ public enum TerrainThemes {
 		@Override
 		public void createModels(Terrain terrain) {
 			Pixmap pm = new Pixmap(64, 64, Format.RGBA8888);
-			pm.setColor(Color.BROWN.cpy().sub(0.1f, 0.1f, 0, 0));
-			pm.fillRectangle(0, 0, pm.getWidth(), pm.getHeight());
 			pm.setColor(Color.BROWN);
+			pm.fillRectangle(0, 0, pm.getWidth(), pm.getHeight());
+			pm.setColor(Color.BROWN.cpy().add(0.1f, 0.1f, 0, 0));
 			pm.fillCircle(pm.getWidth() / 2, pm.getWidth() / 2, pm.getWidth() / 2);
 			
 			Texture texture = new Texture(pm);
@@ -442,7 +442,7 @@ public enum TerrainThemes {
 			wallW.translation.set(-terrain.getWidth() / 2, wallHeight / 2, 0);
 			BoxShapeBuilder.build(part(mb.part(wallW.id, GL20.GL_TRIANGLES, VertexAttributes.Usage.Position | VertexAttributes.Usage.Normal | VertexAttributes.Usage.TextureCoordinates, wallsMaterial), terrain.getDepth(), wallHeight), wallDepth, wallHeight, terrain.getDepth());
 			
-			float bottomPart = 0.25f, windowPart = 0.5f, upperPart = 1 - bottomPart - windowPart;
+			float bottomPart = 0.15f, windowPart = 0.5f, upperPart = 1 - bottomPart - windowPart;
 			float wallHeight1 = wallHeight * bottomPart, wallHeight2 = wallHeight * upperPart, wallHeight3 = wallHeight * windowPart;
 			
 			Node wallE1 = mb.node();
