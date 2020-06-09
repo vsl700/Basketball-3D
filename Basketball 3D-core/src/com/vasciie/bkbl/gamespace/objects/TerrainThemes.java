@@ -21,6 +21,7 @@ import com.badlogic.gdx.graphics.g3d.model.Node;
 import com.badlogic.gdx.graphics.g3d.utils.MeshPartBuilder;
 import com.badlogic.gdx.graphics.g3d.utils.ModelBuilder;
 import com.badlogic.gdx.graphics.g3d.utils.shapebuilders.BoxShapeBuilder;
+import com.badlogic.gdx.graphics.g3d.utils.shapebuilders.CylinderShapeBuilder;
 import com.badlogic.gdx.math.MathUtils;
 
 /**
@@ -417,6 +418,10 @@ public enum TerrainThemes {
 			texture.setWrap(Texture.TextureWrap.Repeat, Texture.TextureWrap.Repeat);
 			texture.setFilter(Texture.TextureFilter.Linear, Texture.TextureFilter.Linear);
 			
+			Material wallsMaterial1 = new Material(ColorAttribute.createDiffuse(Color.YELLOW));
+			
+			Material ladderMaterial = new Material(ColorAttribute.createDiffuse(Color.GOLD));
+			
 			Material material = new Material(ColorAttribute.createDiffuse(Color.GRAY.cpy().add(0.3f, 0.3f, 0.3f, 0)));
 			
 			
@@ -437,16 +442,31 @@ public enum TerrainThemes {
 			BoxShapeBuilder.build(part(mb.part(wallW.id, GL20.GL_TRIANGLES, VertexAttributes.Usage.Position | VertexAttributes.Usage.Normal | VertexAttributes.Usage.TextureCoordinates, wallsMaterial), terrain.getDepth(), wallHeight), wallDepth, wallHeight, terrain.getDepth());
 			
 			float bottomPart = 0.25f, windowPart = 0.5f, upperPart = 1 - bottomPart - windowPart;
-			float wallHeight1 = wallHeight * bottomPart, wallHeight2 = wallHeight * upperPart;
+			float wallHeight1 = wallHeight * bottomPart, wallHeight2 = wallHeight * upperPart, wallHeight3 = wallHeight * windowPart;
 			
 			Node wallE1 = mb.node();
 			wallE1.translation.set(terrain.getWidth() / 2, wallHeight1 / 2, 0);
-			BoxShapeBuilder.build(part(mb.part(wallE1.id, GL20.GL_TRIANGLES, VertexAttributes.Usage.Position | VertexAttributes.Usage.Normal | VertexAttributes.Usage.TextureCoordinates, wallsMaterial), terrain.getDepth(), wallHeight1), wallDepth, wallHeight1, terrain.getDepth());
+			BoxShapeBuilder.build(mb.part(wallE1.id, GL20.GL_TRIANGLES, VertexAttributes.Usage.Position | VertexAttributes.Usage.Normal, wallsMaterial1), wallDepth, wallHeight1, terrain.getDepth());
 			
 			Node wallE2 = mb.node();
 			wallE2.translation.set(terrain.getWidth() / 2, wallHeight - wallHeight2 / 2, 0);
-			BoxShapeBuilder.build(part(mb.part(wallE2.id, GL20.GL_TRIANGLES, VertexAttributes.Usage.Position | VertexAttributes.Usage.Normal | VertexAttributes.Usage.TextureCoordinates, wallsMaterial), terrain.getDepth(), wallHeight2), wallDepth, wallHeight2, terrain.getDepth());
+			BoxShapeBuilder.build(mb.part(wallE2.id, GL20.GL_TRIANGLES, VertexAttributes.Usage.Position | VertexAttributes.Usage.Normal, wallsMaterial1), wallDepth, wallHeight2, terrain.getDepth());
 			
+			Node wallE3 = mb.node();
+			wallE3.translation.set(terrain.getWidth() / 2, wallHeight1 + wallHeight3 / 2, -terrain.getDepth() / 4);
+			BoxShapeBuilder.build(mb.part(wallE3.id, GL20.GL_TRIANGLES, VertexAttributes.Usage.Position | VertexAttributes.Usage.Normal, material), wallDepth, wallHeight3, 1);
+			
+			Node wallE4 = mb.node();
+			wallE4.translation.set(terrain.getWidth() / 2, wallHeight1 + wallHeight3 / 2, terrain.getDepth() / 4);
+			BoxShapeBuilder.build(mb.part(wallE4.id, GL20.GL_TRIANGLES, VertexAttributes.Usage.Position | VertexAttributes.Usage.Normal, material), wallDepth, wallHeight3, 1);
+			
+			Node wallE5 = mb.node();
+			wallE5.translation.set(terrain.getWidth() / 2, wallHeight1 + wallHeight3 / 2, 0);
+			BoxShapeBuilder.build(mb.part(wallE5.id, GL20.GL_TRIANGLES, VertexAttributes.Usage.Position | VertexAttributes.Usage.Normal, material), wallDepth, wallHeight3, 1);
+			
+			Node ceiling = mb.node();
+			ceiling.translation.set(0, wallHeight, 0);
+			BoxShapeBuilder.build(mb.part(ceiling.id, GL20.GL_TRIANGLES, VertexAttributes.Usage.Position | VertexAttributes.Usage.Normal, material), terrain.getWidth(), wallDepth, terrain.getDepth());
 			
 			float worldPlateWidth = terrain.getWidth() * 4;
 			Node worldPlate = mb.node();
@@ -455,10 +475,39 @@ public enum TerrainThemes {
 			BoxShapeBuilder.build(mb.part(worldPlate.id, GL20.GL_TRIANGLES, VertexAttributes.Usage.Position | VertexAttributes.Usage.Normal, material), worldPlateWidth, 0.01f, terrain.getDepth() * 8);
 			
 			modelInstances.add(new ModelInstance(mb.end()));
+			
+			
+			int divisions = 15;
+			float ladderRadius = 0.5f, ladderHeight = wallHeight - 1, ladderWidth = 10;
+			float startLadderZ = terrain.getDepth() / 3;
+			
+			mb.begin();
+			Node ladder1 = mb.node();
+			ladder1.translation.set(-terrain.getWidth() / 2 + ladderRadius, ladderHeight / 2, startLadderZ);
+			CylinderShapeBuilder.build(mb.part(ladder1.id, GL20.GL_TRIANGLES, VertexAttributes.Usage.Position | VertexAttributes.Usage.Normal, ladderMaterial), ladderRadius, ladderHeight, ladderRadius, divisions);
+			
+			Node ladder2 = mb.node();
+			ladder2.translation.set(-terrain.getWidth() / 2 + ladderRadius, ladderHeight / 2, startLadderZ - ladderWidth);
+			CylinderShapeBuilder.build(mb.part(ladder2.id, GL20.GL_TRIANGLES, VertexAttributes.Usage.Position | VertexAttributes.Usage.Normal, ladderMaterial), ladderRadius, ladderHeight, ladderRadius, divisions);
+			
+			for (int m = 0; m < 3; m++) {
+				for (int i = 1; i <= 5 - m; i++) {
+					Node ladder3 = mb.node();
+					ladder3.translation.set(-terrain.getWidth() / 2 + ladderRadius, i + 6 * m, startLadderZ - ladderWidth / 2);
+					ladder3.rotation.setEulerAngles(0, 90, 0);
+					CylinderShapeBuilder.build(mb.part(ladder3.id, GL20.GL_TRIANGLES, VertexAttributes.Usage.Position | VertexAttributes.Usage.Normal, ladderMaterial), ladderRadius, ladderWidth, ladderRadius, divisions);
+				}
+			}
+			
+			Model temp = mb.end();
+			
+			modelInstances.add(new ModelInstance(temp));
+			modelInstances.add(new ModelInstance(temp, 0, 0, -ladderWidth / 2 - startLadderZ));
+			
 		}
 		
 		private MeshPartBuilder part(MeshPartBuilder input, float width, float height) {
-			input.setUVRange(0, 0, Math.min(width, height), Math.max(width, height));
+			input.setUVRange(0, 0, height, width);
 			
 			return input;
 		}
@@ -562,7 +611,14 @@ public enum TerrainThemes {
 		while(modelInstances.size() > 0) {
 			int index = modelInstances.size() - 1;
 			
-			modelInstances.get(index).model.dispose();
+			Model temp = modelInstances.get(index).model;
+			
+			try {
+				temp.dispose();
+			}catch (Exception e) {
+				System.out.print(temp);
+				System.out.println(" already disposed!");
+			}
 			modelInstances.remove(index);
 		}
 	}
