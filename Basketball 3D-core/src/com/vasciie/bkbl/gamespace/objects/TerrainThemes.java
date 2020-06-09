@@ -473,7 +473,7 @@ public enum TerrainThemes {
 			Node worldPlate = mb.node();
 			worldPlate.id = "worldPlate";
 			worldPlate.translation.set(worldPlateWidth / 2 - terrain.getWidth() / 2, -0.1f, 0);
-			BoxShapeBuilder.build(mb.part(worldPlate.id, GL20.GL_TRIANGLES, VertexAttributes.Usage.Position | VertexAttributes.Usage.Normal, material), worldPlateWidth, 0.01f, terrain.getDepth() * 8);
+			BoxShapeBuilder.build(mb.part(worldPlate.id, GL20.GL_TRIANGLES, VertexAttributes.Usage.Position | VertexAttributes.Usage.Normal, material), worldPlateWidth, 0.01f, terrain.getDepth() * 4);
 			
 			modelInstances.add(new ModelInstance(mb.end()));
 			
@@ -564,8 +564,9 @@ public enum TerrainThemes {
 			
 			modelInstances.add(new ModelInstance(mb.end()));
 			
+			
 			float grassPlateWidth = terrain.getWidth() * 2.17f, grassPlateHeight = 0.01f, grassPlateDepth = terrain.getDepth() * 3;
-			float grassPlateWidth1 = terrain.getWidth() * 1.83f, grassPlateDepth1 = terrain.getDepth();
+			float grassPlateDepth1 = terrain.getWidth() * 1.83f, grassPlateWidth1 = terrain.getDepth();
 			
 			Material grassMaterial = new Material(ColorAttribute.createDiffuse(Color.GREEN.cpy().sub(0, 0.6f, 0, 0)));
 			
@@ -577,13 +578,49 @@ public enum TerrainThemes {
 			
 			Node grassPlate1 = mb.node();
 			grassPlate1.translation.set(0, 0.01f, terrain.getDepth() / 2 + grassPlateWidth / 2);
-			BoxShapeBuilder.build(mb.part(grassPlate1.id, GL20.GL_TRIANGLES, VertexAttributes.Usage.Position | VertexAttributes.Usage.Normal, grassMaterial), grassPlateDepth1, grassPlateHeight, grassPlateWidth1);
+			BoxShapeBuilder.build(mb.part(grassPlate1.id, GL20.GL_TRIANGLES, VertexAttributes.Usage.Position | VertexAttributes.Usage.Normal, grassMaterial), grassPlateWidth1, grassPlateHeight, grassPlateDepth1);
 			
 			Node grassPlate2 = mb.node();
 			grassPlate2.translation.set(0, 0.01f, -(terrain.getDepth() / 2 + grassPlateWidth / 2));
-			BoxShapeBuilder.build(mb.part(grassPlate2.id, GL20.GL_TRIANGLES, VertexAttributes.Usage.Position | VertexAttributes.Usage.Normal, grassMaterial), grassPlateDepth1, grassPlateHeight, grassPlateWidth1);
+			BoxShapeBuilder.build(mb.part(grassPlate2.id, GL20.GL_TRIANGLES, VertexAttributes.Usage.Position | VertexAttributes.Usage.Normal, grassMaterial), grassPlateWidth1, grassPlateHeight, grassPlateDepth1);
 			
 			modelInstances.add(new ModelInstance(mb.end()));
+			
+			
+			float fDoorRadius = ladderRadius, fDoorWidth = 15;
+			
+			Material fDoorMaterial = new Material(ColorAttribute.createDiffuse(Color.GRAY));
+			
+			mb.begin();
+			
+			Node fDoor1 = mb.node();
+			fDoor1.translation.set(fDoorWidth / 2, ladderHeight / 2 - 6, 0);
+			fDoor1.rotation.setEulerAngles(0, -25, 0);
+			CylinderShapeBuilder.build(mb.part(fDoor1.id, GL20.GL_TRIANGLES, VertexAttributes.Usage.Position | VertexAttributes.Usage.Normal, fDoorMaterial), fDoorRadius, ladderHeight / 2, fDoorRadius, divisions);
+			
+			Node fDoor2 = mb.node();
+			fDoor2.translation.set(-fDoorWidth / 2, ladderHeight / 2 - 6, 0);
+			fDoor2.rotation.setEulerAngles(0, -25, 0);
+			CylinderShapeBuilder.build(mb.part(fDoor2.id, GL20.GL_TRIANGLES, VertexAttributes.Usage.Position | VertexAttributes.Usage.Normal, fDoorMaterial), fDoorRadius, ladderHeight / 2, fDoorRadius, divisions);
+			
+			Node fDoor3 = mb.node();
+			fDoor3.translation.set(0, ladderHeight / 2 - 1.8f, -1.95f);
+			fDoor3.rotation.setEulerAngles(0, 0, 90);
+			CylinderShapeBuilder.build(mb.part(fDoor3.id, GL20.GL_TRIANGLES, VertexAttributes.Usage.Position | VertexAttributes.Usage.Normal, fDoorMaterial), fDoorRadius, fDoorWidth, fDoorRadius, divisions);
+			
+			Node fDoor4 = mb.node();
+			fDoor4.translation.set(fDoorWidth / 2, ladderHeight / 2 - 6, -1.95f);
+			CylinderShapeBuilder.build(mb.part(fDoor4.id, GL20.GL_TRIANGLES, VertexAttributes.Usage.Position | VertexAttributes.Usage.Normal, fDoorMaterial), fDoorRadius, ladderHeight / 2 - 1, fDoorRadius, divisions);
+			
+			Node fDoor5 = mb.node();
+			fDoor5.translation.set(-fDoorWidth / 2, ladderHeight / 2 - 6, -1.95f);
+			CylinderShapeBuilder.build(mb.part(fDoor5.id, GL20.GL_TRIANGLES, VertexAttributes.Usage.Position | VertexAttributes.Usage.Normal, fDoorMaterial), fDoorRadius, ladderHeight / 2 - 1, fDoorRadius, divisions);
+			
+			Model fDoor = mb.end();
+			
+			modelInstances.add(new ModelInstance(fDoor, terrain.getWidth() * 1.7f, 0, terrain.getDepth() / 2));
+			modelInstances.add(new ModelInstance(fDoor, terrain.getWidth() * 1.7f, 0, -terrain.getDepth() / 2));
+			modelInstances.get(modelInstances.size() - 1).transform.rotate(0, 1, 0, 180);
 		}
 		
 		private MeshPartBuilder part(MeshPartBuilder input, float width, float height) {
