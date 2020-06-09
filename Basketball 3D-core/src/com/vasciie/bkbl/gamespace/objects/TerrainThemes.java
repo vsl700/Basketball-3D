@@ -8,6 +8,8 @@ import java.util.ArrayList;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.GL20;
+import com.badlogic.gdx.graphics.Pixmap;
+import com.badlogic.gdx.graphics.Pixmap.Format;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.VertexAttributes;
 import com.badlogic.gdx.graphics.g3d.Material;
@@ -16,6 +18,7 @@ import com.badlogic.gdx.graphics.g3d.ModelInstance;
 import com.badlogic.gdx.graphics.g3d.attributes.ColorAttribute;
 import com.badlogic.gdx.graphics.g3d.attributes.TextureAttribute;
 import com.badlogic.gdx.graphics.g3d.model.Node;
+import com.badlogic.gdx.graphics.g3d.utils.MeshPartBuilder;
 import com.badlogic.gdx.graphics.g3d.utils.ModelBuilder;
 import com.badlogic.gdx.graphics.g3d.utils.shapebuilders.BoxShapeBuilder;
 import com.badlogic.gdx.math.MathUtils;
@@ -127,7 +130,7 @@ public enum TerrainThemes {
 			Node cityPlate = mb.node();
 			cityPlate.id = "cityPlate";
 			cityPlate.translation.set(0, -0.1f, 0);
-			BoxShapeBuilder.build(mb.part(wallUpper4.id, GL20.GL_TRIANGLES, VertexAttributes.Usage.Position | VertexAttributes.Usage.Normal, material), terrain.getWidth() * 8, 0.01f, terrain.getDepth() * 8);
+			BoxShapeBuilder.build(mb.part(cityPlate.id, GL20.GL_TRIANGLES, VertexAttributes.Usage.Position | VertexAttributes.Usage.Normal, material), terrain.getWidth() * 8, 0.01f, terrain.getDepth() * 8);
 			
 			//STREETS
 			float streetWidth = 11f, streetMarkWidth = 1f, streetMarkDepth = 4.5f, streetMarkSpace = 3, streetYPos = cityPlate.translation.y + 0.011f, streetHeight = 0.3f;
@@ -399,8 +402,65 @@ public enum TerrainThemes {
 
 		@Override
 		public void createModels(Terrain terrain) {
+			Pixmap pm = new Pixmap(64, 64, Format.RGBA8888);
+			pm.setColor(Color.BROWN.cpy().sub(0.1f, 0.1f, 0, 0));
+			pm.fillRectangle(0, 0, pm.getWidth(), pm.getHeight());
+			pm.setColor(Color.BROWN);
+			pm.fillCircle(pm.getWidth() / 2, pm.getWidth() / 2, pm.getWidth() / 2);
+			
+			Texture texture = new Texture(pm);
+			pm.dispose();
+			
+			ModelBuilder mb = new ModelBuilder();
+			
+			Material wallsMaterial = new Material(TextureAttribute.createDiffuse(texture));
+			texture.setWrap(Texture.TextureWrap.Repeat, Texture.TextureWrap.Repeat);
+			texture.setFilter(Texture.TextureFilter.Linear, Texture.TextureFilter.Linear);
+			
+			Material material = new Material(ColorAttribute.createDiffuse(Color.GRAY.cpy().add(0.3f, 0.3f, 0.3f, 0)));
 			
 			
+			float wallHeight = 20, wallDepth = 0.01f;
+			
+			mb.begin();
+			
+			Node wallN = mb.node();
+			wallN.translation.set(0, wallHeight / 2, terrain.getDepth() / 2);
+			BoxShapeBuilder.build(part(mb.part(wallN.id, GL20.GL_TRIANGLES, VertexAttributes.Usage.Position | VertexAttributes.Usage.Normal | VertexAttributes.Usage.TextureCoordinates, wallsMaterial), terrain.getWidth(), wallHeight), terrain.getWidth(), wallHeight, wallDepth);
+			
+			Node wallS = mb.node();
+			wallS.translation.set(0, wallHeight / 2, -terrain.getDepth() / 2);
+			BoxShapeBuilder.build(part(mb.part(wallS.id, GL20.GL_TRIANGLES, VertexAttributes.Usage.Position | VertexAttributes.Usage.Normal | VertexAttributes.Usage.TextureCoordinates, wallsMaterial), terrain.getWidth(), wallHeight), terrain.getWidth(), wallHeight, wallDepth);
+			
+			Node wallW = mb.node();
+			wallW.translation.set(-terrain.getWidth() / 2, wallHeight / 2, 0);
+			BoxShapeBuilder.build(part(mb.part(wallW.id, GL20.GL_TRIANGLES, VertexAttributes.Usage.Position | VertexAttributes.Usage.Normal | VertexAttributes.Usage.TextureCoordinates, wallsMaterial), terrain.getDepth(), wallHeight), wallDepth, wallHeight, terrain.getDepth());
+			
+			float bottomPart = 0.25f, windowPart = 0.5f, upperPart = 1 - bottomPart - windowPart;
+			float wallHeight1 = wallHeight * bottomPart, wallHeight2 = wallHeight * upperPart;
+			
+			Node wallE1 = mb.node();
+			wallE1.translation.set(terrain.getWidth() / 2, wallHeight1 / 2, 0);
+			BoxShapeBuilder.build(part(mb.part(wallE1.id, GL20.GL_TRIANGLES, VertexAttributes.Usage.Position | VertexAttributes.Usage.Normal | VertexAttributes.Usage.TextureCoordinates, wallsMaterial), terrain.getDepth(), wallHeight1), wallDepth, wallHeight1, terrain.getDepth());
+			
+			Node wallE2 = mb.node();
+			wallE2.translation.set(terrain.getWidth() / 2, wallHeight - wallHeight2 / 2, 0);
+			BoxShapeBuilder.build(part(mb.part(wallE2.id, GL20.GL_TRIANGLES, VertexAttributes.Usage.Position | VertexAttributes.Usage.Normal | VertexAttributes.Usage.TextureCoordinates, wallsMaterial), terrain.getDepth(), wallHeight2), wallDepth, wallHeight2, terrain.getDepth());
+			
+			
+			float worldPlateWidth = terrain.getWidth() * 4;
+			Node worldPlate = mb.node();
+			worldPlate.id = "worldPlate";
+			worldPlate.translation.set(worldPlateWidth / 2 - terrain.getWidth() / 2, -0.1f, 0);
+			BoxShapeBuilder.build(mb.part(worldPlate.id, GL20.GL_TRIANGLES, VertexAttributes.Usage.Position | VertexAttributes.Usage.Normal, material), worldPlateWidth, 0.01f, terrain.getDepth() * 8);
+			
+			modelInstances.add(new ModelInstance(mb.end()));
+		}
+		
+		private MeshPartBuilder part(MeshPartBuilder input, float width, float height) {
+			input.setUVRange(0, 0, Math.min(width, height), Math.max(width, height));
+			
+			return input;
 		}
 
 		@Override
@@ -484,7 +544,7 @@ public enum TerrainThemes {
 	};
 	
 	private static Model customTerrainModel;
-	public static final ArrayList<ModelInstance> modelInstances = new ArrayList<ModelInstance>();;
+	public static final ArrayList<ModelInstance> modelInstances = new ArrayList<ModelInstance>();
 	
 	
 	public abstract void createModels(Terrain terrain);

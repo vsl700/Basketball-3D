@@ -123,7 +123,7 @@ public class GameMap {
 
     int teamScore, oppScore;
 
-    int difficulty;
+    int difficulty = 1;
 
     float startTimer;
 
