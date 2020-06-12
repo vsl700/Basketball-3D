@@ -23,6 +23,7 @@ import com.badlogic.gdx.graphics.g3d.utils.ModelBuilder;
 import com.badlogic.gdx.graphics.g3d.utils.shapebuilders.BoxShapeBuilder;
 import com.badlogic.gdx.graphics.g3d.utils.shapebuilders.CylinderShapeBuilder;
 import com.badlogic.gdx.math.MathUtils;
+import com.badlogic.gdx.math.Vector3;
 
 /**
  * Themes for the terrain for each specific gamemode
@@ -647,8 +648,98 @@ public enum TerrainThemes {
 
 		@Override
 		public void createModels(Terrain terrain) {
+			ModelBuilder mb = new ModelBuilder();
+			
+			Material material = new Material(ColorAttribute.createDiffuse(Color.GRAY));
+			Material standBWMaterial = new Material(ColorAttribute.createDiffuse(Color.GRAY.cpy().add(0.25f, 0.25f, 0.25f, 0)));
+			Material plateMaterial = new Material(ColorAttribute.createDiffuse(Color.LIGHT_GRAY));
+			Material wallMaterial = new Material(ColorAttribute.createDiffuse(Color.DARK_GRAY.cpy().add(0.05f, 0.05f, 0, 0)));
+			
+			float space = 50;
+			float worldPlateWidth = terrain.getWidth() + space / 2, worldPlateDepth = terrain.getDepth() + space, worldPlateHeight = 0.01f;
+			
+			mb.begin();
+			Node worldPlate = mb.node();
+			worldPlate.translation.set(0, -0.1f, 0);
+			BoxShapeBuilder.build(mb.part(worldPlate.id, GL20.GL_TRIANGLES, VertexAttributes.Usage.Position | VertexAttributes.Usage.Normal, plateMaterial), worldPlateWidth, worldPlateHeight, worldPlateDepth);
+			
+			float standLevels = 15;
+			float standD = 3, standH = standD;
+			
+			for(int i = 0; i < standLevels; i++) {
+				Vector3 posW = new Vector3(worldPlateWidth / 2 + standD / 2 + standD * i, standH / 2 + standD * i + worldPlate.translation.y, 0);
+				Vector3 posD = new Vector3(0, standH / 2 + standD * i + worldPlate.translation.y, worldPlateDepth / 2 + standD / 2 + standD * i);
+				
+				Node stand1 = mb.node();
+				stand1.translation.set(posD);
+				BoxShapeBuilder.build(mb.part(stand1.id, GL20.GL_TRIANGLES, VertexAttributes.Usage.Position | VertexAttributes.Usage.Normal, material), worldPlateWidth, standH, standD);
+				
+				Node stand2 = mb.node();
+				stand2.translation.set(posW);
+				BoxShapeBuilder.build(mb.part(stand2.id, GL20.GL_TRIANGLES, VertexAttributes.Usage.Position | VertexAttributes.Usage.Normal, material), standD, standH, worldPlateDepth);
+				
+				Node stand3 = mb.node();
+				stand3.translation.set(posD).scl(1, 1, -1);
+				BoxShapeBuilder.build(mb.part(stand3.id, GL20.GL_TRIANGLES, VertexAttributes.Usage.Position | VertexAttributes.Usage.Normal, material), worldPlateWidth, standH, standD);
+				
+				Node stand4 = mb.node();
+				stand4.translation.set(posW).scl(-1, 1, 1);
+				BoxShapeBuilder.build(mb.part(stand4.id, GL20.GL_TRIANGLES, VertexAttributes.Usage.Position | VertexAttributes.Usage.Normal, material), standD, standH, worldPlateDepth);
+			}
+			
+			float standBWSize = standD * standLevels, standBWHeight = standD * (standLevels + 10);
+			Vector3 pos1 = new Vector3(worldPlateWidth / 2 + standBWSize / 2, standBWHeight / 2, worldPlateDepth / 2 + standBWSize / 2);
+			
+			Node standBW1 = mb.node(); //standBetween
+			standBW1.translation.set(pos1);
+			BoxShapeBuilder.build(mb.part(standBW1.id, GL20.GL_TRIANGLES, VertexAttributes.Usage.Position | VertexAttributes.Usage.Normal, standBWMaterial), standBWSize, standBWHeight, standBWSize);
+			
+			Node standBW2 = mb.node(); //standBetween
+			standBW2.translation.set(pos1).scl(-1, 1, 1);
+			BoxShapeBuilder.build(mb.part(standBW2.id, GL20.GL_TRIANGLES, VertexAttributes.Usage.Position | VertexAttributes.Usage.Normal, standBWMaterial), standBWSize, standBWHeight, standBWSize);
+			
+			Node standBW3 = mb.node(); //standBetween
+			standBW3.translation.set(pos1).scl(1, 1, -1);
+			BoxShapeBuilder.build(mb.part(standBW3.id, GL20.GL_TRIANGLES, VertexAttributes.Usage.Position | VertexAttributes.Usage.Normal, standBWMaterial), standBWSize, standBWHeight, standBWSize);
+			
+			Node standBW4 = mb.node(); //standBetween
+			standBW4.translation.set(pos1).scl(-1, 1, -1);
+			BoxShapeBuilder.build(mb.part(standBW4.id, GL20.GL_TRIANGLES, VertexAttributes.Usage.Position | VertexAttributes.Usage.Normal, standBWMaterial), standBWSize, standBWHeight, standBWSize);
+			
+			Node wall1 = mb.node();
+			wall1.translation.set(0, standBWHeight / 2, worldPlateDepth / 2 + standBWSize / 2 + standD * standLevels / 2);
+			BoxShapeBuilder.build(mb.part(wall1.id, GL20.GL_TRIANGLES, VertexAttributes.Usage.Position | VertexAttributes.Usage.Normal, wallMaterial), worldPlateWidth, standBWHeight, worldPlateHeight);
+			
+			Node wall2 = mb.node();
+			wall2.translation.set(worldPlateWidth / 2 + standBWSize / 2 + standD * standLevels / 2, standBWHeight / 2, 0);
+			BoxShapeBuilder.build(mb.part(wall2.id, GL20.GL_TRIANGLES, VertexAttributes.Usage.Position | VertexAttributes.Usage.Normal, wallMaterial), worldPlateHeight, standBWHeight, worldPlateDepth);
+			
+			Node wall3 = mb.node();
+			wall3.translation.set(wall1.translation).scl(1, 1, -1);
+			BoxShapeBuilder.build(mb.part(wall3.id, GL20.GL_TRIANGLES, VertexAttributes.Usage.Position | VertexAttributes.Usage.Normal, wallMaterial), worldPlateWidth, standBWHeight, worldPlateHeight);
+			
+			Node wall4 = mb.node();
+			wall4.translation.set(wall2.translation).scl(-1, 1, 1);
+			BoxShapeBuilder.build(mb.part(wall4.id, GL20.GL_TRIANGLES, VertexAttributes.Usage.Position | VertexAttributes.Usage.Normal, wallMaterial), worldPlateHeight, standBWHeight, worldPlateDepth);
+			
+			modelInstances.add(new ModelInstance(mb.end()));
 			
 			
+			float chairSize = standD - 1, chairSize2 = 0.1f;
+			
+			Material chairMaterial = new Material(ColorAttribute.createDiffuse(Color.WHITE));
+			
+			mb.begin();
+			Node chairSeat = mb.node();
+			chairSeat.translation.set(0, 0, chairSize / 2 + chairSize2 / 2);
+			BoxShapeBuilder.build(mb.part(chairSeat.id, GL20.GL_TRIANGLES, VertexAttributes.Usage.Position | VertexAttributes.Usage.Normal, chairMaterial), chairSize, chairSize2, chairSize);
+			
+			Node chairBack = mb.node();
+			chairBack.rotation.setEulerAngles(0, 90, 0);
+			chairBack.translation.set(0, chairSize / 2, 0);
+			BoxShapeBuilder.build(mb.part(chairBack.id, GL20.GL_TRIANGLES, VertexAttributes.Usage.Position | VertexAttributes.Usage.Normal, chairMaterial), chairSize, chairSize2, chairSize);
+			
+			modelInstances.add(new ModelInstance(mb.end(), 0, 5, 0));
 		}
 
 		@Override

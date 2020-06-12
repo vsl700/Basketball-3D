@@ -20,8 +20,6 @@ import com.vasciie.bkbl.gamespace.MotionState;
 
 public class Terrain extends GameObject {
 	
-	ModelInstance customPlate;
-	
 	TerrainThemes theme;
 	
 	static final float wallDepth = 5f;
@@ -68,16 +66,12 @@ public class Terrain extends GameObject {
 		
 		if(theme != null) {
 			theme.createModels(this);
-			
-			customPlate = theme.getCustomTerrainModelInstance();
 		}
 	}
 	
 	public void clearTheme() {
 		theme.dispose();
 		theme = null;
-		
-		customPlate = null;
 	}
 	
 	private TerrainThemes chooseTheme() {
@@ -96,8 +90,8 @@ public class Terrain extends GameObject {
 				mCache.add(m);
 			}
 			
-			if(customPlate != null)
-				mCache.add(customPlate);
+			if(theme.hasOwnTerrain())
+				mCache.add(theme.getCustomTerrainModelInstance());
 			else mCache.add(modelInstance);
 		}else mCache.add(modelInstance);
 	}
