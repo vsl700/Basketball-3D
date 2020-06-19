@@ -46,8 +46,8 @@ public abstract class Player extends Entity {
 	Matrix4 camMatrix;
 	
 	//The recent player's movement (or linear acceleration in this mechanic)
-	private Vector3 moveVec = new Vector3();
-	private Vector3 prevMoveVec = new Vector3(); //Average move speed
+	private static final Vector3 moveVec = new Vector3();
+	private static final Vector3 prevMoveVec = new Vector3();
 	
 	//Collision objects maps for reaching an object just by calling its mostly used name
 	HashMap<String, btRigidBody> bodiesMap;
@@ -821,7 +821,7 @@ public abstract class Player extends Entity {
 		
 		//if(isMainPlayer())
 		prevMoveVec.set(moveVec);
-		moveVec = dir;
+		moveVec.set(dir);
 	}
 	
 	public void run(Vector3 dir) {
@@ -848,7 +848,7 @@ public abstract class Player extends Entity {
 			
 			//if(isMainPlayer())
 			prevMoveVec.set(moveVec);
-			moveVec = dir;
+			moveVec.set(dir);
 		}
 		else walk(dir);
 	}
