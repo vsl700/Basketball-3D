@@ -17,6 +17,7 @@ import com.badlogic.gdx.physics.bullet.collision.btCollisionObject;
 import com.badlogic.gdx.physics.bullet.collision.btCollisionShape;
 import com.badlogic.gdx.physics.bullet.dynamics.btRigidBody;
 import com.vasciie.bkbl.gamespace.MotionState;
+import com.vasciie.bkbl.themes.TerrainThemes;
 
 public class Terrain extends GameObject {
 	

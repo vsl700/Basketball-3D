@@ -1,7 +1,7 @@
 /**
  * 
  */
-package com.vasciie.bkbl.gamespace.objects;
+package com.vasciie.bkbl.themes;
 
 import java.util.ArrayList;
 
@@ -24,6 +24,7 @@ import com.badlogic.gdx.graphics.g3d.utils.shapebuilders.BoxShapeBuilder;
 import com.badlogic.gdx.graphics.g3d.utils.shapebuilders.CylinderShapeBuilder;
 import com.badlogic.gdx.math.MathUtils;
 import com.badlogic.gdx.math.Vector3;
+import com.vasciie.bkbl.gamespace.objects.Terrain;
 
 /**
  * Themes for the terrain for each specific gamemode
@@ -688,22 +689,22 @@ public enum TerrainThemes {
 			}
 			
 			float standBWSize = standD * standLevels, standBWHeight = standD * (standLevels + 10);
-			Vector3 pos1 = new Vector3(worldPlateWidth / 2 + standBWSize / 2, standBWHeight / 2, worldPlateDepth / 2 + standBWSize / 2);
+			Vector3 pos = new Vector3(worldPlateWidth / 2 + standBWSize / 2, standBWHeight / 2, worldPlateDepth / 2 + standBWSize / 2);
 			
 			Node standBW1 = mb.node(); //standBetween
-			standBW1.translation.set(pos1);
+			standBW1.translation.set(pos);
 			BoxShapeBuilder.build(mb.part(standBW1.id, GL20.GL_TRIANGLES, VertexAttributes.Usage.Position | VertexAttributes.Usage.Normal, standBWMaterial), standBWSize, standBWHeight, standBWSize);
 			
 			Node standBW2 = mb.node(); //standBetween
-			standBW2.translation.set(pos1).scl(-1, 1, 1);
+			standBW2.translation.set(pos).scl(-1, 1, 1);
 			BoxShapeBuilder.build(mb.part(standBW2.id, GL20.GL_TRIANGLES, VertexAttributes.Usage.Position | VertexAttributes.Usage.Normal, standBWMaterial), standBWSize, standBWHeight, standBWSize);
 			
 			Node standBW3 = mb.node(); //standBetween
-			standBW3.translation.set(pos1).scl(1, 1, -1);
+			standBW3.translation.set(pos).scl(1, 1, -1);
 			BoxShapeBuilder.build(mb.part(standBW3.id, GL20.GL_TRIANGLES, VertexAttributes.Usage.Position | VertexAttributes.Usage.Normal, standBWMaterial), standBWSize, standBWHeight, standBWSize);
 			
 			Node standBW4 = mb.node(); //standBetween
-			standBW4.translation.set(pos1).scl(-1, 1, -1);
+			standBW4.translation.set(pos).scl(-1, 1, -1);
 			BoxShapeBuilder.build(mb.part(standBW4.id, GL20.GL_TRIANGLES, VertexAttributes.Usage.Position | VertexAttributes.Usage.Normal, standBWMaterial), standBWSize, standBWHeight, standBWSize);
 			
 			Node wall1 = mb.node();
