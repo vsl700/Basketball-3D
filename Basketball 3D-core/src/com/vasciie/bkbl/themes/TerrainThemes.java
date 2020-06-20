@@ -24,6 +24,8 @@ import com.badlogic.gdx.graphics.g3d.utils.shapebuilders.BoxShapeBuilder;
 import com.badlogic.gdx.graphics.g3d.utils.shapebuilders.CylinderShapeBuilder;
 import com.badlogic.gdx.math.MathUtils;
 import com.badlogic.gdx.math.Vector3;
+import com.vasciie.bkbl.gamespace.entities.EntityType;
+import com.vasciie.bkbl.gamespace.entities.Player;
 import com.vasciie.bkbl.gamespace.objects.Terrain;
 
 /**
@@ -655,6 +657,8 @@ public enum TerrainThemes {
 			Material standBWMaterial = new Material(ColorAttribute.createDiffuse(Color.GRAY.cpy().add(0.25f, 0.25f, 0.25f, 0)));
 			Material plateMaterial = new Material(ColorAttribute.createDiffuse(Color.LIGHT_GRAY));
 			Material wallMaterial = new Material(ColorAttribute.createDiffuse(Color.DARK_GRAY.cpy().add(0.05f, 0.05f, 0, 0)));
+			Material ceilingMaterial = new Material(ColorAttribute.createDiffuse(Color.BLACK));
+			Material stickMaterial = new Material(ColorAttribute.createDiffuse(Color.BLUE.cpy().sub(0, 0, 0.5f, 0)));
 			
 			float space = 50;
 			float worldPlateWidth = terrain.getWidth() + space / 2, worldPlateDepth = terrain.getDepth() + space, worldPlateHeight = 0.01f;
@@ -663,6 +667,7 @@ public enum TerrainThemes {
 			Node worldPlate = mb.node();
 			worldPlate.translation.set(0, -0.1f, 0);
 			BoxShapeBuilder.build(mb.part(worldPlate.id, GL20.GL_TRIANGLES, VertexAttributes.Usage.Position | VertexAttributes.Usage.Normal, plateMaterial), worldPlateWidth, worldPlateHeight, worldPlateDepth);
+			
 			
 			float standLevels = 15;
 			float standD = 3, standH = standD;
@@ -723,10 +728,51 @@ public enum TerrainThemes {
 			wall4.translation.set(wall2.translation).scl(-1, 1, 1);
 			BoxShapeBuilder.build(mb.part(wall4.id, GL20.GL_TRIANGLES, VertexAttributes.Usage.Position | VertexAttributes.Usage.Normal, wallMaterial), worldPlateHeight, standBWHeight, worldPlateDepth);
 			
+			
+			float ceilingWidth = (worldPlateWidth / 2 + standBWSize / 2 + standD * standLevels / 2) * 2 , ceilingDepth = (worldPlateDepth / 2 + standBWSize / 2 + standD * standLevels / 2) * 2;
+			Node ceiling = mb.node();
+			ceiling.translation.set(0, standBWHeight, 0);
+			BoxShapeBuilder.build(mb.part(ceiling.id, GL20.GL_TRIANGLES, VertexAttributes.Usage.Position | VertexAttributes.Usage.Normal, ceilingMaterial), ceilingWidth, worldPlateHeight, ceilingDepth);
+			
+			float stickD = 0.5f, stickSpace = 4;
+			float stickH1 = standBWHeight - stickD / 2, stickH2 = standBWHeight - stickSpace;
+			
+			Node ceilingStick = mb.node();
+			ceilingStick.translation.set(0, stickH1, 0);
+			BoxShapeBuilder.build(mb.part(ceilingStick.id, GL20.GL_TRIANGLES, VertexAttributes.Usage.Position | VertexAttributes.Usage.Normal, stickMaterial), stickD, stickD, ceilingDepth);
+			
+			Node ceilingStick1 = mb.node();
+			ceilingStick1.translation.set(0, stickH2, 0);
+			BoxShapeBuilder.build(mb.part(ceilingStick1.id, GL20.GL_TRIANGLES, VertexAttributes.Usage.Position | VertexAttributes.Usage.Normal, stickMaterial), stickD, stickD, ceilingDepth);
+			
+			Node ceilingStick3 = mb.node();
+			ceilingStick3.translation.set(0, stickH1, ceilingDepth / 4);
+			BoxShapeBuilder.build(mb.part(ceilingStick3.id, GL20.GL_TRIANGLES, VertexAttributes.Usage.Position | VertexAttributes.Usage.Normal, stickMaterial), ceilingWidth, stickD, stickD);
+			
+			Node ceilingStick4 = mb.node();
+			ceilingStick4.translation.set(0, stickH2, ceilingDepth / 4);
+			BoxShapeBuilder.build(mb.part(ceilingStick4.id, GL20.GL_TRIANGLES, VertexAttributes.Usage.Position | VertexAttributes.Usage.Normal, stickMaterial), ceilingWidth, stickD, stickD);
+			
+			Node ceilingStick5 = mb.node();
+			ceilingStick5.translation.set(0, stickH1, -ceilingDepth / 4);
+			BoxShapeBuilder.build(mb.part(ceilingStick5.id, GL20.GL_TRIANGLES, VertexAttributes.Usage.Position | VertexAttributes.Usage.Normal, stickMaterial), ceilingWidth, stickD, stickD);
+			
+			Node ceilingStick6 = mb.node();
+			ceilingStick6.translation.set(0, stickH2, -ceilingDepth / 4);
+			BoxShapeBuilder.build(mb.part(ceilingStick6.id, GL20.GL_TRIANGLES, VertexAttributes.Usage.Position | VertexAttributes.Usage.Normal, stickMaterial), ceilingWidth, stickD, stickD);
+			
+			Node ceilingStick7 = mb.node();
+			ceilingStick7.translation.set(0, stickH1, 0);
+			BoxShapeBuilder.build(mb.part(ceilingStick7.id, GL20.GL_TRIANGLES, VertexAttributes.Usage.Position | VertexAttributes.Usage.Normal, stickMaterial), ceilingWidth, stickD, stickD);
+			
+			Node ceilingStick8 = mb.node();
+			ceilingStick8.translation.set(0, stickH2, 0);
+			BoxShapeBuilder.build(mb.part(ceilingStick8.id, GL20.GL_TRIANGLES, VertexAttributes.Usage.Position | VertexAttributes.Usage.Normal, stickMaterial), ceilingWidth, stickD, stickD);
+			
 			modelInstances.add(new ModelInstance(mb.end()));
 			
 			
-			float chairSize = standD - 1, chairSize2 = 0.1f;
+			float chairSize = standD - 1, chairSize2 = 0.1f, chairSpace = 4.5f;
 			
 			Material chairMaterial = new Material(ColorAttribute.createDiffuse(Color.WHITE));
 			
@@ -740,7 +786,85 @@ public enum TerrainThemes {
 			chairBack.translation.set(0, chairSize / 2, 0);
 			BoxShapeBuilder.build(mb.part(chairBack.id, GL20.GL_TRIANGLES, VertexAttributes.Usage.Position | VertexAttributes.Usage.Normal, chairMaterial), chairSize, chairSize2, chairSize);
 			
-			modelInstances.add(new ModelInstance(mb.end(), 0, 5, 0));
+			Model chairM = mb.end(), teamM = EntityType.TEAMMATE.createEntityModel(), oppM = EntityType.OPPONENT.createEntityModel();//We're creating brand new player models as we have to make them sit (change their nodes transforms)
+			
+			
+			float elbowDegrees = -83, shoulderDg = 15;
+			
+			teamM.getNode("hipL").rotation.setEulerAngles(0, -90, 0);
+			teamM.getNode("hipR").rotation.setEulerAngles(0, -90, 0);
+			
+			teamM.getNode("shoulderL").rotation.setEulerAngles(-shoulderDg, 0, 0);
+			teamM.getNode("shoulderR").rotation.setEulerAngles(shoulderDg, 0, 0);
+			
+			teamM.getNode("elbowL").rotation.setEulerAngles(0, elbowDegrees, 0);
+			teamM.getNode("elbowR").rotation.setEulerAngles(0, elbowDegrees, 0);
+			
+			teamM.getNode("kneeL").rotation.setEulerAngles(0, 90, 0);
+			teamM.getNode("kneeR").rotation.setEulerAngles(0, 90, 0);
+			
+			oppM.getNode("hipL").rotation.setEulerAngles(0, -90, 0);
+			oppM.getNode("hipR").rotation.setEulerAngles(0, -90, 0);
+			
+			oppM.getNode("shoulderL").rotation.setEulerAngles(-shoulderDg, 0, 0);
+			oppM.getNode("shoulderR").rotation.setEulerAngles(shoulderDg, 0, 0);
+			
+			oppM.getNode("elbowL").rotation.setEulerAngles(0, elbowDegrees, 0);
+			oppM.getNode("elbowR").rotation.setEulerAngles(0, elbowDegrees, 0);
+			
+			oppM.getNode("kneeL").rotation.setEulerAngles(0, 90, 0);
+			oppM.getNode("kneeR").rotation.setEulerAngles(0, 90, 0);
+			
+			
+			float temp, chairYOffset = chairSize / 4 - chairSize2 / 2, chairZOffset = chairSize / 4;
+			for (int i = 0; i < standLevels; i++) {
+				for (int j = 0; (temp = -worldPlateWidth / 2 + chairSize / 2 + chairSpace * j) < worldPlateWidth / 2 - chairSize / 2; j++) {
+					ModelInstance tempChair = new ModelInstance(chairM, temp, standH / 2 + standD * i + worldPlate.translation.y + chairSize - chairYOffset, worldPlateDepth / 2 + standD / 2 + standD * i + chairZOffset);
+					tempChair.transform.rotate(0, 1, 0, 180);
+					modelInstances.add(tempChair);
+					
+					Vector3 tempVecOff = new Vector3(0, 0, -1.5f);
+					createPlayerInstance(teamM, oppM, tempChair, tempVecOff);
+					
+					ModelInstance tempChair2 = new ModelInstance(chairM, temp, standH / 2 + standD * i + worldPlate.translation.y + chairSize - chairYOffset, -(worldPlateDepth / 2 + standD / 2 + standD * i + chairZOffset));
+					tempChair2.transform.rotate(0, 1, 0, 0);
+					modelInstances.add(tempChair2);
+					
+					createPlayerInstance(teamM, oppM, tempChair2, tempVecOff.scl(1, 1, -1));
+				}
+				
+				for (int j = 0; (temp = -worldPlateDepth / 2 + chairSize / 2 + chairSpace * j) < worldPlateDepth / 2 - chairSize / 2; j++) {
+					ModelInstance tempChair = new ModelInstance(chairM, worldPlateWidth / 2 + standD / 2 + standD * i + chairZOffset, standH / 2 + standD * i + worldPlate.translation.y + chairSize - chairYOffset, temp);
+					tempChair.transform.rotate(0, 1, 0, -90);
+					modelInstances.add(tempChair);
+					
+					Vector3 tempVecOff = new Vector3(-1.5f, 0, 0);
+					createPlayerInstance(teamM, oppM, tempChair, tempVecOff);
+					
+					ModelInstance tempChair2 = new ModelInstance(chairM, -(worldPlateWidth / 2 + standD / 2 + standD * i + chairZOffset), standH / 2 + standD * i + worldPlate.translation.y + chairSize - chairYOffset, temp);
+					tempChair2.transform.rotate(0, 1, 0, 90);
+					modelInstances.add(tempChair2);
+					
+					createPlayerInstance(teamM, oppM, tempChair2, tempVecOff.scl(-1, 1, 1));
+				}
+			}
+			
+		}
+		
+		private void createPlayerInstance(Model teamM, Model oppM, ModelInstance tempChair, Vector3 offset) {
+			float playerYOffset = Player.scale3;
+			
+			if (MathUtils.random(1, 10) > 2) {
+				Model tempPlayerM;
+				ModelInstance tempPlayer;
+				if (MathUtils.randomBoolean())
+					tempPlayerM = teamM;
+				else
+					tempPlayerM = oppM;
+
+				tempPlayer = new ModelInstance(tempPlayerM, tempChair.transform.cpy().trn(0, playerYOffset, 0).trn(offset));
+				inGameModelInstances.add(tempPlayer);
+			}
 		}
 
 		@Override
@@ -803,6 +927,7 @@ public enum TerrainThemes {
 	
 	private static Model customTerrainModel;
 	public static final ArrayList<ModelInstance> modelInstances = new ArrayList<ModelInstance>();
+	public static final ArrayList<ModelInstance> inGameModelInstances = new ArrayList<ModelInstance>();
 	
 	
 	public abstract void createModels(Terrain terrain);
@@ -829,6 +954,20 @@ public enum TerrainThemes {
 				System.out.println(" already disposed!");
 			}
 			modelInstances.remove(index);
+		}
+		
+		while(inGameModelInstances.size() > 0) {
+			int index = inGameModelInstances.size() - 1;
+			
+			Model temp = inGameModelInstances.get(index).model;
+			
+			try {
+				temp.dispose();
+			}catch (Exception e) {
+				System.out.print(temp);
+				System.out.println(" already disposed!");
+			}
+			inGameModelInstances.remove(index);
 		}
 	}
 	

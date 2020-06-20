@@ -16,6 +16,7 @@ import com.badlogic.gdx.physics.bullet.collision.btBoxShape;
 import com.badlogic.gdx.physics.bullet.collision.btCollisionObject;
 import com.badlogic.gdx.physics.bullet.collision.btCollisionShape;
 import com.badlogic.gdx.physics.bullet.dynamics.btRigidBody;
+import com.vasciie.bkbl.MyGdxGame;
 import com.vasciie.bkbl.gamespace.MotionState;
 import com.vasciie.bkbl.themes.TerrainThemes;
 
@@ -89,6 +90,12 @@ public class Terrain extends GameObject {
 		if(theme != null) {
 			for(ModelInstance m : TerrainThemes.modelInstances) {
 				mCache.add(m);
+			}
+			
+			if(MyGdxGame.TESTING || map.getTeammates().size() > 0) {
+				for(ModelInstance m : TerrainThemes.inGameModelInstances) {
+					mCache.add(m);
+				}
 			}
 			
 			if(theme.hasOwnTerrain())

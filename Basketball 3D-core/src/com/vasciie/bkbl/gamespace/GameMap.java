@@ -536,7 +536,7 @@ public class GameMap {
         opponents.clear();
         
         //terrain.clearTheme();
-        //createCache();
+        createCache();
         
         MyGdxGame.clearColor();
 
