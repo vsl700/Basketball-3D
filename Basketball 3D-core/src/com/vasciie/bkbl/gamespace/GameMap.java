@@ -127,7 +127,7 @@ public class GameMap {
 
     float startTimer;
 
-    boolean challenge = true;
+    boolean challenge;
     
     boolean gameRunning;//Whether or not the players can play
     boolean ruleTriggered;
