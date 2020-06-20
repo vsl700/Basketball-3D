@@ -52,14 +52,14 @@ public class Terrain extends GameObject {
 	
 	public void createTheme() {
 		if(theme != null) {
-			TerrainThemes temp = chooseTheme();
+			TerrainThemes temp = TerrainThemes.chooseTheme(this, false);
 			
 			if(!temp.equals(theme)) {
 				clearTheme();
 				
 				loadTheme(temp);
 			}
-		}else loadTheme(chooseTheme());
+		}else loadTheme(TerrainThemes.chooseTheme(this, false));
 
 	}
 	
@@ -74,15 +74,6 @@ public class Terrain extends GameObject {
 	public void clearTheme() {
 		theme.dispose();
 		theme = null;
-	}
-	
-	private TerrainThemes chooseTheme() {
-		switch(map.getDifficulty()) {
-			case 0: return TerrainThemes.EASY;
-			case 1: return TerrainThemes.HARD;
-			case 2: return TerrainThemes.VERYHARD;
-			default: return null;
-		}
 	}
 	
 	@Override

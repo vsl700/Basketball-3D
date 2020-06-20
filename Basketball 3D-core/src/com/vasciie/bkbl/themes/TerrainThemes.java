@@ -657,7 +657,7 @@ public enum TerrainThemes {
 			Material standBWMaterial = new Material(ColorAttribute.createDiffuse(Color.GRAY.cpy().add(0.25f, 0.25f, 0.25f, 0)));
 			Material plateMaterial = new Material(ColorAttribute.createDiffuse(Color.LIGHT_GRAY));
 			Material wallMaterial = new Material(ColorAttribute.createDiffuse(Color.DARK_GRAY.cpy().add(0.05f, 0.05f, 0, 0)));
-			Material ceilingMaterial = new Material(ColorAttribute.createDiffuse(Color.BLACK));
+			//Material ceilingMaterial = new Material(ColorAttribute.createDiffuse(Color.BLACK));
 			Material stickMaterial = new Material(ColorAttribute.createDiffuse(Color.BLUE.cpy().sub(0, 0, 0.5f, 0)));
 			
 			float space = 50;
@@ -730,9 +730,9 @@ public enum TerrainThemes {
 			
 			
 			float ceilingWidth = (worldPlateWidth / 2 + standBWSize / 2 + standD * standLevels / 2) * 2 , ceilingDepth = (worldPlateDepth / 2 + standBWSize / 2 + standD * standLevels / 2) * 2;
-			Node ceiling = mb.node();
+			/*Node ceiling = mb.node();
 			ceiling.translation.set(0, standBWHeight, 0);
-			BoxShapeBuilder.build(mb.part(ceiling.id, GL20.GL_TRIANGLES, VertexAttributes.Usage.Position | VertexAttributes.Usage.Normal, ceilingMaterial), ceilingWidth, worldPlateHeight, ceilingDepth);
+			BoxShapeBuilder.build(mb.part(ceiling.id, GL20.GL_TRIANGLES, VertexAttributes.Usage.Position | VertexAttributes.Usage.Normal, ceilingMaterial), ceilingWidth, worldPlateHeight, ceilingDepth);*/
 			
 			float stickD = 0.5f, stickSpace = 4;
 			float stickH1 = standBWHeight - stickD / 2, stickH2 = standBWHeight - stickSpace;
@@ -876,29 +876,29 @@ public enum TerrainThemes {
 		@Override
 		public Color getThemeColor() {
 			
-			return null;
+			return new Color(0, 0.3f, 0.3f, 1);
 		}
 		
 	},
 	
 	CHALLENGE{
-
+		TerrainThemes theme;
 		@Override
 		public void createModels(Terrain terrain) {
-			
-			
+			theme = chooseTheme(terrain, true);
+			theme.createModels(terrain);
 		}
 
 		@Override
 		public boolean hasOwnTerrain() {
 			
-			return false;
+			return theme.hasOwnTerrain();
 		}
 
 		@Override
 		public Color getThemeColor() {
 			
-			return null;
+			return new Color(0.3f, 0.3f, 0, 1);
 		}
 		
 	},
@@ -935,6 +935,25 @@ public enum TerrainThemes {
 	public abstract Color getThemeColor();
 	
 	public abstract boolean hasOwnTerrain();
+	
+	public static TerrainThemes chooseTheme(Terrain terrain, boolean local) {
+		if (local && terrain.getMap().isChallenge() || !terrain.getMap().isChallenge())
+			switch (terrain.getMap().getDifficulty()) {
+			case 0:
+				return TerrainThemes.EASY;
+			case 1:
+				return TerrainThemes.HARD;
+			case 2:
+				return TerrainThemes.VERYHARD;
+			default:
+				return null;
+			}
+		
+		if(terrain.getMap().isChallenge())
+			return TerrainThemes.CHALLENGE;
+		
+		return null;
+	}
 	
 	public void dispose() {
 		if(customTerrainModel != null) {

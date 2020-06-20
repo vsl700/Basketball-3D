@@ -123,10 +123,12 @@ public class GameMap {
 
     int teamScore, oppScore;
 
-    int difficulty = 2;
+    int difficulty = 0;
 
     float startTimer;
 
+    boolean challenge = true;
+    
     boolean gameRunning;//Whether or not the players can play
     boolean ruleTriggered;
     boolean ruleTriggeredActing;//Whether the players are currently acting like after a broken rule (for example during a throw-in, until the thrower throws the ball and another player catches it, this boolean stays true)
@@ -1098,7 +1100,15 @@ public class GameMap {
         return startTimer;
     }
 
-    public boolean isGameRunning() {
+    public boolean isChallenge() {
+		return challenge;
+	}
+
+	public void setChallenge(boolean challenge) {
+		this.challenge = challenge;
+	}
+
+	public boolean isGameRunning() {
         return gameRunning;
     }
 
