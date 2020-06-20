@@ -104,9 +104,6 @@ public abstract class Entity implements Proximity<Vector3>, Steerable<Vector3> {
 	}
 	
 	public void dispose() {
-		model.dispose();
-		model = null;
-		
 		for(btCollisionObject o : collisionObjects)
 			o.dispose();
 		collisionObjects.clear();
@@ -182,7 +179,9 @@ public abstract class Entity implements Proximity<Vector3>, Steerable<Vector3> {
 		return modelInstance.transform.cpy().mul(nodeTrans);
 	}
 	
-	protected abstract void createModels(Vector3 pos);
+	protected void createModels(Vector3 pos) {
+		model = type.getModel();
+	}
 	
 	protected abstract void createCollisions();
 	

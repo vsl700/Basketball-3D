@@ -2,13 +2,7 @@ package com.vasciie.bkbl.gamespace.entities;
 
 import java.util.ArrayList;
 
-import com.badlogic.gdx.Gdx;
-import com.badlogic.gdx.graphics.Texture;
-import com.badlogic.gdx.graphics.VertexAttributes;
-import com.badlogic.gdx.graphics.g3d.Material;
 import com.badlogic.gdx.graphics.g3d.ModelInstance;
-import com.badlogic.gdx.graphics.g3d.attributes.TextureAttribute;
-import com.badlogic.gdx.graphics.g3d.utils.ModelBuilder;
 import com.badlogic.gdx.math.Matrix4;
 import com.badlogic.gdx.math.Vector3;
 import com.badlogic.gdx.physics.bullet.collision.btCollisionObject;
@@ -30,17 +24,7 @@ public class Ball extends Entity {
 	}
 	
 	protected void createModels(Vector3 pos) {
-		ModelBuilder mb = new ModelBuilder();
-		//MeshPartBuilder meshBuilder;
-		
-		Texture ballTexture = new Texture(Gdx.files.internal("game/basketball_3d_texture.jpg"));
-		ballTexture.setWrap(Texture.TextureWrap.ClampToEdge, Texture.TextureWrap.ClampToEdge);
-		ballTexture.setFilter(Texture.TextureFilter.Linear, Texture.TextureFilter.Linear);
-		
-		Material material = new Material(TextureAttribute.createDiffuse(ballTexture));
-		
-		model = mb.createSphere(1, 1, 1, 23, 23, material, VertexAttributes.Usage.Position | VertexAttributes.Usage.Normal | VertexAttributes.Usage.TextureCoordinates);
-		model.manageDisposable(ballTexture);
+		super.createModels(pos);
 		
 		modelInstance = new ModelInstance(model, pos.add(0, 0.5f, 0));
 	}
