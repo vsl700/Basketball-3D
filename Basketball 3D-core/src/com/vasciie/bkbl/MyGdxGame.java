@@ -22,7 +22,7 @@ import com.vasciie.bkbl.screens.*;
 public class MyGdxGame extends Game {
 	
 	public static Color defaultColor = new Color(0, 0.7f, 0.8f, 1), currentColor;
-	public static final boolean TESTING = true;
+	public static final boolean TESTING = false;
 	
 	SpriteBatch batch;
 	BitmapFont font;
@@ -179,7 +179,7 @@ public class MyGdxGame extends Game {
 		if (!getScreen().equals(spScreen1) && !getScreen().equals(spScreen2) && !game.paused()) {
 			batch.setProjectionMatrix(cam.combined);
 			batch.begin();
-			font.draw(batch, Gdx.graphics.getFramesPerSecond() + " fps; SN:13/05/20-v1.0", 0, font.getLineHeight());
+			font.draw(batch, Gdx.graphics.getFramesPerSecond() + " fps; SN:22/06/20-v1.0", 0, font.getLineHeight());
 			batch.end();
 		}
 	}
