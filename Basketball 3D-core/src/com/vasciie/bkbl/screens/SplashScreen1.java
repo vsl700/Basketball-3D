@@ -18,6 +18,8 @@ public class SplashScreen1 implements Screen {
 	
 	float time;
 	
+	boolean firstShown;
+	
 	public SplashScreen1(MyGdxGame mg) {
 		game=mg;
 		
@@ -40,7 +42,7 @@ public class SplashScreen1 implements Screen {
 	
 	@Override
 	public void show() {
-		
+		firstShown = false;
 
 	}
 
@@ -54,7 +56,9 @@ public class SplashScreen1 implements Screen {
 		batch.draw(logo, cam.viewportWidth / 2 - logo.getWidth() / 2, cam.viewportHeight / 2 - logo.getHeight() / 2);
 		batch.end();
 		
-		checkTime(delta);
+		if(firstShown)
+			checkTime(delta);
+		else firstShown = true;
 
 	}
 

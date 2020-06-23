@@ -235,7 +235,7 @@ public class SettingsScreen implements Screen, UpDownListener, GUIRenderer {
 
 	@Override
 	public void resize(int width, int height) {
-		System.out.println(height);
+		//System.out.println(height);
 		cam.setToOrtho(false, width, height);
 		
 		goBack.setSize(game.pixelXByCurrentSize(223), game.pixelYByCurrentSize(30));

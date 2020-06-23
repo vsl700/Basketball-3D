@@ -137,6 +137,8 @@ public class GameMap {
     int index = 0, lastIndex, ballIndex, lastBallIndex;
     
     boolean interrupted = false;
+    
+    boolean firstShown;
 
     public GameMap(RulesListener rulesListener, GUIRenderer guiRenderer) {
 		if (!MyGdxGame.TESTING) {
@@ -457,6 +459,8 @@ public class GameMap {
         	MyGdxGame.currentColor = tempColor;
         
         createCache();
+        
+        firstShown = false;
     }
 
     private void createTerrainLanes() {
@@ -619,7 +623,7 @@ public class GameMap {
             if (!ruleTriggered) {
                 if (startTimer <= 0)
                     gameRunning = true;
-                else
+                else if(firstShown)
                     startTimer -= delta;
             }
         }
@@ -657,7 +661,7 @@ public class GameMap {
         
         updatePhysics();
 
-
+        firstShown = true;
     }
 
     private void updateGameEnvironment(float delta) {
