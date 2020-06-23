@@ -256,6 +256,8 @@ public class MyGdxGame extends Game {
 		}
 		else if(background != null)
 			background.dispose();
+		
+		getScreen().dispose();
 	}
 	
 	public GameMap getMap() {

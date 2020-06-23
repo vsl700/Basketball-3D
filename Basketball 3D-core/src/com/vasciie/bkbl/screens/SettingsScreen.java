@@ -119,6 +119,8 @@ public class SettingsScreen implements Screen, UpDownListener, GUIRenderer {
 			invY.setToggled(invertY = prefs.readSettingBool("invertY"));
 			
 			game.setForegroundFps(fpsUpDown.getOption());
+			if(fullscreen.isToggled())
+				Gdx.graphics.setFullscreenMode(Gdx.graphics.getDisplayMode());
 		} else {
 			beautifulGfx.setToggled(game.isBeautifulBack());
 			fullscreen.setToggled(Gdx.graphics.isFullscreen());
@@ -293,6 +295,8 @@ public class SettingsScreen implements Screen, UpDownListener, GUIRenderer {
 
 	@Override
 	public void dispose() {
+		if(game.getScreen().equals(this))
+			writeSettings();
 		
 		batch.dispose();
 		shape.dispose();
