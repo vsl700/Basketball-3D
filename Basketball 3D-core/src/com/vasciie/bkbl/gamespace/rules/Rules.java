@@ -41,6 +41,7 @@ public class Rules {
 		gameRules = new GameRule[] {
 				new GameRule(this, null, "ball_out", "Out Of Bounds!", map) {
 					Player recentHolder, thrower;
+					boolean justTouched;
 					
 					
 					@Override
@@ -51,31 +52,32 @@ public class Rules {
 							return false;
 						
 						if (tempPlayer == null) {//If there is currently holding player
-							if (recentHolder == null) { //If there was still no holding player (very rare case)
-								for (btCollisionObject obj : map.getBall().getOutsideColliders()) {
-									for (Player player : map.getAllPlayers()) {
-										if (player.getAllCollObjects().contains(obj)) {
-											recentHolder = tempPlayer;//Make the recent holder a player that has recently just touched the ball
-										}
+							for (btCollisionObject obj : map.getBall().getOutsideColliders()) {
+								for (Player player : map.getAllPlayers()) {
+									if (player.getAllCollObjects().contains(obj)) {
+										recentHolder = player;// Make the recent holder a player that has recently just touched the ball
+										justTouched = true;
 									}
 								}
 							}
-						}else
+						}else {
 							recentHolder = tempPlayer;
+							justTouched = false;
+						}
 						
 						/*if(thrower != null && thrower.equals(recentHolder))
 							return false;*/
 						
-						if (recentHolder != null) {//If the ball is still not ever touched, don't check for terrain bounds collision (CPU economy) 
-							if(!recentHolder.isBallFree())
+						if (recentHolder != null) {//If the ball is still not ever touched, don't check for terrain bounds collision (CPU economy)
+							if(!recentHolder.isBallFree()) {
+								justTouched = false;
 								return false;
+							}
 							
 							for (btCollisionObject obj : map.getBall().getOutsideColliders()) {
 								if (map.getTerrain().getInvisBodies().contains(obj)) {
 									ruleTriggerer = recentHolder;
 									occurPlace.set(map.getBall().getPosition()).add(occurPlace.cpy().scl(-1).nor().scl(3)).y = recentHolder.getPosition().y;
-									if(!recentHolder.isAiming() && !recentHolder.isShooting())
-										map.playerReleaseBall();
 									return true;
 								}
 							}
@@ -97,6 +99,10 @@ public class Rules {
 
 							@Override
 							public boolean act() {
+								justTouched = false;
+								
+								map.playerReleaseBall();
+								
 								ArrayList<Player> allPlayers = map.getAllPlayers();
 								
 								if(ruleTriggerer instanceof Teammate) {
@@ -104,7 +110,6 @@ public class Rules {
 								}else {
 									thrower = GameTools.getClosestPlayer(map.getBall().getPosition(), map.getTeammates(), null);
 								}
-								
 								//thrower = map.getMainPlayer();
 								recentHolder = thrower;
 								
@@ -292,7 +297,7 @@ public class Rules {
 										//float checkConst = /*Terrain.getWalldepth() * 1.6f*/ 3;
 										if(!thrower.getMoveVector().isZero()/* && throwerPos.dst(secondCloseWallPos) > checkConst*/) {
 											parent.setRuleTriggerer(thrower);
-											map.playerReleaseBall();
+											//map.playerReleaseBall();
 											return true;
 										}
 										
@@ -303,7 +308,7 @@ public class Rules {
 									@Override
 									public String getDescription() {
 										
-										return "The Thrower Should Stay Around The Foul Occuring Place During Throw-in!";
+										return "The Thrower Should Stay On The Foul Occuring Place During Throw-in!";
 									}
 									
 								}
@@ -314,8 +319,18 @@ public class Rules {
 
 					@Override
 					public String getDescription() {
+						String text = "The Ball Has Reached The Bounds Of The Terrain";
+						if(justTouched) {
+							String temp;
+							if(recentHolder instanceof Teammate)
+								temp = "A Teammate";
+							else temp = "An Opponent";
+							
+							return text + " After " + temp + " Touched The Ball!";
+						}
 						
-						return "The Ball Has Reached The Bounds Of The Terrain!";
+						
+						return text + "!";
 					}
 				},
 				
