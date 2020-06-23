@@ -260,8 +260,8 @@ public class Rules {
 										//Terrain terrain = map.getTerrain();
 										
 										//Vector3 closestWallPos, secondCloseWallPos;
-										Vector3 throwerPos = thrower.getPosition();
-										Vector3 occurPlaceCpy = occurPlace.cpy();
+										/*Vector3 throwerPos = thrower.getPosition();
+										Vector3 occurPlaceCpy = occurPlace.cpy();*/
 										
 										/*ArrayList<Vector3> wallPositions = new ArrayList<Vector3>();
 										
@@ -289,9 +289,10 @@ public class Rules {
 											occurPlaceCpy.z = throwerPos.z;
 										else occurPlaceCpy.x = throwerPos.x;*/
 										
-										float checkConst = /*Terrain.getWalldepth() * 1.6f*/ 3;
-										if(!thrower.getPrevMoveVec().isZero() && throwerPos.dst(occurPlaceCpy) > checkConst/* && throwerPos.dst(secondCloseWallPos) > checkConst*/) {
-											ruleTriggerer = thrower;
+										//float checkConst = /*Terrain.getWalldepth() * 1.6f*/ 3;
+										if(!thrower.getMoveVector().isZero()/* && throwerPos.dst(secondCloseWallPos) > checkConst*/) {
+											parent.setRuleTriggerer(thrower);
+											map.playerReleaseBall();
 											return true;
 										}
 										
@@ -302,7 +303,7 @@ public class Rules {
 									@Override
 									public String getDescription() {
 										
-										return "The Thrower Should Stay Around The Foul Occuring Plcae During Throw-in!";
+										return "The Thrower Should Stay Around The Foul Occuring Place During Throw-in!";
 									}
 									
 								}
@@ -537,7 +538,7 @@ public class Rules {
 					@Override
 					public void managePlayers() {
 						GameRule switchRule = rules.getGameRuleById("ball_out");
-						switchRule.setRuleBreaker(ruleTriggerer);
+						switchRule.setRuleTriggerer(ruleTriggerer);
 						
 						rules.setTriggeredRule(switchRule);
 					}
@@ -631,7 +632,7 @@ public class Rules {
 					@Override
 					public void managePlayers() {
 						GameRule switchRule = rules.getGameRuleById("ball_out");
-						switchRule.setRuleBreaker(ruleTriggerer);
+						switchRule.setRuleTriggerer(ruleTriggerer);
 						
 						rules.setTriggeredRule(switchRule);
 					}
@@ -722,7 +723,7 @@ public class Rules {
 					@Override
 					public void managePlayers() {
 						GameRule switchRule = rules.getGameRuleById("ball_out");
-						switchRule.setRuleBreaker(ruleTriggerer);
+						switchRule.setRuleTriggerer(ruleTriggerer);
 						
 						rules.setTriggeredRule(switchRule);
 					}
@@ -956,11 +957,11 @@ public class Rules {
 			ruleTriggerer = null;
 		}
 		
-		public void setRuleBreaker(Player ruleBreaker) {
+		public void setRuleTriggerer(Player ruleBreaker) {
 			this.ruleTriggerer = ruleBreaker;
 		}
 		
-		public Player getRuleBreaker() {
+		public Player getRuleTriggerer() {
 			return ruleTriggerer;
 		}
 		
