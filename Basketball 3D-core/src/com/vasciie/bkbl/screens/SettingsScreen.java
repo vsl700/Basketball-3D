@@ -10,6 +10,7 @@ import com.badlogic.gdx.graphics.g2d.BitmapFont;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 import com.vasciie.bkbl.MyGdxGame;
+import com.vasciie.bkbl.gamespace.tools.SettingsPrefsIO;
 import com.vasciie.bkbl.gui.Button;
 import com.vasciie.bkbl.gui.CheckButton;
 import com.vasciie.bkbl.gui.GUIRenderer;
@@ -38,6 +39,8 @@ public class SettingsScreen implements Screen, UpDownListener, GUIRenderer {
 	//TextUpDown resUpDown;
 	Label fpsLabel, camRotLabel, mthLabel;
 	
+	SettingsPrefsIO prefs;
+	
 	Screen prevScreen;
 	
 	public static boolean invertX, invertY, multithreadOption;
@@ -58,6 +61,8 @@ public class SettingsScreen implements Screen, UpDownListener, GUIRenderer {
 		
 		font2 = new BitmapFont();
 		font2.getData().setScale(2);
+		
+		prefs = new SettingsPrefsIO();
 		
 		createGui();
 	}
@@ -105,11 +110,26 @@ public class SettingsScreen implements Screen, UpDownListener, GUIRenderer {
 		mthLabel = new Label("INCREASES PERFORMANCE, BUT MIGHT DECREASE QUALITY", font, Color.BROWN, true, this);
 		//resLabel = new Label("THE RESOLUTION OF THE WINDOW", font, Color.BROWN, true);
 		
-		beautifulGfx.setToggled(game.isBeautifulBack());
-		fullscreen.setToggled(Gdx.graphics.isFullscreen());
-		fpsUpDown.setOption(game.getForegroundFps());
-		multithread.setToggled(true);
-		multithreadOption = true;
+		if(prefs.readSettingBool("exists")) {
+			beautifulGfx.setToggled(prefs.readSettingBool("beautifulBack"));
+			fullscreen.setToggled(prefs.readSettingBool("fullscreen"));
+			fpsUpDown.setOption(prefs.readSettingInteger("fps"));
+			multithread.setToggled(multithreadOption = prefs.readSettingBool("multithread"));
+			invX.setToggled(prefs.readSettingBool("invertX"));
+			invY.setToggled(prefs.readSettingBool("invertY"));
+			
+			game.setForegroundFps(fpsUpDown.getOption());
+		} else {
+			beautifulGfx.setToggled(game.isBeautifulBack());
+			fullscreen.setToggled(Gdx.graphics.isFullscreen());
+			fpsUpDown.setOption(game.getForegroundFps());
+			multithread.setToggled(true);
+			multithreadOption = true;
+			
+			prefs.writeSettingBool("exists", true);
+			writeSettings();
+			prefs.flush();
+		}
 	}
 	
 	@Override
@@ -176,6 +196,16 @@ public class SettingsScreen implements Screen, UpDownListener, GUIRenderer {
 		fpsLabel.draw();
 		camRotLabel.draw();
 		mthLabel.draw();
+	}
+	
+	private void writeSettings() {
+		prefs.writeSettingBool("beautifulBack", game.isBeautifulBack());
+		prefs.writeSettingBool("fullscreen", fullscreen.isToggled());
+		prefs.writeSettingBool("multithread", multithread.isToggled());
+		prefs.writeSettingBool("invertX", invertX);
+		prefs.writeSettingBool("invertY", invertY);
+		prefs.writeSettingInt("fps", fpsUpDown.getOption());
+		prefs.flush();
 	}
 	
 	/*private void changeRes() {
@@ -257,7 +287,7 @@ public class SettingsScreen implements Screen, UpDownListener, GUIRenderer {
 
 	@Override
 	public void hide() {
-		
+		writeSettings();
 
 	}
 
