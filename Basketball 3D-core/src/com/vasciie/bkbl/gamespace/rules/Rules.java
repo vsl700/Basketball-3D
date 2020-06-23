@@ -319,13 +319,18 @@ public class Rules {
 				},
 				
 				new GameRule(this, null, "incorrect_ball_steal", "Reached In!", map) {
-					boolean warning;
+					Player recentHolder;
 					
 					@Override
 					public boolean checkRule() {
 						Player temp = map.getHoldingPlayer();
 						
 						if (temp != null) {
+							if(!temp.equals(recentHolder)) {
+								recentHolder = temp;
+								return false;
+							}
+							
 							for (btCollisionObject obj : map.getBall().getOutsideColliders()) {
 								// The checked entity would be always a player
 								// as the players and the ball are the only
@@ -337,13 +342,9 @@ public class Rules {
 								Player checked = (Player) tempE;
 
 								if (checked != null && !checked.equals(temp) && checked.isCurrentlyPointing() && !temp.isDribbling()) {
-									if(!warning) {
-										warning = true;//Sometimes when a player catches the ball, the players that are updating after it can't stop the catching process. So I added this thing
-										return false;
-									}
 									ruleTriggerer = checked;
 									return true;
-								}else warning = false;
+								}
 							}
 						}
 						
@@ -469,14 +470,20 @@ public class Rules {
 				},
 				
 				new GameRule(this, null, "stay_no_dribble", "Dribble Violation!", map) {
+					Player recentHolder;
+					
 					final float defaultTime = 3;
 					float timer = defaultTime;
 					
 					@Override
 					public boolean checkRule() {
 						Player temp = map.getHoldingPlayer();
-						if(temp == null) {
+						if(temp == null || !temp.equals(recentHolder)) {
 							timer = defaultTime;
+							
+							if(temp != null)
+								recentHolder = temp;
+							
 							return false;
 						}
 						
@@ -555,18 +562,22 @@ public class Rules {
 				},
 				
 				new GameRule(this, null, "move_no_dribble", "Dribble Violation!", map) {
+					Player recentHolder;
+					
 					final float defaultTime = 0.75f;
 					float timer = defaultTime;
 					
 					@Override
 					public boolean checkRule() {
 						Player temp = map.getHoldingPlayer();
-						if(temp == null) {
+						if(temp == null || !temp.equals(recentHolder)) {
 							timer = defaultTime;
+							
+							if(temp != null)
+								recentHolder = temp;
+							
 							return false;
 						}
-						
-						System.out.println(timer);
 						
 						if (!temp.getPrevMoveVec().isZero() || !temp.getMoveVector().isZero()) {
 							if (!temp.isDribbling() && !temp.isShooting() && !temp.isAiming() && !temp.isCurrentlyAiming()) {
