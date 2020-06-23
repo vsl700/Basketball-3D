@@ -115,8 +115,8 @@ public class SettingsScreen implements Screen, UpDownListener, GUIRenderer {
 			fullscreen.setToggled(prefs.readSettingBool("fullscreen"));
 			fpsUpDown.setOption(prefs.readSettingInteger("fps"));
 			multithread.setToggled(multithreadOption = prefs.readSettingBool("multithread"));
-			invX.setToggled(prefs.readSettingBool("invertX"));
-			invY.setToggled(prefs.readSettingBool("invertY"));
+			invX.setToggled(invertX = prefs.readSettingBool("invertX"));
+			invY.setToggled(invertY = prefs.readSettingBool("invertY"));
 			
 			game.setForegroundFps(fpsUpDown.getOption());
 		} else {
