@@ -38,6 +38,8 @@ public class TestScreen implements Screen {
 	public void render(float delta) {
 		camController.update(delta);
 
+		
+		System.out.println(game.getPCam().position);
 	}
 
 	@Override

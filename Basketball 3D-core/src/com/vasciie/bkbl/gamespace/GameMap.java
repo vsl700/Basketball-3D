@@ -8,7 +8,6 @@ import com.badlogic.gdx.Application;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.ai.GdxAI;
 import com.badlogic.gdx.ai.steer.SteerableAdapter;
-import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.PerspectiveCamera;
 import com.badlogic.gdx.graphics.g3d.Environment;
 import com.badlogic.gdx.graphics.g3d.ModelBatch;
@@ -46,6 +45,7 @@ import com.vasciie.bkbl.gamespace.rules.Rules.GameRule;
 import com.vasciie.bkbl.gamespace.rules.Rules.RulesListener;
 import com.vasciie.bkbl.gamespace.tools.InputController;
 import com.vasciie.bkbl.gamespace.tools.VEThread;
+import com.vasciie.bkbl.gamespace.zones.Zones;
 import com.vasciie.bkbl.gui.GUIRenderer;
 import com.vasciie.bkbl.screens.SettingsScreen;
 
@@ -91,6 +91,7 @@ public class GameMap {
     Runnable dynamicsWorldRunnable;
 
     Rules rules;
+    Zones zones;
 
     ArrayList<Player> teammates;
     ArrayList<Player> opponents;
@@ -123,7 +124,7 @@ public class GameMap {
 
     int teamScore, oppScore;
 
-    int difficulty = 0;
+    int difficulty = 3;
 
     float startTimer;
 
@@ -157,6 +158,8 @@ public class GameMap {
         inputs = new InputController(guiRenderer);
 
         rules = new Rules(this, rulesListener);
+        
+        zones = new Zones(this);
 
         mCache = new ModelCache();
         
@@ -321,7 +324,9 @@ public class GameMap {
         
 		if (MyGdxGame.TESTING) {
 			terrain.createTheme();
-			MyGdxGame.setColor(terrain.getTheme().getThemeColor());
+			
+			if(terrain.getTheme() != null)
+				MyGdxGame.setColor(terrain.getTheme().getThemeColor());
 		}
         createCache();
     }
@@ -454,9 +459,8 @@ public class GameMap {
         playersReady = true;
         
         terrain.createTheme();
-        Color tempColor = terrain.getTheme().getThemeColor();
-        if(tempColor != null)
-        	MyGdxGame.currentColor = tempColor;
+        if(terrain.getTheme() != null)
+        	MyGdxGame.setColor(terrain.getTheme().getThemeColor());
         
         createCache();
         
@@ -712,6 +716,8 @@ public class GameMap {
         }
 
         mBatch.end();
+        
+        System.out.println(zones.isInZone("center", pCam.position));
     }
 
     public void updateController(){

@@ -16,6 +16,7 @@ import com.badlogic.gdx.math.Vector3;
 import com.badlogic.gdx.physics.bullet.collision.btCollisionObject;
 import com.badlogic.gdx.physics.bullet.collision.btCollisionShape;
 import com.badlogic.gdx.physics.bullet.dynamics.btRigidBody;
+import com.vasciie.bkbl.MyGdxGame;
 import com.vasciie.bkbl.gamespace.GameMap;
 import com.vasciie.bkbl.gamespace.MotionState;
 import com.vasciie.bkbl.gamespace.objects.ObjectType;
@@ -70,6 +71,9 @@ public abstract class Entity implements Proximity<Vector3>, Steerable<Vector3> {
 		
 		createModels(pos);
 		modelInstance.calculateTransforms();
+		if(MyGdxGame.TESTING)
+			return;
+		
 		createCollisions();
 		createCollisionObjectAndBodies();
 		setCollisionTransform(true);
@@ -104,6 +108,9 @@ public abstract class Entity implements Proximity<Vector3>, Steerable<Vector3> {
 	}
 	
 	public void dispose() {
+		if(MyGdxGame.TESTING)
+			return;
+		
 		for(btCollisionObject o : collisionObjects)
 			o.dispose();
 		collisionObjects.clear();

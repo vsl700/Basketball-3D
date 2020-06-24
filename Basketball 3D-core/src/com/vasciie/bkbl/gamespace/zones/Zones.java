@@ -17,15 +17,39 @@ import com.vasciie.bkbl.gamespace.tools.GameTools;
  */
 public class Zones {
 
+	GameMap map;
+	
 	Zone[] zones;
 	
 	boolean firstRendered;
 	
 	
-	public Zones() {
+	public Zones(GameMap map) {
 		zones = new Zone[] {
-				
+				new CircleZone("center", map, new Vector2(), 4.31f) {
+
+					@Override
+					public void createModels() {
+						
+						
+					}
+
+					@Override
+					public void createTexture() {
+						
+						
+					}
+
+					@Override
+					public boolean isZoneActive(GameMap map) {
+						
+						return true;
+					}
+					
+				}
 		};
+		
+		this.map = map;
 	}
 	
 	public boolean isInZone(String id, Vector3 pos) {
@@ -60,12 +84,15 @@ public class Zones {
 	
 	public static abstract class Zone {
 		
+		GameMap map;
+		
 		String id;
 		Model model;
 		ModelInstance modelInstance;
 		
 		
-		public Zone(String id) {
+		public Zone(String id, GameMap map) {
+			this.map = map;
 			this.id = id;
 		}
 		
@@ -76,7 +103,8 @@ public class Zones {
 		public abstract boolean checkZone(Vector2 pos);
 		
 		public void render(ModelBatch mBatch, Environment e) {
-			mBatch.render(modelInstance, e);
+			if(isZoneActive(map))
+				mBatch.render(modelInstance, e);
 		}
 		
 		public abstract boolean isZoneActive(GameMap map);

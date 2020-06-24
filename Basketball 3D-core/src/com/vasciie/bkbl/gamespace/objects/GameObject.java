@@ -15,6 +15,7 @@ import com.badlogic.gdx.math.Vector3;
 import com.badlogic.gdx.physics.bullet.collision.btCollisionObject;
 import com.badlogic.gdx.physics.bullet.collision.btCollisionShape;
 import com.badlogic.gdx.physics.bullet.dynamics.btRigidBody;
+import com.vasciie.bkbl.MyGdxGame;
 import com.vasciie.bkbl.gamespace.GameMap;
 import com.vasciie.bkbl.gamespace.MotionState;
 
@@ -68,6 +69,9 @@ public abstract class GameObject implements Steerable<Vector3>, Proximity<Vector
 		matrixes = new ArrayList<Matrix4>();
 		
 		createModels();
+		if(MyGdxGame.TESTING)
+			return;
+		
 		if(modelInstance != null)
 			mainTrans = modelInstance.transform;
 		else mainTrans = new Matrix4(); 
@@ -94,6 +98,9 @@ public abstract class GameObject implements Steerable<Vector3>, Proximity<Vector
 			model.dispose();
 			model = null;
 		}
+		
+		if(MyGdxGame.TESTING)
+			return;
 		
 		for(btRigidBody o : bodies)
 			o.dispose();

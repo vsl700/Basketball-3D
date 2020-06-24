@@ -4,22 +4,25 @@ import com.badlogic.gdx.math.Vector2;
 import com.vasciie.bkbl.gamespace.GameMap;
 import com.vasciie.bkbl.gamespace.zones.Zones.Zone;
 
-public abstract class CircleZone extends Zone {
+public abstract class MultipleZones extends Zone {
 
-	Vector2 pos;
-	float radius;
+	Zone[] zones;
 	
-	public CircleZone(String id, GameMap map, Vector2 pos, float radius) {
+
+	public MultipleZones(String id, GameMap map, Zone[] zones) {
 		super(id, map);
 		
-		this.pos = pos;
-		this.radius = radius;
+		this.zones = zones;
 	}
 
 	@Override
 	public boolean checkZone(Vector2 pos) {
+		for(Zone zone : zones) {
+			if(zone.checkZone(pos))
+				return true;
+		}
 		
-		return pos.dst(this.pos) <= radius;
+		return false;
 	}
 
 }

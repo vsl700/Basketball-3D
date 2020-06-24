@@ -19,6 +19,7 @@ import com.badlogic.gdx.physics.bullet.collision.btBoxShape;
 import com.badlogic.gdx.physics.bullet.collision.btCollisionObject;
 import com.badlogic.gdx.physics.bullet.collision.btCylinderShape;
 import com.badlogic.gdx.physics.bullet.dynamics.btRigidBody;
+import com.vasciie.bkbl.MyGdxGame;
 
 public abstract class Basket extends GameObject {
 	
@@ -172,7 +173,9 @@ public abstract class Basket extends GameObject {
 	public void setRotation(float x, float y, float z, float angle) {
 		super.setRotation(x, y, z, angle);
 		
-		recalcCollisionsTransform();
+		if(!MyGdxGame.TESTING)
+			recalcCollisionsTransform();
+		
 		manuallyRecalcCollisions();
 	}
 
@@ -237,7 +240,8 @@ public abstract class Basket extends GameObject {
 	protected void manuallySetObjects() {
 		modelInstance.calculateTransforms();
 		
-		collisionObjects.get(0).setWorldTransform(getBasketTargetTrans());
+		if(!MyGdxGame.TESTING)
+			collisionObjects.get(0).setWorldTransform(getBasketTargetTrans());
 		
 		tabCenter.transform.set(getTabCenterTrans());
 	}

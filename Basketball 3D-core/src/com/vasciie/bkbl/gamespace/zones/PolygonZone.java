@@ -1,14 +1,15 @@
 package com.vasciie.bkbl.gamespace.zones;
 
 import com.badlogic.gdx.math.Vector2;
+import com.vasciie.bkbl.gamespace.GameMap;
 import com.vasciie.bkbl.gamespace.zones.Zones.Zone;
 
 public abstract class PolygonZone extends Zone {
 
 	Vector2[] positions;
 	
-	public PolygonZone(String id, Vector2[] positions) {
-		super(id);
+	public PolygonZone(String id, GameMap map, Vector2[] positions) {
+		super(id, map);
 		this.positions = positions;
 	}
 	
