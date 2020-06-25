@@ -717,7 +717,7 @@ public class GameMap {
 
         mBatch.end();
         
-        System.out.println(zones.isInZone("center", pCam.position));
+        System.out.println(zones.isInZone("three-point-team", pCam.position));
     }
 
     public void updateController(){

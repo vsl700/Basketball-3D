@@ -25,6 +25,32 @@ public class Zones {
 	
 	
 	public Zones(GameMap map) {
+		Vector2[] tempTeamFree = new Vector2[] {new Vector2(3.6292338f, 15.944867f), new Vector2(-3.6292338f, 15.944867f), new Vector2(-5.6740437f, 28.619236f), new Vector2(5.6740437f, 28.619236f)};
+		Vector2[] tempOppFree = new Vector2[tempTeamFree.length];
+		
+		for(int i = 0; i < tempOppFree.length; i++) {
+			tempOppFree[i] = tempTeamFree[i].cpy().scl(1, -1);
+		}
+		
+		Vector2[] tempTeamThree = new Vector2[] {new Vector2(1.7919577f, 11.742527f), new Vector2(-1.5362037f, 11.742527f), new Vector2(-2.7052748f, 11.907272f), new Vector2(-3.5413492f, 12.016001f),
+				new Vector2(-4.043659f, 12.180585f), new Vector2(-4.542652f, 12.417303f), new Vector2(-5.1205544f, 12.647329f), new Vector2(-5.4438825f, 12.877891f), new Vector2(-6.048061f, 13.203553f),
+				new Vector2(-6.3040233f, 13.501618f), new Vector2(-6.5534277f, 13.672493f), new Vector2(-6.87086f, 13.9120035f), new Vector2(-7.0578227f, 14.158667f), 
+				new Vector2(-7.218311f, 14.416079f), new Vector2(-7.4736457f, 14.621986f), new Vector2(-7.719531f, 14.799216f), new Vector2(-7.868765f, 14.963927f), new Vector2(-8.043922f, 15.1564455f),
+				new Vector2(-8.208387f, 15.429901f), new Vector2(-8.375041f, 15.660322f), new Vector2(-8.538396f, 15.867058f), new Vector2(-8.712505f, 16.1703f), new Vector2(-9.536805f, 17.554167f),
+				new Vector2(-10.208837f, 19.707685f), new Vector2(-10.299844f, 28.70149f)};
+		
+		Vector2[] realTeamThree = new Vector2[tempTeamThree.length * 2 - 1]; //We miss the first item
+		
+		int index;
+		for(int i = 0; (index = i) < tempTeamThree.length; i++) {
+			realTeamThree[i] = tempTeamThree[i];
+		}
+		
+		int tempIndex = index;
+		for(int i = index; (index = i) < realTeamThree.length; i++) {
+			realTeamThree[i] = tempTeamThree[tempTeamThree.length - (i - tempIndex) - 1].cpy().scl(-1, 1);
+		}
+		
 		zones = new Zone[] {
 				new CircleZone("center", map, new Vector2(), 4.31f) {
 
@@ -41,9 +67,71 @@ public class Zones {
 					}
 
 					@Override
-					public boolean isZoneActive(GameMap map) {
+					public boolean isZoneActive() {
 						
 						return true;
+					}
+					
+				},
+				
+				new PolygonZone("free-throw-team", map, tempTeamFree) {
+
+					@Override
+					public void createModels() {
+						
+					}
+
+					@Override
+					public void createTexture() {
+						
+					}
+
+					@Override
+					public boolean isZoneActive() {
+						
+						return true;
+					}
+					
+				}, 
+				
+				new PolygonZone("free-throw-opp", map, tempOppFree) {
+
+					@Override
+					public void createModels() {
+						
+					}
+
+					@Override
+					public void createTexture() {
+						
+					}
+
+					@Override
+					public boolean isZoneActive() {
+						
+						return true;
+					}
+					
+				},
+				
+				new PolygonZone("three-point-team", map, realTeamThree) {
+
+					@Override
+					public void createModels() {
+						
+						
+					}
+
+					@Override
+					public void createTexture() {
+						
+						
+					}
+
+					@Override
+					public boolean isZoneActive() {
+						
+						return false;
 					}
 					
 				}
@@ -103,11 +191,11 @@ public class Zones {
 		public abstract boolean checkZone(Vector2 pos);
 		
 		public void render(ModelBatch mBatch, Environment e) {
-			if(isZoneActive(map))
+			if(isZoneActive())
 				mBatch.render(modelInstance, e);
 		}
 		
-		public abstract boolean isZoneActive(GameMap map);
+		public abstract boolean isZoneActive();
 		
 		public void dispose() {
 			model.dispose();

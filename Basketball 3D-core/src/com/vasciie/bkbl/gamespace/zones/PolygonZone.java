@@ -43,7 +43,7 @@ public abstract class PolygonZone extends Zone {
 		
 		float tempDst = mainToCheck1.dst2(mainToCheck2);
 		
-		return mainToCheck1.dst2(mainToEntity) < tempDst && mainToCheck2.dst2(mainToEntity) < tempDst;
+		return mainToCheck1.dst2(mainToEntity) <= tempDst && mainToCheck2.dst2(mainToEntity) <= tempDst;
 	}
 
 }
