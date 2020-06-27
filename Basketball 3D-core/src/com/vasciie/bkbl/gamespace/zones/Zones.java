@@ -71,6 +71,12 @@ public class Zones {
 			realTeamThree[i] = tempTeamThree[tempTeamThree.length - (i - tempIndex) - 1].cpy().scl(-1, 1);
 		}
 		
+		Vector2[] realOppThree = new Vector2[realTeamThree.length];
+		
+		for(int i = 0; i < realOppThree.length; i++) {
+			realOppThree[i] = realTeamThree[i].cpy().scl(1, -1);
+		}
+		
 		zones = new Zone[] {
 				new CircleZone("center", map, new Vector2(), 4.31f) {
 
@@ -135,6 +141,28 @@ public class Zones {
 				},
 				
 				new PolygonZone("three-point-team", map, realTeamThree) {
+
+					@Override
+					public void createModels() {
+						
+						
+					}
+
+					@Override
+					public void createTexture() {
+						
+						
+					}
+
+					@Override
+					public boolean isZoneActive() {
+						
+						return false;
+					}
+					
+				},
+				
+				new PolygonZone("three-point-opp", map, realOppThree) {
 
 					@Override
 					public void createModels() {
