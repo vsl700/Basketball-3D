@@ -295,7 +295,7 @@ public class Rules {
 										else occurPlaceCpy.x = throwerPos.x;*/
 										
 										//float checkConst = /*Terrain.getWalldepth() * 1.6f*/ 3;
-										if(!thrower.getMoveVector().isZero()/* && throwerPos.dst(secondCloseWallPos) > checkConst*/) {
+										if(thrower.getPosition().dst(occurPlace) > 0.5f/* && throwerPos.dst(secondCloseWallPos) > checkConst*/) {
 											parent.setRuleTriggerer(thrower);
 											//map.playerReleaseBall();
 											return true;
@@ -308,7 +308,7 @@ public class Rules {
 									@Override
 									public String getDescription() {
 										
-										return "The Thrower Should Stay On The Foul Occuring Place During Throw-in!";
+										return "The Thrower Should Stay Around The Foul Occuring Place During Throw-in!";
 									}
 									
 								}
