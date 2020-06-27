@@ -39,7 +39,27 @@ public class Zones {
 				new Vector2(-8.208387f, 15.429901f), new Vector2(-8.375041f, 15.660322f), new Vector2(-8.538396f, 15.867058f), new Vector2(-8.712505f, 16.1703f), new Vector2(-9.536805f, 17.554167f),
 				new Vector2(-10.208837f, 19.707685f), new Vector2(-10.299844f, 28.70149f)};
 		
-		Vector2[] realTeamThree = new Vector2[tempTeamThree.length * 2 - 1]; //We miss the first item
+		for(int i = 0; i < tempTeamThree.length - 1; i++) { //We apply a little bit correction (it's System println's fault)
+			if(i < 2) {
+				tempTeamThree[i].sub(0, 1.5f);
+				continue;
+			}
+			
+			if(i > tempTeamThree.length / 2 - 1) {
+				if(i < tempTeamThree.length - 2)
+					tempTeamThree[i].sub(1, 0);
+				else if(i == tempTeamThree.length - 2) 
+					tempTeamThree[i].sub(2f, 0);
+				else if(i >= tempTeamThree.length - 4)
+					tempTeamThree[i].add(2.5f, 0);
+			}else if(i > 1) {
+				tempTeamThree[i].sub(0, 0.2f);
+			}
+			
+			tempTeamThree[i].sub(1.1f, 1.8f);
+		}
+		
+		Vector2[] realTeamThree = new Vector2[tempTeamThree.length * 2 - 2]; //We miss the first item
 		
 		int index;
 		for(int i = 0; (index = i) < tempTeamThree.length; i++) {
