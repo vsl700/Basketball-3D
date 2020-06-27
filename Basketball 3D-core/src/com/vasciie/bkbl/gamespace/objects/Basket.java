@@ -203,10 +203,10 @@ public abstract class Basket extends GameObject {
 		return standD + tabD + bkHoldD + tabCentD;
 	}
 	
-	@Override
+	/*@Override
 	public float getBoundingRadius() {
 		return 8;
-	}
+	}*/
 
 	public Matrix4 getBasketTargetTrans() {
 		return calcTransformFromNodesTransform(modelInstance.getNode("basket1").globalTransform.cpy().trn(0, 0, -tabCentW / 2));

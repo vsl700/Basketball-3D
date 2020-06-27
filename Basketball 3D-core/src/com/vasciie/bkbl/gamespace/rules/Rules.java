@@ -295,7 +295,7 @@ public class Rules {
 										else occurPlaceCpy.x = throwerPos.x;*/
 										
 										//float checkConst = /*Terrain.getWalldepth() * 1.6f*/ 3;
-										if(thrower.getPosition().dst(occurPlace) > 0.5f/* && throwerPos.dst(secondCloseWallPos) > checkConst*/) {
+										if(thrower.getPosition().dst(occurPlace) > 3.5f/* && throwerPos.dst(secondCloseWallPos) > checkConst*/) {
 											parent.setRuleTriggerer(thrower);
 											//map.playerReleaseBall();
 											return true;

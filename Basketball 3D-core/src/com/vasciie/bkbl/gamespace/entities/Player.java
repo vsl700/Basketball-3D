@@ -1503,10 +1503,10 @@ public abstract class Player extends Entity {
 					count++;
 	
 			//if (!isHoldingBall()) {
-				if (isProximityColliding(map.getHomeBasket()) && callback.reportNeighbor(map.getHomeBasket()))
+				if (/*isProximityColliding(map.getHomeBasket()) && */callback.reportNeighbor(map.getHomeBasket()))
 					count++;
 
-				else if (isProximityColliding(map.getAwayBasket()) && callback.reportNeighbor(map.getAwayBasket()))
+				else if (/*isProximityColliding(map.getAwayBasket()) && */callback.reportNeighbor(map.getAwayBasket()))
 					count++;
 			//}
 			
