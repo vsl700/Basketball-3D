@@ -36,12 +36,6 @@ public class Camera extends GameObject {
 	}
 
 	@Override
-	protected void specialFunction() {
-		
-
-	}
-
-	@Override
 	public float getWidth() {
 		
 		return 0.5f;

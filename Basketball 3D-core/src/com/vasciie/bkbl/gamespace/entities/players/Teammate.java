@@ -8,14 +8,22 @@ public class Teammate extends Player {
 
 	@Override
 	protected Color getPlayerColor() {
-		// TODO Auto-generated method stub
 		return Color.BLUE;
 	}
 
 	@Override
 	public Basket getTargetBasket() {
-		// TODO Auto-generated method stub
 		return map.getAwayBasket();
+	}
+
+	@Override
+	public boolean isInAwayBasketZone() {
+		return map.getZones().isInZone("free-throw-opp", getPosition());
+	}
+
+	@Override
+	public boolean isInAwayThreePointZone() {
+		return map.getZones().isInZone("three-point-opp", getPosition());
 	}
 
 }

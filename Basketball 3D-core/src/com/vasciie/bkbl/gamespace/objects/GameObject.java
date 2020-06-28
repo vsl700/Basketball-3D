@@ -72,9 +72,7 @@ public abstract class GameObject implements Steerable<Vector3>, Proximity<Vector
 		if(MyGdxGame.TESTING)
 			return;
 		
-		if(modelInstance != null)
-			mainTrans = modelInstance.transform;
-		else mainTrans = new Matrix4(); 
+		createMainTrans();
 		createCollisionShapes();
 		
 		//motionState = new MotionState();
@@ -85,6 +83,12 @@ public abstract class GameObject implements Steerable<Vector3>, Proximity<Vector
 		dimensions.set(getWidth(), getHeight(), getDepth());
 		//manuallySetCollisions();
 		
+	}
+	
+	protected void createMainTrans() {
+		if(modelInstance != null)
+			mainTrans = modelInstance.transform;
+		else mainTrans = new Matrix4(); 
 	}
 	
 	public void render(ModelCache mCache) {
@@ -233,11 +237,6 @@ public abstract class GameObject implements Steerable<Vector3>, Proximity<Vector
 		}
 	}
 	
-	/**
-	 * Contains functions which are done when a collision at a specified place occurs
-	 */
-	protected abstract void specialFunction();
-	
 	public void setWorldTransform(Matrix4 trans) {
 		mainTrans = trans;
 		
@@ -275,7 +274,7 @@ public abstract class GameObject implements Steerable<Vector3>, Proximity<Vector
 
 	@Override
 	public Vector3 getPosition() {
-		return modelInstance.transform.getTranslation(new Vector3());
+		return modelInstance.transform.getTranslation(new Vector3()).scl(1, 0, 1);
 	}
 
 	@Override

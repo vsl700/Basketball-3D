@@ -138,6 +138,11 @@ public abstract class Basket extends GameObject {
 		matrixes.add(modelInstance.getNode(tabCenter3.id).globalTransform);*/
 	}
 	
+	@Override
+	protected void createMainTrans() {
+		mainTrans = new Matrix4().setToTranslation(modelInstance.transform.getTranslation(new Vector3())).cpy().trn(0, getHeight() / 2, 0);
+	}
+	
 	private Matrix4 getTabCenterTrans() {
 		return calcTransformFromNodesTransform(modelInstance.getNode("tab").globalTransform.trn(0, 0, tabCentD));
 	}
@@ -178,11 +183,10 @@ public abstract class Basket extends GameObject {
 		
 		manuallyRecalcCollisions();
 	}
-
+	
 	@Override
-	protected void specialFunction() {
-		
-
+	public Vector3 getPosition() {
+		return super.getPosition().add(0, 0.925f, 0); //We do it so that players can catch the bounding radius of the basket
 	}
 
 	@Override
@@ -203,10 +207,10 @@ public abstract class Basket extends GameObject {
 		return standD + tabD + bkHoldD + tabCentD;
 	}
 	
-	/*@Override
+	@Override
 	public float getBoundingRadius() {
-		return 8;
-	}*/
+		return standW * 5;
+	}
 
 	public Matrix4 getBasketTargetTrans() {
 		return calcTransformFromNodesTransform(modelInstance.getNode("basket1").globalTransform.cpy().trn(0, 0, -tabCentW / 2));

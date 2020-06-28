@@ -8,14 +8,22 @@ public class Opponent extends Player {
 
 	@Override
 	protected Color getPlayerColor() {
-		// TODO Auto-generated method stub
 		return Color.RED;
 	}
 
 	@Override
 	public Basket getTargetBasket() {
-		// TODO Auto-generated method stub
 		return map.getHomeBasket();
+	}
+
+	@Override
+	public boolean isInAwayBasketZone() {
+		return map.getZones().isInZone("free-throw-team", getPosition());
+	}
+
+	@Override
+	public boolean isInAwayThreePointZone() {
+		return map.getZones().isInZone("three-point-team", getPosition());
 	}
 	
 	

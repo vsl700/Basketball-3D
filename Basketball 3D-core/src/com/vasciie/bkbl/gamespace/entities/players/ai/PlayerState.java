@@ -93,7 +93,7 @@ public enum PlayerState implements State<Player> {
 				}
 			}
 
-			mem.setSwitchHandTime(mem.getSwitchHandTime() + Gdx.graphics.getDeltaTime());
+			//mem.setSwitchHandTime(mem.getSwitchHandTime() + Gdx.graphics.getDeltaTime());
 
 			// Walking & running mechanism
 			/*if(player.isBehindBasket()) {

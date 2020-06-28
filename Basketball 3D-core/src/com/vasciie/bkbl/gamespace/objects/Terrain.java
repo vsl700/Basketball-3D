@@ -107,12 +107,6 @@ public class Terrain extends GameObject {
 		
 		//invisibleCollShapes.add(new btBoxShape(new Vector3(getWidth() * 2, 10000, 0.1f)));//Midcourt lane
 	}
-
-	@Override
-	protected void specialFunction() {
-		
-
-	}
 	
 	@Override 
 	public void dispose() {

@@ -1851,9 +1851,9 @@ public abstract class Player extends Entity {
 		return westObstacle;
 	}*/
 	
-	public boolean isInAwayBasketZone() {
-		return isProximityColliding(getTargetBasket());
-	}
+	public abstract boolean isInAwayBasketZone();
+	
+	public abstract boolean isInAwayThreePointZone();
 	
 	public boolean isBehindBasket() {
 		return Math.abs(modelInstance.transform.getTranslation(new Vector3()).z) - Math.abs(map.getHomeBasket().getModelInstance().transform.getTranslation(new Vector3()).z) >= -0.5f;

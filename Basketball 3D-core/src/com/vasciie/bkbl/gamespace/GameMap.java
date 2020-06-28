@@ -1013,6 +1013,10 @@ public class GameMap {
     public HashMap<Integer, btCollisionObject> getCollObjsValsMap() {
         return collObjsValsMap;
     }
+    
+    public Zones getZones() {
+    	return zones;
+    }
 
     public Player getMainPlayer() {
         return mainPlayer;
