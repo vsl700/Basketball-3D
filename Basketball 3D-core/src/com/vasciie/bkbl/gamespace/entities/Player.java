@@ -333,8 +333,12 @@ public abstract class Player extends Entity {
 		}
 		
 		if (!isAiming() && !isShooting()) {
-			dir.x *= MAX_RUNNING_VELOCITY;
-			dir.z *= MAX_RUNNING_VELOCITY;
+			float multiplier = MAX_RUNNING_VELOCITY;
+			if(isHoldingBall() && !map.isRuleTriggeredActing())
+				multiplier -= 3;
+			
+			dir.x *= multiplier;
+			dir.z *= multiplier;
 			dir.y = 0;
 
 			modelInstance.transform.trn(dir);
