@@ -1489,7 +1489,13 @@ public abstract class Player extends Entity {
 						callback.reportNeighbor(p);
 			//System.out.println("Player separate invoked");
 			return 0;
-		}else if(callback.equals(brain.getAllPlayerSeparate())) {
+		}else if(callback.equals(brain.getTargetPlayerSeparate())) {
+			Player targetPlayer = brain.getMemory().getTargetPlayer();
+			
+			if(targetPlayer != null && targetPlayer.getPosition().dst(getPosition()) <= 5)
+				callback.reportNeighbor(targetPlayer);
+		}
+		else if(callback.equals(brain.getAllPlayerSeparate())) {
 			for(Player p : map.getAllPlayers())
 				if(!p.equals(this) && isProximityColliding(p)) 
 					callback.reportNeighbor(p);

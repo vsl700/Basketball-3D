@@ -44,9 +44,10 @@ public class Brain {
 	LookWhereYouAreGoing<Vector3> lookAt;
 	CollisionAvoidance<Vector3> collAvoid; //For players and basket stands
 	Interpose<Vector3> interpose; //For blocking opponents from getting close to the player holding the ball in co-op state
-	Separation<Vector3> ballSeparate, basketSeparate, playerSeparate, allPlayerSeparate; //For player and basket surroundings and ball distance keeping
+	Interpose<Vector3> playerBasketInterpose;
+	Separation<Vector3> ballSeparate, basketSeparate, playerSeparate, allPlayerSeparate, targetPlayerSeparate; //For player and basket surroundings and ball distance keeping
 	//RaycastObstacleAvoidance<Vector3> obstAvoid; //For invisible user.getMap().getTerrain() walls
-	PrioritySteering<Vector3> pSBallChasePart, pSCoop, pSSurround, pSCustom;
+	PrioritySteering<Vector3> pSBallChasePart, pSCoop, pSSurround, pSShooting, pSCustom;
 	BlendedSteering<Vector3> mSBallChase, mSBallInHand, mSSurround;	//Groups of behaviors for each state
 	
 	
@@ -69,10 +70,13 @@ public class Brain {
 		lookAt = new LookWhereYouAreGoing<Vector3>(user);
 		collAvoid = new CollisionAvoidance<Vector3>(user, user);
 		interpose = new Interpose<Vector3>(user, null, null, 0.8f);
+		playerBasketInterpose = new Interpose<Vector3>(user, null, null, 0.5f);
+		playerBasketInterpose.setArrivalTolerance(0.5f);
 		ballSeparate = new Separation<Vector3>(user, user); //The differences between these behaviors are in the overrided findNeighbors void in the Player class
 		basketSeparate = new Separation<Vector3>(user, user);//
 		playerSeparate = new Separation<Vector3>(user, user);//
 		allPlayerSeparate = new Separation<Vector3>(user, user);
+		targetPlayerSeparate = new Separation<Vector3>(user, user);
 		
 		//rayConfig = new ParallelSideRayConfiguration<Vector3>(user, 3, 0.5f);
 		//obstAvoid = new RaycastObstacleAvoidance<Vector3>(user, rayConfig, user.getMap());
@@ -110,14 +114,21 @@ public class Brain {
 		pSCoop.add(pursue);
 		
 		mSSurround = new BlendedSteering<Vector3>(user);
+		mSSurround.add(allPlayerSeparate, 1.5f);
 		mSSurround.add(playerSeparate, 1.3f);
 		mSSurround.add(collAvoid, 1);
 		mSSurround.add(pursue, 1.3f);
 		
 		pSSurround = new PrioritySteering<Vector3>(user);
+		pSSurround.add(allPlayerSeparate);
 		pSSurround.add(playerSeparate);
 		pSSurround.add(collAvoid);
 		pSSurround.add(pursue);
+		
+		pSShooting = new PrioritySteering<Vector3>(user);
+		pSShooting.add(playerBasketInterpose);
+		pSShooting.add(allPlayerSeparate);
+		pSSurround.add(collAvoid);
 		
 		pSCustom = new PrioritySteering<Vector3>(user);
 		pSCustom.add(ballSeparate);
@@ -176,11 +187,17 @@ public class Brain {
 				
 				//If a teammate of the current player (either a teammate or an opponent to the main player) is holding the ball
 				if(user instanceof Teammate && user.getMap().isBallInTeam() || user instanceof Opponent && user.getMap().isBallInOpp()) {
-					if(!stateMachine.isInState(PlayerState.COOPERATIVE)) stateMachine.changeState(PlayerState.COOPERATIVE);
+					if(user.getMap().getHoldingPlayer().isCurrentlyAiming() || user.getMap().getHoldingPlayer().isShooting()) {
+						if(!stateMachine.isInState(PlayerState.HOLDING_PLAYER_SHOOTING)) stateMachine.changeState(PlayerState.HOLDING_PLAYER_SHOOTING);
+					}
+					else if(!stateMachine.isInState(PlayerState.COOPERATIVE)) stateMachine.changeState(PlayerState.COOPERATIVE);
 				}
 				//If an opponent of the current player (either a teammate or an opponent to the main player) is holding the ball
 				else if(user instanceof Teammate && user.getMap().isBallInOpp() || user instanceof Opponent && user.getMap().isBallInTeam()) {
-					if(!stateMachine.isInState(PlayerState.PLAYER_SURROUND)) stateMachine.changeState(PlayerState.PLAYER_SURROUND);
+					if(user.getMap().getHoldingPlayer().isCurrentlyAiming() || user.getMap().getHoldingPlayer().isShooting()) {
+						if(!stateMachine.isInState(PlayerState.HOLDING_PLAYER_SHOOTING)) stateMachine.changeState(PlayerState.HOLDING_PLAYER_SHOOTING);
+					}
+					else if(!stateMachine.isInState(PlayerState.PLAYER_SURROUND)) stateMachine.changeState(PlayerState.PLAYER_SURROUND);
 				}
 				//If nobody is holding the ball
 				else 
@@ -463,6 +480,10 @@ public class Brain {
 		return interpose;
 	}
 
+	public Interpose<Vector3> getPlayerBasketInterpose() {
+		return playerBasketInterpose;
+	}
+
 	public PrioritySteering<Vector3> getPSCoop() {
 		return pSCoop;
 	}
@@ -477,6 +498,10 @@ public class Brain {
 
 	public Separation<Vector3> getPlayerSeparate() {
 		return playerSeparate;
+	}
+
+	public Separation<Vector3> getTargetPlayerSeparate() {
+		return targetPlayerSeparate;
 	}
 
 	public Separation<Vector3> getAllPlayerSeparate() {
@@ -499,6 +524,10 @@ public class Brain {
 		return pSSurround;
 	}
 	
+	public PrioritySteering<Vector3> getPSShooting() {
+		return pSShooting;
+	}
+
 	public PrioritySteering<Vector3> getPSCustom(){
 		return pSCustom;
 	}

@@ -339,11 +339,13 @@ public enum PlayerState implements State<Player> {
 			mem.setRandomFoulTime(mem.getRandomFoulTime() + Gdx.graphics.getDeltaTime());
 			
 			//Movement
-			if(player.getPosition().dst(tempBall.getPosition()) > 4.5f || player.getMoveVector().len() > 6) {
+			if (player.getPosition().dst(tempBall.getPosition()) > 4.5f || player.getMoveVector().len() > 6) {
 				player.setRunning();
-				
+
 				brain.getPlayerSeparate().setEnabled(true);
-			}else brain.getPlayerSeparate().setEnabled(false);
+
+			} else
+				brain.getPlayerSeparate().setEnabled(false);
 			
 			brain.getMSSurround().calculateSteering(Player.steering);
 			player.setMoveVector(Player.steering.linear);
@@ -372,6 +374,51 @@ public enum PlayerState implements State<Player> {
 					player.interactWithBallR();
 			}else if(!chased.isDribbling() && !point) mem.setMissStealing(false);
 		}
+	},
+	
+	HOLDING_PLAYER_SHOOTING{
+		
+		@Override
+		public void enter(Player player) {
+			Player targetPlayer = player.getMap().getHoldingPlayer();
+			Brain brain = player.getBrain();
+			
+			brain.getMemory().setTargetPlayer(targetPlayer);
+			
+			brain.getPlayerBasketInterpose().setAgentA(targetPlayer);
+			brain.getPlayerBasketInterpose().setAgentB(targetPlayer.getTargetBasket());
+			
+			brain.getPlayerBasketInterpose().setEnabled(true);
+			brain.getAllPlayerSeparate().setEnabled(true);
+		}
+		
+		@Override
+		public void exit(Player player) {
+			Brain brain = player.getBrain();
+			
+			brain.getPlayerBasketInterpose().setAgentA(null);
+			brain.getPlayerBasketInterpose().setAgentB(null);
+			
+			brain.getMemory().setTargetPlayer(null);
+		}
+
+		@Override
+		public void update(Player player) {
+			Brain brain = player.getBrain();
+			AIMemory mem = brain.getMemory();
+			Player chased = mem.getTargetPlayer();
+			
+
+			if (chased.getPosition().dst(player.getPosition()) <= chased.getPosition().dst(chased.getTargetBasket().getPosition()) / 2 - 3)
+				player.setRunning();
+			
+			brain.getPSShooting().calculateSteering(Player.steering);
+			player.setMoveVector(Player.steering.linear);
+			
+			player.lookAt(chased.getPosition(), false);
+			
+		}
+		
 	},
 
 	IDLING() {
