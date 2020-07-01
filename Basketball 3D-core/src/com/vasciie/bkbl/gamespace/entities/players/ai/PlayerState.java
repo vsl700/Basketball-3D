@@ -112,12 +112,20 @@ public enum PlayerState implements State<Player> {
 				if (tempAimVec != null)
 					brain.performShooting(tempAimVec);
 				else {
-					// TODO Make hand switch mechanism
-
 					if (mem.getDribbleTime() > 0.7f) {
-						if (player.isLeftHolding())
+						ArrayList<Player> tempOpp;
+						if(player instanceof Teammate)
+							tempOpp = player.getMap().getOpponents();
+						else tempOpp = player.getMap().getTeammates();
+						
+						Player closestPlayer = GameTools.getClosestPlayer(player.getPosition(), tempOpp, null);
+						
+						Vector3 leftHandPos = player.calcTransformFromNodesTransform(player.getModelInstance().getNode("handL").globalTransform).getTranslation(new Vector3());
+						Vector3 rightHandPos = player.calcTransformFromNodesTransform(player.getModelInstance().getNode("handR").globalTransform).getTranslation(new Vector3());
+						
+						if (closestPlayer.getPosition().dst(leftHandPos) >= closestPlayer.getPosition().dst(rightHandPos))
 							player.interactWithBallL();
-						else if (player.isRightHolding())
+						else
 							player.interactWithBallR();
 
 						mem.setDribbleTime(0);
