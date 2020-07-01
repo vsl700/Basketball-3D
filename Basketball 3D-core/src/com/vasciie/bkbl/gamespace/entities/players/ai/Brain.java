@@ -71,7 +71,7 @@ public class Brain {
 		collAvoid = new CollisionAvoidance<Vector3>(user, user);
 		interpose = new Interpose<Vector3>(user, null, null, 0.8f);
 		playerBasketInterpose = new Interpose<Vector3>(user, null, null, 0.5f);
-		playerBasketInterpose.setArrivalTolerance(0.5f);
+		//playerBasketInterpose.setArrivalTolerance(1.5f);
 		ballSeparate = new Separation<Vector3>(user, user); //The differences between these behaviors are in the overrided findNeighbors void in the Player class
 		basketSeparate = new Separation<Vector3>(user, user);//
 		playerSeparate = new Separation<Vector3>(user, user);//
@@ -108,10 +108,10 @@ public class Brain {
 		mSBallInHand.add(pursueBallInHand, 1.3f);
 		
 		pSCoop = new PrioritySteering<Vector3>(user);
+		pSCoop.add(targetPlayerSeparate);
 		pSCoop.add(collAvoid);
-		//mSCoop.add(pursue, 1);
-		pSCoop.add(interpose);
-		pSCoop.add(pursue);
+		pSCoop.add(allPlayerSeparate);
+		pSCoop.add(playerBasketInterpose);
 		
 		mSSurround = new BlendedSteering<Vector3>(user);
 		mSSurround.add(allPlayerSeparate, 1.5f);
@@ -128,7 +128,7 @@ public class Brain {
 		pSShooting = new PrioritySteering<Vector3>(user);
 		pSShooting.add(playerBasketInterpose);
 		pSShooting.add(allPlayerSeparate);
-		pSSurround.add(collAvoid);
+		pSShooting.add(collAvoid);
 		
 		pSCustom = new PrioritySteering<Vector3>(user);
 		pSCustom.add(ballSeparate);

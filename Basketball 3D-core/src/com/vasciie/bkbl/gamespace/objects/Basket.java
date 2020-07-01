@@ -209,7 +209,7 @@ public abstract class Basket extends GameObject {
 	
 	@Override
 	public float getBoundingRadius() {
-		return standW * 5;
+		return standW * 8;
 	}
 
 	public Matrix4 getBasketTargetTrans() {

@@ -25,5 +25,11 @@ public class Teammate extends Player {
 	public boolean isInAwayThreePointZone() {
 		return map.getZones().isInZone("three-point-opp", getPosition());
 	}
+	
+	@Override
+	public boolean isInAwayZone() {
+		
+		return getPosition().z < 0;
+	}
 
 }

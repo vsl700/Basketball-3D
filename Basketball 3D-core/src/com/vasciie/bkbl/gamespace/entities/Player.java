@@ -66,7 +66,7 @@ public abstract class Player extends Entity {
 	public static final float handPercentage = 0.4f;
 
 	//Player's mechanics
-	boolean walking, running, jumping;
+	boolean walking, running, currentRunning, jumping;
 	boolean leftHoldingBall, rightHoldingBall;
 	boolean leftAimBall, rightAimBall, leftCurrentAim, rightCurrentAim;
 	boolean leftThrowBall, rightThrowBall, readyBall;
@@ -344,7 +344,7 @@ public abstract class Player extends Entity {
 			modelInstance.transform.trn(dir);
 			//setCollisionTransform(true);
 
-			running = true;
+			running = currentRunning = true;
 			
 			//if(isMainPlayer())
 			prevMoveVec.set(moveVec);
@@ -1263,6 +1263,9 @@ public abstract class Player extends Entity {
 		if(!ableToRun)
 			running = false;
 		
+		if(running == false)
+			currentRunning = false;
+		
 		lockRotationAndRandomFloating(true);
 		
 		String prevIdArmL = armLController.current.animation.id;
@@ -1492,7 +1495,7 @@ public abstract class Player extends Entity {
 		}else if(callback.equals(brain.getTargetPlayerSeparate())) {
 			Player targetPlayer = brain.getMemory().getTargetPlayer();
 			
-			if(targetPlayer != null && targetPlayer.getPosition().dst(getPosition()) <= 5)
+			if(targetPlayer != null && targetPlayer.getPosition().dst(getPosition()) <= 3)
 				callback.reportNeighbor(targetPlayer);
 		}
 		else if(callback.equals(brain.getAllPlayerSeparate())) {
@@ -1505,11 +1508,11 @@ public abstract class Player extends Entity {
 			int count = 0;
 
 			for (Player p : map.getTeammates())
-				if (collAvoidCheck(p) && callback.reportNeighbor(p))
+				if (collAvoidCheck(p)/* && (brain.getMemory().getTargetPlayer() != null && !p.equals(brain.getMemory().getTargetPlayer()) || brain.getMemory().getTargetPlayer() == null)*/ && callback.reportNeighbor(p))
 					count++;
 
 			for (Player p : map.getOpponents())
-				if (collAvoidCheck(p) && callback.reportNeighbor(p))
+				if (collAvoidCheck(p)/* && (brain.getMemory().getTargetPlayer() != null && !p.equals(brain.getMemory().getTargetPlayer()) || brain.getMemory().getTargetPlayer() == null)*/ && callback.reportNeighbor(p))
 					count++;
 	
 			//if (!isHoldingBall()) {
@@ -1567,7 +1570,7 @@ public abstract class Player extends Entity {
 	public abstract Basket getTargetBasket();
 	
 	public void setRunning() {
-		running = true;
+		running = currentRunning = true;
 	}
 	
 	public Brain getBrain() {
@@ -1816,6 +1819,10 @@ public abstract class Player extends Entity {
 		return running;
 	}
 	
+	public boolean isCurrentlyRunning() {
+		return currentRunning;
+	}
+	
 	/*public boolean isNorthSurround() {
 		return northSurround;
 	}
@@ -1860,6 +1867,8 @@ public abstract class Player extends Entity {
 	public boolean isWestObstacle() {
 		return westObstacle;
 	}*/
+	
+	public abstract boolean isInAwayZone();
 	
 	public abstract boolean isInAwayBasketZone();
 	

@@ -25,6 +25,12 @@ public class Opponent extends Player {
 	public boolean isInAwayThreePointZone() {
 		return map.getZones().isInZone("three-point-team", getPosition());
 	}
+
+	@Override
+	public boolean isInAwayZone() {
+		
+		return getPosition().z > 0;
+	}
 	
 	
 

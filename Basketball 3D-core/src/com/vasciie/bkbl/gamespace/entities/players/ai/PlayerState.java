@@ -235,52 +235,66 @@ public enum PlayerState implements State<Player> {
 	COOPERATIVE() {
 		@Override
 		public void enter(Player player) {
+			Brain brain = player.getBrain();
+			AIMemory mem = brain.getMemory();
+			Player holdingPlayer = player.getMap().getHoldingPlayer();
 			
+			//brain.getPlayerBasketInterpose().setInterpositionRatio(0.3f);
+			
+			brain.getPlayerBasketInterpose().setAgentA(holdingPlayer);
+			brain.getPlayerBasketInterpose().setAgentB(holdingPlayer.getTargetBasket());
+			
+			mem.setTargetPlayer(holdingPlayer);
 		}
 
 		@Override
 		public void update(Player player) {
 			Brain brain = player.getBrain();
-			AIMemory mem = brain.getMemory();
+			Player holdingPlayer = brain.getMemory().getTargetPlayer();
 			
-			Player holdingPlayer;
-			ArrayList<Player> tempOpp;
-			if (player instanceof Teammate) {
-				holdingPlayer = player.getMap().getTeammateHolding();
-				tempOpp = player.getMap().getOpponents();
+			boolean check = holdingPlayer.getPosition().dst(player.getPosition()) <= holdingPlayer.getPosition().dst(holdingPlayer.getTargetBasket().getPosition()) * brain.getPlayerBasketInterpose().getInterpositionRatio() - 3;
+			boolean check2 = check && player.getPosition().dst(brain.getPlayerBasketInterpose().getInternalTargetPosition()) > 3;
+			
+			if(player.isInAwayThreePointZone()) {
+				brain.getPlayerBasketInterpose().setEnabled(false);
+				
+				brain.getAllPlayerSeparate().setEnabled(true);
+				brain.getTargetPlayerSeparate().setEnabled(true);
 			}else {
-				holdingPlayer = player.getMap().getOpponentHolding();
-				tempOpp = player.getMap().getTeammates();
+				brain.getPlayerBasketInterpose().setEnabled(true);
+				brain.getTargetPlayerSeparate().setEnabled(false);
+				
+				if(check)
+					brain.getAllPlayerSeparate().setEnabled(false);
+				else brain.getAllPlayerSeparate().setEnabled(true);
 			}
-
-			Ball tempBall = player.getMap().getBall();
-
-			if (mem.getTargetPlayer() == null) {
-				Player targetToBlock = GameTools.getClosestPlayer(tempBall.getPosition(), tempOpp, ignored);
-				mem.setTargetPlayer(targetToBlock);
-				ignored.add(targetToBlock);
-
-				brain.getInterpose().setAgentA(tempBall);
-				brain.getInterpose().setAgentB(targetToBlock);
-
-			}else if(holdingPlayer.getPosition().dst(mem.getTargetPlayer().getPosition()) > 5)
-				brain.getInterpose().setEnabled(false);
-			else brain.getInterpose().setEnabled(true);
+			
+			if(player.isInAwayZone())
+				brain.getPlayerBasketInterpose().setInterpositionRatio(0.5f);
+			else brain.getPlayerBasketInterpose().setInterpositionRatio(0.3f);
+			
+			if(player.getPosition().dst(holdingPlayer.getPosition()) < 1.5f)
+				brain.getTargetPlayerSeparate().setEnabled(true);
+			
 			
 			player.lookAt(holdingPlayer.getPosition(), false);
 			
 			brain.getPSCoop().calculateSteering(Player.steering);
 			player.setMoveVector(Player.steering.linear);
 			
-			if(player.getPosition().dst(tempBall.getPosition()) > 6 || player.getMoveVector().len() > 6)
+			if(check2)
 				player.setRunning();
 			
 		}
 		
 		@Override
 		public void exit(Player player) {
-			ignored.remove(player.getBrain().getMemory().getTargetPlayer());
-			player.getBrain().getMemory().setTargetPlayer(null);
+			Brain brain = player.getBrain();
+			
+			brain.getMemory().setTargetPlayer(null);
+			
+			brain.getPlayerBasketInterpose().setAgentA(null);
+			brain.getPlayerBasketInterpose().setAgentB(null);
 		}
 	},
 
@@ -340,12 +354,17 @@ public enum PlayerState implements State<Player> {
 			
 			//Movement
 			if (player.getPosition().dst(tempBall.getPosition()) > 4.5f || player.getMoveVector().len() > 6) {
-				player.setRunning();
+				
 
 				brain.getPlayerSeparate().setEnabled(true);
 
 			} else
 				brain.getPlayerSeparate().setEnabled(false);
+			
+			if(player.getMap().getTeammates().size() == 1) {
+				if(!player.isCurrentlyRunning() && player.getPosition().dst(chased.getPosition()) > 3 || player.isCurrentlyRunning() && player.getPosition().dst(chased.getPosition()) > 1.78f)
+					player.setRunning();
+			}else player.setRunning();
 			
 			brain.getMSSurround().calculateSteering(Player.steering);
 			player.setMoveVector(Player.steering.linear);
@@ -390,6 +409,8 @@ public enum PlayerState implements State<Player> {
 			
 			brain.getPlayerBasketInterpose().setEnabled(true);
 			brain.getAllPlayerSeparate().setEnabled(true);
+			
+			player.getBrain().getPlayerBasketInterpose().setInterpositionRatio(0.5f);
 		}
 		
 		@Override
@@ -496,7 +517,7 @@ public enum PlayerState implements State<Player> {
 
 	// float dribbleTime, aimingTime, shootTime, switchHandTime;
 
-	protected final ArrayList<Player> ignored = new ArrayList<Player>();
+	//protected final ArrayList<Player> ignored = new ArrayList<Player>();
 	
 	@Override
 	public void enter(Player entity) {
