@@ -104,7 +104,7 @@ public class Brain {
 		/*mSBallInHand.add(collAvoid, 1.6f);
 		mSBallInHand.add(basketSeparate, 0.6f);
 		mSBallInHand.add(allPlayerSeparate, 1f);*/
-		mSBallInHand.add(pSBallInHandPart, 1.35f);
+		mSBallInHand.add(pSBallInHandPart, 1.5f);
 		mSBallInHand.add(pursueBallInHand, 1.3f);
 		
 		pSCoop = new PrioritySteering<Vector3>(user);
@@ -126,8 +126,8 @@ public class Brain {
 		pSSurround.add(pursue);
 		
 		pSShooting = new PrioritySteering<Vector3>(user);
-		pSShooting.add(playerBasketInterpose);
 		pSShooting.add(allPlayerSeparate);
+		pSShooting.add(playerBasketInterpose);
 		pSShooting.add(collAvoid);
 		
 		pSCustom = new PrioritySteering<Vector3>(user);

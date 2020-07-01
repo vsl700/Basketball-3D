@@ -105,8 +105,6 @@ public class PauseScreen implements Screen, GUIRenderer {
 	public void resize(int width, int height) {
 		cam.setToOrtho(false, width, height);
 
-		System.out.println(height);
-
 		float spaceHeight = 720 * 3 / 4;
 
 		resume.setSize(game.pixelXByCurrentSize(223 * MyGdxGame.GUI_SCALE), game.pixelYByCurrentSize(30 * MyGdxGame.GUI_SCALE));

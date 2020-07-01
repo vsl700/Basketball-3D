@@ -19,6 +19,7 @@ import com.badlogic.gdx.physics.bullet.collision.btCollisionObject;
 import com.badlogic.gdx.physics.bullet.collision.btCollisionShape;
 import com.badlogic.gdx.physics.bullet.collision.btSphereShape;
 import com.badlogic.gdx.physics.bullet.dynamics.btRigidBody;
+import com.badlogic.gdx.utils.Array;
 import com.vasciie.bkbl.gamespace.GameMap;
 import com.vasciie.bkbl.gamespace.entities.players.Opponent;
 import com.vasciie.bkbl.gamespace.entities.players.Teammate;
@@ -420,8 +421,13 @@ public abstract class Player extends Entity {
 	}
 	
 	public void focus(boolean special) {
+		focus(null, special);
+	}
+	
+	public void focus(Array<Player> players, boolean special) {
 		focus = true;
 		avoidInterpose = special;
+		ignored = players;
 	}
 	
 	public void switchDribble() {
@@ -1098,6 +1104,7 @@ public abstract class Player extends Entity {
 	private final Matrix4 invTrans = new Matrix4();
 	private Player focusTarget;
 	private boolean rotDifference;
+	private Array<Player> ignored;
 	private void lookAtClosestToViewPlayer() {
 		ArrayList<Player> tempPlayers;
 		
@@ -1127,9 +1134,9 @@ public abstract class Player extends Entity {
 		float minDist = direction.dst2(tempClosestDir);
 		
 		Player tempTarget = startingPlayer;//Used to store the closest player while there's still not found any unblocked player (if any at all)
-		boolean change = avoidInterpose;//If true, the system below will keep changing the player no matter he is being blocked or not. Otherwise, it checks for blockings
+		boolean change = avoidInterpose || ignored.contains(tempTarget, false);//If change is true, the system below will keep changing the player no matter he is being blocked or not. Otherwise, it checks for blockings
 		for(Player p : tempPlayers) {//The players this player should choose from for pointing at
-			if(p.equals(this) || p.equals(startingPlayer) && !avoidInterpose)
+			if(p.equals(this) || p.equals(startingPlayer)/* && !avoidInterpose*/ || ignored != null && ignored.contains(p, false))//FIXME ignored system not working!
 				continue;
 			
 			Vector3 tempPos = p.getPosition();
@@ -1475,7 +1482,7 @@ public abstract class Player extends Entity {
 			return 0;
 		}else if(callback.equals(brain.getBasketSeparate())) {
 			//System.out.println("Basket separate invoked");
-			if (isProximityColliding(getTargetBasket())) {
+			if (/*isProximityColliding(getTargetBasket())*/ getPosition().dst(getTargetBasket().getPosition()) <= 2) {
 				callback.reportNeighbor(getTargetBasket());
 				//System.out.println("Basket separate worked");
 			}
@@ -1867,6 +1874,10 @@ public abstract class Player extends Entity {
 	public boolean isWestObstacle() {
 		return westObstacle;
 	}*/
+	
+	public abstract boolean isInHomeBasketZone();
+	
+	public abstract boolean isInHomeThreePointZone();
 	
 	public abstract boolean isInAwayZone();
 	

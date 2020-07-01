@@ -982,16 +982,18 @@ public class GameMap {
             Gdx.input.setCursorPosition(Gdx.input.getX(), Gdx.graphics.getHeight() - substractor);
     }
 
-    public void scoreTeam(boolean triple) {
+    public void scoreTeam(boolean doub, boolean triple) {
         if (triple)
             teamScore += 3;
-        else teamScore += 2;
+        else if(doub) teamScore += 2;
+        else teamScore++;
     }
 
-    public void scoreOpp(boolean triple) {
+    public void scoreOpp(boolean doub, boolean triple) {
         if (triple)
             oppScore += 3;
-        else oppScore += 2;
+        else if(doub) oppScore += 2;
+        else oppScore++;
     }
 
     public btDynamicsWorld getDynamicsWorld() {

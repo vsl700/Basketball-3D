@@ -32,6 +32,17 @@ public class Opponent extends Player {
 		return getPosition().z > 0;
 	}
 	
+	@Override
+	public boolean isInHomeBasketZone() {
+		
+		return map.getZones().isInZone("free-throw-opp", getPosition());
+	}
+
+	@Override
+	public boolean isInHomeThreePointZone() {
+		
+		return map.getZones().isInZone("three-point-opp", getPosition());
+	}
 	
 
 }

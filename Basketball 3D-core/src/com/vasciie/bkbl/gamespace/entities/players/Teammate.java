@@ -32,4 +32,16 @@ public class Teammate extends Player {
 		return getPosition().z < 0;
 	}
 
+	@Override
+	public boolean isInHomeBasketZone() {
+		
+		return map.getZones().isInZone("free-throw-team", getPosition());
+	}
+
+	@Override
+	public boolean isInHomeThreePointZone() {
+		
+		return map.getZones().isInZone("three-point-team", getPosition());
+	}
+
 }

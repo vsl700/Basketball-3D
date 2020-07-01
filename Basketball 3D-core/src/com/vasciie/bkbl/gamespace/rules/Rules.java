@@ -719,7 +719,7 @@ public class Rules {
 				
 				new GameRule(this, null, "basket_score", "SCORE!", map) {
 					Player recentHolder;
-					boolean holderInZone = false;
+					boolean holderInZone = false, holderInThreePoint = false;
 					
 					boolean teamScore = false;
 					
@@ -750,19 +750,20 @@ public class Rules {
 							recentHolder = holdingPlayer;
 							
 							holderInZone = holdingPlayer.isInAwayBasketZone();
+							holderInThreePoint = holdingPlayer.isInAwayThreePointZone();
 						}
 						
 						if (map.getBall().getLinearVelocity().y < 0) {
 							if (map.getBall().isCollidedWTeamBasket()) {
 								teamScore = false;
-								map.scoreOpp(!holderInZone);
+								map.scoreOpp(!holderInZone, !holderInThreePoint);
 								
 								ruleTriggerer = recentHolder;
 								setOccurPlace();
 								return true;
 							} else if (map.getBall().isCollidedWOppBasket()) {
 								teamScore = true;
-								map.scoreTeam(!holderInZone);
+								map.scoreTeam(!holderInZone, !holderInThreePoint);
 
 								ruleTriggerer = recentHolder;
 								setOccurPlace();

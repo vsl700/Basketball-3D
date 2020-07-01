@@ -7,6 +7,7 @@ import com.badlogic.gdx.ai.msg.Telegram;
 import com.badlogic.gdx.ai.utils.Location;
 import com.badlogic.gdx.math.MathUtils;
 import com.badlogic.gdx.math.Vector3;
+import com.badlogic.gdx.utils.Array;
 import com.vasciie.bkbl.gamespace.entities.Ball;
 import com.vasciie.bkbl.gamespace.entities.Entity;
 import com.vasciie.bkbl.gamespace.entities.Player;
@@ -21,6 +22,34 @@ public enum PlayerState implements State<Player> {
 		@Override
 		public void enter(Player player) {
 			
+		}
+		
+		private boolean isAnOpponentClose(Player player) {
+			ArrayList<Player> tempOpp;
+			if (player instanceof Teammate)
+				tempOpp = player.getMap().getTeammates();
+			else
+				tempOpp = player.getMap().getOpponents();
+			
+			
+			for(Player p : tempOpp)
+				if(p.getPosition().dst(player/*.getMap().getBall()*/.getPosition()) <= 0.85f)
+					return true;
+			
+			return false;
+		}
+		
+		private Array<Player> playersFurtherFromBasket(Player player){
+			Array<Player> players = new Array<Player>(player.getMap().getTeammates().size());
+			
+			Basket targetBasket = player.getTargetBasket();
+			
+			for(Player p : players) {
+				if(p.getPosition().dst(targetBasket.getPosition()) > player.getPosition().dst(targetBasket.getPosition()))
+					players.add(p);
+			}
+			
+			return players;
 		}
 		
 		@Override
@@ -43,45 +72,49 @@ public enum PlayerState implements State<Player> {
 			
 			mem.setRandomFoulTime(mem.getRandomFoulTime() + Gdx.graphics.getDeltaTime());
 
+			if(player.getMap().getTeammates().size() > 1 && (player.isInHomeThreePointZone() || (mem.getDribbleTime() > 0.7f && !player.isInAwayThreePointZone()) && (player.isFocusing() || player.isBehindBasket() || isAnOpponentClose(player)))) {
+				player.focus(playersFurtherFromBasket(player), false);
+				
+				Player focusedPlayer = player.getFocusedPlayer();
+				if(focusedPlayer == null)
+					return;
+				
+				brain.getMemory().setTargetPlayer(focusedPlayer);
+				
+				if(brain.isShooting())
+					brain.getMemory().setTargetVec(focusedPlayer.getPosition());
+			}
+			
+			
+			
 			// Ball behavior mechanism
-			if (!brain.updateShooting(1.25f)) {
-				if (/*player.isSurrounded() && player.getMap().getTeammates().size() > 1 || */player.isInAwayBasketZone()) {
-					Vector3 playerVec = player.getPosition();
-					Vector3 tempAimVec;
+			float time;
+			if(player.isFocusing()) {
+				if(player.isInHomeThreePointZone())
+					time = 1.3f;
+				else time = 0.7f;
+			}else time = 1.25f;
+			
+			if (!brain.updateShooting(time)) {
+				Vector3 tempAimVec = null;
+				float scoreDiff = 4/*, scoreDiff2 = 6*/;
 
-					if (!player.isBehindBasket())
-						tempAimVec = brain.makeBasketTargetVec(player.getTargetBasket());
-					else {
-						ArrayList<Player> tempTeam;
-						if (player instanceof Teammate)
-							tempTeam = player.getMap().getTeammates();
-						else
-							tempTeam = player.getMap().getOpponents();
+				if (player.isFocusing())
+					tempAimVec = brain.getMemory().getTargetPlayer().getPosition();
+				else if (player.isInAwayBasketZone() || player.isInAwayThreePointZone() && (
+						player instanceof Teammate && player.getMap().getOppScore() - player.getMap().getTeamScore() >= scoreDiff ||
+						player instanceof Opponent && player.getMap().getTeamScore() - player.getMap().getOppScore() >= scoreDiff)/* || 
+						player instanceof Teammate && player.getMap().getOppScore() - player.getMap().getTeamScore() >= scoreDiff2 ||
+						player instanceof Opponent && player.getMap().getTeamScore() - player.getMap().getOppScore() >= scoreDiff2*/)
+					tempAimVec = brain.makeBasketTargetVec(player.getTargetBasket());
+				
 
-						tempAimVec = GameTools.getShortestDistance(playerVec, tempTeam);
-					}
-					
+				if (tempAimVec != null)
 					brain.performShooting(tempAimVec);
-
-				}
-
 				else {
+					// TODO Make hand switch mechanism
 
-					/*if (player.isEastSurround()) {
-						player.turnY(210 * Gdx.graphics.getDeltaTime());
-
-						if (player.rightHolding() && mem.getSwitchHandTime() > 0.5f) {
-							player.interactWithBallL();
-							mem.setSwitchHandTime(0);
-						}
-					} else if (player.isWestSurround()) {
-						player.turnY(-210 * Gdx.graphics.getDeltaTime());
-
-						if (player.leftHolding() && mem.getSwitchHandTime() > 0.5f) {
-							player.interactWithBallR();
-							mem.setSwitchHandTime(0);
-						}
-					} else */if (mem.getDribbleTime() > 0.7f) {
+					if (mem.getDribbleTime() > 0.7f) {
 						if (player.isLeftHolding())
 							player.interactWithBallL();
 						else if (player.isRightHolding())
@@ -100,6 +133,9 @@ public enum PlayerState implements State<Player> {
 				
 			}*/
 			
+			if(player.isFocusing())
+				return;
+				
 			if(player.isInAwayBasketZone())
 				brain.getPursueBallInHand().setEnabled(false);
 			else {
@@ -141,11 +177,13 @@ public enum PlayerState implements State<Player> {
 			// memory.get(player).setShootTime(0);
 			// memory.get(player).setAimingTime(0);
 			player.getBrain().getMemory().setAimingTime(0);
+			player.getBrain().getMemory().setDribbleTime(0);
 			
 			player.getBrain().getBallSeparate().setEnabled(true);
 			
 			player.getBrain().getMemory().setTargetVec(null);
 			player.getBrain().getMemory().setShootVec(null);
+			player.getBrain().getMemory().setTargetPlayer(null);
 		}
 
 	},
