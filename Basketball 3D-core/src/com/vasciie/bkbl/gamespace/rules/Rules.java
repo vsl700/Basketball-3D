@@ -138,7 +138,7 @@ public class Rules {
 										//Putting a calculated from the original by the group one position into the targets vector
 										p.getBrain().setCustomVecTarget(positionsCalc.cpy().mul(tempTrans).getTranslation(new Vector3()), true);
 										//p.getBrain().getMemory().setTargetFacing(p.getBrain().getMemory().getTargetPosition());
-										p.getBrain().getCustomPursue().setArrivalTolerance(2);
+										p.getBrain().getCustomPursue().setArrivalTolerance(2.5f);
 									}
 								}
 								
@@ -159,6 +159,13 @@ public class Rules {
 								if(recentHolder.isHoldingBall()) {
 									recentHolder.getBrain().clearCustomTarget();
 									
+									if (Math.abs(occurPlace.z) >= 26) {
+										float diff = 5;
+										if (occurPlace.x < 0)
+											occurPlace.x = Math.min(-diff, occurPlace.x);
+										else
+											occurPlace.x = Math.max(diff, occurPlace.x);
+									}
 									//map.setPlayerTargetPosition(occurPlace, recentHolder);
 									recentHolder.getBrain().setCustomVecTarget(occurPlace, true);
 									

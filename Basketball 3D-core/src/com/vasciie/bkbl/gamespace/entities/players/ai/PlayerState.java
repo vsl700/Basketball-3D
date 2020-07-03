@@ -72,7 +72,7 @@ public enum PlayerState implements State<Player> {
 			
 			mem.setRandomFoulTime(mem.getRandomFoulTime() + Gdx.graphics.getDeltaTime());
 
-			if(player.getMap().getTeammates().size() > 1 && (player.isInHomeThreePointZone() || (mem.getDribbleTime() > 0.7f && !player.isInAwayThreePointZone()) && (player.isFocusing() || player.isBehindBasket() || isAnOpponentClose(player)))) {
+			if(player.getMap().getTeammates().size() > 1 && (player.isInHomeThreePointZone() || player.isBehindBasket() || (mem.getDribbleTime() > 0.7f && !player.isInAwayThreePointZone()) && (player.isFocusing() || player.isBehindBasket() || isAnOpponentClose(player)))) {
 				player.focus(playersFurtherFromBasket(player), false);
 				
 				Player focusedPlayer = player.getFocusedPlayer();
@@ -495,7 +495,7 @@ public enum PlayerState implements State<Player> {
 			//Brain brain = player.getBrain();
 			//brain.getCustomPursue().setArrivalTolerance(brain.getMemory().getTargetPosition().getBoundingRadius());
 			//brain.getCustomPursue().setTarget(brain.getMemory().getTargetPosition());
-			
+			//player.getBrain().getBasketSeparate().setEnabled(true);
 		}
 
 		@Override
@@ -518,6 +518,11 @@ public enum PlayerState implements State<Player> {
 				brain.getCustomPursue().setEnabled(true);
 				brain.getCollAvoid().setEnabled(true);
 			}
+			
+			//float checkConst = 2;
+			//if(player.getMap().getHomeBasket().getPosition().dst(player.getPosition()) <= checkConst || player.getMap().getAwayBasket().getPosition().dst(player.getPosition()) <= checkConst)
+			
+			//else brain.getBasketSeparate().setEnabled(false);
 			
 			brain.getPSCustom().calculateSteering(Player.steering);
 			// System.out.println("Idling movement");

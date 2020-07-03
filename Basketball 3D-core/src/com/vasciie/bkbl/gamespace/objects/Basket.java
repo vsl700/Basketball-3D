@@ -209,7 +209,17 @@ public abstract class Basket extends GameObject {
 	
 	@Override
 	public float getBoundingRadius() {
-		return standW * 8;
+		return standW;
+	}
+	
+	//CollisionAvoidance works only with moving objects. OK then, here, the basket is moving! HA!
+	private final Vector3 tempDir = new Vector3();
+	private boolean sw = false;
+	@Override
+	public Vector3 getLinearVelocity() {
+		sw = !sw;
+		
+		return tempDir.set(sw ? 1 : -1, 0, 0)/*.nor().scl(Gdx.graphics.getDeltaTime())*/;
 	}
 
 	public Matrix4 getBasketTargetTrans() {

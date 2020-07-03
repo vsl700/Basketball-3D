@@ -116,7 +116,7 @@ public abstract class Player extends Entity {
 		
 		//if(!isMainPlayer())
 		brain = new Brain(this);
-		boundRadius = 2;
+		//boundRadius = 2;
 		
 		invTrans.set(modelInstance.transform);
 			//stateMachine = new DefaultStateMachine<Player, PlayerState>(this, PlayerState.IDLING);
@@ -1482,7 +1482,8 @@ public abstract class Player extends Entity {
 			return 0;
 		}else if(callback.equals(brain.getBasketSeparate())) {
 			//System.out.println("Basket separate invoked");
-			if (/*isProximityColliding(getTargetBasket())*/ getPosition().dst(getTargetBasket().getPosition()) <= 2) {
+			float diff = 4;
+			if (/*isProximityColliding(getTargetBasket())*/ getPosition().dst(map.getHomeBasket().getPosition()) <= diff || getPosition().dst(map.getAwayBasket().getPosition()) <= diff) {
 				callback.reportNeighbor(getTargetBasket());
 				//System.out.println("Basket separate worked");
 			}
@@ -1523,10 +1524,10 @@ public abstract class Player extends Entity {
 					count++;
 	
 			//if (!isHoldingBall()) {
-				if (/*isProximityColliding(map.getHomeBasket()) && */callback.reportNeighbor(map.getHomeBasket()))
+				if (isProximityColliding(map.getHomeBasket()) && callback.reportNeighbor(map.getHomeBasket()))
 					count++;
 
-				else if (/*isProximityColliding(map.getAwayBasket()) && */callback.reportNeighbor(map.getAwayBasket()))
+				else if (isProximityColliding(map.getAwayBasket()) && callback.reportNeighbor(map.getAwayBasket()))
 					count++;
 			//}
 			
