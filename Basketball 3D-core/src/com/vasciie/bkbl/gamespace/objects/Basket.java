@@ -209,7 +209,7 @@ public abstract class Basket extends GameObject {
 	
 	@Override
 	public float getBoundingRadius() {
-		return standW;
+		return standW + 0.5f;
 	}
 	
 	//CollisionAvoidance works only with moving objects. OK then, here, the basket is moving! HA!

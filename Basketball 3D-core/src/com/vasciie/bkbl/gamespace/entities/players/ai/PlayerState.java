@@ -73,7 +73,7 @@ public enum PlayerState implements State<Player> {
 			mem.setRandomFoulTime(mem.getRandomFoulTime() + Gdx.graphics.getDeltaTime());
 
 			if(player.getMap().getTeammates().size() > 1 && (player.isInHomeThreePointZone() || player.isBehindBasket() || (mem.getDribbleTime() > 0.7f && !player.isInAwayThreePointZone()) && (player.isFocusing() || player.isBehindBasket() || isAnOpponentClose(player)))) {
-				player.focus(playersFurtherFromBasket(player), false);
+				player.focus(playersFurtherFromBasket(player), true);
 				
 				Player focusedPlayer = player.getFocusedPlayer();
 				if(focusedPlayer == null)

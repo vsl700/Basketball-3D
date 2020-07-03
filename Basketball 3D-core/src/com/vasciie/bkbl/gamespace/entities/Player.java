@@ -1134,7 +1134,7 @@ public abstract class Player extends Entity {
 		float minDist = direction.dst2(tempClosestDir);
 		
 		Player tempTarget = startingPlayer;//Used to store the closest player while there's still not found any unblocked player (if any at all)
-		boolean change = avoidInterpose || ignored.contains(tempTarget, false);//If change is true, the system below will keep changing the player no matter he is being blocked or not. Otherwise, it checks for blockings
+		boolean change = avoidInterpose || ignored != null && ignored.contains(tempTarget, false);//If change is true, the system below will keep changing the player no matter he is being blocked or not. Otherwise, it checks for blockings
 		for(Player p : tempPlayers) {//The players this player should choose from for pointing at
 			if(p.equals(this) || p.equals(startingPlayer)/* && !avoidInterpose*/ || ignored != null && ignored.contains(p, false))//FIXME ignored system not working!
 				continue;
