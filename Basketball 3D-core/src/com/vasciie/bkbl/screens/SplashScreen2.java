@@ -11,6 +11,13 @@ public class SplashScreen2 extends SplashScreen1 {
 	}
 	
 	@Override
+	public void show() {
+		super.show();
+		
+		MyGdxGame.assets.finishLoading();
+	}
+	
+	@Override
 	protected void createTexture() {
 		logo = new Texture(Gdx.files.internal("application/powered_by_libgdx.png"));
 	}

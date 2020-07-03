@@ -3,6 +3,7 @@ package com.vasciie.bkbl;
 import com.badlogic.gdx.Application;
 import com.badlogic.gdx.Game;
 import com.badlogic.gdx.Gdx;
+import com.badlogic.gdx.assets.AssetManager;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.OrthographicCamera;
@@ -11,6 +12,7 @@ import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.BitmapFont;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.g3d.Environment;
+import com.badlogic.gdx.graphics.g3d.Model;
 import com.badlogic.gdx.graphics.g3d.ModelBatch;
 import com.badlogic.gdx.graphics.g3d.attributes.ColorAttribute;
 import com.badlogic.gdx.graphics.g3d.environment.DirectionalLight;
@@ -44,6 +46,8 @@ public class MyGdxGame extends Game {
 	public SettingsScreen settings;
 	public TestScreen tester;
 	
+	public static AssetManager assets;
+	
 	public final static int WIDTH = 848;
 	public final static int HEIGHT = 480;
 	public static float GUI_SCALE;
@@ -52,7 +56,12 @@ public class MyGdxGame extends Game {
 	
 	@Override
 	public void create () {
+		assets = new AssetManager();
+		assets.load("game/basketframe.obj", Model.class);
+		
 		if (TESTING) {
+			assets.finishLoading();
+			
 			load3DGraphics();
 			tester = new TestScreen(this, pCam);
 			setScreen(tester);
@@ -78,8 +87,6 @@ public class MyGdxGame extends Game {
 		main = new MainScreen(this);		
 		level = new LevelScreen(this);
 		game = new GameScreen(this);
-		
-		
 		
 
 		if(!Gdx.app.getType().equals(Application.ApplicationType.Android))
@@ -258,6 +265,8 @@ public class MyGdxGame extends Game {
 			background.dispose();
 		
 		getScreen().dispose();
+		
+		assets.dispose();
 	}
 	
 	public GameMap getMap() {

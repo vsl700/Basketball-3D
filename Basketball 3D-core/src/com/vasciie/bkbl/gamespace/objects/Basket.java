@@ -6,6 +6,7 @@ import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.VertexAttributes;
 import com.badlogic.gdx.graphics.g3d.Material;
+import com.badlogic.gdx.graphics.g3d.Model;
 import com.badlogic.gdx.graphics.g3d.ModelCache;
 import com.badlogic.gdx.graphics.g3d.ModelInstance;
 import com.badlogic.gdx.graphics.g3d.attributes.ColorAttribute;
@@ -15,15 +16,17 @@ import com.badlogic.gdx.graphics.g3d.utils.shapebuilders.BoxShapeBuilder;
 import com.badlogic.gdx.graphics.g3d.utils.shapebuilders.CylinderShapeBuilder;
 import com.badlogic.gdx.math.Matrix4;
 import com.badlogic.gdx.math.Vector3;
+import com.badlogic.gdx.physics.bullet.Bullet;
 import com.badlogic.gdx.physics.bullet.collision.btBoxShape;
 import com.badlogic.gdx.physics.bullet.collision.btCollisionObject;
+import com.badlogic.gdx.physics.bullet.collision.btCollisionShape;
 import com.badlogic.gdx.physics.bullet.collision.btCylinderShape;
 import com.badlogic.gdx.physics.bullet.dynamics.btRigidBody;
 import com.vasciie.bkbl.MyGdxGame;
 
 public abstract class Basket extends GameObject {
 	
-	private ModelInstance tabCenter;
+	private ModelInstance tabCenter, frame;
 
 	private static final float standW = 1;
 	private static final float standH = 9;
@@ -31,12 +34,13 @@ public abstract class Basket extends GameObject {
 	private static final float tabW = 5.5f;
 	private static final float tabH = 3;
 	private static final float tabD = 0.115f;
-	private static final float tabCentW = 2.3f;
+	private static final float tabCentW = 2.6f;
 	private static final float tabCentH = 0.15f;
 	private static final float tabCentH1 = 1.2f;
 	private static final float tabCentD = 0.01f;
 	private static final float bkHoldW = 0.08f;
 	private static final float bkHoldD = 0.2f;
+	//private static final float bkTargetScale = 0.53f;
 	
 	protected abstract Color getColor();
 
@@ -72,7 +76,7 @@ public abstract class Basket extends GameObject {
 		BoxShapeBuilder.build(childMB.part(basketHold.id, GL20.GL_TRIANGLES, VertexAttributes.Usage.Position | VertexAttributes.Usage.Normal, material), bkHoldW, bkHoldW, bkHoldD);
 		basketHold.translation.set(0, -tabH / 2 + bkHoldW / 2, -tabD / 2 - bkHoldD / 2);
 		
-		Node basket1 = childMB.node();
+		/*Node basket1 = childMB.node();
 		basket1.id = "basket1";
 		basketHold.addChild(basket1);
 		BoxShapeBuilder.build(childMB.part(basket1.id, GL20.GL_TRIANGLES, VertexAttributes.Usage.Position | VertexAttributes.Usage.Normal, material), tabCentW, bkHoldW, bkHoldW);
@@ -94,7 +98,7 @@ public abstract class Basket extends GameObject {
 		basket4.id = "basket4";
 		basket1.addChild(basket4);
 		BoxShapeBuilder.build(childMB.part(basket4.id, GL20.GL_TRIANGLES, VertexAttributes.Usage.Position | VertexAttributes.Usage.Normal, material), bkHoldW, bkHoldW, tabCentW);
-		basket4.translation.set(tabCentW / 2 - bkHoldW / 2, 0, -tabCentW / 2);
+		basket4.translation.set(tabCentW / 2 - bkHoldW / 2, 0, -tabCentW / 2);*/
 		
 		childMB.end();
 		model = mb.end();
@@ -124,13 +128,21 @@ public abstract class Basket extends GameObject {
 		childMB.end();
 		tabCenter = new ModelInstance(mb.end(), getTabCenterTrans());
 		
+		frame = new ModelInstance(MyGdxGame.assets.get("game/basketframe.obj", Model.class), getBasketTargetTrans());
+		//frame.transform.scl(bkTargetScale);
+		
 		matrixes.add(modelInstance.getNode(stand.id).globalTransform);
 		matrixes.add(modelInstance.getNode(tab.id).globalTransform);
 		matrixes.add(modelInstance.getNode(basketHold.id).globalTransform);
-		matrixes.add(modelInstance.getNode(basket1.id).globalTransform);
+		//matrixes.add(frame.transform);
+		
+		outsideMatrixes = new ArrayList<Matrix4>();
+		outsideMatrixes.add(frame.transform);
+		
+		/*matrixes.add(modelInstance.getNode(basket1.id).globalTransform);
 		matrixes.add(modelInstance.getNode(basket2.id).globalTransform);
 		matrixes.add(modelInstance.getNode(basket3.id).globalTransform);
-		matrixes.add(modelInstance.getNode(basket4.id).globalTransform);
+		matrixes.add(modelInstance.getNode(basket4.id).globalTransform);*/
 		
 		tabCenterDimensions.set(tabCentW, tabCentH, tabCentD);
 		/*matrixes.add(modelInstance.getNode(tabCenter1.id).globalTransform);
@@ -154,34 +166,40 @@ public abstract class Basket extends GameObject {
 		
 		//if (GameTools.isObjectVisibleToScreen(pCam, tabCenter, tabCenterDimensions)) {
 			//mBatch.flush();
-			mCache.add(tabCenter);
+		mCache.add(frame);	
+		mCache.add(tabCenter);
+			
 		//}
 	}
 
 	@Override
 	protected void createCollisionShapes() {
 		
-		Vector3 bk13 = new Vector3(tabCentW / 2, bkHoldW / 2, bkHoldW / 2);
-		Vector3 bk24 = new Vector3(bkHoldW / 2, bkHoldW / 2, tabCentW / 2);
+		/*Vector3 bk13 = new Vector3(tabCentW / 2, bkHoldW / 2, bkHoldW / 2);
+		Vector3 bk24 = new Vector3(bkHoldW / 2, bkHoldW / 2, tabCentW / 2);*/
 		
 		visibleCollShapes.add(new btCylinderShape(new Vector3(standW / 2, standH / 2, standD / 2)));
 		visibleCollShapes.add(new btBoxShape(new Vector3(tabW / 2, tabH / 2, tabD / 2)));
 		visibleCollShapes.add(new btBoxShape(new Vector3(bkHoldW / 2, bkHoldW / 2, bkHoldD / 2)));
-		visibleCollShapes.add(new btBoxShape(bk13));
-		visibleCollShapes.add(new btBoxShape(bk24));
-		visibleCollShapes.add(new btBoxShape(bk13));
-		visibleCollShapes.add(new btBoxShape(bk24));
 		
-		invisibleCollShapes.add(new btBoxShape(new Vector3(tabCentW / 2, bkHoldW / 2, tabCentW / 2)));
+		btCollisionShape tempShape = Bullet.obtainStaticNodeShape(frame.nodes);
+		visibleCollShapes.add(tempShape);
+		
+		/*visibleCollShapes.add(new btBoxShape(bk13));
+		visibleCollShapes.add(new btBoxShape(bk24));
+		visibleCollShapes.add(new btBoxShape(bk13));
+		visibleCollShapes.add(new btBoxShape(bk24));*/
+		
+		invisibleCollShapes.add(new btCylinderShape(new Vector3(tabCentW / 2, bkHoldW / 2, tabCentW / 2)));
 	}
 	
 	public void setRotation(float x, float y, float z, float angle) {
 		super.setRotation(x, y, z, angle);
 		
+		manuallyRecalcCollisions();
+		
 		if(!MyGdxGame.TESTING)
 			recalcCollisionsTransform();
-		
-		manuallyRecalcCollisions();
 	}
 	
 	@Override
@@ -213,17 +231,17 @@ public abstract class Basket extends GameObject {
 	}
 	
 	//CollisionAvoidance works only with moving objects. OK then, here, the basket is moving! HA!
-	private final Vector3 tempDir = new Vector3();
+	private static final Vector3 tempDir = new Vector3();
 	private boolean sw = false;
 	@Override
 	public Vector3 getLinearVelocity() {
 		sw = !sw;
 		
-		return tempDir.set(sw ? 1 : -1, 0, 0)/*.nor().scl(Gdx.graphics.getDeltaTime())*/;
+		return tempDir.set(sw ? 1 : -1, 0, 0);
 	}
 
 	public Matrix4 getBasketTargetTrans() {
-		return calcTransformFromNodesTransform(modelInstance.getNode("basket1").globalTransform.cpy().trn(0, 0, -tabCentW / 2));
+		return calcTransformFromNodesTransform(modelInstance.getNode("basketHold").globalTransform.cpy().trn(0, 0, -tabCentW / 2 - 0.04f));
 	}
 
 	@Override
@@ -258,6 +276,7 @@ public abstract class Basket extends GameObject {
 			collisionObjects.get(0).setWorldTransform(getBasketTargetTrans());
 		
 		tabCenter.transform.set(getTabCenterTrans());
+		frame.transform.set(getBasketTargetTrans());
 	}
 
 	@Override

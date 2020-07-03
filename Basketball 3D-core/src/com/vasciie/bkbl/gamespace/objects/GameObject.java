@@ -27,7 +27,7 @@ public abstract class GameObject implements Steerable<Vector3>, Proximity<Vector
 	protected Model model;
 	protected ModelInstance modelInstance;
 	//protected ArrayList<Node> nodes;
-	protected ArrayList<Matrix4> matrixes;
+	protected ArrayList<Matrix4> matrixes, outsideMatrixes;//outside - for matrixes outside the modelInstance
 	protected ArrayList<btCollisionShape> visibleCollShapes;
 	protected ArrayList<btCollisionShape> invisibleCollShapes;
 	//protected ArrayList<btCollisionShape> invisibleCollObjShapes;
@@ -67,6 +67,7 @@ public abstract class GameObject implements Steerable<Vector3>, Proximity<Vector
 		
 		//nodes = new ArrayList<Node>();
 		matrixes = new ArrayList<Matrix4>();
+		//outsideMatrixes = new ArrayList<Matrix4>();
 		
 		createModels();
 		if(MyGdxGame.TESTING)
@@ -185,6 +186,8 @@ public abstract class GameObject implements Steerable<Vector3>, Proximity<Vector
 		for(int i = 0; i < bodies.size() && modelInstance != null; i++)
 			if(i == mainBodyIndex)
 				bodies.get(i).proceedToTransform(mainTrans);
+			else if(i > matrixes.size() - 1)
+				bodies.get(i).proceedToTransform(outsideMatrixes.get(matrixes.size() - i));
 			else bodies.get(i).proceedToTransform(calcTransformFromNodesTransform(matrixes.get(i)));
 	}
 	
@@ -220,6 +223,8 @@ public abstract class GameObject implements Steerable<Vector3>, Proximity<Vector
 			else motionStates.get(i).transform = new Matrix4();*/
 			if(i == mainBodyIndex)
 				motionStates.get(i).transform = mainTrans;
+			else if(i > matrixes.size() - 1)
+				motionStates.get(i).transform = outsideMatrixes.get(matrixes.size() - i);
 			else motionStates.get(i).transform = calcTransformFromNodesTransform(matrixes.get(i));
 			bodies.get(i).setMotionState(motionStates.get(i));
 		}
@@ -232,7 +237,9 @@ public abstract class GameObject implements Steerable<Vector3>, Proximity<Vector
 			/*Matrix4 temp = new Matrix4();
 			Matrix4 glTr = nodes.get(i).globalTransform;
 			temp.set(glTr.cpy().setToTranslation(glTr.getTranslation(new Vector3()).add(x, y, z)).getTranslation(new Vector3()), new Quaternion().setFromAxis(rX, rY, rZ, rA));*/
-			motionStates.get(i).transform = calcTransformFromNodesTransform(matrixes.get(i));
+			if(i > matrixes.size() - 1)
+				motionStates.get(i).transform = outsideMatrixes.get(matrixes.size() - i);
+			else motionStates.get(i).transform = calcTransformFromNodesTransform(matrixes.get(i));
 			bodies.get(i).setMotionState(motionStates.get(i));
 		}
 	}
