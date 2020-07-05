@@ -66,8 +66,6 @@ public enum PlayerState implements State<Player> {
 
 			Basket basket = player.getTargetBasket();
 			
-			float closeCheck = 9;
-			
 			int difficulty = player.getMap().getDifficulty();
 			if(mem.isRandomFoulTime()) {
 				if (difficulty == 0 && player instanceof Opponent && MathUtils.random(0, 100) <= 60) {
@@ -92,7 +90,7 @@ public enum PlayerState implements State<Player> {
 				
 				if(brain.isShooting())
 					brain.getMemory().setTargetVec(focusedPlayer.getPosition());
-			}else if (player.isBehindBasket() || player.getPosition().dst(player.getTargetBasket().getPosition()) <= closeCheck) {
+			}else if (brain.tooCloseOrBehindBasket()) {
 				brain.getPursueBallInHand().setEnabled(false);
 				brain.getPursueBallInHand2().setEnabled(true);
 			}else {
@@ -115,7 +113,7 @@ public enum PlayerState implements State<Player> {
 
 				if (player.isFocusing())
 					tempAimVec = brain.getMemory().getTargetPlayer().getPosition();
-				else if (player.isInAwayBasketZone() || player.isInAwayThreePointZone() && checkPlayerPointsDiff(player) && !player.isBehindBasket() && player.getPosition().dst(player.getTargetBasket().getPosition()) > closeCheck)
+				else if ((player.isInAwayBasketZone() || player.isInAwayThreePointZone() && checkPlayerPointsDiff(player)) && !brain.tooCloseOrBehindBasket())
 					tempAimVec = brain.makeBasketTargetVec(player.getTargetBasket());
 				
 
@@ -202,6 +200,8 @@ public enum PlayerState implements State<Player> {
 			player.getBrain().getMemory().setTargetVec(null);
 			player.getBrain().getMemory().setShootVec(null);
 			player.getBrain().getMemory().setTargetPlayer(null);
+			
+			player.getBrain().getPursueBallInHand2().setEnabled(false);
 		}
 
 	},
@@ -573,6 +573,8 @@ public enum PlayerState implements State<Player> {
 			brain.getCollAvoid().setEnabled(true);
 			brain.getBallSeparate().setEnabled(true);
 			brain.getAllPlayerSeparate().setEnabled(true);
+			
+			player.getBrain().getPursueBallInHand2().setEnabled(false);
 		}
 	};
 

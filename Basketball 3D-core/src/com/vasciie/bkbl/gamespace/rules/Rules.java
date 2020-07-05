@@ -443,11 +443,12 @@ public class Rules {
 							public boolean act() {
 								Player holdingPlayer = map.getHoldingPlayer();
 									
-								if(holdingPlayer.isInAwayBasketZone()) {
+								boolean tooCloseOrBehind = holdingPlayer.getBrain().tooCloseOrBehindBasket();
+								
+								if((!tooCloseOrBehind || holdingPlayer.getBrain().isShooting()) && holdingPlayer.isInAwayBasketZone()) {
 									if(!holdingPlayer.getBrain().updateShooting(1.25f)) {
 										holdingPlayer.getBrain().clearCustomTarget();
 										holdingPlayer.getBrain().performShooting(holdingPlayer.getBrain().makeBasketTargetVec(holdingPlayer.getTargetBasket()));
-										System.out.println("Shoot performed");
 									}else if(!holdingPlayer.getBrain().isShooting()) {
 										for(Player p : map.getAllPlayers()) {
 											if(p.equals(holdingPlayer))
@@ -458,7 +459,15 @@ public class Rules {
 										
 										return true;
 									}
+								}else if (tooCloseOrBehind) {
+									holdingPlayer.getBrain().getPursueBallInHand2().setEnabled(true);
+									holdingPlayer.getBrain().getCustomPursue().setEnabled(false);
+									
+									holdingPlayer.setRunning();
 								}else {
+									holdingPlayer.getBrain().getPursueBallInHand2().setEnabled(false);
+									holdingPlayer.getBrain().getCustomPursue().setEnabled(true);
+									
 									holdingPlayer.getBrain().setCustomTarget(holdingPlayer.getTargetBasket());
 									holdingPlayer.getBrain().getMemory().setTargetFacing(holdingPlayer.getTargetBasket());
 									holdingPlayer.getBrain().getAllPlayerSeparate().setEnabled(false);

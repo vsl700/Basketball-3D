@@ -71,6 +71,8 @@ public class Brain {
 		
 		pursueBallInHand = new Arrive<Vector3>(user, user.getTargetBasket());
 		pursueBallInHand2 = new Arrive<Vector3>(user, tempSteerable);
+		pursueBallInHand2.setEnabled(false);
+		
 		customPursue = new Arrive<Vector3>(user, null);
 		customPursue.setArrivalTolerance(0);
 		//pursue.setArrivalTolerance(0.1f);
@@ -144,6 +146,7 @@ public class Brain {
 		//pSCustom.add(basketSeparate);
 		pSCustom.add(collAvoid);
 		pSCustom.add(allPlayerSeparate);
+		pSCustom.add(pursueBallInHand2);
 		pSCustom.add(customPursue);
 		//mSCoop.add(playerSeparate, 0.9f);
 	}
@@ -415,6 +418,10 @@ public class Brain {
 		Ball tempBall = user.getMap().getBall();
 		
 		return tempBall.getPosition().dst(user.getPosition()) <= user.getDepth() / 2 + tempBall.getDepth() / 2 + 0.7f && !tempBall.isGrounded();
+	}
+	
+	public boolean tooCloseOrBehindBasket() {
+		return user.isBehindBasket() || user.getPosition().dst(user.getTargetBasket().getPosition()) <= 9;
 	}
 	
 	/*public boolean isAbleToShoot() {
