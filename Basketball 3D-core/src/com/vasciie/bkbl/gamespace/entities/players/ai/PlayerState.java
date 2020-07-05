@@ -52,12 +52,21 @@ public enum PlayerState implements State<Player> {
 			return players;
 		}
 		
+		private boolean checkPlayerPointsDiff(Player player) {
+			float scoreDiff = 4;
+			
+			return player instanceof Teammate && player.getMap().getOppScore() - player.getMap().getTeamScore() >= scoreDiff ||
+					player instanceof Opponent && player.getMap().getTeamScore() - player.getMap().getOppScore() >= scoreDiff;
+		}
+		
 		@Override
 		public void update(Player player) {
 			Brain brain = player.getBrain();
 			AIMemory mem = brain.getMemory();
 
 			Basket basket = player.getTargetBasket();
+			
+			float closeCheck = 9;
 			
 			int difficulty = player.getMap().getDifficulty();
 			if(mem.isRandomFoulTime()) {
@@ -83,6 +92,12 @@ public enum PlayerState implements State<Player> {
 				
 				if(brain.isShooting())
 					brain.getMemory().setTargetVec(focusedPlayer.getPosition());
+			}else if (player.isBehindBasket() || player.getPosition().dst(player.getTargetBasket().getPosition()) <= closeCheck) {
+				brain.getPursueBallInHand().setEnabled(false);
+				brain.getPursueBallInHand2().setEnabled(true);
+			}else {
+				brain.getPursueBallInHand().setEnabled(true);
+				brain.getPursueBallInHand2().setEnabled(false);
 			}
 			
 			
@@ -97,15 +112,10 @@ public enum PlayerState implements State<Player> {
 			
 			if (!brain.updateShooting(time)) {
 				Vector3 tempAimVec = null;
-				float scoreDiff = 4/*, scoreDiff2 = 6*/;
 
 				if (player.isFocusing())
 					tempAimVec = brain.getMemory().getTargetPlayer().getPosition();
-				else if (player.isInAwayBasketZone() || player.isInAwayThreePointZone() && (
-						player instanceof Teammate && player.getMap().getOppScore() - player.getMap().getTeamScore() >= scoreDiff ||
-						player instanceof Opponent && player.getMap().getTeamScore() - player.getMap().getOppScore() >= scoreDiff)/* || 
-						player instanceof Teammate && player.getMap().getOppScore() - player.getMap().getTeamScore() >= scoreDiff2 ||
-						player instanceof Opponent && player.getMap().getTeamScore() - player.getMap().getOppScore() >= scoreDiff2*/)
+				else if (player.isInAwayBasketZone() || player.isInAwayThreePointZone() && checkPlayerPointsDiff(player) && !player.isBehindBasket() && player.getPosition().dst(player.getTargetBasket().getPosition()) > closeCheck)
 					tempAimVec = brain.makeBasketTargetVec(player.getTargetBasket());
 				
 

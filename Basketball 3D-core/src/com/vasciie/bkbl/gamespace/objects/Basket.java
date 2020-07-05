@@ -102,9 +102,10 @@ public abstract class Basket extends GameObject {
 		
 		childMB.end();
 		model = mb.end();
-		model.calculateTransforms();
+		//model.calculateTransforms();
 		
 		modelInstance = new ModelInstance(model, x, y, z);
+		//modelInstance.calculateTransforms();
 		
 		mb.begin();
 		childMB.begin();
@@ -155,8 +156,12 @@ public abstract class Basket extends GameObject {
 		mainTrans = new Matrix4().setToTranslation(modelInstance.transform.getTranslation(new Vector3())).cpy().trn(0, getHeight() / 2, 0);
 	}
 	
-	private Matrix4 getTabCenterTrans() {
-		return calcTransformFromNodesTransform(modelInstance.getNode("tab").globalTransform.trn(0, 0, tabCentD));
+	public Matrix4 getTabCenterTrans() {
+		return calcTransformFromNodesTransform(modelInstance.getNode("tab").globalTransform.cpy().trn(0, 0, -tabCentD * 2));
+	}
+	
+	public Matrix4 getTabCenterPartTrans(int part) {
+		return tabCenter.transform.cpy().mul(tabCenter.getNode("tabCent" + part).globalTransform);
 	}
 	
 	private final Vector3 tabCenterDimensions = new Vector3();
@@ -277,6 +282,9 @@ public abstract class Basket extends GameObject {
 		
 		tabCenter.transform.set(getTabCenterTrans());
 		frame.transform.set(getBasketTargetTrans());
+		
+		tabCenter.calculateTransforms();
+		frame.calculateTransforms();
 	}
 
 	@Override

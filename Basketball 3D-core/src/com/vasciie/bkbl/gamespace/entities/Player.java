@@ -26,6 +26,7 @@ import com.vasciie.bkbl.gamespace.entities.players.Teammate;
 import com.vasciie.bkbl.gamespace.entities.players.ai.*;
 import com.vasciie.bkbl.gamespace.objects.Basket;
 import com.vasciie.bkbl.gamespace.tools.GameTools;
+import com.vasciie.bkbl.gamespace.zones.Zones.Zone;
 
 public abstract class Player extends Entity {
 
@@ -1876,18 +1877,34 @@ public abstract class Player extends Entity {
 		return westObstacle;
 	}*/
 	
-	public abstract boolean isInHomeBasketZone();
+	public abstract Zone getHomeBasketZone();
 	
-	public abstract boolean isInHomeThreePointZone();
+	public abstract Zone getHomeThreePointZone();
+	
+	public abstract Zone getAwayBasketZone();
+	
+	public abstract Zone getAwayThreePointZone();
+	
+	public boolean isInHomeBasketZone() {
+		return getHomeBasketZone().checkZone(GameTools.toVector2(getPosition()));
+	}
+	
+	public boolean isInHomeThreePointZone() {
+		return getHomeThreePointZone().checkZone(GameTools.toVector2(getPosition()));
+	}
 	
 	public abstract boolean isInAwayZone();
 	
-	public abstract boolean isInAwayBasketZone();
+	public boolean isInAwayBasketZone() {
+		return getAwayBasketZone().checkZone(GameTools.toVector2(getPosition()));
+	}
 	
-	public abstract boolean isInAwayThreePointZone();
+	public boolean isInAwayThreePointZone() {
+		return getAwayThreePointZone().checkZone(GameTools.toVector2(getPosition()));
+	}
 	
 	public boolean isBehindBasket() {
-		return Math.abs(modelInstance.transform.getTranslation(new Vector3()).z) - Math.abs(map.getHomeBasket().getModelInstance().transform.getTranslation(new Vector3()).z) >= -0.5f;
+		return Math.abs(getPosition().z) - Math.abs(map.getHomeBasket().getPosition().z) >= 1.25f;
 	}
 
 	public boolean isMainPlayer() {

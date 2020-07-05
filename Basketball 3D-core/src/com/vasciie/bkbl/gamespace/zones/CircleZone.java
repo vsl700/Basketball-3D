@@ -21,5 +21,10 @@ public abstract class CircleZone extends Zone {
 		
 		return pos.dst(this.pos) <= radius;
 	}
+	
+	@Override
+	public Vector2[] getPositions() {
+		return new Vector2[] {pos};
+	}
 
 }

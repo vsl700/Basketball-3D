@@ -188,6 +188,14 @@ public class Zones {
 		this.map = map;
 	}
 	
+	public Zone getZone(String id) {
+		for(Zone zone : zones)
+			if(id.equals(zone.getId()))
+				return zone;
+		
+		return null;
+	}
+	
 	public boolean isInZone(String id, Vector3 pos) {
 		for(Zone zone : zones) {
 			if(zone.getId().equals(id))
@@ -252,5 +260,7 @@ public class Zones {
 		public String getId() {
 			return id;
 		}
+		
+		public abstract Vector2[] getPositions();
 	}
 }

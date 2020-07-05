@@ -3,6 +3,7 @@ package com.vasciie.bkbl.gamespace.entities.players;
 import com.badlogic.gdx.graphics.Color;
 import com.vasciie.bkbl.gamespace.entities.Player;
 import com.vasciie.bkbl.gamespace.objects.Basket;
+import com.vasciie.bkbl.gamespace.zones.Zones.Zone;
 
 public class Teammate extends Player {
 
@@ -15,16 +16,6 @@ public class Teammate extends Player {
 	public Basket getTargetBasket() {
 		return map.getAwayBasket();
 	}
-
-	@Override
-	public boolean isInAwayBasketZone() {
-		return map.getZones().isInZone("free-throw-opp", getPosition());
-	}
-
-	@Override
-	public boolean isInAwayThreePointZone() {
-		return map.getZones().isInZone("three-point-opp", getPosition());
-	}
 	
 	@Override
 	public boolean isInAwayZone() {
@@ -33,15 +24,27 @@ public class Teammate extends Player {
 	}
 
 	@Override
-	public boolean isInHomeBasketZone() {
+	public Zone getHomeBasketZone() {
 		
-		return map.getZones().isInZone("free-throw-team", getPosition());
+		return map.getZones().getZone("free-throw-team");
 	}
 
 	@Override
-	public boolean isInHomeThreePointZone() {
+	public Zone getHomeThreePointZone() {
 		
-		return map.getZones().isInZone("three-point-team", getPosition());
+		return map.getZones().getZone("three-point-team");
+	}
+
+	@Override
+	public Zone getAwayBasketZone() {
+		
+		return map.getZones().getZone("free-throw-opp");
+	}
+
+	@Override
+	public Zone getAwayThreePointZone() {
+		
+		return map.getZones().getZone("three-point-opp");
 	}
 
 }

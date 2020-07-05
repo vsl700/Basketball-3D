@@ -45,5 +45,10 @@ public abstract class PolygonZone extends Zone {
 		
 		return mainToCheck1.dst2(mainToEntity) <= tempDst && mainToCheck2.dst2(mainToEntity) <= tempDst;
 	}
+	
+	@Override
+	public Vector2[] getPositions() {
+		return positions;
+	}
 
 }

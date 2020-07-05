@@ -40,7 +40,7 @@ public class Brain {
 	Player user;
 	
 	//Some player behaviors
-	Arrive<Vector3> pursue, pursueBallInHand, customPursue;
+	Arrive<Vector3> pursue, pursueBallInHand, pursueBallInHand2, customPursue;
 	LookWhereYouAreGoing<Vector3> lookAt;
 	CollisionAvoidance<Vector3> collAvoid; //For players and basket stands
 	Interpose<Vector3> interpose; //For blocking opponents from getting close to the player holding the ball in co-op state
@@ -53,16 +53,24 @@ public class Brain {
 	
 	//RayConfiguration<Vector3> rayConfig;
 	
-	public Brain(Player user) {
+	public Brain(final Player user) {
 		this.user = user;
 		
 		stateMachine = new DefaultStateMachine<Player, PlayerState>(user, PlayerState.IDLING);
 		memory = new AIMemory();
 		
+		SteerableAdapter<Vector3> tempSteerable = new SteerableAdapter<Vector3>() {
+			@Override
+			public Vector3 getPosition() {
+				return new Vector3(GameTools.toVector3(user.getAwayBasketZone().getPositions()[0]).scl(0, 0, 1));
+			}
+		};
+		
 		pursue = new Arrive<Vector3>(user, user.getMap().getBall());
 		pursue.setDecelerationRadius(user.getMap().getBall().getWidth() * 1.5f);
 		
 		pursueBallInHand = new Arrive<Vector3>(user, user.getTargetBasket());
+		pursueBallInHand2 = new Arrive<Vector3>(user, tempSteerable);
 		customPursue = new Arrive<Vector3>(user, null);
 		customPursue.setArrivalTolerance(0);
 		//pursue.setArrivalTolerance(0.1f);
@@ -106,6 +114,7 @@ public class Brain {
 		mSBallInHand.add(allPlayerSeparate, 1f);*/
 		mSBallInHand.add(pSBallInHandPart, 1.5f);
 		mSBallInHand.add(pursueBallInHand, 1.3f);
+		mSBallInHand.add(pursueBallInHand2, 1.3f);
 		
 		pSCoop = new PrioritySteering<Vector3>(user);
 		pSCoop.add(targetPlayerSeparate);
@@ -278,7 +287,7 @@ public class Brain {
 		float dst = user.getPosition().dst(targetVec);
 		
 		float farRotation = dst / 1.39f;
-		float nearRotation = (1 / dst) * 65;
+		float nearRotation = (1 / dst) * 90;
 		float rotation;
 		if(dst < near)
 			rotation = nearRotation;
@@ -294,12 +303,17 @@ public class Brain {
 		System.out.print(targetVec);
 		System.out.println(returnVec);*/
 		//Modify player shootPower
-		float farShootPower = dst * 0.89f;
-		float nearShootPower = (20 - dst) / 8.7f;
+		float farShootPower = dst * 0.5f;
+		float nearShootPower = (20 - dst) / 8.9f;
 		float shootPower;
-		if(dst < near)
+		if(dst < near) {
 			shootPower = nearShootPower;
-		else shootPower = farShootPower;
+			
+			System.out.println("NEAR SHOOTING");
+		}else {
+			shootPower = farShootPower;
+			System.out.println("FAR SHOOTING");
+		}
 		
 		user.setShootPower(shootPower);
 		//System.out.println(farShootPower + " ; " + nearShootPower + ": " + shootPower + "; dst: " + dst);
@@ -446,7 +460,14 @@ public class Brain {
 	}
 	
 	public Vector3 makeBasketTargetVec(Basket targetBasket) {
-		return targetBasket.getBasketTargetTrans().getTranslation(new Vector3());
+		Vector3 ballPos = user.getMap().getBall().getPosition();
+		
+		if(ballPos.x > targetBasket.getWidth() / 2)
+			return targetBasket.getTabCenterPartTrans(user.getPosition().z > 0 ? 3 : 2).getTranslation(new Vector3());
+		else if(ballPos.x < -targetBasket.getWidth() / 2)
+			return targetBasket.getTabCenterPartTrans(user.getPosition().z > 0 ? 2 : 3).getTranslation(new Vector3());
+		else 
+			return targetBasket.getTabCenterPartTrans(1).getTranslation(new Vector3());
 	}
 
 	public StateMachine<Player, PlayerState> getStateMachine() {
@@ -463,6 +484,10 @@ public class Brain {
 	
 	public Arrive<Vector3> getPursueBallInHand() {
 		return pursueBallInHand;
+	}
+	
+	public Arrive<Vector3> getPursueBallInHand2() {
+		return pursueBallInHand2;
 	}
 	
 	public Arrive<Vector3> getCustomPursue() {

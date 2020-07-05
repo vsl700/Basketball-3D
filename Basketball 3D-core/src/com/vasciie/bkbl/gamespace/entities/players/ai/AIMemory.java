@@ -124,7 +124,7 @@ public class AIMemory {
 	}
 
 	public boolean isRandomFoulTime() {
-		return randomPointTime >= 0.25f;
+		return randomPointTime >= 0.35f;
 	}
 
 	public float getResetTime() {
