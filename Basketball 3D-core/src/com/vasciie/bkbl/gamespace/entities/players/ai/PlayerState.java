@@ -93,6 +93,8 @@ public enum PlayerState implements State<Player> {
 			}else if (brain.tooCloseOrBehindBasket()) {
 				brain.getPursueBallInHand().setEnabled(false);
 				brain.getPursueBallInHand2().setEnabled(true);
+				
+				player.setRunning();
 			}else {
 				brain.getPursueBallInHand().setEnabled(true);
 				brain.getPursueBallInHand2().setEnabled(false);

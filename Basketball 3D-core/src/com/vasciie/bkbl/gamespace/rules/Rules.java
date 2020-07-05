@@ -14,6 +14,7 @@ import com.badlogic.gdx.physics.bullet.collision.btCollisionObject;
 import com.vasciie.bkbl.gamespace.GameMap;
 import com.vasciie.bkbl.gamespace.entities.Entity;
 import com.vasciie.bkbl.gamespace.entities.Player;
+import com.vasciie.bkbl.gamespace.entities.players.Opponent;
 import com.vasciie.bkbl.gamespace.entities.players.Teammate;
 import com.vasciie.bkbl.gamespace.objects.Terrain;
 import com.vasciie.bkbl.gamespace.rules.Rules.GameRule.Actions.Action;
@@ -364,6 +365,9 @@ public class Rules {
 								
 								Player checked = (Player) tempE;
 
+								if(checked instanceof Teammate && temp instanceof Teammate || checked instanceof Opponent && temp instanceof Opponent)
+									continue;
+								
 								if (checked != null && !checked.equals(temp) && checked.isCurrentlyPointing() && !temp.isDribbling()) {
 									ruleTriggerer = checked;
 									return true;

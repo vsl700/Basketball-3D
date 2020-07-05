@@ -1,7 +1,8 @@
 package com.vasciie.bkbl.gamespace.entities.players.ai;
 
+import java.util.ArrayList;
+
 import com.badlogic.gdx.Gdx;
-import com.badlogic.gdx.math.Quaternion;
 import com.badlogic.gdx.math.Vector3;
 import com.vasciie.bkbl.gamespace.entities.Ball;
 import com.vasciie.bkbl.gamespace.entities.Player;
@@ -271,6 +272,9 @@ public class Brain {
 		Vector3 returnVec = targetVec.cpy().add(0, xzDist / 2 + yDist, 0);*/
 		
 		Vector3 returnVec = targetVec.cpy();
+		/*if(memory.getTargetPlayer() != null)
+			returnVec.add(memory.getTargetPlayer().getMoveVector());*/
+		
 		//Vector3 tempTargetVec;
 		
 		//returnVec.scl(0.5f, 1, 0.5f);
@@ -285,21 +289,28 @@ public class Brain {
 		
 		returnVec.add(changeVec);*/
 		
+		boolean targetCheck = targetVec.y - 0.9f > user.getPosition().y;
+		
 		float near = 11;
 		
 		float dst = user.getPosition().dst(targetVec);
 		
-		float farRotation = dst / 1.39f;
+		float farRotation = dst / 1.47f;
 		float nearRotation = (1 / dst) * 90;
 		float rotation;
-		if(dst < near)
+		if(dst < near && targetCheck)
 			rotation = nearRotation;
 		else rotation = farRotation;
 		
-		if(targetVec.z > 0)
-			rotation = -rotation;
+		//if(targetVec.cpy().sub(user.getPosition()).z > 0)
+			//rotation = -rotation;
 		
-		returnVec.rotate(rotation, 1, 0, 0);
+		if(targetVec.y == user.getPosition().y)
+			rotation+= 30;
+		else rotation-= 3;
+		
+		//returnVec.rotate(rotation, 1, 0, 0);
+		returnVec.y += rotation;
 		
 		/*System.out.println(xzDist + "; " + yDist);
 		System.out.print(player.getPosition());
@@ -358,11 +369,48 @@ public class Brain {
 	}
 	
 	private void checkForObstacles() {
-		Vector3 dirVec = Vector3.Z.cpy();
-		user.getModelInstance().transform.getRotation(new Quaternion()).transform(dirVec);
+		Vector3 targetVec = memory.getTargetVec();
+		Vector3 pos = user.getPosition();
+		Vector3 dirVec = targetVec.cpy().sub(pos).nor();
 		
 		avoidObstacles(user.getMap().getHomeBasket(), dirVec);
 		avoidObstacles(user.getMap().getAwayBasket(), dirVec);
+		
+		ArrayList<Player> players = user.getMap().getAllPlayers();
+		
+		Player closestPlayer = null;
+		float maxDist = 0;
+		
+		float checkConst = user.getWidth() / 13f;
+		for(int i = 0; i < players.size(); i++) {
+			if(players.indexOf(closestPlayer) == i || players.get(i).equals(user) || players.get(i).getPosition().idt(targetVec))
+				continue;
+			
+			Vector3 tempPos = players.get(i).getPosition();
+			float tempDist = tempPos.dst(pos);
+			
+			if(pos.dst2(targetVec) > tempPos.dst2(targetVec) && maxDist < tempDist) {
+				Vector3 tempDir = tempPos.cpy().sub(pos).nor();
+				
+				if(tempDir.dst(dirVec) <= checkConst) {
+					maxDist = tempDist;
+					closestPlayer = players.get(i);
+				}
+			}
+		}
+		
+		if(closestPlayer == null || closestPlayer.getPosition().idt(targetVec) || closestPlayer.getPosition().cpy().sub(pos).nor().dst(dirVec) > checkConst)
+			return;
+		
+		System.out.println("Orientation modified");
+		
+		Vector3 shootVec = memory.getShootVec();
+		float rotation = 1 / maxDist * 150;
+		
+		//if(shootVec.cpy().sub(user.getPosition()).z > 0)
+			//rotation = -rotation;
+		
+		shootVec.y += rotation;
 	}
 	
 	private void avoidObstacles(Location<Vector3> obstacle, Vector3 currentDir) {
@@ -409,7 +457,7 @@ public class Brain {
 		Basket awayBasket = user.getMap().getAwayBasket();
 		Vector3 awayBasketPos = makeBasketTargetVec(awayBasket);
 		
-		float checkConst = 0.001f;
+		float checkConst = 0.1f;
 		
 		return targetVec.dst(homeBasketPos) <= checkConst || targetVec.dst(awayBasketPos) <= checkConst;
 	}
