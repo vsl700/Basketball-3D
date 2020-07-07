@@ -139,7 +139,7 @@ public class Rules {
 										//Putting a calculated from the original by the group one position into the targets vector
 										p.getBrain().setCustomVecTarget(positionsCalc.cpy().mul(tempTrans).getTranslation(new Vector3()), true);
 										//p.getBrain().getMemory().setTargetFacing(p.getBrain().getMemory().getTargetPosition());
-										p.getBrain().getCustomPursue().setArrivalTolerance(2.5f);
+										p.getBrain().getCustomPursue().setArrivalTolerance(thrower.getWidth() * 1.3f);
 									}
 								}
 								

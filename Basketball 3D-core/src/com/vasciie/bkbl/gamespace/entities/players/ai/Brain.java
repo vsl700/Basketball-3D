@@ -289,13 +289,20 @@ public class Brain {
 		
 		returnVec.add(changeVec);*/
 		
+		System.out.println();
+		
+		Vector3 pos = user.getMap().getBall().getPosition();
+		
 		boolean targetCheck = targetVec.y - 0.9f > user.getPosition().y;
+		
+		if(targetCheck)
+			System.out.println("Basket shooting (targetCheck)");
 		
 		float near = 11;
 		
-		float dst = user.getPosition().dst(targetVec);
+		float dst = pos.dst(targetVec);
 		
-		float farRotation = dst / 1.47f;
+		float farRotation = dst / 1.41f;
 		float nearRotation = (1 / dst) * 90;
 		float rotation;
 		if(dst < near && targetCheck)
@@ -305,9 +312,11 @@ public class Brain {
 		//if(targetVec.cpy().sub(user.getPosition()).z > 0)
 			//rotation = -rotation;
 		
-		if(targetVec.y == user.getPosition().y)
+		/*if(targetCheck)
 			rotation+= 30;
-		else rotation-= 3;
+		else */rotation-= 3;
+		
+		System.out.println(rotation);
 		
 		//returnVec.rotate(rotation, 1, 0, 0);
 		returnVec.y += rotation;
@@ -328,6 +337,8 @@ public class Brain {
 			shootPower = farShootPower;
 			System.out.println("FAR SHOOTING");
 		}
+		
+		System.out.println(shootPower);
 		
 		user.setShootPower(shootPower);
 		//System.out.println(farShootPower + " ; " + nearShootPower + ": " + shootPower + "; dst: " + dst);
@@ -381,15 +392,18 @@ public class Brain {
 		Player closestPlayer = null;
 		float maxDist = 0;
 		
-		float checkConst = user.getWidth() / 13f;
+		float dst = pos.dst(targetVec);
+		
+		float targetConst = user.getDepth() / 2;
+		float checkConst = user.getWidth() / dst * 3;
 		for(int i = 0; i < players.size(); i++) {
-			if(players.indexOf(closestPlayer) == i || players.get(i).equals(user) || players.get(i).getPosition().idt(targetVec))
+			if(players.get(i).equals(user) || players.get(i).getPosition().dst(targetVec) <= targetConst)
 				continue;
 			
 			Vector3 tempPos = players.get(i).getPosition();
 			float tempDist = tempPos.dst(pos);
 			
-			if(pos.dst2(targetVec) > tempPos.dst2(targetVec) && maxDist < tempDist) {
+			if(maxDist < tempDist && dst > tempPos.dst(pos)) {
 				Vector3 tempDir = tempPos.cpy().sub(pos).nor();
 				
 				if(tempDir.dst(dirVec) <= checkConst) {
@@ -399,16 +413,18 @@ public class Brain {
 			}
 		}
 		
-		if(closestPlayer == null || closestPlayer.getPosition().idt(targetVec) || closestPlayer.getPosition().cpy().sub(pos).nor().dst(dirVec) > checkConst)
+		if(closestPlayer == null || closestPlayer.getPosition().dst(targetVec) <= targetConst || closestPlayer.getPosition().cpy().sub(pos).nor().dst(dirVec) > checkConst)
 			return;
 		
 		System.out.println("Orientation modified");
 		
 		Vector3 shootVec = memory.getShootVec();
-		float rotation = 1 / maxDist * 150;
+		float rotation = 1 / maxDist * 130;
 		
 		//if(shootVec.cpy().sub(user.getPosition()).z > 0)
 			//rotation = -rotation;
+		
+		System.out.println(rotation);
 		
 		shootVec.y += rotation;
 	}

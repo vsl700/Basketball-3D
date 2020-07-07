@@ -1123,11 +1123,20 @@ public abstract class Player extends Entity {
 		currentRot.transform(direction).nor().y = 0;
 		
 		Player prevTarget = focusTarget;
-		Player startingPlayer;
-		if (!tempPlayers.get(0).equals(this))
-			startingPlayer = focusTarget = tempPlayers.get(0);
-		else
-			startingPlayer = focusTarget = tempPlayers.get(1);
+		Player startingPlayer = null;
+		
+		if(tempPlayers.size() > 2)
+		for(Player p : tempPlayers) {
+			if(!p.equals(this) && (ignored != null && !ignored.contains(p, false) || ignored == null))
+				startingPlayer = focusTarget = p;
+		}
+		
+		if (startingPlayer == null) {
+			if (!tempPlayers.get(0).equals(this))
+				startingPlayer = focusTarget = tempPlayers.get(0);
+			else
+				startingPlayer = focusTarget = tempPlayers.get(1);
+		}
 		
 		Vector3 closestPos = startingPlayer.getPosition();
 		Vector3 tempClosestDir = closestPos.cpy().sub(getPosition()).nor();
@@ -1137,7 +1146,7 @@ public abstract class Player extends Entity {
 		Player tempTarget = startingPlayer;//Used to store the closest player while there's still not found any unblocked player (if any at all)
 		boolean change = avoidInterpose || ignored != null && ignored.contains(tempTarget, false);//If change is true, the system below will keep changing the player no matter he is being blocked or not. Otherwise, it checks for blockings
 		for(Player p : tempPlayers) {//The players this player should choose from for pointing at
-			if(p.equals(this) || p.equals(startingPlayer)/* && !avoidInterpose*/ || ignored != null && ignored.contains(p, false))//FIXME ignored system not working!
+			if(p.equals(this) || p.equals(startingPlayer) && !avoidInterpose || ignored != null && ignored.contains(p, false))//FIXME ignored system not working!
 				continue;
 			
 			Vector3 tempPos = p.getPosition();

@@ -40,11 +40,16 @@ public enum PlayerState implements State<Player> {
 		}
 		
 		private Array<Player> playersFurtherFromBasket(Player player){
-			Array<Player> players = new Array<Player>(player.getMap().getTeammates().size());
+			Array<Player> players = new Array<Player>(player.getMap().getTeammates().size());//Heard that libGDX's Array works faster than Java's ArrayList...
+			
+			ArrayList<Player> tempTeam;
+			if(player instanceof Teammate)
+				tempTeam = player.getMap().getTeammates();
+			else tempTeam = player.getMap().getOpponents();
 			
 			Basket targetBasket = player.getTargetBasket();
 			
-			for(Player p : players) {
+			for(Player p : tempTeam) {
 				if(p.getPosition().dst(targetBasket.getPosition()) > player.getPosition().dst(targetBasket.getPosition()))
 					players.add(p);
 			}
@@ -79,7 +84,9 @@ public enum PlayerState implements State<Player> {
 			
 			mem.setRandomFoulTime(mem.getRandomFoulTime() + Gdx.graphics.getDeltaTime());
 
-			if(player.getMap().getTeammates().size() > 1 && (player.isInHomeThreePointZone() || player.isBehindBasket() || (mem.getDribbleTime() > 0.7f && !player.isInAwayThreePointZone()) && (player.isFocusing() || player.isBehindBasket() || isAnOpponentClose(player)))) {
+			if(player.isFocusing() || player.getMap().getTeammates().size() > 1 && 
+					(player.isInHomeThreePointZone() || player.isBehindBasket() || (mem.getDribbleTime() > 0.7f && !player.isInAwayThreePointZone()) && isAnOpponentClose(player))) {
+				
 				player.focus(playersFurtherFromBasket(player), true);
 				
 				Player focusedPlayer = player.getFocusedPlayer();
@@ -504,10 +511,12 @@ public enum PlayerState implements State<Player> {
 
 		@Override
 		public void enter(Player player) {
-			//Brain brain = player.getBrain();
+			Brain brain = player.getBrain();
 			//brain.getCustomPursue().setArrivalTolerance(brain.getMemory().getTargetPosition().getBoundingRadius());
 			//brain.getCustomPursue().setTarget(brain.getMemory().getTargetPosition());
 			//player.getBrain().getBasketSeparate().setEnabled(true);
+			
+			brain.getCollAvoid().setEnabled(true);
 		}
 
 		@Override
@@ -525,11 +534,13 @@ public enum PlayerState implements State<Player> {
 			Location<Vector3> tempTarget = brain.getCustomPursue().getTarget();
 			if(tempTarget == null) {
 				brain.getCustomPursue().setEnabled(false);
-				brain.getCollAvoid().setEnabled(false);
+				//brain.getCollAvoid().setEnabled(false);
 			}else {
 				brain.getCustomPursue().setEnabled(true);
-				brain.getCollAvoid().setEnabled(true);
+				
 			}
+			
+			
 			
 			//float checkConst = 2;
 			//if(player.getMap().getHomeBasket().getPosition().dst(player.getPosition()) <= checkConst || player.getMap().getAwayBasket().getPosition().dst(player.getPosition()) <= checkConst)
