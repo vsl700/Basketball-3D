@@ -300,8 +300,6 @@ public class GameMap {
 
             index++;
         }
-
-        createTerrainLanes();
     }
 
     private void createMap() {
@@ -465,22 +463,6 @@ public class GameMap {
         createCache();
         
         firstShown = false;
-    }
-
-    private void createTerrainLanes() {
-        btCollisionObject teamZone = terrain.getCollisionObjects().get(0);
-        teamZone.setUserValue(index);
-        teamZone.setCollisionFlags(teamZone.getCollisionFlags() | btCollisionObject.CollisionFlags.CF_CUSTOM_MATERIAL_CALLBACK);
-
-        dynamicsWorld.addCollisionObject(teamZone, OBJECT_FLAG, ENT_SPECIAL_FLAG);//The ball might collide which would cause this object to behave like an invisible wall
-        teamZone.setContactCallbackFlag(OBJECT_FLAG);
-        teamZone.setContactCallbackFilter(ENT_SPECIAL_FLAG);
-
-        objectsMap.put(index, ObjectType.TERRAIN.getId() + "Team");
-        collObjsInObjectMap.put(teamZone, terrain);
-        collObjsValsMap.put(index, teamZone);
-
-        index++;
     }
 
     private void createBall() {
@@ -717,7 +699,7 @@ public class GameMap {
 
         mBatch.end();
         
-        //System.out.println(zones.isInZone("three-point-opp", pCam.position));
+        System.out.println(zones.isInZone("red-zone", pCam.position));
     }
 
     public void updateController(){

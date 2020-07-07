@@ -77,6 +77,13 @@ public class Zones {
 			realOppThree[i] = realTeamThree[i].cpy().scl(1, -1);
 		}
 		
+		Vector2[] blueZone = new Vector2[] {new Vector2(-13.763321f, 0.12507318f), new Vector2(-13.763321f, 28.86293f), new Vector2(13.763321f, 28.86293f), new Vector2(13.763321f, 0.12507318f)};
+		
+		Vector2[] redZone = new Vector2[blueZone.length];
+		for(int i = 0; i < redZone.length; i++) {
+			redZone[i] = blueZone[i].cpy().scl(1, -1);
+		}
+		
 		zones = new Zone[] {
 				new CircleZone("center", map, new Vector2(), 4.31f) {
 
@@ -163,6 +170,50 @@ public class Zones {
 				},
 				
 				new PolygonZone("three-point-opp", map, realOppThree) {
+
+					@Override
+					public void createModels() {
+						
+						
+					}
+
+					@Override
+					public void createTexture() {
+						
+						
+					}
+
+					@Override
+					public boolean isZoneActive() {
+						
+						return false;
+					}
+					
+				},
+				
+				new PolygonZone("blue-zone", map, blueZone) {
+
+					@Override
+					public void createModels() {
+						
+						
+					}
+
+					@Override
+					public void createTexture() {
+						
+						
+					}
+
+					@Override
+					public boolean isZoneActive() {
+						
+						return false;
+					}
+					
+				},
+				
+				new PolygonZone("red-zone", map, redZone) {
 
 					@Override
 					public void createModels() {

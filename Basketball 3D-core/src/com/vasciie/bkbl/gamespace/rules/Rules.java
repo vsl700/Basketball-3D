@@ -12,6 +12,7 @@ import com.badlogic.gdx.math.Matrix4;
 import com.badlogic.gdx.math.Vector3;
 import com.badlogic.gdx.physics.bullet.collision.btCollisionObject;
 import com.vasciie.bkbl.gamespace.GameMap;
+import com.vasciie.bkbl.gamespace.entities.Ball;
 import com.vasciie.bkbl.gamespace.entities.Entity;
 import com.vasciie.bkbl.gamespace.entities.Player;
 import com.vasciie.bkbl.gamespace.entities.players.Opponent;
@@ -690,52 +691,43 @@ public class Rules {
 					}
 				},
 				
-				//FIXME Add this rule and also note that the collision world doesn't always detect the collisions which messes the system up. Think about putting a timeout for clearing
-				//collision objects from entities' lists or limiting the FPS of the game!
-				/*new GameRule("backcourt_violation", "Backcourt Violation!", "The Team That Has The Ball Cannot Let The Ball Cross The Midcourt Line Once It Got In Their Opposite's Team Zone!", map) {
-					boolean crossed;//Whether it has already crossed the midcourt lane of the terrain
+				new GameRule(this, null, "backcourt_violation", "Backcourt Violation!", map) {
+					boolean crossed;
 					
 					@Override
 					public boolean checkRule() {
-						Player currentHolder = map.getHoldingPlayer();
+						Player holdingPlayer = map.getHoldingPlayer();
+						Ball ball = map.getBall();
 						
-						if(currentHolder == null) {
-							crossed = false;
-							return false;
-						}
-						
-						
-						if (currentHolder instanceof Teammate) {
-							if (currentHolder.getOutsideColliders().contains(map.getTerrain().getTeamzone())) { //If it is in Teammate zone
-								if (crossed) {
-									System.out.println("MidCourt");
-									crossed = false;
-									
-									return true;// If the player doesn't collide
-												// with the teamzone any more,
-												// it means that it's not in it.
-												// Then we give the foul
-												// message.
-									
-								}
-							} else
-								crossed = true;
-						}
-						else {
-							if (!currentHolder.getOutsideColliders().contains(map.getTerrain().getTeamzone())) {
-								if (crossed) {
-									System.out.println("MidCourt");
-									crossed = false;
-									
-									return true;
-								}
-							} else
-								crossed = true;
+						if(crossed) {
+							if(!holdingPlayer.isInAwayZone()) {
+								crossed = false;
+								ruleTriggerer = holdingPlayer;//TODO Check for this rule's actions!
+								return true;
+							}
 						}
 						
 						return false;
 					}
-				},*/
+
+					@Override
+					public GameRule[] createInnerRules() {
+						
+						return null;
+					}
+
+					@Override
+					public void createActions() {
+						
+						
+					}
+
+					@Override
+					public String getDescription() {
+						
+						return "The Team That Has The Ball Cannot Let The Ball Cross The Midcourt Line Once It Got In Their Opposite's Team Zone!";
+					}
+				},
 				
 				new GameRule(this, null, "basket_score", "SCORE!", map) {
 					Player recentHolder;

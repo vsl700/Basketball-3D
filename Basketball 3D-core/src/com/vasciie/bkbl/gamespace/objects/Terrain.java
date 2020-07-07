@@ -13,7 +13,6 @@ import com.badlogic.gdx.graphics.g3d.utils.ModelBuilder;
 import com.badlogic.gdx.math.Matrix4;
 import com.badlogic.gdx.math.Vector3;
 import com.badlogic.gdx.physics.bullet.collision.btBoxShape;
-import com.badlogic.gdx.physics.bullet.collision.btCollisionObject;
 import com.badlogic.gdx.physics.bullet.collision.btCollisionShape;
 import com.badlogic.gdx.physics.bullet.dynamics.btRigidBody;
 import com.vasciie.bkbl.MyGdxGame;
@@ -163,16 +162,6 @@ public class Terrain extends GameObject {
 			invisBodies.get(i).setRestitution(0.1f);
 		}
 		
-		collisionObjects = new ArrayList<btCollisionObject>();
-		
-		ArrayList<btCollisionShape> zoneShapes = new ArrayList<btCollisionShape>();
-		zoneShapes.add(new btBoxShape(new Vector3(getWidth() * 2, 10000, getDepth() / 2)));
-		
-		for(int i = 0; i < zoneShapes.size(); i++) {
-			collisionObjects.add(new btCollisionObject());
-			collisionObjects.get(i).setCollisionShape(zoneShapes.get(i));
-		}
-		
 		manuallySetObjects();
 	}
 
@@ -188,7 +177,7 @@ public class Terrain extends GameObject {
 
 	@Override
 	protected void manuallySetObjects() {
-		collisionObjects.get(0).setWorldTransform(getMainTrans().cpy().trn(0, 0, getDepth() / 2 + 2.5f)); //Sends the zone to Teammates' zone
+		
 	}
 
 	@Override
@@ -208,10 +197,6 @@ public class Terrain extends GameObject {
 		
 		matrixes.get(index).set(getMainTrans().cpy().mul(new Matrix4().setToTranslation(x, y, z + getDepth() / 2 + wallDepth)));
 		invisBodies.get(index1++).proceedToTransform(matrixes.get(index++));
-	}
-	
-	public btCollisionObject getTeamzone() {
-		return collisionObjects.get(0);
 	}
 	
 	public TerrainThemes getTheme() {
