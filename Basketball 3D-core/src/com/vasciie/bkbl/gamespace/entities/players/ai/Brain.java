@@ -63,7 +63,7 @@ public class Brain {
 		SteerableAdapter<Vector3> tempSteerable = new SteerableAdapter<Vector3>() {
 			@Override
 			public Vector3 getPosition() {
-				return new Vector3(GameTools.toVector3(user.getAwayBasketZone().getPositions()[0]).scl(0, 0, 1));
+				return new Vector3(GameTools.toVector3(user.getAwayBasketZone().getPositions()[0], new Vector3()).scl(0, 0, 1));
 			}
 		};
 		
@@ -295,8 +295,8 @@ public class Brain {
 		
 		boolean targetCheck = targetVec.y - 0.9f > user.getPosition().y;
 		
-		if(targetCheck)
-			System.out.println("Basket shooting (targetCheck)");
+		/*if(targetCheck)
+			System.out.println("Basket shooting (targetCheck)");*/
 		
 		float near = 11;
 		
@@ -316,7 +316,7 @@ public class Brain {
 			rotation+= 30;
 		else */rotation-= 3;
 		
-		System.out.println(rotation);
+		//System.out.println(rotation);
 		
 		//returnVec.rotate(rotation, 1, 0, 0);
 		returnVec.y += rotation;
@@ -326,19 +326,19 @@ public class Brain {
 		System.out.print(targetVec);
 		System.out.println(returnVec);*/
 		//Modify player shootPower
-		float farShootPower = dst * 0.5f;
+		float farShootPower = dst * 0.53f;
 		float nearShootPower = (20 - dst) / 8.9f;
 		float shootPower;
 		if(dst < near) {
 			shootPower = nearShootPower;
 			
-			System.out.println("NEAR SHOOTING");
+			//System.out.println("NEAR SHOOTING");
 		}else {
 			shootPower = farShootPower;
-			System.out.println("FAR SHOOTING");
+			//System.out.println("FAR SHOOTING");
 		}
 		
-		System.out.println(shootPower);
+		//System.out.println(shootPower);
 		
 		user.setShootPower(shootPower);
 		//System.out.println(farShootPower + " ; " + nearShootPower + ": " + shootPower + "; dst: " + dst);
@@ -416,7 +416,7 @@ public class Brain {
 		if(closestPlayer == null || closestPlayer.getPosition().dst(targetVec) <= targetConst || closestPlayer.getPosition().cpy().sub(pos).nor().dst(dirVec) > checkConst)
 			return;
 		
-		System.out.println("Orientation modified");
+		//System.out.println("Orientation modified");
 		
 		Vector3 shootVec = memory.getShootVec();
 		float rotation = 1 / maxDist * 130;
@@ -424,7 +424,7 @@ public class Brain {
 		//if(shootVec.cpy().sub(user.getPosition()).z > 0)
 			//rotation = -rotation;
 		
-		System.out.println(rotation);
+		//System.out.println(rotation);
 		
 		shootVec.y += rotation;
 	}

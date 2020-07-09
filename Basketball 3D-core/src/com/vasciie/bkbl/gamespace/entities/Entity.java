@@ -479,6 +479,10 @@ public abstract class Entity implements Proximity<Vector3>, Steerable<Vector3> {
 		return modelInstance;
 	}
 	
+	public Vector3 getDimensions() {
+		return dimensions;
+	}
+	
 	public btRigidBody getMainBody() {
 		return bodies.get(mainBodyIndex);
 	}

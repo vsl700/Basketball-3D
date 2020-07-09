@@ -1146,7 +1146,7 @@ public abstract class Player extends Entity {
 		Player tempTarget = startingPlayer;//Used to store the closest player while there's still not found any unblocked player (if any at all)
 		boolean change = avoidInterpose || ignored != null && ignored.contains(tempTarget, false);//If change is true, the system below will keep changing the player no matter he is being blocked or not. Otherwise, it checks for blockings
 		for(Player p : tempPlayers) {//The players this player should choose from for pointing at
-			if(p.equals(this) || p.equals(startingPlayer) && !avoidInterpose || ignored != null && ignored.contains(p, false))//FIXME ignored system not working!
+			if(p.equals(this) || p.equals(startingPlayer) && !avoidInterpose || ignored != null && ignored.contains(p, false))
 				continue;
 			
 			Vector3 tempPos = p.getPosition();
@@ -1172,7 +1172,7 @@ public abstract class Player extends Entity {
 						tempDir1.y = 0;
 						
 						float dirDist = tempDir.dst(tempDir1);
-						float checkConst = getWidth() / 2.3f;
+						float checkConst = getWidth() / dist * 3;
 						if(dirDist <= checkConst) {
 							float posDist = tempPos1.dst2(getPosition()) - tempPos.dst2(getPosition());
 							if(posDist < 0) { //If the eventual blocker (tempPos1) is in front of the chosen one (tempPos)
@@ -1886,6 +1886,10 @@ public abstract class Player extends Entity {
 		return westObstacle;
 	}*/
 	
+	public abstract Zone getHomeZone();
+	
+	public abstract Zone getAwayZone();
+	
 	public abstract Zone getHomeBasketZone();
 	
 	public abstract Zone getHomeThreePointZone();
@@ -1895,21 +1899,27 @@ public abstract class Player extends Entity {
 	public abstract Zone getAwayThreePointZone();
 	
 	public boolean isInHomeBasketZone() {
-		return getHomeBasketZone().checkZone(GameTools.toVector2(getPosition()));
+		return getHomeBasketZone().checkZone(getPosition());
 	}
 	
 	public boolean isInHomeThreePointZone() {
-		return getHomeThreePointZone().checkZone(GameTools.toVector2(getPosition()));
+		return getHomeThreePointZone().checkZone(getPosition());
 	}
 	
-	public abstract boolean isInAwayZone();
+	public boolean isInHomeZone() {
+		return getHomeZone().checkZone(getPosition());
+	}
+	
+	public boolean isInAwayZone() {
+		return getAwayZone().checkZone(getPosition());
+	}
 	
 	public boolean isInAwayBasketZone() {
-		return getAwayBasketZone().checkZone(GameTools.toVector2(getPosition()));
+		return getAwayBasketZone().checkZone(getPosition());
 	}
 	
 	public boolean isInAwayThreePointZone() {
-		return getAwayThreePointZone().checkZone(GameTools.toVector2(getPosition()));
+		return getAwayThreePointZone().checkZone(getPosition());
 	}
 	
 	public boolean isBehindBasket() {

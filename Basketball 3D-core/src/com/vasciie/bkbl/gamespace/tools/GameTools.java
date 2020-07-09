@@ -10,7 +10,10 @@ import com.badlogic.gdx.graphics.Camera;
 import com.badlogic.gdx.graphics.g3d.ModelInstance;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.math.Vector3;
+import com.badlogic.gdx.utils.Array;
 import com.vasciie.bkbl.gamespace.entities.Player;
+import com.vasciie.bkbl.gamespace.entities.players.Teammate;
+import com.vasciie.bkbl.gamespace.zones.Zones.Zone;
 
 /**
  * A class containing useful functions like getting the closest to an object player
@@ -26,17 +29,53 @@ public final class GameTools {
 		return cam.frustum.boundsInFrustum(tempVec, dimensions);
 	}
 	
+	public static boolean isObjectVisibleToScreen(Camera cam, ModelInstance instance, float radius) {
+		instance.transform.getTranslation(tempVec);
+		return cam.frustum.sphereInFrustum(tempVec, radius);
+	}
+	
 	public static float getDistanceBetweenLocations(Location<Vector3> st1, Location<Vector3> st2) {
 		return st1.getPosition().dst(st2.getPosition());
 	}
 	
-	private static final Vector2 tempVec2 = new Vector2();
-	public static Vector2 toVector2(Vector3 vec) {
-		return tempVec2.set(vec.x, vec.z);
+	public static Vector2 toVector2(Vector3 vec, Vector2 input) {
+		return input.set(vec.x, vec.z);
 	}
 	
-	public static Vector3 toVector3(Vector2 vec) {
-		return tempVec.set(vec.x, 0, vec.y);
+	public static Vector3 toVector3(Vector2 vec, Vector3 input) {
+		return input.set(vec.x, 0, vec.y);
+	}
+	
+	public static Array<Player> playersInZone(Player player, Zone zone){
+		Array<Player> players = new Array<Player>(player.getMap().getTeammates().size());//Heard that libGDX's Array works faster than Java's ArrayList...
+		
+		ArrayList<Player> tempTeam;
+		if(player instanceof Teammate)
+			tempTeam = player.getMap().getTeammates();
+		else tempTeam = player.getMap().getOpponents();
+		
+		for(Player p : tempTeam) {
+			if(!p.equals(player) && zone.checkZone(p.getPosition()/*, p.getDimensions()*/))
+				players.add(p);
+		}
+		
+		return players;
+	}
+	
+	public static Array<Player> playersOutOfZone(Player player, Zone zone){
+		Array<Player> players = new Array<Player>(player.getMap().getTeammates().size());//Heard that libGDX's Array works faster than Java's ArrayList...
+		
+		ArrayList<Player> tempTeam;
+		if(player instanceof Teammate)
+			tempTeam = player.getMap().getTeammates();
+		else tempTeam = player.getMap().getOpponents();
+		
+		for(Player p : tempTeam) {
+			if(!p.equals(player) && !zone.checkZone(p.getPosition()/*, p.getDimensions()*/))
+				players.add(p);
+		}
+		
+		return players;
 	}
 	
 	/**

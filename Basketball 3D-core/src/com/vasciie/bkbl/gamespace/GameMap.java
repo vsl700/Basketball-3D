@@ -699,7 +699,7 @@ public class GameMap {
 
         mBatch.end();
         
-        System.out.println(zones.isInZone("red-zone", pCam.position));
+        //System.out.println(zones.isInZone("red-zone", pCam.position));
     }
 
     public void updateController(){

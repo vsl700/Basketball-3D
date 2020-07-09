@@ -2,6 +2,9 @@ package com.vasciie.bkbl.gamespace.entities;
 
 import java.util.ArrayList;
 
+import com.badlogic.gdx.graphics.PerspectiveCamera;
+import com.badlogic.gdx.graphics.g3d.Environment;
+import com.badlogic.gdx.graphics.g3d.ModelBatch;
 import com.badlogic.gdx.graphics.g3d.ModelInstance;
 import com.badlogic.gdx.math.Matrix4;
 import com.badlogic.gdx.math.Vector3;
@@ -9,6 +12,7 @@ import com.badlogic.gdx.physics.bullet.collision.btCollisionObject;
 import com.badlogic.gdx.physics.bullet.collision.btCollisionShape;
 import com.badlogic.gdx.physics.bullet.collision.btSphereShape;
 import com.vasciie.bkbl.gamespace.GameMap;
+import com.vasciie.bkbl.gamespace.tools.GameTools;
 
 public class Ball extends Entity {
 	
@@ -35,6 +39,12 @@ public class Ball extends Entity {
 		modelInstance.transform.set(getMainBody().getWorldTransform());
 		manuallySetCollTransform();
 		//getMainBody().getWorldTransform(); //For some reason I had to call this to make everything work :| (ball's modelInstance teleports into the main player's stomach)
+	}
+	
+	@Override
+	public void render(ModelBatch mBatch, Environment e, PerspectiveCamera pCam) {
+		if(GameTools.isObjectVisibleToScreen(pCam, modelInstance, getWidth()))
+			mBatch.render(modelInstance, e);
 	}
 	
 	@Override

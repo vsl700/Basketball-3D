@@ -53,7 +53,7 @@ public class Rules {
 						if(thrower != null && !thrower.isBallFree())
 							return false;
 						
-						if (tempPlayer == null) {//If there is currently holding player
+						if (tempPlayer == null) {//If there is currently no holding player
 							for (btCollisionObject obj : map.getBall().getOutsideColliders()) {
 								for (Player player : map.getAllPlayers()) {
 									if (player.getAllCollObjects().contains(obj)) {
@@ -159,7 +159,7 @@ public class Rules {
 							@Override
 							public boolean act() {
 								if(recentHolder.isHoldingBall()) {
-									recentHolder.getBrain().clearCustomTarget();
+									//recentHolder.getBrain().clearCustomTarget();
 									
 									if (Math.abs(occurPlace.z) >= 26) {
 										float diff = 5;
@@ -225,7 +225,7 @@ public class Rules {
 									return true;
 								
 								if (!thrower.isMainPlayer()) {
-									thrower.focus(true);
+									thrower.focus(GameTools.playersOutOfZone(thrower, thrower.getAwayZone()), true);
 
 									Player focusedPlayer = thrower.getFocusedPlayer();
 									if (focusedPlayer == null)
@@ -319,6 +319,12 @@ public class Rules {
 										
 										return "The Thrower Should Stay Around The Foul Occuring Place During Throw-in!";
 									}
+
+									@Override
+									public void onRuleTrigger() {
+										
+										
+									}
 									
 								}
 						};
@@ -340,6 +346,12 @@ public class Rules {
 						
 						
 						return text + "!";
+					}
+
+					@Override
+					public void onRuleTrigger() {
+						recentHolder = null;
+						
 					}
 				},
 				
@@ -504,6 +516,12 @@ public class Rules {
 						
 						return "The Ball Has Been Touched While The Holding Player Was Not Dribbling!";
 					}
+
+					@Override
+					public void onRuleTrigger() {
+						
+						
+					}
 				},
 				
 				new GameRule(this, null, "stay_no_dribble", "Dribble Violation!", map) {
@@ -595,6 +613,12 @@ public class Rules {
 					public String getDescription() {
 						
 						return "The Ball Has Not Been Dribbled For 3 Seconds!";
+					}
+
+					@Override
+					public void onRuleTrigger() {
+						timer = defaultTime;
+						
 					}
 				},
 				
@@ -689,23 +713,61 @@ public class Rules {
 						
 						return "The Player That Is Holding The Ball Is Moving Without Dribbling It For A Total Of 3/4 Of A Second!";
 					}
+
+					@Override
+					public void onRuleTrigger() {
+						timer = defaultTime;
+						
+					}
 				},
 				
 				new GameRule(this, null, "backcourt_violation", "Backcourt Violation!", map) {
-					boolean crossed;
+					Player recentHolder;
+					boolean crossed, justTouched;
 					
 					@Override
 					public boolean checkRule() {
 						Player holdingPlayer = map.getHoldingPlayer();
 						Ball ball = map.getBall();
 						
-						if(crossed) {
-							if(!holdingPlayer.isInAwayZone()) {
+						if (holdingPlayer == null) {
+							for (btCollisionObject obj : map.getBall().getOutsideColliders()) {
+								for (Player player : map.getAllPlayers()) {
+									if (player.getAllCollObjects().contains(obj)) {
+										if(recentHolder != null && (recentHolder instanceof Teammate && player instanceof Opponent || recentHolder instanceof Opponent && player instanceof Teammate))
+											crossed = false;
+											
+										recentHolder = player;// Make the recent holder a player that has recently just touched the ball
+										justTouched = true;
+									}
+								}
+							}
+						}else {
+							if(recentHolder instanceof Teammate && holdingPlayer instanceof Opponent || recentHolder instanceof Opponent && holdingPlayer instanceof Teammate)
 								crossed = false;
-								ruleTriggerer = holdingPlayer;//TODO Check for this rule's actions!
+							
+							recentHolder = holdingPlayer;
+							justTouched = false;
+						}
+						
+						if(recentHolder == null)
+							return false;
+						
+						if(crossed) {
+							if((!recentHolder.isCurrentlyAiming() && !recentHolder.isShooting() || !recentHolder.getMoveVector().isZero()) && !recentHolder.getAwayZone().checkZone(ball.getPosition(), ball.getDimensions()) && (recentHolder.getBrain().getMemory().isBallJustShot() && ball.getPosition().dst(recentHolder.getPosition()) >= recentHolder.getHeight() / 1.5f || recentHolder.getBrain().getMemory().isBallJustShot())) {
+								ruleTriggerer = recentHolder;
+								occurPlace.set(ball.getPosition()).scl(1, 0, 0);
+								
+								if(!recentHolder.isCurrentlyAiming() && !recentHolder.isShooting())
+									map.playerReleaseBall();
+								
 								return true;
 							}
+						}else if(recentHolder.getBrain().getMemory().isBallJustShot() && ball.getPosition().dst(recentHolder.getPosition()) >= recentHolder.getHeight() / 1.5f || !recentHolder.getBrain().getMemory().isBallJustShot()) {
+							crossed = holdingPlayer != null && holdingPlayer.isInAwayZone() || holdingPlayer == null && recentHolder.getAwayZone().checkZone(ball.getPosition(), ball.getDimensions());
 						}
+						
+						//System.out.println(crossed);
 						
 						return false;
 					}
@@ -718,14 +780,77 @@ public class Rules {
 
 					@Override
 					public void createActions() {
+						actions.addAction(new Action() {
+
+							@Override
+							public boolean act() {
+								Player actor;
+								
+								if(ruleTriggerer instanceof Teammate)
+									actor = GameTools.getClosestPlayer(map.getBall().getPosition(), map.getOpponents(), null);
+								else actor = GameTools.getClosestPlayer(map.getBall().getPosition(), map.getTeammates(), null);
+								
+								if(!actor.isHoldingBall() && actor.getBrain().getMemory().getTargetPosition() == null) {
+									actor.getBrain().setCustomTarget(map.getBall());
+									actor.getBrain().getMemory().setTargetFacing(map.getBall());
+									actor.getBrain().getMemory().setCatchBall(true);
+									actor.getBrain().getCustomPursue().setArrivalTolerance(0);
+								}else if (actor.isHoldingBall()){
+									if(actor.getPosition().dst(occurPlace) < 2.5f)
+										return true;
+									
+									actor.getBrain().setCustomVecTarget(occurPlace, true);
+								}
+								
+								
+								return false;
+							}
+
+							@Override
+							public boolean isGameDependent() {
+								
+								return false;
+							}
+							
+						});
 						
-						
+						actions.addAction(new Action() {
+
+							@Override
+							public boolean act() {
+								
+								return true;
+							}
+
+							@Override
+							public boolean isGameDependent() {
+								
+								return true;
+							}
+							
+						});
 					}
 
 					@Override
 					public String getDescription() {
+						String text = "The Team That Has The Ball Cannot Let The Ball Cross The Midcourt Line Once It Got In Their Opposite's Team Zone!";
+						if(justTouched) {
+							String temp;
+							if(recentHolder instanceof Teammate)
+								temp = "A Teammate";
+							else temp = "An Opponent";
+							
+							return text + " The Foul Occured " + " After " + temp + " Touched The Ball!";
+						}
 						
-						return "The Team That Has The Ball Cannot Let The Ball Cross The Midcourt Line Once It Got In Their Opposite's Team Zone!";
+						
+						return text;
+					}
+
+					@Override
+					public void onRuleTrigger() {
+						crossed = false;
+						recentHolder = null;
 					}
 				},
 				
@@ -814,6 +939,12 @@ public class Rules {
 						
 						return "The Opposite Team Has Just Scored!";
 					}
+
+					@Override
+					public void onRuleTrigger() {
+						
+						
+					}
 					
 				}
 		};
@@ -824,14 +955,17 @@ public class Rules {
 		if(triggeredRule == null) {
 			for (GameRule rule : gameRules) {
 				if (rule.checkRule()) {
-					// A rule has been broken
+					// A rule has been t
 					triggeredRule = rule;
 					map.onRuleTriggered(rule);
 					rulesListener.onRuleTriggered(rule);
 	
+					for(GameRule rule1 : gameRules)
+						rule1.onRuleTrigger();
+					
 					break;
 				}
-			} // TODO Bring this back after you finish testing the rules!!!
+			}
 
 			//GameRule tempRule = gameRules[1];
 			/*GameRule[] ruleTest = new GameRule[] {getGameRuleById("basket_score")};
@@ -908,6 +1042,11 @@ public class Rules {
 			
 			createActions();
 		}
+		
+		/**
+		 * Whenever any rule of the rules system triggers (not the specified one)
+		 */
+		public abstract void onRuleTrigger();
 		
 		public abstract GameRule[] createInnerRules();
 		

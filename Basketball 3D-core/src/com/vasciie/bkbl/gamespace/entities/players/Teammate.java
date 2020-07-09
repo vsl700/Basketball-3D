@@ -16,12 +16,6 @@ public class Teammate extends Player {
 	public Basket getTargetBasket() {
 		return map.getAwayBasket();
 	}
-	
-	@Override
-	public boolean isInAwayZone() {
-		
-		return getPosition().z < 0;
-	}
 
 	@Override
 	public Zone getHomeBasketZone() {
@@ -45,6 +39,17 @@ public class Teammate extends Player {
 	public Zone getAwayThreePointZone() {
 		
 		return map.getZones().getZone("three-point-opp");
+	}
+
+	@Override
+	public Zone getAwayZone() {
+		return map.getZones().getZone("red-zone");
+	}
+	
+	@Override
+	public Zone getHomeZone() {
+		
+		return map.getZones().getZone("blue-zone");
 	}
 
 }

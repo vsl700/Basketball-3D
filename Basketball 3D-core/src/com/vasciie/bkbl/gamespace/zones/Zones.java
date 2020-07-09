@@ -77,7 +77,7 @@ public class Zones {
 			realOppThree[i] = realTeamThree[i].cpy().scl(1, -1);
 		}
 		
-		Vector2[] blueZone = new Vector2[] {new Vector2(-13.763321f, 0.12507318f), new Vector2(-13.763321f, 28.86293f), new Vector2(13.763321f, 28.86293f), new Vector2(13.763321f, 0.12507318f)};
+		Vector2[] blueZone = new Vector2[] {new Vector2(-13.763321f, 0.75f), new Vector2(-13.763321f, 28.86293f), new Vector2(13.763321f, 28.86293f), new Vector2(13.763321f, 0.75f)};
 		
 		Vector2[] redZone = new Vector2[blueZone.length];
 		for(int i = 0; i < redZone.length; i++) {
@@ -247,10 +247,11 @@ public class Zones {
 		return null;
 	}
 	
+	private static final Vector2 tempVec = new Vector2();
 	public boolean isInZone(String id, Vector3 pos) {
 		for(Zone zone : zones) {
 			if(zone.getId().equals(id))
-				return zone.checkZone(GameTools.toVector2(pos));
+				return zone.checkZone(GameTools.toVector2(pos, tempVec));
 		}
 		
 		return false;
@@ -295,7 +296,22 @@ public class Zones {
 		
 		public abstract void createTexture();
 		
-		public abstract boolean checkZone(Vector2 pos);
+		protected abstract boolean checkZone(Vector2 pos);
+		
+		protected abstract boolean checkZone(Vector2 pos, Vector2 dimensions);
+		
+		private static final Vector2 tempVec1 = new Vector2(), tempVec2 = new Vector2();
+		public boolean checkZone(Vector3 pos) {
+			return checkZone(GameTools.toVector2(pos, tempVec1));
+		}
+		
+		public boolean checkZone(Vector3 pos, Vector3 dimensions) {
+			Vector2 tempDimensions = GameTools.toVector2(dimensions, tempVec2);
+			
+			tempDimensions.scl(0.5f);
+			
+			return checkZone(GameTools.toVector2(pos, tempVec1), tempDimensions);
+		}
 		
 		public void render(ModelBatch mBatch, Environment e) {
 			if(isZoneActive())

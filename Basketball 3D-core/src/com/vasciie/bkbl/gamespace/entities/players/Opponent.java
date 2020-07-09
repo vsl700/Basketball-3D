@@ -18,12 +18,6 @@ public class Opponent extends Player {
 	}
 
 	@Override
-	public boolean isInAwayZone() {
-		
-		return getPosition().z > 0;
-	}
-
-	@Override
 	public Zone getHomeBasketZone() {
 		
 		return map.getZones().getZone("free-throw-opp");
@@ -45,6 +39,17 @@ public class Opponent extends Player {
 	public Zone getAwayThreePointZone() {
 		
 		return map.getZones().getZone("three-point-team");
+	}
+
+	@Override
+	public Zone getAwayZone() {
+		return map.getZones().getZone("blue-zone");
+	}
+
+	@Override
+	public Zone getHomeZone() {
+		
+		return map.getZones().getZone("red-zone");
 	}
 	
 
