@@ -43,7 +43,7 @@ public class Rules {
 		gameRules = new GameRule[] {
 				new GameRule(this, null, "ball_out", "Out Of Bounds!", map) {
 					Player recentHolder, thrower;
-					boolean justTouched;
+					boolean justTouched, basketUpsideDown;
 					
 					
 					@Override
@@ -54,6 +54,13 @@ public class Rules {
 							return false;
 						
 						if (tempPlayer == null) {//If there is currently no holding player
+							if((map.getBall().isCollidedWTeamBasket() || map.getBall().isCollidedWOppBasket()) && map.getBall().getLinearVelocity().y > 0) {
+								ruleTriggerer = recentHolder;
+								basketUpsideDown = true;
+								setOccurPlace();
+								return true;
+							}
+							
 							for (btCollisionObject obj : map.getBall().getOutsideColliders()) {
 								for (Player player : map.getAllPlayers()) {
 									if (player.getAllCollObjects().contains(obj)) {
@@ -79,13 +86,30 @@ public class Rules {
 							for (btCollisionObject obj : map.getBall().getOutsideColliders()) {
 								if (map.getTerrain().getInvisBodies().contains(obj)) {
 									ruleTriggerer = recentHolder;
+									basketUpsideDown = false;
 									occurPlace.set(map.getBall().getPosition()).add(occurPlace.cpy().scl(-1).nor().scl(3)).y = recentHolder.getPosition().y;
 									return true;
 								}
 							}
 						}
-						//TODO Also add a check for situations in which the ball gets in the basket through its bottom!
+						
 						return false;
+					}
+					
+					private void setOccurPlace() {
+						/*Vector3 ballPos = map.getBall().getPosition();*/
+						Vector3 basketPos;
+						/*float compatibChange = map.getBall().getWidth() / 2 + Terrain.getWalldepth();*/
+						
+						if(map.getBall().isCollidedWTeamBasket())
+							basketPos = map.getAwayBasket().getPosition();
+						else basketPos = map.getHomeBasket().getPosition();
+						
+						float setter = map.getTerrain().getWidth() / 4;
+						if(map.getBall().getPosition().x < 0)
+							setter = -setter;
+						
+						occurPlace.set(basketPos).x = setter;
 					}
 
 					/*@Override
@@ -379,6 +403,9 @@ public class Rules {
 
 					@Override
 					public String getDescription() {
+						if(basketUpsideDown)
+							return "The Ball Has Entered Into The Basket From Its Bottom!";
+						
 						String text = "The Ball Has Reached The Bounds Of The Terrain";
 						if(justTouched) {
 							String temp;
@@ -1376,7 +1403,7 @@ public class Rules {
 	
 	public void update() {
 		if(triggeredRule == null) {
-			for (GameRule rule : gameRules) {
+			/*for (GameRule rule : gameRules) {
 				if (rule.checkRule()) {
 					// A rule has been t
 					triggeredRule = rule;
@@ -1388,17 +1415,17 @@ public class Rules {
 					
 					break;
 				}
-			}
+			}*/
 
 			//GameRule tempRule = gameRules[1];
-			/*GameRule[] ruleTest = new GameRule[] {getGameRuleById("ball_moving")};
+			GameRule[] ruleTest = new GameRule[] {getGameRuleById("ball_out")};
 			for (GameRule r : ruleTest)
 				if (r.checkRule()) {
 					setTriggeredRule(r);
 					
 					for(GameRule rule1 : gameRules)
 						rule1.onRuleTrigger();
-				}*/
+				}
 		}
 		else {
 			triggeredRule.managePlayers();
