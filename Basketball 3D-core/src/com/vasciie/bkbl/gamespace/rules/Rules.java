@@ -326,6 +326,51 @@ public class Rules {
 										
 									}
 									
+								},
+								
+								new GameRule(rules, this, "time_out", "Time Out!", map) {
+									final float defaultTime = 5;
+									float time = defaultTime;;
+									
+									
+									@Override
+									public void onRuleTrigger() {
+										time = defaultTime;
+										
+									}
+
+									@Override
+									public GameRule[] createInnerRules() {
+										
+										return null;
+									}
+
+									@Override
+									public void createActions() {
+										
+										
+									}
+
+									@Override
+									public boolean checkRule() {
+										if(time < 0) {
+											parent.setRuleTriggerer(thrower);
+											map.playerReleaseBall();
+											
+											return true;
+										}
+										
+										time -= Gdx.graphics.getDeltaTime();
+											
+										return false;
+									}
+
+									@Override
+									public String getDescription() {
+										
+										return "You Cannot Hold The Ball For More Than 5 Seconds During Throw-in!";
+									}
+									
 								}
 						};
 						
@@ -352,6 +397,8 @@ public class Rules {
 					public void onRuleTrigger() {
 						recentHolder = null;
 						
+						for(GameRule rule : innerRules)
+							rule.onRuleTrigger();
 					}
 				},
 				
@@ -974,6 +1021,9 @@ public class Rules {
 
 					@Override
 					public boolean checkRule() {
+						if(map.getDifficulty() < 2)
+							return false;
+						
 						Player holdingPlayer = map.getHoldingPlayer();
 						if(holdingPlayer == null && recentHolder == null)
 							return false;
@@ -1005,9 +1055,7 @@ public class Rules {
 					}
 					
 					private void setOccurPlace() {
-						/*Vector3 ballPos = map.getBall().getPosition();*/
 						Vector3 basketPos;
-						/*float compatibChange = map.getBall().getWidth() / 2 + Terrain.getWalldepth();*/
 						
 						if(recentHolder instanceof Teammate)
 							basketPos = map.getAwayBasket().getPosition();
@@ -1465,6 +1513,9 @@ public class Rules {
 				for(GameRule r : innerRules)
 					if(r.checkRule()) {
 						rules.setTriggeredRule(r);
+						for(GameRule rule : innerRules)
+							rule.onRuleTrigger();
+						
 						actions.firstAction();
 						//return false;
 					}

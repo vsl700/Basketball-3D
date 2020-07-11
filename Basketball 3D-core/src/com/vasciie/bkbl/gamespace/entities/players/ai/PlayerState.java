@@ -93,9 +93,9 @@ public enum PlayerState implements State<Player> {
 			int difficulty = player.getMap().getDifficulty();
 			if(mem.isRandomFoulTime()) {
 				if (difficulty == 0 && player instanceof Opponent && MathUtils.random(0, 100) <= 60) {
-					mem.setDribbleTime(mem.getDribbleTime() - Gdx.graphics.getDeltaTime() * 3);
+					mem.setDribbleTime(mem.getDribbleTime() - Gdx.graphics.getDeltaTime() * 2.1f);
 				}else if(difficulty == 2 && player instanceof Teammate && MathUtils.random(0, 100) <= 60) {
-					mem.setDribbleTime(mem.getDribbleTime() - Gdx.graphics.getDeltaTime() * 3);
+					mem.setDribbleTime(mem.getDribbleTime() - Gdx.graphics.getDeltaTime() * 2.1f);
 				}
 				
 				mem.setRandomFoulTime(0);
@@ -244,6 +244,7 @@ public enum PlayerState implements State<Player> {
 			// memory.get(player).setAimingTime(0);
 			player.getBrain().getMemory().setAimingTime(0);
 			player.getBrain().getMemory().setDribbleTime(0);
+			player.getBrain().getMemory().setRandomFoulTime(0);
 			
 			player.getBrain().getBallSeparate().setEnabled(true);
 			
@@ -314,7 +315,7 @@ public enum PlayerState implements State<Player> {
 				//if (mem.getCatchTime() > 0.5f) {
 					player.interactWithBallA();
 				//}
-			} else {
+			} else if(!(player.getMap().getDifficulty() == 2 && player.isInAwayBasketZone())){
 				player.getBrain().getMSBallChase().calculateSteering(Player.steering);
 				// System.out.println(Player.steering.linear.cpy().x);
 				player.setMoveVector(Player.steering.linear);

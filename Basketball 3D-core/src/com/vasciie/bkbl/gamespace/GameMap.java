@@ -868,6 +868,7 @@ public class GameMap {
 
     public void playerReleaseBall() {
         currentPlayerHoldTeam = currentPlayerHoldOpp = -1;
+        ball.getMainBody().setLinearVelocity(Vector3.Zero);
     }
 
     private void controlPlayer(float delta) {
