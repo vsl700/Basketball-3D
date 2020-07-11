@@ -1028,6 +1028,112 @@ public class Rules {
 					
 				},
 				
+				new GameRule(this, null, "shoot_catch", "Catch Violation!", map) {
+					Player recentHolder;
+					boolean ballJustShot, currentlyShooting;
+					
+					@Override
+					public void onRuleTrigger() {
+						recentHolder = null;
+						ballJustShot = currentlyShooting = false;
+					}
+					
+					@Override
+					public void managePlayers() {
+						GameRule switchRule = rules.getGameRuleById("ball_out");
+						switchRule.setRuleTriggerer(ruleTriggerer);
+						
+						rules.setTriggeredRule(switchRule);
+					}
+
+					@Override
+					public GameRule[] createInnerRules() {
+						
+						return null;
+					}
+
+					@Override
+					public void createActions() {
+						
+						
+					}
+
+					@Override
+					public boolean checkRule() {
+						if(map.getTeammates().size() == 1)
+							return false;
+						
+						Player holdingPlayer = map.getHoldingPlayer();
+						if(holdingPlayer == null && recentHolder == null)
+							return false;
+						
+						if(ballJustShot) {
+							if(recentHolder != null && holdingPlayer != null) {
+								if (holdingPlayer.equals(recentHolder)) {
+									ruleTriggerer = recentHolder;
+
+									if (!recentHolder.isAiming() && !recentHolder.isShooting())
+										map.playerReleaseBall();
+
+									ArrayList<Vector3> wallPositions = new ArrayList<Vector3>(8);
+									Terrain terrain = map.getTerrain();
+
+									for (int i = 1; i < 5; i++) {
+										Vector3 wallPos = terrain.getMatrixes().get(i).getTranslation(new Vector3());
+										wallPos.y = recentHolder.getPosition().y;
+
+										float changer, compatibChange = map.getBall().getWidth() / 2 + Terrain.getWalldepth();
+
+										if (wallPos.x == 0) {// Basewall
+											changer = terrain.getWidth() / 4;
+
+											if (wallPos.z < 0)
+												compatibChange = -compatibChange;
+
+											wallPositions.add(wallPos.cpy().add(changer, 0, -compatibChange));
+											wallPositions.add(wallPos.sub(changer, 0, compatibChange));
+										} else {// Sidewall
+											changer = terrain.getDepth() / 4;
+
+											if (wallPos.x < 0)
+												compatibChange = -compatibChange;
+
+											wallPositions.add(wallPos.cpy().add(-compatibChange, 0, changer));
+											wallPositions.add(wallPos.sub(compatibChange, 0, changer));
+										}
+									}
+
+									occurPlace.set(GameTools.getShortestDistanceWVectors(recentHolder.getPosition(), wallPositions));
+
+									return true;
+								} else {
+									recentHolder = holdingPlayer;
+									ballJustShot = false;
+								}
+							}
+						}else {
+							if(holdingPlayer != null)
+								recentHolder = holdingPlayer;
+							
+							boolean temp = recentHolder.isCurrentlyAiming() || recentHolder.isShooting();
+							
+							if(!temp && currentlyShooting)
+								ballJustShot = true;
+							
+							currentlyShooting = temp;
+						}
+						
+						return false;
+					}
+
+					@Override
+					public String getDescription() {
+						
+						return "A Player That Has Just Shot The Ball Cannot Catch It Right Away Again!";
+					}
+					
+				},
+				
 				new GameRule(this, null, "basket_score", "SCORE!", map) {
 					Player recentHolder;
 					boolean holderInZone = false, holderInThreePoint = false;
@@ -1146,7 +1252,7 @@ public class Rules {
 			}
 
 			//GameRule tempRule = gameRules[1];
-			/*GameRule[] ruleTest = new GameRule[] {getGameRuleById("basket_score")};
+			/*GameRule[] ruleTest = new GameRule[] {getGameRuleById("shoot_catch")};
 			for (GameRule r : ruleTest)
 				if (r.checkRule()) {
 					setTriggeredRule(r);

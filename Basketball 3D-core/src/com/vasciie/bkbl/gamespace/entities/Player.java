@@ -1255,7 +1255,7 @@ public abstract class Player extends Entity {
 		
 		if(!leftHoldingBall && !rightHoldingBall || !leftAimBall && !rightAimBall) {
 			leftCurrentAim = rightCurrentAim = false;
-			leftThrowBall = rightThrowBall = false;
+			//leftThrowBall = rightThrowBall = false;
 		}
 		
 		boolean mainPlayerBrainUpdate = isMainPlayer() && map.isRuleTriggeredActing() && !map.isGameRunning();
