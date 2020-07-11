@@ -80,7 +80,7 @@ public class Rules {
 						if (recentHolder != null) {//If the ball is still not ever touched, don't check for terrain bounds collision (CPU economy)
 							if(!recentHolder.isBallFree()) {
 								justTouched = false;
-								return false;
+								//return false;
 							}
 							
 							for (btCollisionObject obj : map.getBall().getOutsideColliders()) {
@@ -88,6 +88,10 @@ public class Rules {
 									ruleTriggerer = recentHolder;
 									basketUpsideDown = false;
 									occurPlace.set(map.getBall().getPosition()).add(occurPlace.cpy().scl(-1).nor().scl(3)).y = recentHolder.getPosition().y;
+									
+									if(!recentHolder.isCurrentlyAiming() && !recentHolder.isShooting())
+										map.playerReleaseBall();
+									
 									return true;
 								}
 							}
@@ -1403,7 +1407,7 @@ public class Rules {
 	
 	public void update() {
 		if(triggeredRule == null) {
-			/*for (GameRule rule : gameRules) {
+			for (GameRule rule : gameRules) {
 				if (rule.checkRule()) {
 					// A rule has been t
 					triggeredRule = rule;
@@ -1415,17 +1419,17 @@ public class Rules {
 					
 					break;
 				}
-			}*/
+			}
 
 			//GameRule tempRule = gameRules[1];
-			GameRule[] ruleTest = new GameRule[] {getGameRuleById("ball_out")};
+			/*GameRule[] ruleTest = new GameRule[] {getGameRuleById("ball_out")};
 			for (GameRule r : ruleTest)
 				if (r.checkRule()) {
 					setTriggeredRule(r);
 					
 					for(GameRule rule1 : gameRules)
 						rule1.onRuleTrigger();
-				}
+				}*/
 		}
 		else {
 			triggeredRule.managePlayers();
