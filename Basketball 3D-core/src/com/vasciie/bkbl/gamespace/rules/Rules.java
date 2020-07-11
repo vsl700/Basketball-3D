@@ -942,6 +942,92 @@ public class Rules {
 					
 				},
 				
+				new GameRule(this, null, "free_throw", "Free Throw Violation!", map) {
+					Player recentHolder;
+					boolean inside;
+					
+					@Override
+					public void onRuleTrigger() {
+						inside = false;
+						
+					}
+					
+					@Override
+					public void managePlayers() {
+						GameRule switchRule = rules.getGameRuleById("ball_out");
+						switchRule.setRuleTriggerer(ruleTriggerer);
+						
+						rules.setTriggeredRule(switchRule);
+					}
+
+					@Override
+					public GameRule[] createInnerRules() {
+						
+						return null;
+					}
+
+					@Override
+					public void createActions() {
+						
+						
+					}
+
+					@Override
+					public boolean checkRule() {
+						Player holdingPlayer = map.getHoldingPlayer();
+						if(holdingPlayer == null && recentHolder == null)
+							return false;
+						
+						if(holdingPlayer != null) {
+							if(recentHolder != null && !recentHolder.equals(holdingPlayer))
+								inside = false;
+							
+							recentHolder = holdingPlayer;
+						}
+						
+						if(inside) {
+							if(!recentHolder.isInAwayBasketZone()) {
+								ruleTriggerer = recentHolder;
+								setOccurPlace();
+								return true;
+							}else {
+								Ball ball = map.getBall();
+								
+								if(ball.getOutsideColliders().contains(recentHolder.getTargetBasket().getBasketRim())) {
+									inside = false;
+									recentHolder = null;
+								}
+							}
+						}else
+							inside = recentHolder.isInAwayBasketZone() && recentHolder.isCurrentlyAiming();
+						
+						return false;
+					}
+					
+					private void setOccurPlace() {
+						/*Vector3 ballPos = map.getBall().getPosition();*/
+						Vector3 basketPos;
+						/*float compatibChange = map.getBall().getWidth() / 2 + Terrain.getWalldepth();*/
+						
+						if(recentHolder instanceof Teammate)
+							basketPos = map.getAwayBasket().getPosition();
+						else basketPos = map.getHomeBasket().getPosition();
+						
+						float setter = map.getTerrain().getWidth() / 4;
+						if(map.getBall().getPosition().x < 0)
+							setter = -setter;
+						
+						occurPlace.set(basketPos).x = setter;
+					}
+
+					@Override
+					public String getDescription() {
+						
+						return "Once A Player Starts Shooting From The Free-Throw Zone He Cannot Get Out Of It Until The Ball Touches The Rim Of The Basket Or Anyone Else Catches It!";
+					}
+					
+				},
+				
 				new GameRule(this, null, "basket_score", "SCORE!", map) {
 					Player recentHolder;
 					boolean holderInZone = false, holderInThreePoint = false;
@@ -1009,7 +1095,11 @@ public class Rules {
 							basketPos = map.getAwayBasket().getPosition();
 						else basketPos = map.getHomeBasket().getPosition();
 						
-						occurPlace.set(basketPos).x = map.getTerrain().getWidth() / 4;
+						float setter = map.getTerrain().getWidth() / 4;
+						if(map.getBall().getPosition().x < 0)
+							setter = -setter;
+						
+						occurPlace.set(basketPos).x = setter;
 					}
 					
 					@Override

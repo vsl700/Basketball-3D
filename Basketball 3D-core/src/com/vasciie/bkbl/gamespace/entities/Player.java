@@ -1253,6 +1253,11 @@ public abstract class Player extends Entity {
 			map.getBall().getMainBody().setGravity(map.getDynamicsWorld().getGravity());
 		}
 		
+		if(!leftHoldingBall && !rightHoldingBall || !leftAimBall && !rightAimBall) {
+			leftCurrentAim = rightCurrentAim = false;
+			leftThrowBall = rightThrowBall = false;
+		}
+		
 		boolean mainPlayerBrainUpdate = isMainPlayer() && map.isRuleTriggeredActing() && !map.isGameRunning();
 		if(mainPlayerBrainUpdate /*updateBrain && map.isRuleBrokenActing()*/ || !isMainPlayer() && !map.isRuleTriggered()) {
 			brain.update(true);

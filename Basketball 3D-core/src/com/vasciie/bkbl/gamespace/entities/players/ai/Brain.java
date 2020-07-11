@@ -289,7 +289,7 @@ public class Brain {
 		
 		returnVec.add(changeVec);*/
 		
-		System.out.println();
+		//System.out.println();
 		
 		Vector3 pos = user.getMap().getBall().getPosition();
 		

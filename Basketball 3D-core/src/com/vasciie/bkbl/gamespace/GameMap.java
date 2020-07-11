@@ -202,7 +202,10 @@ public class GameMap {
             co.setContactCallbackFlag(OBJECT_FLAG);
             co.setContactCallbackFilter(ENTITY_FLAG);
 
-            objectsMap.put(index, ObjectType.HOMEBASKET.getId());
+            
+            if(co.getUserIndex() == 1)
+            	objectsMap.put(index, ObjectType.HOMEBASKET.getId() + "Rim");
+            else objectsMap.put(index, ObjectType.HOMEBASKET.getId());
             collObjsInObjectMap.put(co, basket1);
             collObjsValsMap.put(index, co);
 
@@ -230,7 +233,9 @@ public class GameMap {
             co.setContactCallbackFlag(OBJECT_FLAG);
             co.setContactCallbackFilter(ENTITY_FLAG);
 
-            objectsMap.put(index, ObjectType.AWAYBASKET.getId());
+            if(co.getUserIndex() == 1)
+            	objectsMap.put(index, ObjectType.AWAYBASKET.getId() + "Rim");
+            else objectsMap.put(index, ObjectType.AWAYBASKET.getId());
             collObjsInObjectMap.put(co, basket2);
             collObjsValsMap.put(index, co);
 

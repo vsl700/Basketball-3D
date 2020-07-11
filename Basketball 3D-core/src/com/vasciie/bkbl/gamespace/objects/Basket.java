@@ -26,6 +26,8 @@ import com.vasciie.bkbl.MyGdxGame;
 
 public abstract class Basket extends GameObject {
 	
+	btRigidBody basketRim;
+	
 	private ModelInstance tabCenter, frame;
 
 	private static final float standW = 1;
@@ -253,6 +255,9 @@ public abstract class Basket extends GameObject {
 	protected void setCollisions() {
 		super.setCollisions();
 		
+		bodies.get(bodies.size() - 1).setUserIndex(1);
+		basketRim = bodies.get(bodies.size() - 1);
+		
 		for(btRigidBody bo : bodies) {
 			bo.setRestitution(0.4f);
 			bo.setFriction(0f);
@@ -290,6 +295,10 @@ public abstract class Basket extends GameObject {
 	@Override
 	protected void manuallySetBodies() {
 		
+	}
+
+	public btRigidBody getBasketRim() {
+		return basketRim;
 	}
 
 }
