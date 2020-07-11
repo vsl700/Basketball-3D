@@ -559,7 +559,7 @@ public class Rules {
 									
 									float changer, compatibChange = map.getBall().getWidth() / 2 + Terrain.getWalldepth();
 									
-									if(wallPos.x == 0) {//Basket-side wall
+									if(wallPos.x == 0) {//Basewall
 										changer = terrain.getWidth() / 4;
 										
 										if(wallPos.z < 0)
@@ -658,7 +658,7 @@ public class Rules {
 										
 										float changer, compatibChange = map.getBall().getWidth() / 2 + Terrain.getWalldepth();
 										
-										if(wallPos.x == 0) {//Basket-side wall
+										if(wallPos.x == 0) {//Basewall
 											changer = terrain.getWidth() / 4;
 											
 											if(wallPos.z < 0)
@@ -852,6 +852,94 @@ public class Rules {
 						crossed = false;
 						recentHolder = null;
 					}
+				},
+
+				new GameRule(this, null, "walk_shoot", "Walk Shooting!", map) {
+					final float defaultTime = 1;
+					float time = defaultTime;
+					
+					@Override
+					public void onRuleTrigger() {
+						time = defaultTime;
+						
+					}
+
+					@Override
+					public GameRule[] createInnerRules() {
+						
+						return null;
+					}
+
+					@Override
+					public void managePlayers() {
+						GameRule switchRule = rules.getGameRuleById("ball_out");
+						switchRule.setRuleTriggerer(ruleTriggerer);
+						
+						rules.setTriggeredRule(switchRule);
+					}
+					
+					@Override
+					public void createActions() {
+						
+						
+					}
+
+					@Override
+					public boolean checkRule() {
+						Player holdingPlayer = map.getHoldingPlayer();
+						if(holdingPlayer == null || !holdingPlayer.isCurrentlyAiming() && !holdingPlayer.isShooting()) {
+							time = defaultTime;
+							return false;
+						}
+						
+						if(time < 0) {
+							ruleTriggerer = holdingPlayer;
+							
+							ArrayList<Vector3> wallPositions = new ArrayList<Vector3>(8);
+							Terrain terrain = map.getTerrain();
+							
+							for(int i = 1; i < 5; i++) {
+								Vector3 wallPos = terrain.getMatrixes().get(i).getTranslation(new Vector3());
+								wallPos.y = holdingPlayer.getPosition().y;
+								
+								float changer, compatibChange = map.getBall().getWidth() / 2 + Terrain.getWalldepth();
+								
+								if(wallPos.x == 0) {//Basewall
+									changer = terrain.getWidth() / 4;
+									
+									if(wallPos.z < 0)
+										compatibChange = -compatibChange;
+									
+									wallPositions.add(wallPos.cpy().add(changer, 0, -compatibChange));
+									wallPositions.add(wallPos.sub(changer, 0, compatibChange));
+								}else {//Sidewall
+									changer = terrain.getDepth() / 4;
+									
+									if(wallPos.x < 0)
+										compatibChange = -compatibChange;
+									
+									wallPositions.add(wallPos.cpy().add(-compatibChange, 0, changer));
+									wallPositions.add(wallPos.sub(compatibChange, 0, changer));
+								}
+							}
+							
+							occurPlace.set(GameTools.getShortestDistanceWVectors(holdingPlayer.getPosition(), wallPositions));
+							
+							return true;
+						}else if(!holdingPlayer.getMoveVector().isZero()) {
+							time -= Gdx.graphics.getDeltaTime();
+						}
+							
+						
+						return false;
+					}
+
+					@Override
+					public String getDescription() {
+						
+						return "A Shooting Player Cannot Walk At The Same Time For More Than 1 Second!";
+					}
+					
 				},
 				
 				new GameRule(this, null, "basket_score", "SCORE!", map) {
