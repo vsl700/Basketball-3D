@@ -1134,6 +1134,96 @@ public class Rules {
 					
 				},
 				
+				new GameRule(this, null, "ball_moving", "Movement Violation!", map) {
+					final float defaultTime = 0.35f;
+					float time = defaultTime;
+					
+					
+					@Override
+					public void managePlayers() {
+						GameRule switchRule = rules.getGameRuleById("ball_out");
+						switchRule.setRuleTriggerer(ruleTriggerer);
+						
+						rules.setTriggeredRule(switchRule);
+					}
+					
+					@Override
+					public void onRuleTrigger() {
+						time = defaultTime;
+						
+					}
+
+					@Override
+					public GameRule[] createInnerRules() {
+						
+						return null;
+					}
+
+					@Override
+					public void createActions() {
+						
+						
+					}
+
+					@Override
+					public boolean checkRule() {
+						if(map.getHoldingPlayer() != null/* || !map.getBall().isGrounded()*/) {
+							time = defaultTime;
+							return false;
+						}
+						
+						for (btCollisionObject obj : map.getBall().getOutsideColliders()) {
+							for (Player player : map.getAllPlayers()) {
+								if (player.getMainBody().equals(obj) && !player.getMoveVector().isZero()) {
+									time -= Gdx.graphics.getDeltaTime();
+									if (time < 0) {
+										ruleTriggerer = player;
+
+										ArrayList<Vector3> wallPositions = new ArrayList<Vector3>(4);
+										Terrain terrain = map.getTerrain();
+
+										for (int i = 1; i < 5; i++) {
+											Vector3 wallPos = terrain.getMatrixes().get(i).getTranslation(new Vector3());
+											wallPos.y = player.getPosition().y;
+
+											float changer, compatibChange = map.getBall().getWidth() / 2 + Terrain.getWalldepth();
+
+											if (wallPos.z == 0) {// Sidewall
+												changer = terrain.getDepth() / 4;
+
+												if (wallPos.x < 0)
+													compatibChange = -compatibChange;
+
+												wallPositions.add(wallPos.cpy().add(-compatibChange, 0, changer));
+												wallPositions.add(wallPos.sub(compatibChange, 0, changer));
+
+												if (wallPositions.size() == 4)
+													break;
+											}
+										}
+
+										occurPlace.set(GameTools.getShortestDistanceWVectors(player.getPosition(), wallPositions));
+
+										return true;
+									}
+
+									break;
+								}
+							}
+						}
+						
+						
+						return false;
+					}
+
+					@Override
+					public String getDescription() {
+						
+						return "Players Cannot Move The Ball By Not Holding It!";
+					}
+					
+				},
+				
 				new GameRule(this, null, "basket_score", "SCORE!", map) {
 					Player recentHolder;
 					boolean holderInZone = false, holderInThreePoint = false;
@@ -1167,6 +1257,7 @@ public class Rules {
 							recentHolder = holdingPlayer;
 							
 							holderInZone = holdingPlayer.isInAwayBasketZone();
+							if(!holderInZone)
 							holderInThreePoint = holdingPlayer.isInAwayThreePointZone();
 						}
 						
@@ -1252,10 +1343,13 @@ public class Rules {
 			}
 
 			//GameRule tempRule = gameRules[1];
-			/*GameRule[] ruleTest = new GameRule[] {getGameRuleById("shoot_catch")};
+			/*GameRule[] ruleTest = new GameRule[] {getGameRuleById("ball_moving")};
 			for (GameRule r : ruleTest)
 				if (r.checkRule()) {
 					setTriggeredRule(r);
+					
+					for(GameRule rule1 : gameRules)
+						rule1.onRuleTrigger();
 				}*/
 		}
 		else {
