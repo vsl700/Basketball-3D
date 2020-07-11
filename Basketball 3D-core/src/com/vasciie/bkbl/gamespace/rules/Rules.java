@@ -754,7 +754,7 @@ public class Rules {
 							return false;
 						
 						if(crossed) {
-							if((!recentHolder.isCurrentlyAiming() && !recentHolder.isShooting() || !recentHolder.getMoveVector().isZero()) && !recentHolder.getAwayZone().checkZone(ball.getPosition(), ball.getDimensions()) && (recentHolder.getBrain().getMemory().isBallJustShot() && ball.getPosition().dst(recentHolder.getPosition()) >= recentHolder.getHeight() / 1.5f || recentHolder.getBrain().getMemory().isBallJustShot())) {
+							if((!recentHolder.isCurrentlyAiming() && !recentHolder.isShooting() || !recentHolder.getMoveVector().isZero()) && recentHolder.getHomeZone().checkZone(ball.getPosition(), ball.getDimensions()) && (recentHolder.getBrain().getMemory().isBallJustShot() && ball.getPosition().dst(recentHolder.getPosition()) >= recentHolder.getHeight() / 1.5f || recentHolder.getBrain().getMemory().isBallJustShot())) {
 								ruleTriggerer = recentHolder;
 								occurPlace.set(ball.getPosition()).scl(1, 0, 0);
 								

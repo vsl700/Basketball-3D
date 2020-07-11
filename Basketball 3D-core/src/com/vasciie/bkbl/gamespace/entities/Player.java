@@ -1087,11 +1087,11 @@ public abstract class Player extends Entity {
 		
 		Quaternion quat2 = new Quaternion();
 		camTrans.getRotation(quat2);
-		float degrees;
-		if(quat2.getPitch() > 38)
-			degrees = 38;
-		else if(quat2.getPitch() < -38)
-			degrees = -38;
+		float degrees, limit = 15;
+		if(quat2.getPitch() > limit)
+			degrees = limit;
+		else if(quat2.getPitch() < -limit)
+			degrees = -limit;
 		else degrees = quat2.getPitch();
 		
 		quat2.setEulerAngles(0, degrees, 0);
