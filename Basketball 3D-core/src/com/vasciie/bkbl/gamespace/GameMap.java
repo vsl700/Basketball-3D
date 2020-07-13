@@ -124,9 +124,11 @@ public class GameMap {
 
     int teamScore, oppScore;
 
-    int difficulty = 3;
+    int difficulty = 0;
 
     float startTimer;
+    
+    float gameSpeed = 1;
 
     boolean challenge;
     
@@ -147,7 +149,7 @@ public class GameMap {
 
 				@Override
 				public void run() {
-					dynamicsWorld.stepSimulation(Gdx.graphics.getDeltaTime(), 5, 1f / 60f);
+					dynamicsWorld.stepSimulation(Gdx.graphics.getDeltaTime() * gameSpeed, 5, 1f / 60f);
 				}
 
 			};
@@ -169,10 +171,10 @@ public class GameMap {
 			createPhysics();
 		
 
-        objectsMap = new HashMap<Integer, String>();
-        collObjsInEntityMap = new HashMap<btCollisionObject, Entity>();
-        collObjsInObjectMap = new HashMap<btCollisionObject, GameObject>();
-        collObjsValsMap = new HashMap<Integer, btCollisionObject>();
+			objectsMap = new HashMap<Integer, String>();
+			collObjsInEntityMap = new HashMap<btCollisionObject, Entity>();
+			collObjsInObjectMap = new HashMap<btCollisionObject, GameObject>();
+			collObjsValsMap = new HashMap<Integer, btCollisionObject>();
 		}
 		
         createMap();
@@ -600,7 +602,7 @@ public class GameMap {
     
     public void update(float delta) {
         //camera.setWorldTransform(new Matrix4(mainPlayer.getModelInstance().transform).mul(mainPlayer.getCamMatrix()).mul(new Matrix4().setToTranslation(0, mainPlayer.getHeight(), -10)));
-
+    	float delta2 = delta * gameSpeed;
         //float delta2 = Math.min(1f / 30f, delta);
     	if(SettingsScreen.multithreadOption)
     		physicsThread.waitToFinish();
@@ -619,7 +621,7 @@ public class GameMap {
             }
         }
         if (ruleTriggeredActing) {
-            updateFullGame(delta);
+            updateFullGame(delta2);
 
             if (rules.getTriggeredRule() == null) {
                 actionOver();
@@ -638,8 +640,8 @@ public class GameMap {
             updatePhysics();
             return;
         } else if (gameRunning)
-            updateFullGame(delta);
-        else updateGameEnvironment(delta);
+            updateFullGame(delta2);
+        else updateGameEnvironment(delta2);
 
         
         if (Gdx.app.getType().equals(Application.ApplicationType.Android)) {
@@ -723,6 +725,21 @@ public class GameMap {
     public void removeRigidBody(btRigidBody body) {
         dynamicsWorld.removeRigidBody(body);
     }
+    
+    public void removePlayer(Player player) {
+    	teammates.remove(player);
+    	opponents.remove(player);
+    	
+    	for(btRigidBody obj : player.getBodies()) {
+    		dynamicsWorld.removeRigidBody(obj);
+    		obj.dispose();
+    	}
+    	
+    	for(btCollisionObject obj : player.getCollisionObjects()) {
+    		dynamicsWorld.removeCollisionObject(obj);
+    		obj.dispose();
+    	}
+    }
 
     public void onRuleTriggered(GameRule rule) {
         //The game will just stop here
@@ -733,21 +750,22 @@ public class GameMap {
 
         if(Gdx.app.getType().equals(Application.ApplicationType.Android))
             inputs.reset();
+        
+        if(difficulty > 0) {
+        	rule.getRuleTriggerer().addFoul();
+        }
     }
 
     public void onRuleBrokenContinue() {
-        // When the player clicks a specified (or any key), the players will go
-        // to their specified by the rule places
-        //
-        // So this method will just give the players target positions according
-        // to the broken rule. (Update void) After the players are ready
-        // (moveVecs == 0 && !AIMemory(only one will be enough to show the
-        // current state).target.isZero()) start the timer (brokenRule == false)
-        // and clear the broken rule from Rule
         ruleTriggered = false;
         ruleTriggeredActing = true;
         startTimer = 0.9f;
-        // Finally, after a quick timeout the game will continue
+        
+        if(difficulty > 0) {
+        	Player triggerer = rules.getTriggeredRule().getRuleTriggerer();
+        	if(triggerer.getFouls() == 7)
+        		removePlayer(triggerer);
+        }
     }
 
     /**
@@ -1008,7 +1026,11 @@ public class GameMap {
     	return zones;
     }
 
-    public Player getMainPlayer() {
+    public Rules getRules() {
+		return rules;
+	}
+
+	public Player getMainPlayer() {
         return mainPlayer;
     }
 

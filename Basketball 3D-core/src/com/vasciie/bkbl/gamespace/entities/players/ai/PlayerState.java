@@ -297,7 +297,7 @@ public enum PlayerState implements State<Player> {
 
 			//If the following player hadn't just thrown the ball
 			if (player.getMap().getTeammates().size() == 1 || !player.getBrain().getMemory().isBallJustShot()) {
-				if(player.getMap().getBall().getPosition().y > player.getHeight() * 2 && player.isProximityColliding(player.getMap().getBall())) {
+				if(tempBall.getLinearVelocity().y < 0 && player.getMap().getBall().getPosition().y > player.getHeight() * 2 && player.isProximityColliding(player.getMap().getBall())) {
 					player.getBrain().getBallSeparate().setEnabled(true);
 					//player.getBrain().getBallSeparate().calculateSteering(Player.steering);
 					//player.getMoveVector().nor().add(Player.steering.linear.cpy().scl(2.5f));

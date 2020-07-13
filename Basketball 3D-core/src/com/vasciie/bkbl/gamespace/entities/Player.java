@@ -90,6 +90,8 @@ public abstract class Player extends Entity {
 	
 	int playerIndex;
 	
+	int fouls;
+	
 	//Abilities
 	boolean ableToRun;
 	
@@ -1725,6 +1727,14 @@ public abstract class Player extends Entity {
 	
 	public Player getFocusedPlayer() {
 		return focusTarget;
+	}
+	
+	public void addFoul() {
+		fouls++;
+	}
+	
+	public int getFouls() {
+		return fouls;
 	}
 	
 	public void setPlayerIndex(int playerIndex) {

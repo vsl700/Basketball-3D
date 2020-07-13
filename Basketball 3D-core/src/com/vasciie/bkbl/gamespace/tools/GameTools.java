@@ -23,6 +23,19 @@ import com.vasciie.bkbl.gamespace.zones.Zones.Zone;
  */
 public final class GameTools {
 	
+	/*public static float textSize(BitmapFont font, String t) {
+		float textW = 0;
+
+		for (int i = 0; i < t.length(); i++) {
+			char ch = t.charAt(i);
+			if (ch != '\n') {
+				textW += font.getData().getGlyph(ch).width * font.getScaleX();
+			}
+		}
+
+		return textW;
+	}*/
+	
 	private static final Vector3 tempVec = new Vector3();
 	public static boolean isObjectVisibleToScreen(Camera cam, ModelInstance instance, Vector3 dimensions) {
 		instance.transform.getTranslation(tempVec);

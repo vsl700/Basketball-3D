@@ -47,11 +47,13 @@ public class GameScreen implements Screen, RulesListener, GUIRenderer {
 	PauseScreen pause;
 	
 	Label homeScore, awayScore, timer, power, powerNum;
-	Label ruleHeading, ruleDesc, clickToCont;
+	Label ruleHeading, ruleDesc, clickToCont, playerRemove;
 	
 	int amount; //Player amount per team
 	
 	float contTimer;//clickToCont timer
+	
+	float messageBarWidth, messageBarHeight;
 	
 	boolean ignorePause;
 
@@ -99,11 +101,11 @@ public class GameScreen implements Screen, RulesListener, GUIRenderer {
 		
 		pause = new PauseScreen(mg);
 		
-		homeScore = new Label("0", textFont, Color.BLUE, true, this);
-		awayScore = new Label("0", textFont, Color.RED, true, this);
-		timer = new Label("", textFont, Color.ORANGE, true, this);
-		power = new Label("POWER", textFont, Color.RED, true, this);
-		powerNum = new Label("10", powFont, Color.WHITE, true, this);
+		homeScore = new Label("0", textFont, Color.BLUE, Color.CYAN, false, this);
+		awayScore = new Label("0", textFont, Color.RED, Color.ORANGE, false, this);
+		timer = new Label("", textFont, Color.ORANGE, false, this);
+		power = new Label("POWER", textFont, Color.RED, false, this);
+		powerNum = new Label("x1", powFont, Color.WHITE, Color.RED, false, this);
 		
 		ruleHeading = new Label("", textFont, true, this);
 		ruleDesc = new Label("", powFont, true, this);
@@ -113,6 +115,8 @@ public class GameScreen implements Screen, RulesListener, GUIRenderer {
 			message = "Tap Anywhere To Continue!";
 		else message = "Click E To Continue!";
 		clickToCont = new Label(message, powFont, Color.WHITE, true, this);
+		
+		playerRemove = new Label("Rule Triggerer Will Be Removed From The Game As He Just Got His 7th Foul!", powFont, Color.RED, true, this);
 	}
 
 	@Override
@@ -136,6 +140,19 @@ public class GameScreen implements Screen, RulesListener, GUIRenderer {
 	}
 
 	private void renderGUI(){
+		if(!paused() && map.isRuleTriggered()) {
+			shape.begin(ShapeRenderer.ShapeType.Filled);
+			shape.setColor(Color.ORANGE.cpy().sub(0, 0.3f, 0, 1));
+			
+			float tempHeight;
+			if(map.getDifficulty() > 0 && map.getRules().getTriggeredRule().getRuleTriggerer().getFouls() == 7)
+				tempHeight = messageBarHeight + playerRemove.getRows() * 26;
+			else tempHeight = messageBarHeight;
+			
+			shape.rect(cam.viewportWidth / 2 - messageBarWidth / 2, cam.viewportHeight - 20 - tempHeight, messageBarWidth, tempHeight);
+			shape.end();
+		}
+		
 		homeScore.draw();
 		awayScore.draw();
 
@@ -144,10 +161,11 @@ public class GameScreen implements Screen, RulesListener, GUIRenderer {
 
 		if(Gdx.app.getType().equals(Application.ApplicationType.Android))
 			map.renderController();
-
+		
 		ruleHeading.draw();
 		ruleDesc.draw();
 		clickToCont.draw();
+		playerRemove.draw();
 
 		timer.draw();
 	}
@@ -158,15 +176,15 @@ public class GameScreen implements Screen, RulesListener, GUIRenderer {
 
 		if (!paused())
 			if (map.isGameRunning() && !Gdx.app.getType().equals(Application.ApplicationType.Android)) {
-				int pow = map.getMainPlayer().getShootingPower();
+				int pow = map.getMainPlayer().getShootingPower() - 9;
 
 				power.update();
-				shape.begin(ShapeRenderer.ShapeType.Filled);
+				/*shape.begin(ShapeRenderer.ShapeType.Filled);
 				shape.setColor(Color.RED);
 				shape.rect(cam.viewportWidth / 2 - pow * 8 / 2, power.getY() - power.getHeight() / 2 - 30, pow * 8, 30);
-				shape.end();
+				shape.end();*/
 
-				powerNum.setText(pow + "");
+				powerNum.setText("x" + pow);
 				powerNum.update();
 			} else if (!map.isGameRunning()) {
 				if (map.getTimer() >= 0 && map.isPlayersReady()) {
@@ -178,11 +196,12 @@ public class GameScreen implements Screen, RulesListener, GUIRenderer {
 						timer.setText("Ready?");
 
 					timer.update();
-				} else if (map.isRuleTriggered()) { // If the game is not
-					// running and there is no
-					// timer counting down
+				} else if (map.isRuleTriggered()) { // If the game is not running and there is no timer counting down
 					ruleHeading.update();
 					ruleDesc.update();
+					
+					if(map.getDifficulty() > 0 && map.getRules().getTriggeredRule().getRuleTriggerer().getFouls() == 7)
+						playerRemove.update();
 
 					if (contTimer <= 0) {
 						clickToCont.update();
@@ -255,15 +274,31 @@ public class GameScreen implements Screen, RulesListener, GUIRenderer {
 		pCam.viewportHeight = height;
 		cam.setToOrtho(false, width, height);
 		
-		homeScore.setPosAndSize(30, height - 70, 10);
-		awayScore.setPosAndSize(width - 30, height - 70, 10);
+		homeScore.setPosAndSize(0, height - 70, 70, 70);
+		awayScore.setPosAndSize(width - 70, height - 70, 70, 70);
 		timer.setPosAndSize(width / 2, height - 120, 10);
-		power.setPosAndSize(width / 2, height - 80, 10);
-		powerNum.setPosAndSize(width / 2, height - 120, 10);
-		ruleHeading.setPosAndSize(width / 2 - (width - 10) / 2, height - 80, width - 10);
-		ruleDesc.setPosAndSize(width / 2 - (width - 10) / 2, height - 120, width - 10);
-		clickToCont.setPosAndSize(width / 2 - (width - 10) / 2, height - 160, width - 10);
+		power.setPosAndSize(width / 2, height - 40, 10);
+		powerNum.setSize(power.textSize(), 26);
+		powerNum.setPos(width / 2 - powerNum.getWidth() / 2 + 5, power.getY() - 50);
+		
+		resizeMessageText(width, height);
+		
 		pCam.update();
+	}
+	
+	private void resizeMessageText() {
+		resizeMessageText((int) cam.viewportWidth, (int) cam.viewportHeight);
+	}
+	
+	private void resizeMessageText(int width, int height) {
+		float diff = 140;
+		ruleHeading.setPosAndSize(width / 2 - (width - diff) / 2, height - 80, width - diff);
+		ruleDesc.setPosAndSize(width / 2 - (width - diff) / 2, ruleHeading.getY() - 30 * ruleDesc.getRows(), width - diff);
+		clickToCont.setPosAndSize(width / 2 - (width - diff) / 2, ruleDesc.getY() - 40 * clickToCont.getRows(), width - diff);
+		playerRemove.setPosAndSize(width / 2 - (width - diff) / 2, clickToCont.getY() - 30 * playerRemove.getRows(), width - diff);
+		
+		messageBarWidth = width - diff;
+		messageBarHeight = ruleHeading.getRows() * 39 + 26 * (ruleDesc.getRows() + clickToCont.getRows() + playerRemove.getRows()) + 13;
 	}
 	
 	public boolean paused() {
@@ -323,6 +358,8 @@ public class GameScreen implements Screen, RulesListener, GUIRenderer {
 		awayScore.setText(map.getOppScore() + "");
 		
 		contTimer = 1;
+		
+		resizeMessageText();
 	}
 
 	@Override

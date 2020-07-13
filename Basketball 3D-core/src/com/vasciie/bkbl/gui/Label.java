@@ -7,6 +7,7 @@ import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 
 public class Label extends Text {
 	
+	float textWidth;
 	float fR, fG, fB, fA;
 
 	boolean multiline, textShorten;
@@ -87,13 +88,13 @@ public class Label extends Text {
 					for (int i = 0; i < words.length; i++)
 						temp += words[i].charAt(0);
 
-					font.draw(batch, temp, x + width / 2 - textSize(font, temp) / 2, y + height / 2 + font.getLineHeight() / 2 - 10);
+					font.draw(batch, temp, x + width / 2 - textSize(font, temp) / 2, y + height / 2 + font.getLineHeight() / 2 - 5);
 				} else
-					font.draw(batch, text, x + width / 2 - textW / 2, y + height / 2 + font.getLineHeight() / 2 - 10);
+					font.draw(batch, text, x + width / 2 - textW / 2, y + height / 2 + font.getLineHeight() / 2 - 5);
 			}
 			
 			else
-				font.draw(batch, text, x + width / 2 - textW / 2, y + height / 2 + font.getLineHeight() / 2 - 10);
+				font.draw(batch, text, x + width / 2 - textW / 2, y + height / 2 + font.getLineHeight() / 2 - 5);
 		}
 		batch.end();
 
@@ -109,24 +110,48 @@ public class Label extends Text {
 
 	protected void onResize() {
 		StringBuilder sb = new StringBuilder();
+		StringBuilder tempSb = new StringBuilder();
 
 		float textW = 0;
+		textWidth = 0;
 
 		for (int i = 0; i < text.length(); i++) {
 			char ch = text.charAt(i);
 
 			if (ch != '\n') {
 				textW += font.getData().getGlyph(ch).width * font.getScaleX();
-				sb.append(ch);
+				textWidth += font.getData().getGlyph(ch).width * font.getScaleX();
 
-				if (textW > width && ch == ' ' && multiline) {
-					sb.append('\n');
-					textW = font.getData().getGlyph(ch).width * font.getScaleX();
-				}
+				if (multiline) {
+					if (ch == ' ') {
+						if (textW > width) {
+							sb.append('\n');
+							textW = textSize(font, tempSb.toString());
+						}
+
+						sb.append(tempSb.toString());
+						sb.append(ch);
+
+						tempSb.delete(0, tempSb.length());
+					} else
+						tempSb.append(ch);
+				}else sb.append(ch);
+				
 			}
 		}
 
+		if(tempSb.length() > 0)
+			sb.append(tempSb.toString());
+		
 		text = sb.toString();
+	}
+	
+	public float textSize() {
+		return textWidth;
+	}
+	
+	public float getRows() {
+		return text.split("\n").length;
 	}
 
 	@Override

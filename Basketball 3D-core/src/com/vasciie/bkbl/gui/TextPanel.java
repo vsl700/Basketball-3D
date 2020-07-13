@@ -153,7 +153,7 @@ public class TextPanel extends Text implements InputProcessor {
 		textH = font.getLineHeight();
 
 		textX = x + width / 2 - textW / 2;
-		textY = y + height / 2 + textH / 2 - 10;
+		textY = y + height / 2 + textH / 2 - 5;
 	}
 	
 	/**
