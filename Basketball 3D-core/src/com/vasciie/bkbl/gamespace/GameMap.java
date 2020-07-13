@@ -545,6 +545,8 @@ public class GameMap {
             rules.getTriggeredRule().clearRuleTriggerer();
             rules.clearTriggeredRule();
         }
+        rules.resetRules();
+        
         ruleTriggered = false;
 
         mainPlayer = null;

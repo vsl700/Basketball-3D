@@ -349,7 +349,7 @@ public class Rules {
 									}
 
 									@Override
-									public void onRuleTrigger() {
+									public void resetRule() {
 										
 										
 									}
@@ -362,7 +362,7 @@ public class Rules {
 									
 									
 									@Override
-									public void onRuleTrigger() {
+									public void resetRule() {
 										time = defaultTime;
 										
 									}
@@ -425,11 +425,11 @@ public class Rules {
 					}
 
 					@Override
-					public void onRuleTrigger() {
+					public void resetRule() {
 						recentHolder = null;
 						
 						for(GameRule rule : innerRules)
-							rule.onRuleTrigger();
+							rule.resetRule();
 					}
 				},
 				
@@ -596,7 +596,7 @@ public class Rules {
 					}
 
 					@Override
-					public void onRuleTrigger() {
+					public void resetRule() {
 						
 						
 					}
@@ -694,7 +694,7 @@ public class Rules {
 					}
 
 					@Override
-					public void onRuleTrigger() {
+					public void resetRule() {
 						timer = defaultTime;
 						
 					}
@@ -793,7 +793,7 @@ public class Rules {
 					}
 
 					@Override
-					public void onRuleTrigger() {
+					public void resetRule() {
 						timer = defaultTime;
 						
 					}
@@ -926,7 +926,7 @@ public class Rules {
 					}
 
 					@Override
-					public void onRuleTrigger() {
+					public void resetRule() {
 						crossed = false;
 						recentHolder = null;
 					}
@@ -937,7 +937,7 @@ public class Rules {
 					float time = defaultTime;
 					
 					@Override
-					public void onRuleTrigger() {
+					public void resetRule() {
 						time = defaultTime;
 						
 					}
@@ -1025,7 +1025,7 @@ public class Rules {
 					boolean inside;
 					
 					@Override
-					public void onRuleTrigger() {
+					public void resetRule() {
 						inside = false;
 						
 					}
@@ -1112,7 +1112,7 @@ public class Rules {
 					boolean ballJustShot, currentlyShooting;
 					
 					@Override
-					public void onRuleTrigger() {
+					public void resetRule() {
 						recentHolder = null;
 						ballJustShot = currentlyShooting = false;
 					}
@@ -1227,7 +1227,7 @@ public class Rules {
 					}
 					
 					@Override
-					public void onRuleTrigger() {
+					public void resetRule() {
 						time = defaultTime;
 						
 					}
@@ -1299,6 +1299,116 @@ public class Rules {
 					public String getDescription() {
 						
 						return "Players Cannot Move The Ball By Not Holding It!";
+					}
+					
+				},
+				
+				new GameRule(this, null, "bring_time", "Time Out!", map) {
+					Player recentHolder;
+					
+					final float defaultTime = 6;
+					float time = defaultTime;
+					
+					
+					@Override
+					public void resetRule() {
+						time = defaultTime;
+						
+					}
+					
+					@Override
+					public void managePlayers() {
+						GameRule switchRule = rules.getGameRuleById("ball_out");
+						switchRule.setRuleTriggerer(ruleTriggerer);
+						
+						rules.setTriggeredRule(switchRule);
+					}
+
+					@Override
+					public GameRule[] createInnerRules() {
+						
+						return null;
+					}
+
+					@Override
+					public void createActions() {
+						
+						
+					}
+
+					@Override
+					public boolean checkRule() {
+						if(map.getDifficulty() == 0)
+							return false;
+						
+						Player holdingPlayer = map.getHoldingPlayer();
+						Ball ball = map.getBall();
+						
+						Player newRecentHolder = null;
+						if (holdingPlayer == null) {//If there is currently no holding player
+							for (btCollisionObject obj : map.getBall().getOutsideColliders()) {
+								for (Player player : map.getAllPlayers()) {
+									if (player.getAllCollObjects().contains(obj)) {
+										newRecentHolder = player;// Make the recent holder a player that has recently just touched the ball
+									}
+								}
+							}
+						}else {
+							newRecentHolder = holdingPlayer;
+						}
+						
+						if (newRecentHolder != null) {
+							if (newRecentHolder instanceof Teammate && recentHolder instanceof Opponent || newRecentHolder instanceof Opponent && recentHolder instanceof Teammate) {
+								time = defaultTime;
+							}
+
+							recentHolder = newRecentHolder;
+						}
+						
+						if (time < 0) {
+							if (recentHolder.getHomeZone().checkZone(ball.getPosition(), ball.getDimensions())) {
+								ruleTriggerer = recentHolder;
+
+								if (!recentHolder.isAiming() && !recentHolder.isShooting())
+									map.playerReleaseBall();
+
+								ArrayList<Vector3> wallPositions = new ArrayList<Vector3>(4);
+								Terrain terrain = map.getTerrain();
+
+								for (int i = 1; i < 5; i++) {
+									Vector3 wallPos = terrain.getMatrixes().get(i).getTranslation(new Vector3());
+									wallPos.y = recentHolder.getPosition().y;
+
+									float changer, compatibChange = map.getBall().getWidth() / 2 + Terrain.getWalldepth();
+
+									if (wallPos.z == 0) {// Sidewall
+										changer = terrain.getDepth() / 4;
+
+										if (wallPos.x < 0)
+											compatibChange = -compatibChange;
+
+										wallPositions.add(wallPos.cpy().add(-compatibChange, 0, changer));
+										wallPositions.add(wallPos.sub(compatibChange, 0, changer));
+
+										if (wallPositions.size() == 4)
+											break;
+									}
+								}
+
+								occurPlace.set(GameTools.getShortestDistanceWVectors(recentHolder.getPosition(), wallPositions));
+
+								return true;
+							}else time = defaultTime; //We do that just because we want to reduce unnecessary zone checks
+						}else time -= Gdx.graphics.getDeltaTime();
+						
+						
+						return false;
+					}
+
+					@Override
+					public String getDescription() {
+						
+						return "The Ball Must Get Out Of The Holding Player's Home Zone Within 6 Seconds!";
 					}
 					
 				},
@@ -1395,7 +1505,7 @@ public class Rules {
 					}
 
 					@Override
-					public void onRuleTrigger() {
+					public void resetRule() {
 						
 						
 					}
@@ -1415,14 +1525,14 @@ public class Rules {
 					rulesListener.onRuleTriggered(rule);
 	
 					for(GameRule rule1 : gameRules)
-						rule1.onRuleTrigger();
+						rule1.resetRule();
 					
 					break;
 				}
 			}
 
 			//GameRule tempRule = gameRules[1];
-			/*GameRule[] ruleTest = new GameRule[] {getGameRuleById("ball_out")};
+			/*GameRule[] ruleTest = new GameRule[] {getGameRuleById("bring_time")};
 			for (GameRule r : ruleTest)
 				if (r.checkRule()) {
 					setTriggeredRule(r);
@@ -1443,6 +1553,11 @@ public class Rules {
 		}
 		
 		triggeredRule = rule;
+	}
+	
+	public void resetRules() {
+		for(GameRule rule : gameRules)
+			rule.resetRule();
 	}
 	
 	public void clearTriggeredRule() {
@@ -1503,7 +1618,7 @@ public class Rules {
 		/**
 		 * Whenever any rule of the rules system triggers (not the specified one)
 		 */
-		public abstract void onRuleTrigger();
+		public abstract void resetRule();
 		
 		public abstract GameRule[] createInnerRules();
 		
@@ -1545,7 +1660,7 @@ public class Rules {
 					if(r.checkRule()) {
 						rules.setTriggeredRule(r);
 						for(GameRule rule : innerRules)
-							rule.onRuleTrigger();
+							rule.resetRule();
 						
 						actions.firstAction();
 						//return false;
