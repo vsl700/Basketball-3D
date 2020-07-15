@@ -39,8 +39,6 @@ public class SettingsScreen implements Screen, UpDownListener, GUIRenderer {
 	//TextUpDown resUpDown;
 	Label fpsLabel, camRotLabel, mthLabel;
 	
-	SettingsPrefsIO prefs;
-	
 	Screen prevScreen;
 	
 	public static boolean invertX, invertY, multithreadOption;
@@ -61,8 +59,6 @@ public class SettingsScreen implements Screen, UpDownListener, GUIRenderer {
 		
 		font2 = new BitmapFont();
 		font2.getData().setScale(2);
-		
-		prefs = new SettingsPrefsIO();
 		
 		createGui();
 	}
@@ -110,13 +106,13 @@ public class SettingsScreen implements Screen, UpDownListener, GUIRenderer {
 		mthLabel = new Label("INCREASES PERFORMANCE, BUT MIGHT DECREASE QUALITY", font, Color.BROWN, true, this);
 		//resLabel = new Label("THE RESOLUTION OF THE WINDOW", font, Color.BROWN, true);
 		
-		if(prefs.readSettingBool("exists")) {
-			beautifulGfx.setToggled(prefs.readSettingBool("beautifulBack"));
-			fullscreen.setToggled(prefs.readSettingBool("fullscreen"));
-			fpsUpDown.setOption(prefs.readSettingInteger("fps"));
-			multithread.setToggled(multithreadOption = prefs.readSettingBool("multithread"));
-			invX.setToggled(invertX = prefs.readSettingBool("invertX"));
-			invY.setToggled(invertY = prefs.readSettingBool("invertY"));
+		if(SettingsPrefsIO.readSettingBool("exists")) {
+			beautifulGfx.setToggled(SettingsPrefsIO.readSettingBool("beautifulBack"));
+			fullscreen.setToggled(SettingsPrefsIO.readSettingBool("fullscreen"));
+			fpsUpDown.setOption(SettingsPrefsIO.readSettingInteger("fps"));
+			multithread.setToggled(multithreadOption = SettingsPrefsIO.readSettingBool("multithread"));
+			invX.setToggled(invertX = SettingsPrefsIO.readSettingBool("invertX"));
+			invY.setToggled(invertY = SettingsPrefsIO.readSettingBool("invertY"));
 			
 			game.setForegroundFps(fpsUpDown.getOption());
 			if(fullscreen.isToggled())
@@ -128,9 +124,9 @@ public class SettingsScreen implements Screen, UpDownListener, GUIRenderer {
 			multithread.setToggled(true);
 			multithreadOption = true;
 			
-			prefs.writeSettingBool("exists", true);
+			SettingsPrefsIO.writeSettingBool("exists", true);
 			writeSettings();
-			prefs.flush();
+			SettingsPrefsIO.flush();
 		}
 	}
 	
@@ -201,13 +197,13 @@ public class SettingsScreen implements Screen, UpDownListener, GUIRenderer {
 	}
 	
 	private void writeSettings() {
-		prefs.writeSettingBool("beautifulBack", game.isBeautifulBack());
-		prefs.writeSettingBool("fullscreen", fullscreen.isToggled());
-		prefs.writeSettingBool("multithread", multithread.isToggled());
-		prefs.writeSettingBool("invertX", invertX);
-		prefs.writeSettingBool("invertY", invertY);
-		prefs.writeSettingInt("fps", fpsUpDown.getOption());
-		prefs.flush();
+		SettingsPrefsIO.writeSettingBool("beautifulBack", game.isBeautifulBack());
+		SettingsPrefsIO.writeSettingBool("fullscreen", fullscreen.isToggled());
+		SettingsPrefsIO.writeSettingBool("multithread", multithread.isToggled());
+		SettingsPrefsIO.writeSettingBool("invertX", invertX);
+		SettingsPrefsIO.writeSettingBool("invertY", invertY);
+		SettingsPrefsIO.writeSettingInt("fps", fpsUpDown.getOption());
+		SettingsPrefsIO.flush();
 	}
 	
 	/*private void changeRes() {

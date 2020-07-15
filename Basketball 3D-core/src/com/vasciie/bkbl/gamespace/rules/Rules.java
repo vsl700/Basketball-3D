@@ -54,7 +54,7 @@ public class Rules {
 							return false;
 						
 						if (tempPlayer == null) {//If there is currently no holding player
-							if((map.getBall().isCollidedWTeamBasket() || map.getBall().isCollidedWOppBasket()) && map.getBall().getLinearVelocity().y > 0) {
+							if((map.getBall().isCollidedWTeamBasket() || map.getBall().isCollidedWOppBasket()) && map.getBall().getLinearVelocity().y > 0.5f && map.getBall().getPosition().y - map.getHomeBasket().getBasketTargetTrans().getTranslation(new Vector3()).y < 0) {
 								ruleTriggerer = recentHolder;
 								basketUpsideDown = true;
 								setOccurPlace();
@@ -242,7 +242,7 @@ public class Rules {
 
 							@Override
 							public boolean act() {
-								if(map.getTeammates().size() == 1)
+								if(thrower instanceof Teammate && map.getTeammates().size() == 1 || thrower instanceof Opponent && map.getOpponents().size() == 1)
 									return true;
 								
 								// We also check whether it is holding or not,
@@ -538,6 +538,9 @@ public class Rules {
 							public boolean act() {
 								Player holdingPlayer = map.getHoldingPlayer();
 									
+								if(holdingPlayer == null)
+									return true;
+								
 								boolean tooCloseOrBehind = holdingPlayer.getBrain().tooCloseOrBehindBasket();
 								
 								if((!tooCloseOrBehind || holdingPlayer.getBrain().isShooting()) && holdingPlayer.isInAwayBasketZone()) {
@@ -1139,9 +1142,6 @@ public class Rules {
 
 					@Override
 					public boolean checkRule() {
-						if(map.getTeammates().size() == 1)
-							return false;
-						
 						Player holdingPlayer = map.getHoldingPlayer();
 						if(holdingPlayer == null && recentHolder == null)
 							return false;
@@ -1149,6 +1149,9 @@ public class Rules {
 						if(ballJustShot) {
 							if(recentHolder != null && holdingPlayer != null) {
 								if (holdingPlayer.equals(recentHolder)) {
+									if(recentHolder instanceof Teammate && map.getTeammates().size() == 1 || recentHolder instanceof Opponent && map.getOpponents().size() == 1)
+										return false;
+									
 									ruleTriggerer = recentHolder;
 
 									if (!recentHolder.isAiming() && !recentHolder.isShooting())
@@ -1188,6 +1191,7 @@ public class Rules {
 								} else {
 									recentHolder = holdingPlayer;
 									ballJustShot = false;
+									currentlyShooting = false;
 								}
 							}
 						}else {
@@ -1442,15 +1446,18 @@ public class Rules {
 					@Override
 					public boolean checkRule() {
 						Player holdingPlayer = map.getHoldingPlayer();
-						if(holdingPlayer != null) {
+						if(holdingPlayer != null || recentHolder != null && (recentHolder.isCurrentlyAiming() || recentHolder.isShooting())) {
 							recentHolder = holdingPlayer;
 							
 							holderInZone = holdingPlayer.isInAwayBasketZone();
 							if(!holderInZone)
-							holderInThreePoint = holdingPlayer.isInAwayThreePointZone();
-						}
-						
-						if (map.getBall().getLinearVelocity().y < 0) {
+								holderInThreePoint = holdingPlayer.isInAwayThreePointZone();
+							else holderInThreePoint = true;
+							
+							System.out.println(holderInZone);
+							System.out.println(holderInThreePoint);
+							System.out.println();
+						}else if (map.getBall().getLinearVelocity().y < 0) {
 							if (map.getBall().isCollidedWTeamBasket()) {
 								teamScore = false;
 								map.scoreOpp(!holderInZone, !holderInThreePoint);
@@ -1506,7 +1513,6 @@ public class Rules {
 
 					@Override
 					public void resetRule() {
-						
 						
 					}
 					

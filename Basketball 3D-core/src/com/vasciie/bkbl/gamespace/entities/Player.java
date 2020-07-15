@@ -320,7 +320,7 @@ public abstract class Player extends Entity {
 		walking = true;
 		
 		//if(isMainPlayer())
-		prevMoveVec.set(moveVec);
+		//prevMoveVec.set(moveVec);
 		moveVec.set(dir);
 	}
 	
@@ -351,7 +351,7 @@ public abstract class Player extends Entity {
 			running = currentRunning = true;
 			
 			//if(isMainPlayer())
-			prevMoveVec.set(moveVec);
+			//prevMoveVec.set(moveVec);
 			moveVec.set(dir);
 		}
 		else walk(dir);
@@ -468,6 +468,8 @@ public abstract class Player extends Entity {
 				if (rightHandInWorld)
 					disableHandDynColl(left);
 			}
+			
+			leftThrowBall = rightThrowBall = false;
 
 			if (!downBody)
 				disableUpperBodyDynColl();
@@ -926,6 +928,9 @@ public abstract class Player extends Entity {
 		
 		map.getBall().setWorldTransform(bodiesMap.get("hand" + primaryId).getWorldTransform().cpy());
 		
+		if(leftThrowBall || rightThrowBall)
+			return;
+		
 		if(focus)
 			lookAtClosestToViewPlayer();
 		
@@ -1260,6 +1265,8 @@ public abstract class Player extends Entity {
 			//leftThrowBall = rightThrowBall = false;
 		}
 		
+		
+		
 		boolean mainPlayerBrainUpdate = isMainPlayer() && map.isRuleTriggeredActing() && !map.isGameRunning();
 		if(mainPlayerBrainUpdate /*updateBrain && map.isRuleBrokenActing()*/ || !isMainPlayer() && !map.isRuleTriggered()) {
 			brain.update(true);
@@ -1283,6 +1290,8 @@ public abstract class Player extends Entity {
 			
 			//updateBrain = false;
 		}
+		
+		prevMoveVec.set(moveVec);
 		
 		if(!ableToRun)
 			running = false;

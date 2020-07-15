@@ -149,7 +149,7 @@ public class GameMap {
 
 				@Override
 				public void run() {
-					dynamicsWorld.stepSimulation(Gdx.graphics.getDeltaTime() * gameSpeed, 5, 1f / 60f);
+					dynamicsWorld.stepSimulation(Gdx.graphics.getDeltaTime() * gameSpeed, 1, 1f / 60f);
 				}
 
 			};
@@ -754,7 +754,8 @@ public class GameMap {
             inputs.reset();
         
         if(difficulty > 0) {
-        	rule.getRuleTriggerer().addFoul();
+        	if(!rule.getId().equals("basket_score"))
+	        	rule.getRuleTriggerer().addFoul();
         }
     }
 
@@ -977,7 +978,7 @@ public class GameMap {
             mainPlayer.turnX(turnX * delta * 9);
         }
 
-        int substractor = 40;
+        int substractor = 140;
 
         if (Gdx.input.getX() > Gdx.graphics.getWidth() - substractor)
             Gdx.input.setCursorPosition(substractor, Gdx.input.getY());

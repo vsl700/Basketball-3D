@@ -43,6 +43,7 @@ public class MyGdxGame extends Game {
 	public MainScreen main;
 	public LevelScreen level;
 	public GameScreen game;
+	public GameOverScreen gameOver;
 	public SettingsScreen settings;
 	public TestScreen tester;
 	
@@ -87,10 +88,12 @@ public class MyGdxGame extends Game {
 		main = new MainScreen(this);		
 		level = new LevelScreen(this);
 		game = new GameScreen(this);
+		gameOver = new GameOverScreen(this);
 		
 
 		if(!Gdx.app.getType().equals(Application.ApplicationType.Android))
 			settings = new SettingsScreen(this);
+		
 		setScreen(spScreen1);
 	}
 	
@@ -112,6 +115,8 @@ public class MyGdxGame extends Game {
 		pCam.position.set(0, 9, 25);
 		pCam.far = 200;
 		pCam.near = 0.1f;
+		
+		assets.finishLoading();
 		
 		map = new GameMap(game, game);
 	}

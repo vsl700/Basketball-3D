@@ -17,7 +17,7 @@ public abstract class GUI {
 		renderable = true;
 	}
 	
-	public abstract void render();
+	protected abstract void render();
 
 	public void draw(){
 		if(renderable) render();
@@ -99,6 +99,10 @@ public abstract class GUI {
 
 	public float getHeight() {
 		return height;
+	}
+
+	public boolean isRenderable() {
+		return renderable;
 	}
 
 	protected abstract void onResize();

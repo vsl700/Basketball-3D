@@ -481,7 +481,7 @@ public class Brain {
 	public boolean shouldStopToCatch() {
 		Ball tempBall = user.getMap().getBall();
 		
-		return tempBall.getPosition().dst(user.getPosition()) <= user.getDepth() / 2 + tempBall.getDepth() / 2 + 0.7f && !tempBall.isGrounded();
+		return tempBall.getPosition().dst(user.getPosition()) <= user.getDepth() + tempBall.getDepth() / 2 + 0.7f && !tempBall.isGrounded();
 	}
 	
 	public boolean tooCloseOrBehindBasket() {

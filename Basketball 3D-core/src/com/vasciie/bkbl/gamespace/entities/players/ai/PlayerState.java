@@ -148,7 +148,7 @@ public enum PlayerState implements State<Player> {
 					time = 1.3f;
 				else time = 0.7f;
 				
-				if(tempPlayers != null && tempPlayers.size == player.getMap().getTeammates().size())
+				if(tempPlayers != null && (player instanceof Teammate && tempPlayers.size == player.getMap().getTeammates().size() || player instanceof Opponent && tempPlayers.size == player.getMap().getOpponents().size()))
 					mem.setAimingTime(mem.getAimingTime() - Gdx.graphics.getDeltaTime());
 			}else time = 1.25f;
 			
@@ -209,7 +209,7 @@ public enum PlayerState implements State<Player> {
 			
 			player.getBrain().getMSBallInHand().calculateSteering(Player.steering);
 			
-			if(player.getMap().getDifficulty() < 2 || willStayInZone(player))
+			if(player.getMap().getDifficulty() < 2 || !brain.isShooting())
 				player.setMoveVector(Player.steering.linear);
 			
 			if(!brain.isShooting() && !mem.isBallJustShot())
@@ -235,10 +235,6 @@ public enum PlayerState implements State<Player> {
 			if(mem.getAimingTime() == 0)
 				player.lookAt(dir.sub(mem.getDistDiff(), 0, 0));*/
 
-		}
-		
-		private boolean willStayInZone(Player player) {
-			return player.isInAwayBasketZone() && player.getAwayBasketZone().checkZone(player.getPosition().add(Player.steering.linear.cpy()/*.nor()*/.scl(Math.min(1, Gdx.graphics.getDeltaTime())))) || !player.isInAwayBasketZone();
 		}
 
 		@Override
@@ -280,7 +276,7 @@ public enum PlayerState implements State<Player> {
 		}
 		
 		private boolean willStayInZone(Player player) {
-			return player.isInAwayBasketZone() && player.getAwayBasketZone().checkZone(player.getPosition().add(Player.steering.linear.cpy()/*.nor()*/.scl(Math.max(1f/20f, Gdx.graphics.getDeltaTime())))) || !player.isInAwayBasketZone() || !player.getBrain().getMemory().isBallJustShot();
+			return player.isInAwayBasketZone() && player.getAwayBasketZone().checkZone(player.getPosition().add(Player.steering.linear.cpy().scl(3))) || !player.isInAwayBasketZone() || !player.getBrain().getMemory().isBallJustShot();
 		}
 		
 		@Override
@@ -296,8 +292,8 @@ public enum PlayerState implements State<Player> {
 			
 
 			//If the following player hadn't just thrown the ball
-			if (player.getMap().getTeammates().size() == 1 || !player.getBrain().getMemory().isBallJustShot()) {
-				if(tempBall.getLinearVelocity().y < 0 && player.getMap().getBall().getPosition().y > player.getHeight() * 2 && player.isProximityColliding(player.getMap().getBall())) {
+			if (player instanceof Teammate && player.getMap().getTeammates().size() == 1 || player instanceof Opponent && player.getMap().getOpponents().size() == 1 || !player.getBrain().getMemory().isBallJustShot()) {
+				if(tempBall.getLinearVelocity().y < 0 && player.getMap().getBall().getPosition().y > player.getHeight() * 2 && player.isProximityColliding(player.getMap().getBall()) || player.getPosition().dst(ballVec) < tempBall.getWidth() * 1.5f) {
 					player.getBrain().getBallSeparate().setEnabled(true);
 					//player.getBrain().getBallSeparate().calculateSteering(Player.steering);
 					//player.getMoveVector().nor().add(Player.steering.linear.cpy().scl(2.5f));
@@ -478,7 +474,7 @@ public enum PlayerState implements State<Player> {
 			} else
 				brain.getPlayerSeparate().setEnabled(false);
 			
-			if(player.getMap().getTeammates().size() == 1) {
+			if(player instanceof Teammate && player.getMap().getTeammates().size() == 1 || player instanceof Opponent && player.getMap().getOpponents().size() == 1) {
 				if(!player.isCurrentlyRunning() && player.getPosition().dst(chased.getPosition()) > 3 || player.isCurrentlyRunning() && player.getPosition().dst(chased.getPosition()) > 1.78f)
 					player.setRunning();
 			}else player.setRunning();

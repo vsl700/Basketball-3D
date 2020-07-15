@@ -19,6 +19,7 @@ import com.badlogic.gdx.math.Matrix4;
 import com.badlogic.gdx.math.Vector3;
 import com.vasciie.bkbl.MyGdxGame;
 import com.vasciie.bkbl.gamespace.GameMap;
+import com.vasciie.bkbl.gamespace.entities.Player;
 import com.vasciie.bkbl.gamespace.rules.Rules.GameRule;
 import com.vasciie.bkbl.gamespace.rules.Rules.RulesListener;
 import com.vasciie.bkbl.gamespace.tools.VEThread;
@@ -206,11 +207,14 @@ public class GameScreen implements Screen, RulesListener, GUIRenderer {
 					if (contTimer <= 0) {
 						clickToCont.update();
 
-						if (Gdx.app.getType().equals(Application.ApplicationType.Android)) {
-							if (Gdx.input.justTouched())
-								map.onRuleBrokenContinue();
-						} else if (Gdx.input.isKeyJustPressed(Keys.E))
+						if (Gdx.app.getType().equals(Application.ApplicationType.Android) && Gdx.input.justTouched() || Gdx.input.isKeyJustPressed(Keys.E)) {
+							Player triggerer = map.getRules().getTriggeredRule().getRuleTriggerer();
+							if(triggerer.getFouls() == 7 && triggerer.isMainPlayer() || map.getTeamScore() == 15 || map.getOppScore() == 15) {
+								game.setScreen(game.gameOver);
+							}
+							
 							map.onRuleBrokenContinue();
+						}
 					} else
 						contTimer -= delta;
 				}
@@ -342,6 +346,10 @@ public class GameScreen implements Screen, RulesListener, GUIRenderer {
 	
 	public void setPlayersAmount(int amount) {
 		this.amount = amount;
+	}
+
+	public int getAmount() {
+		return amount;
 	}
 
 	@Override
