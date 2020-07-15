@@ -143,9 +143,9 @@ public class Brain {
 		pSShooting.add(collAvoid);
 		
 		pSCustom = new PrioritySteering<Vector3>(user);
+		pSCustom.add(collAvoid);
 		pSCustom.add(ballSeparate);
 		//pSCustom.add(basketSeparate);
-		pSCustom.add(collAvoid);
 		pSCustom.add(allPlayerSeparate);
 		pSCustom.add(pursueBallInHand2);
 		pSCustom.add(customPursue);

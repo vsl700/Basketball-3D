@@ -470,6 +470,7 @@ public abstract class Player extends Entity {
 			}
 			
 			leftThrowBall = rightThrowBall = false;
+			readyBall = false;
 
 			if (!downBody)
 				disableUpperBodyDynColl();

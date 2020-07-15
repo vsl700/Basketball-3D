@@ -123,6 +123,7 @@ public class GameMap {
     int currentPlayerHoldTeam, currentPlayerHoldOpp;
 
     int teamScore, oppScore;
+    int mainPlayerScore;
 
     int difficulty = 0;
 
@@ -539,7 +540,7 @@ public class GameMap {
         
         MyGdxGame.clearColor();
 
-        teamScore = oppScore = 0;
+        teamScore = oppScore = mainPlayerScore = 0;
 
         if (rules.getTriggeredRule() != null) {
             rules.getTriggeredRule().clearRuleTriggerer();
@@ -991,18 +992,27 @@ public class GameMap {
             Gdx.input.setCursorPosition(Gdx.input.getX(), Gdx.graphics.getHeight() - substractor);
     }
 
-    public void scoreTeam(boolean doub, boolean triple) {
-        if (triple)
-            teamScore += 3;
-        else if(doub) teamScore += 2;
-        else teamScore++;
+    public void scoreTeam(boolean doub, boolean triple, Player scorer) {
+        int add;
+    	if (triple)
+            add = 3;
+        else if(doub) add = 2;
+        else add = 1;
+    	
+    	teamScore+= add;
+        
+        if(scorer.equals(mainPlayer))
+        	mainPlayerScore+= add;
     }
 
-    public void scoreOpp(boolean doub, boolean triple) {
-        if (triple)
-            oppScore += 3;
-        else if(doub) oppScore += 2;
-        else oppScore++;
+    public void scoreOpp(boolean doub, boolean triple, Player scorer) {
+    	int add;
+    	if (triple)
+            add = 3;
+        else if(doub) add = 2;
+        else add = 1;
+    	
+    	oppScore+= add;
     }
 
     public btDynamicsWorld getDynamicsWorld() {
@@ -1125,7 +1135,11 @@ public class GameMap {
         return oppScore;
     }
 
-    public float getTimer() {
+    public int getMainPlayerScore() {
+		return mainPlayerScore;
+	}
+
+	public float getTimer() {
         return startTimer;
     }
 

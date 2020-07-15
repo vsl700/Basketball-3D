@@ -1453,21 +1453,17 @@ public class Rules {
 							if(!holderInZone)
 								holderInThreePoint = holdingPlayer.isInAwayThreePointZone();
 							else holderInThreePoint = true;
-							
-							System.out.println(holderInZone);
-							System.out.println(holderInThreePoint);
-							System.out.println();
 						}else if (map.getBall().getLinearVelocity().y < 0) {
 							if (map.getBall().isCollidedWTeamBasket()) {
 								teamScore = false;
-								map.scoreOpp(!holderInZone, !holderInThreePoint);
+								map.scoreOpp(!holderInZone, !holderInThreePoint, recentHolder);
 								
 								ruleTriggerer = recentHolder;
 								setOccurPlace();
 								return true;
 							} else if (map.getBall().isCollidedWOppBasket()) {
 								teamScore = true;
-								map.scoreTeam(!holderInZone, !holderInThreePoint);
+								map.scoreTeam(!holderInZone, !holderInThreePoint, recentHolder);
 
 								ruleTriggerer = recentHolder;
 								setOccurPlace();

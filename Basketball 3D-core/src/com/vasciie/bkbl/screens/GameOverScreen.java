@@ -25,14 +25,14 @@ public class GameOverScreen implements Screen, GUIRenderer {
 	OrthographicCamera cam;
 	
 	Label gameOver, winInfo, highscore;
-	Label playersLeft, basketScore, totalScore/*, gamemode*/;
+	Label playersLeft, basketScore, totalScore, mainPlayerScore;
 	Button newGame, quit;
 	
 	Texture basketBall;
 	
 	boolean isHighscore;
 	
-	private static final String highscoreText = "HIGHSCORE! Previous Score: ", playersLeftText = "Players Left: x", basketScoreText = "Basket Score: ", totalScoreText = "Total Score: ";
+	private static final String highscoreText = "HIGHSCORE! Previous Score: ", playersLeftText = "Players Left: x", basketScoreText = "Basket Score: ", totalScoreText = "Total Score: ", mainPlayerScoreText = "Score From You: ";
 	
 	public GameOverScreen(MyGdxGame mg) {
 		game = mg;
@@ -61,7 +61,7 @@ public class GameOverScreen implements Screen, GUIRenderer {
 		
 		playersLeft = new Label(playersLeftText, resultsFont, Color.WHITE, false, this);
 		basketScore = new Label(basketScoreText, resultsFont, Color.WHITE, false, this);
-		/*gamemode = new Label(gamemodeText, resultsFont, Color.WHITE, false, this);*/
+		mainPlayerScore = new Label(mainPlayerScoreText, resultsFont, Color.WHITE, false, this);
 		totalScore = new Label(totalScoreText, resultsFont, Color.WHITE, false, this);
 	}
 	
@@ -82,7 +82,8 @@ public class GameOverScreen implements Screen, GUIRenderer {
 		
 		int basketDiff = Math.max(map.getTeamScore() - map.getOppScore(), 0);
 		int teammatesLeft = map.getTeammates().size();
-		int total = basketDiff * 10 * teammatesLeft;
+		int mainPlayerSc = map.getMainPlayerScore();
+		int total = basketDiff * 10 * teammatesLeft + mainPlayerSc * 10;
 		
 		
 		String level = map.getDifficulty() + "" + game.game.getAmount();
@@ -99,7 +100,7 @@ public class GameOverScreen implements Screen, GUIRenderer {
 		
 		playersLeft.setText(playersLeftText + teammatesLeft);
 		basketScore.setText(basketScoreText + map.getTeamScore() + "-" + map.getOppScore());
-		/*gamemode.setText(gamemodeText + gamemodeName);*/
+		mainPlayerScore.setText(mainPlayerScoreText + mainPlayerSc);
 		totalScore.setText(totalScoreText + (total));
 	}
 
@@ -114,7 +115,7 @@ public class GameOverScreen implements Screen, GUIRenderer {
 		winInfo.update();
 		playersLeft.update();
 		basketScore.update();
-		/*gamemode.update();*/
+		mainPlayerScore.update();
 		totalScore.update();
 		
 		if(newGame.justReleased()) {
@@ -140,7 +141,7 @@ public class GameOverScreen implements Screen, GUIRenderer {
 		winInfo.draw();
 		playersLeft.draw();
 		basketScore.draw();
-		/*gamemode.draw();*/
+		mainPlayerScore.draw();
 		totalScore.draw();
 	}
 
@@ -159,8 +160,8 @@ public class GameOverScreen implements Screen, GUIRenderer {
 		
 		playersLeft.setPos(width / 2 - 13, height / 2 + 56);
 		basketScore.setPos(width / 2 - 13, playersLeft.getY() - 39);
-		/*gamemode.setPos(width / 2 - 13,  basketScore.getY() - 39);*/
-		totalScore.setPos(width / 2 - 13, basketScore.getY() - 117);
+		mainPlayerScore.setPos(width / 2 - 13,  basketScore.getY() - 39);
+		totalScore.setPos(width / 2 - 13, mainPlayerScore.getY() - 78);
 	}
 
 	@Override
@@ -189,6 +190,7 @@ public class GameOverScreen implements Screen, GUIRenderer {
 		bigFont.dispose();
 		infoFont.dispose();
 		resultsFont.dispose();
+		basketBall.dispose();
 	}
 
 	@Override
