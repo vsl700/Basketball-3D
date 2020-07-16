@@ -694,7 +694,8 @@ public class GameMap {
     private void updateFullGame(float delta) {
         ball.update(delta);
 
-        rules.update();
+        if(currentTutorialLevel.usesOriginalRules())
+        	rules.update();
 
         updatePlayers(delta);
 

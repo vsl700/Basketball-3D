@@ -179,7 +179,7 @@ public class GameScreen implements Screen, GameMessageListener, GUIRenderer {
 		awayScore.update();
 
 		if (!paused())
-			if (map.isGameRunning() && !Gdx.app.getType().equals(Application.ApplicationType.Android) && sender == null) {
+			if (map.isGameRunning() && !Gdx.app.getType().equals(Application.ApplicationType.Android) && sender == null && (map.isTutorialMode() && map.getDifficulty() > 0 || !map.isTutorialMode())) {
 				int pow = map.getMainPlayer().getShootingPower() - 9;
 
 				power.update();

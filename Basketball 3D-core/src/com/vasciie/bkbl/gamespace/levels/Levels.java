@@ -35,8 +35,6 @@ public abstract class Levels {
 		return gameLevels[i];
 	}
 	
-	public abstract boolean usesOriginalRules();
-	
 	
 	public static abstract class GameLevel {
 		GameMap map;
