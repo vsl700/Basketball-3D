@@ -9,14 +9,17 @@ import com.badlogic.gdx.graphics.g2d.BitmapFont;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 import com.vasciie.bkbl.MyGdxGame;
+import com.vasciie.bkbl.gamespace.tools.SettingsPrefsIO;
 import com.vasciie.bkbl.gui.Button;
 import com.vasciie.bkbl.gui.GUIRenderer;
 import com.vasciie.bkbl.gui.Label;
 import com.vasciie.bkbl.gui.NumUpDown;
 import com.vasciie.bkbl.gui.TextUpDown;
+import com.vasciie.bkbl.gui.UpDown;
+import com.vasciie.bkbl.gui.UpDownListener;
 
 
-public class LevelScreen implements Screen, GUIRenderer {
+public class LevelScreen implements Screen, GUIRenderer, UpDownListener {
 
 	MyGdxGame game;
 	
@@ -29,6 +32,10 @@ public class LevelScreen implements Screen, GUIRenderer {
 	TextUpDown textUpDown;
 	Button play, back;
 	Label tmPlAmount, difficulty; //tmPlAmount - team players amount description
+	Label highscore;
+	
+	private static final String highscoreText = "Highscore For The Level Combination Below: ";
+	
 	
 	public LevelScreen(MyGdxGame mg) {
 		game = mg;
@@ -50,12 +57,14 @@ public class LevelScreen implements Screen, GUIRenderer {
 	private void createGui() {
 		numUpDown = new NumUpDown(btnFont, textFont, Color.WHITE, Color.BROWN, new Color().set(0.8f, 0.4f, 0, 1), 1, 5, this);
 		numUpDown.setOption(3);
+		numUpDown.setListener(this);
 		
 		ArrayList<String> choices = new ArrayList<String>();
 		choices.add("Easy");
 		choices.add("Hard");
 		choices.add("Very Hard");
 		textUpDown = new TextUpDown(btnFont, textFont, Color.WHITE, Color.BROWN, new Color().set(0.8f, 0.4f, 0, 1), choices, true, this);
+		textUpDown.setListener(this);
 		
 		play = new Button("Play", btnFont, Color.ORANGE.cpy().sub(0, 0.3f, 0, 1), true, true, this);
 		back = new Button("Go Back", btnFont, Color.ORANGE.cpy().sub(0, 0.3f, 0, 1), true, true, this);
@@ -63,6 +72,9 @@ public class LevelScreen implements Screen, GUIRenderer {
 		tmPlAmount = new Label("THE AMOUNT OF PLAYERS PER TEAM", btnFont, Color.BROWN, true, this);
 		
 		difficulty = new Label("THE DIFFICULTY OF THE GAME", btnFont, Color.BROWN, true, this);
+		
+		highscore = new Label(highscoreText, textFont, Color.GREEN, false, this);
+		highscore.setText(highscoreText + SettingsPrefsIO.readSettingInteger(getDifficulty() + "" + numUpDown.getOption()));
 	}
 	
 	@Override
@@ -81,6 +93,7 @@ public class LevelScreen implements Screen, GUIRenderer {
 		
 		tmPlAmount.update();
 		difficulty.update();
+		highscore.update();
 		
 		if(back.justReleased())
 			game.setScreen(game.main);
@@ -98,6 +111,7 @@ public class LevelScreen implements Screen, GUIRenderer {
 
 		tmPlAmount.draw();
 		difficulty.draw();
+		highscore.draw();
 	}
 
 	@Override
@@ -117,6 +131,7 @@ public class LevelScreen implements Screen, GUIRenderer {
 		
 		tmPlAmount.setPosAndSize(numUpDown.getX() + numUpDown.getTotalWidth() / 2 / MyGdxGame.GUI_SCALE - 164 / 2, numUpDown.getY() + numUpDown.getHeight() + 10, 164 * MyGdxGame.GUI_SCALE);
 		difficulty.setPosAndSize(textUpDown.getX() + textUpDown.getTotalWidth() / 2 / MyGdxGame.GUI_SCALE - 164 / 2, textUpDown.getY() + textUpDown.getHeight() + 10, 164 * MyGdxGame.GUI_SCALE);
+		highscore.setPos(width / 2 - 13, game.getLogoY() - 13 * MyGdxGame.GUI_SCALE);
 	}
 
 	@Override
@@ -159,5 +174,11 @@ public class LevelScreen implements Screen, GUIRenderer {
 	@Override
 	public OrthographicCamera getCam() {
 		return cam;
+	}
+
+	@Override
+	public void onOptionChanged(UpDown upDown, int newValue) {
+		highscore.setText(highscoreText + SettingsPrefsIO.readSettingInteger(getDifficulty() + "" + numUpDown.getOption()));
+		
 	}
 }

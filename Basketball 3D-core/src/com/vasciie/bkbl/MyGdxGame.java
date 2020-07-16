@@ -70,9 +70,9 @@ public class MyGdxGame extends Game {
 			return;
 		}
 		
-		if(Gdx.app.getType().equals(Application.ApplicationType.Android))
+		//if(Gdx.app.getType().equals(Application.ApplicationType.Android))
 			GUI_SCALE = 1.5f;
-		else GUI_SCALE = 1;
+		//else GUI_SCALE = 1;
 
 		batch = new SpriteBatch();
 		
@@ -191,7 +191,7 @@ public class MyGdxGame extends Game {
 		if (!getScreen().equals(spScreen1) && !getScreen().equals(spScreen2) && !game.paused()) {
 			batch.setProjectionMatrix(cam.combined);
 			batch.begin();
-			font.draw(batch, Gdx.graphics.getFramesPerSecond() + " fps; SN:11/07/20-v1.0", 0, font.getLineHeight());
+			font.draw(batch, Gdx.graphics.getFramesPerSecond() + " fps; SN:15/07/20-v1.0", 0, font.getLineHeight());
 			batch.end();
 		}
 	}
@@ -216,8 +216,16 @@ public class MyGdxGame extends Game {
 	public void renderLogo(SpriteBatch batch, OrthographicCamera cam) {
 		batch.setProjectionMatrix(cam.combined);
 		batch.begin();
-		batch.draw(logo, cam.viewportWidth / 2 - logo.getWidth() / 2, cam.viewportHeight - logo.getHeight() - 20);
+		batch.draw(logo, getLogoX(), getLogoY());
 		batch.end();
+	}
+	
+	public float getLogoX() {
+		return cam.viewportWidth / 2 - logo.getWidth() / 2;
+	}
+	
+	public float getLogoY() {
+		return cam.viewportHeight - logo.getHeight() - 20;
 	}
 	
 	/**
