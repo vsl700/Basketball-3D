@@ -35,6 +35,8 @@ import com.vasciie.bkbl.gamespace.entities.Ball;
 import com.vasciie.bkbl.gamespace.entities.Entity;
 import com.vasciie.bkbl.gamespace.entities.EntityType;
 import com.vasciie.bkbl.gamespace.entities.Player;
+import com.vasciie.bkbl.gamespace.levels.TutorialLevels;
+import com.vasciie.bkbl.gamespace.levels.TutorialLevels.TutorialLevel;
 import com.vasciie.bkbl.gamespace.objects.Basket;
 import com.vasciie.bkbl.gamespace.objects.Camera;
 import com.vasciie.bkbl.gamespace.objects.GameObject;
@@ -42,7 +44,8 @@ import com.vasciie.bkbl.gamespace.objects.ObjectType;
 import com.vasciie.bkbl.gamespace.objects.Terrain;
 import com.vasciie.bkbl.gamespace.rules.Rules;
 import com.vasciie.bkbl.gamespace.rules.Rules.GameRule;
-import com.vasciie.bkbl.gamespace.rules.Rules.RulesListener;
+import com.vasciie.bkbl.GameMessageListener;
+import com.vasciie.bkbl.GameMessageSender;
 import com.vasciie.bkbl.gamespace.tools.InputController;
 import com.vasciie.bkbl.gamespace.tools.VEThread;
 import com.vasciie.bkbl.gamespace.zones.Zones;
@@ -92,6 +95,9 @@ public class GameMap {
 
     Rules rules;
     Zones zones;
+    
+    TutorialLevels tutorial;
+    TutorialLevel currentTutorialLevel;
 
     ArrayList<Player> teammates;
     ArrayList<Player> opponents;
@@ -144,7 +150,7 @@ public class GameMap {
     
     boolean firstShown;
 
-    public GameMap(RulesListener rulesListener, GUIRenderer guiRenderer) {
+    public GameMap(GameMessageListener messageListener, GUIRenderer guiRenderer) {
 		if (!MyGdxGame.TESTING) {
 			dynamicsWorldRunnable = new Runnable() {
 
@@ -160,7 +166,9 @@ public class GameMap {
 		
         inputs = new InputController(guiRenderer);
 
-        rules = new Rules(this, rulesListener);
+        rules = new Rules(this, messageListener);
+        
+        tutorial = new TutorialLevels(this, messageListener);
         
         zones = new Zones(this);
 
@@ -471,6 +479,8 @@ public class GameMap {
         createCache();
         
         firstShown = false;
+        
+        currentTutorialLevel = (TutorialLevel) tutorial.getGameLevel(difficulty);
     }
 
     private void createBall() {
@@ -541,6 +551,9 @@ public class GameMap {
         MyGdxGame.clearColor();
 
         teamScore = oppScore = mainPlayerScore = 0;
+        
+        currentTutorialLevel.reset();
+        //currentTutorialLevel == null;
 
         if (rules.getTriggeredRule() != null) {
             rules.getTriggeredRule().clearRuleTriggerer();
@@ -611,6 +624,14 @@ public class GameMap {
     		physicsThread.waitToFinish();
     	else dynamicsWorldRunnable.run();
 
+    	if(isTutorialMode()) {
+    		if(tutorial.act(currentTutorialLevel)) {
+    			//TODO Add gameover here!
+    		}
+    		
+    		startTimer = 0;
+    	}
+    	
         if (!gameRunning) {
             turnPlayer(delta);
             updateInputs();
@@ -760,20 +781,22 @@ public class GameMap {
         }
     }
 
-    public void onRuleBrokenContinue() {
-        ruleTriggered = false;
-        ruleTriggeredActing = true;
-        startTimer = 0.9f;
-        
-        if(difficulty > 0) {
-        	Player triggerer = rules.getTriggeredRule().getRuleTriggerer();
-        	if(triggerer.getFouls() == 7)
-        		removePlayer(triggerer);
-        }
+    public void onMessageContinue(GameMessageSender sender) {    	
+		if (ruleTriggered) {
+			ruleTriggered = false;
+			ruleTriggeredActing = true;
+			startTimer = 0.9f;
+
+			if (difficulty > 0) {
+				Player triggerer = rules.getTriggeredRule().getRuleTriggerer();
+				if (triggerer.getFouls() == 7)
+					removePlayer(triggerer);
+			}
+		}else sender.messageReceived();
     }
 
     /**
-     * Sets a new target position of a player. I created this method because of the Rules system. Read the note inside the {@link GameMap#onRuleBrokenContinue()} method
+     * Sets a new target position of a player. I created this method because of the Rules system. Read the note inside the {@link GameMap#onMessageContinue()} method
      *
      * @param pos - the target position
      */
@@ -804,6 +827,14 @@ public class GameMap {
 
     public void actionOver() {
         ruleTriggeredActing = false;
+    }
+    
+    public void stopGame() {
+    	gameRunning = playersReady = false;
+    }
+    
+    public void resumeGame() {
+    	gameRunning = true;
     }
 
     public void dispose() {
@@ -1043,6 +1074,10 @@ public class GameMap {
 		return rules;
 	}
 
+	public TutorialLevel getCurrentTutorialLevel() {
+		return currentTutorialLevel;
+	}
+
 	public Player getMainPlayer() {
         return mainPlayer;
     }
@@ -1151,6 +1186,10 @@ public class GameMap {
 		this.challenge = challenge;
 	}
 
+	public boolean isTutorialMode() {
+		return currentTutorialLevel != null;
+	}
+	
 	public boolean isGameRunning() {
         return gameRunning;
     }

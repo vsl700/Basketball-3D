@@ -20,14 +20,16 @@ import com.badlogic.gdx.math.Vector3;
 import com.vasciie.bkbl.MyGdxGame;
 import com.vasciie.bkbl.gamespace.GameMap;
 import com.vasciie.bkbl.gamespace.entities.Player;
-import com.vasciie.bkbl.gamespace.rules.Rules.GameRule;
-import com.vasciie.bkbl.gamespace.rules.Rules.RulesListener;
+import com.vasciie.bkbl.GameMessageListener;
+import com.vasciie.bkbl.GameMessageSender;
 import com.vasciie.bkbl.gamespace.tools.VEThread;
 import com.vasciie.bkbl.gui.GUIRenderer;
 import com.vasciie.bkbl.gui.Label;
 
-public class GameScreen implements Screen, RulesListener, GUIRenderer {
+public class GameScreen implements Screen, GameMessageListener, GUIRenderer {
 
+	GameMessageSender sender;
+	
 	VEThread updateThread;
 	
 	Runnable updateRunnable;
@@ -57,6 +59,7 @@ public class GameScreen implements Screen, RulesListener, GUIRenderer {
 	float messageBarWidth, messageBarHeight;
 	
 	boolean ignorePause;
+	boolean skippableMessage;
 
 	public GameScreen(MyGdxGame mg) {
 		game = mg;
@@ -141,7 +144,7 @@ public class GameScreen implements Screen, RulesListener, GUIRenderer {
 	}
 
 	private void renderGUI(){
-		if(!paused() && map.isRuleTriggered()) {
+		if(!paused() && (map.isRuleTriggered() || sender != null)) {
 			shape.begin(ShapeRenderer.ShapeType.Filled);
 			shape.setColor(Color.ORANGE.cpy().sub(0, 0.3f, 0, 1));
 			
@@ -176,7 +179,7 @@ public class GameScreen implements Screen, RulesListener, GUIRenderer {
 		awayScore.update();
 
 		if (!paused())
-			if (map.isGameRunning() && !Gdx.app.getType().equals(Application.ApplicationType.Android)) {
+			if (map.isGameRunning() && !Gdx.app.getType().equals(Application.ApplicationType.Android) && sender == null) {
 				int pow = map.getMainPlayer().getShootingPower() - 9;
 
 				power.update();
@@ -187,8 +190,8 @@ public class GameScreen implements Screen, RulesListener, GUIRenderer {
 
 				powerNum.setText("x" + pow);
 				powerNum.update();
-			} else if (!map.isGameRunning()) {
-				if (map.getTimer() >= 0 && map.isPlayersReady()) {
+			} else if (!map.isGameRunning() || sender != null) {
+				if (map.getTimer() >= 0 && map.isPlayersReady() && !map.isTutorialMode()) {
 					if ((int) map.getTimer() == 0)
 						timer.setText("GO!");
 					else if (map.getTimer() <= 4)
@@ -197,25 +200,28 @@ public class GameScreen implements Screen, RulesListener, GUIRenderer {
 						timer.setText("Ready?");
 
 					timer.update();
-				} else if (map.isRuleTriggered()) { // If the game is not running and there is no timer counting down
+				} else/* if (map.isRuleTriggered())*/ { // If the game is not running and there is no timer counting down
 					ruleHeading.update();
 					ruleDesc.update();
 					
 					if(map.getDifficulty() > 0 && map.getRules().getTriggeredRule().getRuleTriggerer().getFouls() == 7)
 						playerRemove.update();
 
-					if (contTimer <= 0) {
+					if (contTimer <= 0 && skippableMessage) {
 						clickToCont.update();
 
 						if (Gdx.app.getType().equals(Application.ApplicationType.Android) && Gdx.input.justTouched() || Gdx.input.isKeyJustPressed(Keys.E)) {
-							Player triggerer = map.getRules().getTriggeredRule().getRuleTriggerer();
-							if(triggerer.getFouls() == 7 && triggerer.isMainPlayer() || map.getTeamScore() == 15 || map.getOppScore() > 15) {
-								game.setScreen(game.gameOver);
+							if (map.isRuleTriggered()) {
+								Player triggerer = map.getRules().getTriggeredRule().getRuleTriggerer();
+								if (triggerer.getFouls() == 7 && triggerer.isMainPlayer() || map.getTeamScore() == 15 || map.getOppScore() > 15) {
+									game.setScreen(game.gameOver);
+								}
 							}
 							
-							map.onRuleBrokenContinue();
+							map.onMessageContinue(sender);
+							sender = null;
 						}
-					} else
+					} else if(contTimer > 0)
 						contTimer -= delta;
 				}
 
@@ -353,13 +359,11 @@ public class GameScreen implements Screen, RulesListener, GUIRenderer {
 	}
 
 	@Override
-	public void onRuleTriggered(GameRule rule) {
-		Color textColor = rule.getTextColor();
-		
-		ruleHeading.setText(rule.getName());
+	public void sendMessage(String heading, String desc, Color textColor, GameMessageSender sender, boolean skippable) {
+		ruleHeading.setText(heading);
 		ruleHeading.setColor(textColor);
 		
-		ruleDesc.setText(rule.getDescription());
+		ruleDesc.setText(desc);
 		ruleDesc.setColor(textColor);
 		
 		homeScore.setText(map.getTeamScore() + "");
@@ -368,6 +372,9 @@ public class GameScreen implements Screen, RulesListener, GUIRenderer {
 		contTimer = 1;
 		
 		resizeMessageText();
+		
+		this.sender = sender;
+		skippableMessage = skippable;
 	}
 
 	@Override

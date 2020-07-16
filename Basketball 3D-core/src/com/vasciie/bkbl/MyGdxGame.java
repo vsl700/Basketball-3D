@@ -70,9 +70,9 @@ public class MyGdxGame extends Game {
 			return;
 		}
 		
-		//if(Gdx.app.getType().equals(Application.ApplicationType.Android))
+		if(Gdx.app.getType().equals(Application.ApplicationType.Android))
 			GUI_SCALE = 1.5f;
-		//else GUI_SCALE = 1;
+		else GUI_SCALE = 1;
 
 		batch = new SpriteBatch();
 		

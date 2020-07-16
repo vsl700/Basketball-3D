@@ -452,7 +452,7 @@ public abstract class Player extends Entity {
 		shootingPower = (int) Math.min(MAX_SHOOTING_POWER, Math.max(MIN_SHOOTING_POWER, value));
 	}
 	
-	private void catchBall(boolean left) {
+	public void catchBall(boolean left) {
 		if(isAbleToCatch() || isDribbling())
 		if ((map.getCurrentPlayerHoldTeam() == -1 && map.getCurrentPlayerHoldOpp() == -1) || 
 				(map.getTeammateHolding() != null && map.getTeammateHolding().equals(this) || map.getOpponentHolding() != null && map.getOpponentHolding().equals(this)) || 

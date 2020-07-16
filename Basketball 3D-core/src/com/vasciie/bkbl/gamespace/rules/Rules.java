@@ -11,6 +11,8 @@ import com.badlogic.gdx.math.MathUtils;
 import com.badlogic.gdx.math.Matrix4;
 import com.badlogic.gdx.math.Vector3;
 import com.badlogic.gdx.physics.bullet.collision.btCollisionObject;
+import com.vasciie.bkbl.GameMessageListener;
+import com.vasciie.bkbl.GameMessageSender;
 import com.vasciie.bkbl.gamespace.GameMap;
 import com.vasciie.bkbl.gamespace.entities.Ball;
 import com.vasciie.bkbl.gamespace.entities.Entity;
@@ -18,7 +20,7 @@ import com.vasciie.bkbl.gamespace.entities.Player;
 import com.vasciie.bkbl.gamespace.entities.players.Opponent;
 import com.vasciie.bkbl.gamespace.entities.players.Teammate;
 import com.vasciie.bkbl.gamespace.objects.Terrain;
-import com.vasciie.bkbl.gamespace.rules.Rules.GameRule.Actions.Action;
+import com.vasciie.bkbl.gamespace.rules.Actions.Action;
 import com.vasciie.bkbl.gamespace.tools.GameTools;
 
 /**
@@ -27,16 +29,16 @@ import com.vasciie.bkbl.gamespace.tools.GameTools;
  * @author studi
  *
  */
-public class Rules {
+public class Rules implements GameMessageSender {
 	
 	final GameRule[] gameRules;
 	GameRule triggeredRule;
 	
 	GameMap map;
 	
-	RulesListener rulesListener; //That's here because the GameScreen does not have any connection with the GameMap or Rules so I had to make the GameScreen an interface
+	GameMessageListener rulesListener; //That's here because the GameScreen does not have any connection with the GameMap or Rules so I had to make the GameScreen an interface
 	
-	public Rules(GameMap map, RulesListener rulesListener) {
+	public Rules(GameMap map, GameMessageListener rulesListener) {
 		this.map = map;
 		this.rulesListener = rulesListener;
 		
@@ -1524,7 +1526,7 @@ public class Rules {
 					// A rule has been t
 					triggeredRule = rule;
 					map.onRuleTriggered(rule);
-					rulesListener.onRuleTriggered(rule);
+					rulesListener.sendMessage(rule.getName(), rule.getDescription(), rule.getTextColor(), this, true);
 	
 					for(GameRule rule1 : gameRules)
 						rule1.resetRule();
@@ -1551,7 +1553,7 @@ public class Rules {
 	public void setTriggeredRule(GameRule rule) {
 		if(rule.getParent() != null || triggeredRule == null) {
 			map.onRuleTriggered(rule);
-			rulesListener.onRuleTriggered(rule);
+			rulesListener.sendMessage(rule.getName(), rule.getDescription(), rule.getTextColor(), this, true);
 		}
 		
 		triggeredRule = rule;
@@ -1709,97 +1711,12 @@ public class Rules {
 			return ruleTriggerer;
 		}
 		
-		public static class Actions{
-			Action firstAction, currentAction;
-			GameMap map;
-			
-			public Actions(GameMap map) {
-				this.map = map;
-			}
-			
-			public void addAction(Action action) {
-				if(currentAction == null) {
-					firstAction = currentAction = action;
-					return;
-				}
-				
-				Action temp = currentAction;
-				while(temp.next != null) {
-					temp = temp.next;
-				}
-				
-				temp.next = action;
-			}
-			
-			public void copyActions(Actions actions) {
-				while(actions.getCurrentAction() != null) {
-					addAction(actions.getCurrentAction());
-					
-					actions.nextAction();
-				}
-			}
-			
-			public Action getCurrentAction() {
-				return currentAction;
-			}
-			
-			public void nextAction() {
-				currentAction = currentAction.next;
-			}
-			
-			public void firstAction() {
-				currentAction = firstAction;
-			}
-			
-			public boolean isEmpty() {
-				return firstAction == null;
-			}
-			
-			public boolean isLastAction() {
-				return currentAction.next == null;
-			}
-			
-			/**
-			 * 
-			 * @return true if all the actions are completed
-			 */
-			public boolean act() {
-				if(isEmpty())
-					return true;
-				
-				if(((currentAction.isGameDependent() && map.isGameRunning()) || !currentAction.isGameDependent()) && currentAction.act()) {
-					if(isLastAction()) {
-						firstAction();
-						return true;
-					}
-					
-					nextAction();
-				}
-				
-				return false;
-			}
-			
-			public static abstract class Action{
-				public Action next;
-				
-				/**
-				 * 
-				 * @return true if the action is completed
-				 */
-				public abstract boolean act();
-				
-				/**
-				 * 
-				 * @return true if the action is dependent on the game and the game should start (it doesn't clear the broken rule or rule breaker)
-				 */
-				public abstract boolean isGameDependent();
-				
-			}
-		}
-	}
-	
-	public interface RulesListener{
 		
-		public void onRuleTriggered(GameRule rule);
+	}
+
+	@Override
+	public void messageReceived() {
+		// TODO Auto-generated method stub
+		
 	}
 }
