@@ -837,7 +837,7 @@ public class Rules implements GameMessageSender {
 							return false;
 						
 						if(crossed) {
-							if((!recentHolder.isCurrentlyAiming() && !recentHolder.isShooting() || !recentHolder.getMoveVector().isZero()) && recentHolder.getHomeZone().checkZone(ball.getPosition(), ball.getDimensions()) && (recentHolder.getBrain().getMemory().isBallJustShot() && ball.getPosition().dst(recentHolder.getPosition()) >= recentHolder.getHeight() / 1.5f || recentHolder.getBrain().getMemory().isBallJustShot())) {
+							if((!recentHolder.isCurrentlyAiming() && !recentHolder.isShooting() || !recentHolder.getMoveVector().isZero()) && recentHolder.getHomeZone().checkZone(ball.getPosition(), ball.getDimensions()) && (recentHolder.getBrain().getMemory().isBallJustShot() && ball.getPosition().dst(recentHolder.getPosition()) >= recentHolder.getHeight() / 1.5f || !recentHolder.getBrain().getMemory().isBallJustShot())) {
 								ruleTriggerer = recentHolder;
 								occurPlace.set(ball.getPosition()).scl(1, 0, 0);
 								
@@ -1114,12 +1114,12 @@ public class Rules implements GameMessageSender {
 				
 				new GameRule(this, null, "shoot_catch", "Catch Violation!", map) {
 					Player recentHolder;
-					boolean ballJustShot, currentlyShooting;
+					boolean ballJustShot, currentlyHolding;
 					
 					@Override
 					public void resetRule() {
 						recentHolder = null;
-						ballJustShot = currentlyShooting = false;
+						ballJustShot = currentlyHolding = false;
 					}
 					
 					@Override
@@ -1193,19 +1193,19 @@ public class Rules implements GameMessageSender {
 								} else {
 									recentHolder = holdingPlayer;
 									ballJustShot = false;
-									currentlyShooting = false;
+									currentlyHolding = false;
 								}
 							}
 						}else {
 							if(holdingPlayer != null)
 								recentHolder = holdingPlayer;
 							
-							boolean temp = recentHolder.isCurrentlyAiming() || recentHolder.isShooting();
+							boolean temp = recentHolder.isHoldingBall();
 							
-							if(!temp && currentlyShooting)
+							if(!temp && currentlyHolding)
 								ballJustShot = true;
 							
-							currentlyShooting = temp;
+							currentlyHolding = temp;
 						}
 						
 						return false;
@@ -1716,7 +1716,7 @@ public class Rules implements GameMessageSender {
 
 	@Override
 	public void messageReceived() {
-		// TODO Auto-generated method stub
+		
 		
 	}
 }

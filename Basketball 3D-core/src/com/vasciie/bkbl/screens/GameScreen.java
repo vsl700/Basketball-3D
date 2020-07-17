@@ -200,7 +200,7 @@ public class GameScreen implements Screen, GameMessageListener, GUIRenderer {
 						timer.setText("Ready?");
 
 					timer.update();
-				} else/* if (map.isRuleTriggered())*/ { // If the game is not running and there is no timer counting down
+				} else if (map.isTutorialMode() || map.isRuleTriggered()) { // If the game is not running and there is no timer counting down
 					ruleHeading.update();
 					ruleDesc.update();
 					

@@ -480,7 +480,7 @@ public class GameMap {
         
         firstShown = false;
         
-        currentTutorialLevel = (TutorialLevel) tutorial.getGameLevel(difficulty);
+        //currentTutorialLevel = (TutorialLevel) tutorial.getGameLevel(difficulty);
     }
 
     private void createBall() {
@@ -552,7 +552,8 @@ public class GameMap {
 
         teamScore = oppScore = mainPlayerScore = 0;
         
-        currentTutorialLevel.reset();
+        if(isTutorialMode())
+        	currentTutorialLevel.reset();
         //currentTutorialLevel == null;
 
         if (rules.getTriggeredRule() != null) {
@@ -694,7 +695,7 @@ public class GameMap {
     private void updateFullGame(float delta) {
         ball.update(delta);
 
-        if(currentTutorialLevel.usesOriginalRules())
+        if(isTutorialMode() && currentTutorialLevel.usesOriginalRules() || !isTutorialMode())
         	rules.update();
 
         updatePlayers(delta);
@@ -981,11 +982,11 @@ public class GameMap {
         if (inputs.isFocusPressed())
             mainPlayer.focus(false);
 
-        if (inputs.isShootPressed()) {
+        if (inputs.isShootPressed() && !mainPlayer.isShooting()) {
             mainPlayer.interactWithBallS();
-        } else if (inputs.isDribbleLPressed()) {
+        } else if (inputs.isDribbleLPressed() && !mainPlayer.isShooting()) {
             mainPlayer.interactWithBallL();
-        } else if (inputs.isDribbleRPressed()) {
+        } else if (inputs.isDribbleRPressed() && !mainPlayer.isShooting()) {
             mainPlayer.interactWithBallR();
         }
     }
