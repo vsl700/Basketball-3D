@@ -96,7 +96,7 @@ public class LevelScreen implements Screen, GUIRenderer, UpDownListener {
 		highscore.update();
 		
 		if(back.justReleased())
-			game.setScreen(game.main);
+			game.setScreen(game.gameType);
 		else if(play.justReleased()) {
 			game.game.setPlayersAmount(numUpDown.getOption());
 			game.setScreen(game.game);

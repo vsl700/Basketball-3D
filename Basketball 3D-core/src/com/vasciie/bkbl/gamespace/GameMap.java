@@ -353,11 +353,11 @@ public class GameMap {
         mCache.end();
     }
 
-    public void spawnPlayers(int count) {
+    public void spawnPlayers(int countTeam, int countOpp) {
         int index2 = index;
         int playerIndex = 1;
 
-        for (int i = 0; i < count; i++) {
+        for (int i = 0; i < countTeam; i++) {
             Player teammate = EntityType.createPlayer(EntityType.TEAMMATE.getId(), this, new Vector3(spawnCoords[i][0], spawnCoords[i][1], spawnCoords[i][2]));
             for (btRigidBody co : teammate.getBodies()) {
                 co.setUserValue(index2);
@@ -404,7 +404,7 @@ public class GameMap {
         }
 
         playerIndex = 1;
-        for (int i = 0; i < count; i++) {
+        for (int i = 0; i < countOpp; i++) {
             Player opponent = EntityType.createPlayer(EntityType.OPPONENT.getId(), this, new Vector3(spawnCoords[i][0], spawnCoords[i][1], -spawnCoords[i][2]));
             for (btRigidBody co : opponent.getBodies()) {
                 co.setUserValue(index2);
@@ -480,8 +480,8 @@ public class GameMap {
         
         firstShown = false;
         
-        currentTutorialLevel = (TutorialLevel) tutorial.getGameLevel(difficulty);
-        currentTutorialLevel.setLevelPart(0);
+        /*currentTutorialLevel = (TutorialLevel) tutorial.getGameLevel(difficulty);
+        currentTutorialLevel.setLevelPart(0);*/
     }
 
     private void createBall() {
@@ -555,7 +555,7 @@ public class GameMap {
         
         if(isTutorialMode())
         	currentTutorialLevel.reset();
-        //currentTutorialLevel == null;
+        currentTutorialLevel = null;
 
         if (rules.getTriggeredRule() != null) {
             rules.getTriggeredRule().clearRuleTriggerer();
@@ -627,9 +627,10 @@ public class GameMap {
     	else dynamicsWorldRunnable.run();
 
     	if(isTutorialMode()) {
-    		if(tutorial.act(currentTutorialLevel)) {
+    		tutorial.act(currentTutorialLevel);
+    		/*if(tutorial.act(currentTutorialLevel)) {
     			//TODO Add gameover here!
-    		}
+    		}*/
     		
     		startTimer = 0;
     	}
@@ -1077,6 +1078,10 @@ public class GameMap {
 		return rules;
 	}
 
+	public TutorialLevels getTutorial() {
+		return tutorial;
+	}
+
 	public TutorialLevel getCurrentTutorialLevel() {
 		return currentTutorialLevel;
 	}
@@ -1155,6 +1160,13 @@ public class GameMap {
 
     public void setDifficulty(int difficulty) {
         this.difficulty = difficulty;
+    }
+    
+    public void setTutorialLevel(int level, int part) {
+    	currentTutorialLevel = (TutorialLevel) tutorial.getGameLevel(level);
+        currentTutorialLevel.setLevelPart(part);
+        
+        currentTutorialLevel.setup();
     }
 
     public int getCurrentPlayerHoldTeam() {

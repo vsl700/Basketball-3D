@@ -17,7 +17,7 @@ public class TutorialLevels extends Levels {
 		super(map, messageListener);
 		
 		gameLevels = new TutorialLevel[] {
-				new TutorialLevel("basics", "Level 1.- Basics", map, messageListener) {
+				new TutorialLevel("basics", "Level 1: Basics", map, messageListener) {
 
 					@Override
 					protected LevelPart[] createLevelParts() {
@@ -106,7 +106,7 @@ public class TutorialLevels extends Levels {
 									
 								},
 								
-								new LevelPart("ball_taking", "1.2 Ball Taking!", map, messageListener) {
+								new LevelPart("ball_taking", "1.2 Ball Taking", map, messageListener) {
 
 									@Override
 									protected void createActions() {
@@ -358,6 +358,48 @@ public class TutorialLevels extends Levels {
 								}
 						};
 					}
+
+					@Override
+					public void setup() {
+						map.spawnPlayers(1, 0);
+					}
+					
+				}, 
+				
+				new TutorialLevel("player_interact", "Level 2: Interacting With Players", map, messageListener) {
+
+					@Override
+					protected LevelPart[] createLevelParts() {
+						
+						return new LevelPart[] {
+								new LevelPart("pass_catch", "Passing & Catching", map, messageListener) {
+
+									@Override
+									protected void createActions() {
+										
+										
+									}
+
+									@Override
+									public boolean updatePlayersNormalAI() {
+										
+										return false;
+									}
+
+									@Override
+									public boolean usesOriginalRules() {
+										
+										return false;
+									}
+									
+								}
+						};
+					}
+
+					@Override
+					public void setup() {
+						map.spawnPlayers(2, 2);
+					}
 					
 				}
 		};
@@ -370,6 +412,17 @@ public class TutorialLevels extends Levels {
 	public void resetLevels() {
 		for(GameLevel level : gameLevels)
 			((TutorialLevel) level).reset();
+	}
+	
+	public int getSize() {
+		return gameLevels.length;
+	}
+	
+	@Override
+	public GameLevel getGameLevel(int i) {
+		resetLevels();
+		
+		return super.getGameLevel(i);
 	}
 	
 	public abstract class TutorialLevel extends GameLevel {
@@ -407,12 +460,24 @@ public class TutorialLevels extends Levels {
 			return temp;
 		}
 		
+		public abstract void setup();
+		
 		public void reset() {
 			for(LevelPart level : parts)
 				level.reset();
 		}
 		
+		public int getParts() {
+			return parts.length;
+		}
+		
+		public LevelPart getPart(int i) {
+			return parts[i];
+		}
+		
 		public void setLevelPart(int part) {
+			parts[this.part].reset();
+			
 			this.part = part;
 		}
 		
@@ -451,6 +516,10 @@ public class TutorialLevels extends Levels {
 			
 			public void reset() {
 				actions.firstAction();
+			}
+			
+			public String getName() {
+				return name;
 			}
 			
 		}

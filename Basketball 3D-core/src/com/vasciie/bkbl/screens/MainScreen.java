@@ -62,7 +62,7 @@ public class MainScreen implements Screen, GUIRenderer {
 			game.setScreen(game.settings);
 		}
 		else if(play.justReleased())
-			game.setScreen(game.level);
+			game.setScreen(game.gameType);
 
 		game.renderLogo(batch, cam);
 
@@ -82,10 +82,14 @@ public class MainScreen implements Screen, GUIRenderer {
 
 		play.setSize(game.pixelXByCurrentSize(223 * MyGdxGame.GUI_SCALE), game.pixelYByCurrentSize(30 * MyGdxGame.GUI_SCALE));
 		play.setPos(width / 4 - play.getWidth() / 2, game.pixelYByCurrentSize(240 / MyGdxGame.GUI_SCALE));
-		if(!Gdx.app.getType().equals(Application.ApplicationType.Android))
-			settings.setPosAndSize(game.pixelXByCurrentSize(520), game.pixelYByCurrentSize(240), game.pixelXByCurrentSize(223), game.pixelYByCurrentSize(30));
+		
+		if(!Gdx.app.getType().equals(Application.ApplicationType.Android)) {
+			settings.setSize(game.pixelXByCurrentSize(223), game.pixelYByCurrentSize(30));
+			settings.setPos(width / 2 - settings.getWidth() / 2, play.getY());
+		}
+		
 		quit.setSize(game.pixelXByCurrentSize(223 * MyGdxGame.GUI_SCALE), game.pixelYByCurrentSize(30 * MyGdxGame.GUI_SCALE));
-		quit.setPos(width * 3 / 4 - play.getWidth() / 2, game.pixelYByCurrentSize(240 / MyGdxGame.GUI_SCALE));
+		quit.setPos(width * 3 / 4 - play.getWidth() / 2, play.getY());
 	}
 
 	@Override

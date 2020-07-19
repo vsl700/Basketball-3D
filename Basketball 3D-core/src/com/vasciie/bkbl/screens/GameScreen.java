@@ -126,7 +126,9 @@ public class GameScreen implements Screen, GameMessageListener, GUIRenderer {
 	@Override
 	public void show() {
 		if(map == null) {
-			game.load3DGraphics();//If the default menus setting is just to show a simple picture of the game instead of the game world
+			if(game.getMap() == null)
+				game.load3DGraphics();//If the default menus setting is just to show a simple picture of the game instead of the game world
+			
 			map = game.getMap();
 		}else {
 			if(map.getTeammates().size() > 0) {
@@ -139,8 +141,10 @@ public class GameScreen implements Screen, GameMessageListener, GUIRenderer {
 		
 		environment = game.getEnvironment();
 		
-		map.setDifficulty(game.level.getDifficulty());
-		map.spawnPlayers(amount);
+		if(!map.isTutorialMode()) {
+			map.setDifficulty(game.level.getDifficulty());
+			map.spawnPlayers(amount, amount);
+		}
 	}
 
 	private void renderGUI(){
@@ -333,6 +337,7 @@ public class GameScreen implements Screen, GameMessageListener, GUIRenderer {
 		homeScore.setText(0 + "");
 		awayScore.setText(0 + "");
 		
+		sender = null;
 		//map.dispose();
 		//game.resetMap();
 	}
@@ -348,6 +353,11 @@ public class GameScreen implements Screen, GameMessageListener, GUIRenderer {
 		
 		if(!updateThread.getState().equals(State.NEW))
 			updateThread.interrupt();
+		
+		batch.dispose();
+		shape.dispose();
+		textFont.dispose();
+		powFont.dispose();
 	}
 	
 	public void setPlayersAmount(int amount) {

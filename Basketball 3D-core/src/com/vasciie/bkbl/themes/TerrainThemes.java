@@ -937,7 +937,7 @@ public enum TerrainThemes {
 	public abstract boolean hasOwnTerrain();
 	
 	public static TerrainThemes chooseTheme(Terrain terrain, boolean local) {
-		if (local && terrain.getMap().isChallenge() || !terrain.getMap().isChallenge())
+		if (!terrain.getMap().isTutorialMode() && (local && terrain.getMap().isChallenge() || !terrain.getMap().isChallenge() || !terrain.getMap().isTutorialMode()))
 			switch (terrain.getMap().getDifficulty()) {
 			case 0:
 				return TerrainThemes.EASY;
