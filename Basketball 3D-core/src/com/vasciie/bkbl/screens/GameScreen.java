@@ -217,7 +217,7 @@ public class GameScreen implements Screen, GameMessageListener, GUIRenderer {
 						if (Gdx.app.getType().equals(Application.ApplicationType.Android) && Gdx.input.justTouched() || Gdx.input.isKeyJustPressed(Keys.E)) {
 							if (map.isRuleTriggered()) {
 								Player triggerer = map.getRules().getTriggeredRule().getRuleTriggerer();
-								if (triggerer.getFouls() == 7 && triggerer.isMainPlayer() || map.getTeamScore() == 15 || map.getOppScore() > 15) {
+								if (triggerer.getFouls() == 7 && triggerer.isMainPlayer() || map.getTeamScore() >= 15 || map.getOppScore() >= 15) {
 									game.setScreen(game.gameOver);
 								}
 							}
