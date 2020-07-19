@@ -35,6 +35,15 @@ public abstract class Levels {
 		return gameLevels[i];
 	}
 	
+	public int indexOf(GameLevel level) {
+		for(int i = 0; i < gameLevels.length; i++) {
+			if(gameLevels[i].equals(level))
+				return i;
+		}
+			
+		return -1;
+	}
+	
 	
 	public static abstract class GameLevel {
 		GameMap map;

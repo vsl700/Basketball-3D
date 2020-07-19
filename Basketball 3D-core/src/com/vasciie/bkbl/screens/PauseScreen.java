@@ -62,7 +62,14 @@ public class PauseScreen implements Screen, GUIRenderer {
 			game.setScreen(game.game);
 			return;
 		}else if(newGame.justReleased()) {
-			game.game.reset();
+			if (game.getMap().isTutorialMode()) {
+				int level = game.getMap().getTutorial().indexOf(game.getMap().getCurrentTutorialLevel());
+
+				game.game.reset();
+				game.getMap().setTutorialLevel(level, 0);
+			}else 
+				game.game.reset();
+			
 			game.game.show();
 			exit();
 			return;

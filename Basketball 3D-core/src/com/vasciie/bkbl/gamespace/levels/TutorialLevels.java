@@ -475,6 +475,10 @@ public class TutorialLevels extends Levels {
 			return parts[i];
 		}
 		
+		public int getPart() {
+			return part;
+		}
+		
 		public void setLevelPart(int part) {
 			parts[this.part].reset();
 			

@@ -153,7 +153,7 @@ public class GameScreen implements Screen, GameMessageListener, GUIRenderer {
 			shape.setColor(Color.ORANGE.cpy().sub(0, 0.3f, 0, 1));
 			
 			float tempHeight;
-			if(map.getDifficulty() > 0 && map.getRules().getTriggeredRule().getRuleTriggerer().getFouls() == 7)
+			if(map.getDifficulty() > 0 && map.isRuleTriggered() && map.getRules().getTriggeredRule().getRuleTriggerer().getFouls() == 7)
 				tempHeight = messageBarHeight + playerRemove.getRows() * 26;
 			else tempHeight = messageBarHeight;
 			
@@ -208,7 +208,7 @@ public class GameScreen implements Screen, GameMessageListener, GUIRenderer {
 					ruleHeading.update();
 					ruleDesc.update();
 					
-					if(map.getDifficulty() > 0 && map.getRules().getTriggeredRule().getRuleTriggerer().getFouls() == 7)
+					if(map.getDifficulty() > 0 && map.isRuleTriggered() && map.getRules().getTriggeredRule().getRuleTriggerer().getFouls() == 7)
 						playerRemove.update();
 
 					if (contTimer <= 0 && skippableMessage) {

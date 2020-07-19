@@ -53,7 +53,7 @@ public class Terrain extends GameObject {
 		if(theme != null) {
 			TerrainThemes temp = TerrainThemes.chooseTheme(this, false);
 			
-			if(!temp.equals(theme)) {
+			if(temp != null && !temp.equals(theme) || temp == null) {
 				clearTheme();
 				
 				loadTheme(temp);
