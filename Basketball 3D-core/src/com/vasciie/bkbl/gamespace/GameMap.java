@@ -481,6 +481,7 @@ public class GameMap {
         firstShown = false;
         
         currentTutorialLevel = (TutorialLevel) tutorial.getGameLevel(difficulty);
+        currentTutorialLevel.setLevelPart(0);
     }
 
     private void createBall() {
@@ -695,7 +696,7 @@ public class GameMap {
     private void updateFullGame(float delta) {
         ball.update(delta);
 
-        if(isTutorialMode() && currentTutorialLevel.usesOriginalRules() || !isTutorialMode())
+        if(isTutorialMode() && currentTutorialLevel.getCurrentPart().usesOriginalRules() || !isTutorialMode())
         	rules.update();
 
         updatePlayers(delta);

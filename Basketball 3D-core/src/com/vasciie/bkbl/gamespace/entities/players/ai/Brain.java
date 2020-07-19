@@ -192,7 +192,7 @@ public class Brain {
 		memory.setResetTime(memory.getResetTime() + Gdx.graphics.getDeltaTime());
 		
 		//The state switcher
-		if((user.getMap().isTutorialMode() && user.getMap().getCurrentTutorialLevel().updatePlayersNormalAI() || !user.getMap().isTutorialMode()) && user.getMap().isGameRunning() && !user.getMap().isRuleTriggeredActing()) {
+		if((user.getMap().isTutorialMode() && user.getMap().getCurrentTutorialLevel().getCurrentPart().updatePlayersNormalAI() || !user.getMap().isTutorialMode()) && user.getMap().isGameRunning() && !user.getMap().isRuleTriggeredActing()) {
 			//If the current player is holding the ball
 			if(user.isHoldingBall()) {
 				if(!stateMachine.isInState(PlayerState.BALL_IN_HAND)) stateMachine.changeState(PlayerState.BALL_IN_HAND);

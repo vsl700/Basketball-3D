@@ -39,19 +39,24 @@ public abstract class Levels {
 	public static abstract class GameLevel {
 		GameMap map;
 
-		String id;
+		String id, name;
 		
 		GameMessageListener messageListener;
 		
 		
-		public GameLevel(String id, GameMap map, GameMessageListener messageListener) {
+		public GameLevel(String id, String name, GameMap map, GameMessageListener messageListener) {
 			this.map = map;
 			this.id = id;
+			this.name = name;
 			this.messageListener = messageListener;
 		}
 		
 		public String getId() {
 			return id;
+		}
+		
+		public String getName() {
+			return name;
 		}
 		
 	}
