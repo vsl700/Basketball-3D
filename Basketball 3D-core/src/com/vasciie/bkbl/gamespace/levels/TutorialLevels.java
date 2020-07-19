@@ -27,7 +27,7 @@ public class TutorialLevels extends Levels {
 						
 						actions.addAction(new TutorialAction("Walking 'n Running!", "First I'm Gonna Teach You Some Walking And Mostly Running Basics Of This Game!", textColor));
 						
-						actions.addAction(new TutorialAction("Walking 'n Running!", "Walking Is Veeeery Very Simple! Just Use The WASD Buttons On The Keyboard And Keep Walking For Around 1 Second!", textColor) {
+						actions.addAction(new TutorialAction("Walking 'n Running!", "Walking Is Veeeery Very Simple! Just Use The WASD Buttons On The Keyboard And Keep Walking For Around 1 Second!", textColor, false) {
 							final float defaultTime = 1.5f;
 							float time = defaultTime;
 							
@@ -36,11 +36,6 @@ public class TutorialLevels extends Levels {
 								super.setup();
 								
 								map.getMainPlayer().setAbleToRun(false);
-							}
-							
-							@Override
-							protected void sendMessage() {
-								messageListener.sendMessage(heading, desc, textColor, this, false);
 							}
 							
 							@Override
@@ -64,14 +59,10 @@ public class TutorialLevels extends Levels {
 						
 						actions.addAction(new TutorialAction("Walking 'n Running!", "Very Good! Now Running Is Also Simple But At The Same Time It Has Some Specific Things You Need To Know!", textColor));
 						
-						actions.addAction(new TutorialAction("Walking 'n Running!", "When Holding The Shift Button (Which Is For Running) You Can ONLY Go Forwards! If You Try To Strafe, The Player Will TURN Left & Right Instead!", textColor) {
+						actions.addAction(new TutorialAction("Walking 'n Running!", "When Holding The Shift Button (Which Is For Running) You Can ONLY Go Forwards! If You Try To Strafe, The Player Will TURN Left & Right Instead!", textColor, false) {
 							final float defaultTime = 3.5f;
 							float time = defaultTime;
 							
-							@Override
-							protected void sendMessage() {
-								messageListener.sendMessage(heading, desc, textColor, this, false);
-							}
 							
 							@Override
 							public boolean act() {
@@ -97,11 +88,7 @@ public class TutorialLevels extends Levels {
 						
 						actions.addAction(new TutorialAction("Ball Taking!", "To Take The Ball Which Is Sitted In The Center Of The Terrain, Just Go Next To It, Make Sure You Are Colliding With It And Press One Of The Mouse Buttons!", textColor));
 						
-						actions.addAction(new TutorialAction("Ball Taking!", "Left Mouse Button Controls Left Hand While Right Button Controls Right Hand! Controlling A Separate Hand Will Make The Player Take The Ball With That Hand!", textColor) {
-							@Override
-							protected void sendMessage() {
-								messageListener.sendMessage(heading, desc, textColor, this, false);
-							}
+						actions.addAction(new TutorialAction("Ball Taking!", "Left Mouse Button Controls Left Hand While Right Button Controls Right Hand! Controlling A Separate Hand Will Make The Player Take The Ball With That Hand!", textColor, false) {
 							
 							@Override
 							public boolean act() {
@@ -160,14 +147,10 @@ public class TutorialLevels extends Levels {
 						
 						actions.addAction(new TutorialAction("Ball Dribble!", "Controlling The Hand You Are Not Holding The Ball With Makes The Player To Dribble The Ball TO His Other Hand (Or Hand Switching)!", textColor));
 						
-						actions.addAction(new TutorialAction("Ball Dribble!", "Try This Out And At The Same Time Run To The Red Basket! Make Sure You Dribble For 0.75 Seconds While Moving Or 3 While Not Moving!", textColor) {
+						actions.addAction(new TutorialAction("Ball Dribble!", "Try This Out And At The Same Time Run To The Red Basket! Make Sure You Dribble For 0.75 Seconds While Moving Or 3 While Not Moving!", textColor, false) {
 							final float defaultTime = 3, defaultTimeMove = 0.75f;
 							float time = defaultTime, timeMove = defaultTimeMove;
 							
-							@Override
-							protected void sendMessage() {
-								messageListener.sendMessage(heading, desc, textColor, this, false);
-							}
 							
 							@Override
 							public boolean act() {
@@ -301,6 +284,28 @@ public class TutorialLevels extends Levels {
 			}
 			
 			@Override
+			public void firstAction() {
+				resetActionMessage();
+				
+				super.firstAction();
+			}
+			
+			@Override
+			public void nextAction() {
+				resetActionMessage();
+				
+				super.nextAction();
+			}
+			
+			private void resetActionMessage() {
+				if (getCurrentAction() instanceof TutorialAction) {
+					TutorialAction action = (TutorialAction) getCurrentAction();
+
+					action.resetMessage();
+				}
+			}
+			
+			@Override
 			public boolean act() {
 				if (getCurrentAction() instanceof TutorialAction) {
 					TutorialAction action = (TutorialAction) getCurrentAction();
@@ -316,12 +321,18 @@ public class TutorialLevels extends Levels {
 		public class TutorialAction extends Action implements GameMessageSender {
 			String heading, desc;
 			Color textColor;
+			boolean skippable;
 			boolean received, sent;
 			
 			public TutorialAction(String heading, String desc, Color textColor) {
+				this(heading, desc, textColor, true);
+			}
+			
+			public TutorialAction(String heading, String desc, Color textColor, boolean skippable) {
 				this.heading = heading;
 				this.desc = desc;
 				this.textColor = textColor;
+				this.skippable = skippable;
 			}
 			
 			public void setup() {
@@ -331,15 +342,11 @@ public class TutorialLevels extends Levels {
 			}
 			
 			protected void sendMessage() {
-				messageListener.sendMessage(heading, desc, textColor, this, true);
+				messageListener.sendMessage(heading, desc, textColor, this, skippable);
 			}
 			
 			@Override
 			public boolean act() {
-				if(received) {
-					sent = false;
-				}
-				
 				return received;
 			}
 			
@@ -356,6 +363,10 @@ public class TutorialLevels extends Levels {
 			
 			public boolean isMessageReceived() {
 				return received;
+			}
+			
+			public void resetMessage() {
+				sent = false;
 			}
 			
 			public boolean isMessageSent() {

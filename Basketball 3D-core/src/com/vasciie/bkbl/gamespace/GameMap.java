@@ -480,7 +480,7 @@ public class GameMap {
         
         firstShown = false;
         
-        //currentTutorialLevel = (TutorialLevel) tutorial.getGameLevel(difficulty);
+        currentTutorialLevel = (TutorialLevel) tutorial.getGameLevel(difficulty);
     }
 
     private void createBall() {
