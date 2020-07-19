@@ -103,6 +103,12 @@ public class TutorialLevels extends Levels {
 										
 										return false;
 									}
+
+									@Override
+									public boolean showPower() {
+										
+										return false;
+									}
 									
 								},
 								
@@ -128,7 +134,7 @@ public class TutorialLevels extends Levels {
 											
 										});
 										
-										actions.addAction(new TutorialAction("Ball Taking!", "Well Done! Now I Just Would Like To See That Once Again! Go To The Blue Basket And Take The Ball!", textColor));
+										actions.addAction(new TutorialAction("Ball Taking!", "Well Done! Now I Just Want To See That Once Again! Go To The Blue Basket And Take The Ball!", textColor));
 										
 										actions.addAction(new Action() {
 
@@ -174,6 +180,12 @@ public class TutorialLevels extends Levels {
 
 									@Override
 									public boolean usesOriginalRules() {
+										return false;
+									}
+
+									@Override
+									public boolean showPower() {
+										
 										return false;
 									}
 									
@@ -273,6 +285,12 @@ public class TutorialLevels extends Levels {
 									public boolean usesOriginalRules() {
 										return false;
 									}
+
+									@Override
+									public boolean showPower() {
+										
+										return false;
+									}
 									
 								}, 
 								
@@ -286,10 +304,27 @@ public class TutorialLevels extends Levels {
 										
 										actions.addAction(new TutorialAction("Ball Shooting!", "It's Important That You Measure The Shot According To THE HAND You Hold The Ball With!", textColor));
 										
-										actions.addAction(new TutorialAction("Ball Shooting!", "You Can Now Try Putting The Ball In One Of The Baskets! Just Hold The CTRL Button And Release It After You Aim At The Basket!", textColor, false) {
+										actions.addAction(new TutorialAction("Ball Shooting!", "You Can Now Try Putting The Ball In One Of The Baskets! Just Hold The CTRL Button And Release It After You Aim At The Basket! Scroll Wheel Or Q & E Keys Are For The Shooting Power Below!", textColor, false) {
+											boolean shootPowerReg;
+											
+											@Override
+											public void resetMessage() {
+												super.resetMessage();
+												
+												shootPowerReg = false;
+											}
+											
+											@Override
+											protected void sendMessage() {
+												messageListener.sendMessage(heading, desc, textColor, this, skippable, true);
+											}
 											
 											@Override
 											public boolean act() {
+												if(!shootPowerReg)
+													map.getMainPlayer().setShootingPower(10);
+												
+												shootPowerReg = true;
 												
 												return map.getBall().isCollidedWOppBasket() || map.getBall().isCollidedWTeamBasket();
 											}
@@ -301,7 +336,7 @@ public class TutorialLevels extends Levels {
 											
 										});
 										
-										actions.addAction(new TutorialAction("Excellent!", "Well Done! You've Learned The Basics Of Basketball-3D! Now You Can Either Remain In This Level To Practise Or Get Out And Start The Next One!", textColor));
+										actions.addAction(new TutorialAction("Excellent!", "Well Done! You've Learned The Basics Of Basketball-3D! Now You Can Either Remain In This Level To Practise The Way You Want To Or Get Out And Start The Next One!", textColor));
 										
 										actions.addAction(new TutorialAction("Practising!", "Remember! From This Level You Should Know How To Move And How To Take, Dribble And Shoot The Ball! I Recommend You To Practise Those Things A Bit Cuz You'll Need Them A Lot!", textColor));
 										
@@ -317,6 +352,12 @@ public class TutorialLevels extends Levels {
 									public boolean usesOriginalRules() {
 										
 										return false;
+									}
+
+									@Override
+									public boolean showPower() {
+										
+										return true;
 									}
 									
 								},
@@ -354,6 +395,12 @@ public class TutorialLevels extends Levels {
 										
 										return false;
 									}
+
+									@Override
+									public boolean showPower() {
+										
+										return true;
+									}
 									
 								}
 						};
@@ -390,6 +437,12 @@ public class TutorialLevels extends Levels {
 									public boolean usesOriginalRules() {
 										
 										return false;
+									}
+
+									@Override
+									public boolean showPower() {
+										
+										return true;
 									}
 									
 								}
@@ -510,6 +563,8 @@ public class TutorialLevels extends Levels {
 			
 			public abstract boolean usesOriginalRules();
 			
+			public abstract boolean showPower();
+			
 			public Action getCurrentAction() {
 				return actions.getCurrentAction();
 			}
@@ -593,7 +648,7 @@ public class TutorialLevels extends Levels {
 			}
 			
 			protected void sendMessage() {
-				messageListener.sendMessage(heading, desc, textColor, this, skippable);
+				messageListener.sendMessage(heading, desc, textColor, this, skippable, false);
 			}
 			
 			@Override

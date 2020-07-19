@@ -1526,7 +1526,7 @@ public class Rules implements GameMessageSender {
 					// A rule has been t
 					triggeredRule = rule;
 					map.onRuleTriggered(rule);
-					rulesListener.sendMessage(rule.getName(), rule.getDescription(), rule.getTextColor(), this, true);
+					rulesListener.sendMessage(rule.getName(), rule.getDescription(), rule.getTextColor(), this, true, false);
 	
 					for(GameRule rule1 : gameRules)
 						rule1.resetRule();
@@ -1553,7 +1553,7 @@ public class Rules implements GameMessageSender {
 	public void setTriggeredRule(GameRule rule) {
 		if(rule.getParent() != null || triggeredRule == null) {
 			map.onRuleTriggered(rule);
-			rulesListener.sendMessage(rule.getName(), rule.getDescription(), rule.getTextColor(), this, true);
+			rulesListener.sendMessage(rule.getName(), rule.getDescription(), rule.getTextColor(), this, true, false);
 		}
 		
 		triggeredRule = rule;

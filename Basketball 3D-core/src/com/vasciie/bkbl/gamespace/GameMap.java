@@ -1163,6 +1163,8 @@ public class GameMap {
     }
     
     public void setTutorialLevel(int level, int part) {
+        difficulty = 0;
+    	
     	currentTutorialLevel = (TutorialLevel) tutorial.getGameLevel(level);
         currentTutorialLevel.setLevelPart(part);
         

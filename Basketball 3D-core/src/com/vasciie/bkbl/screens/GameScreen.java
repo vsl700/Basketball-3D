@@ -59,7 +59,7 @@ public class GameScreen implements Screen, GameMessageListener, GUIRenderer {
 	float messageBarWidth, messageBarHeight;
 	
 	boolean ignorePause;
-	boolean skippableMessage;
+	boolean skippableMessage, showPower;
 
 	public GameScreen(MyGdxGame mg) {
 		game = mg;
@@ -182,19 +182,27 @@ public class GameScreen implements Screen, GameMessageListener, GUIRenderer {
 		homeScore.update();
 		awayScore.update();
 
-		if (!paused())
-			if (map.isGameRunning() && !Gdx.app.getType().equals(Application.ApplicationType.Android) && sender == null && (map.isTutorialMode() && map.getDifficulty() > 0 || !map.isTutorialMode())) {
+		if (!paused()) {
+			boolean temp = map.isGameRunning() && sender == null;
+			
+			if (((temp || showPower) && map.isTutorialMode() && map.getCurrentTutorialLevel().getCurrentPart().showPower() || !map.isTutorialMode()) && !Gdx.app.getType().equals(Application.ApplicationType.Android)) {
 				int pow = map.getMainPlayer().getShootingPower() - 9;
 
 				power.update();
-				/*shape.begin(ShapeRenderer.ShapeType.Filled);
-				shape.setColor(Color.RED);
-				shape.rect(cam.viewportWidth / 2 - pow * 8 / 2, power.getY() - power.getHeight() / 2 - 30, pow * 8, 30);
-				shape.end();*/
 
 				powerNum.setText("x" + pow);
 				powerNum.update();
-			} else if (!map.isGameRunning() || sender != null) {
+				
+				if(!temp) {
+					power.setY(getPowerY() - messageBarHeight - 13);
+					powerNum.setY(getPowerNumY());
+				}
+				else {
+					power.setY(getPowerY());
+					powerNum.setY(getPowerNumY());
+				}
+			} 
+			if (!temp) {
 				if (map.getTimer() >= 0 && map.isPlayersReady() && !map.isTutorialMode()) {
 					if ((int) map.getTimer() == 0)
 						timer.setText("GO!");
@@ -230,6 +238,7 @@ public class GameScreen implements Screen, GameMessageListener, GUIRenderer {
 				}
 
 			}
+		}
 	}
 
 	private static final Matrix4 tempMatrix = new Matrix4();
@@ -291,13 +300,21 @@ public class GameScreen implements Screen, GameMessageListener, GUIRenderer {
 		homeScore.setPosAndSize(0, height - 70, 70, 70);
 		awayScore.setPosAndSize(width - 70, height - 70, 70, 70);
 		timer.setPosAndSize(width / 2, height - 120, 10);
-		power.setPosAndSize(width / 2, height - 40, 10);
+		power.setPosAndSize(width / 2, getPowerY(), 10);
 		powerNum.setSize(power.textSize(), 26);
-		powerNum.setPos(width / 2 - powerNum.getWidth() / 2 + 5, power.getY() - 50);
+		powerNum.setPos(width / 2 - powerNum.getWidth() / 2 + 5, getPowerNumY());
 		
 		resizeMessageText(width, height);
 		
 		pCam.update();
+	}
+	
+	private float getPowerY() {
+		return cam.viewportHeight - 40;
+	}
+	
+	private float getPowerNumY() {
+		return power.getY() - 50;
 	}
 	
 	private void resizeMessageText() {
@@ -312,7 +329,7 @@ public class GameScreen implements Screen, GameMessageListener, GUIRenderer {
 		playerRemove.setPosAndSize(width / 2 - (width - diff) / 2, clickToCont.getY() - 30 * playerRemove.getRows(), width - diff);
 		
 		messageBarWidth = width - diff;
-		messageBarHeight = ruleHeading.getRows() * 39 + 26 * (ruleDesc.getRows() + clickToCont.getRows() + playerRemove.getRows()) + 13;
+		messageBarHeight = ruleHeading.getRows() * 39 + 26.5f * (ruleDesc.getRows() + (skippableMessage ? clickToCont.getRows() : 0) + playerRemove.getRows()) + 13;
 	}
 	
 	public boolean paused() {
@@ -369,7 +386,7 @@ public class GameScreen implements Screen, GameMessageListener, GUIRenderer {
 	}
 
 	@Override
-	public void sendMessage(String heading, String desc, Color textColor, GameMessageSender sender, boolean skippable) {
+	public void sendMessage(String heading, String desc, Color textColor, GameMessageSender sender, boolean skippable, boolean showPower) {
 		ruleHeading.setText(heading);
 		ruleHeading.setColor(textColor);
 		
@@ -381,10 +398,13 @@ public class GameScreen implements Screen, GameMessageListener, GUIRenderer {
 		
 		contTimer = 1;
 		
-		resizeMessageText();
-		
 		this.sender = sender;
 		skippableMessage = skippable;
+		this.showPower = showPower;
+		
+		resizeMessageText();
+		
+		
 	}
 
 	@Override
