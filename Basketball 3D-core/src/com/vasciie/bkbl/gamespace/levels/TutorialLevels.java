@@ -3,6 +3,7 @@ package com.vasciie.bkbl.gamespace.levels;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.math.Matrix4;
+import com.badlogic.gdx.math.Vector3;
 import com.vasciie.bkbl.GameMessageListener;
 import com.vasciie.bkbl.GameMessageSender;
 import com.vasciie.bkbl.gamespace.GameMap;
@@ -16,6 +17,7 @@ public class TutorialLevels extends Levels {
 	public TutorialLevels(GameMap map, GameMessageListener messageListener) {
 		super(map, messageListener);
 		
+		final Matrix4 tempMx = new Matrix4();
 		gameLevels = new TutorialLevel[] {
 				new TutorialLevel("basics", "Level 1: Basics", map, messageListener) {
 
@@ -142,7 +144,7 @@ public class TutorialLevels extends Levels {
 											public boolean act() {
 												map.playerReleaseBall();
 												
-												map.getBall().setWorldTransform(new Matrix4().setToTranslation(0, 0.5f, 25));
+												map.getBall().setCopyTransform(tempMx.setToTranslation(0, 0.5f, 25));
 												
 												return true;
 											}
@@ -214,7 +216,7 @@ public class TutorialLevels extends Levels {
 													time = defaultTime;
 													timeMove = defaultTimeMove;
 												}else if((time < 0 || timeMove < 0) && map.getMainPlayer().isHoldingBall()) {
-													map.getMainPlayer().setWorldTransform(new Matrix4().setToTranslation(0, map.getMainPlayer().getHeight() / 1.5f, 25));
+													map.getMainPlayer().setCopyTransform(tempMx.setToTranslation(0, map.getMainPlayer().getHeight() / 1.5f, 25));
 													time = defaultTime;
 													timeMove = defaultTimeMove;
 												}else if(!map.getMainPlayer().getPrevMoveVec().isZero() || !map.getMainPlayer().getMoveVector().isZero())
@@ -249,7 +251,7 @@ public class TutorialLevels extends Levels {
 													time = defaultTime;
 													timeMove = defaultTimeMove;
 												}else if((time < 0 || timeMove < 0) && map.getMainPlayer().isHoldingBall()) {
-													map.getMainPlayer().setWorldTransform(new Matrix4().setToTranslation(0, map.getMainPlayer().getHeight() / 1.5f, -25));
+													map.getMainPlayer().setCopyTransform(tempMx.setToTranslation(0, map.getMainPlayer().getHeight() / 1.5f, -25));
 													time = defaultTime;
 													timeMove = defaultTimeMove;
 												}else if(!map.getMainPlayer().getPrevMoveVec().isZero() || !map.getMainPlayer().getMoveVector().isZero())
@@ -420,17 +422,107 @@ public class TutorialLevels extends Levels {
 						
 						return new LevelPart[] {
 								new LevelPart("pass_catch", "Passing & Catching", map, messageListener) {
-
+									final Vector3 tempVec = new Vector3(7, 0, 25);
+									
 									@Override
 									protected void createActions() {
+										actions.addAction(new TutorialAction("Interacting With Players!", "In This Level We're Gonna Look Into Important Things You Should Be Able To Do With Other Players!", textColor));
 										
+										actions.addAction(new TutorialAction("Passing & Catching", "First We Are Gonna Look Into Passing To Players And Also Catching Their Passes!", textColor));
+										
+										actions.addAction(new TutorialAction("Passing & Catching", "If You Were Practising In Tutorial Level 1 You Had Probably Noticed That When The Ball Is In The Air, You Can Only Catch It With The End Of Your Arm!", textColor));
+										
+										actions.addAction(new TutorialAction("Passing & Catching", "That's An Important Thing Not Only For Catching Passes (or any ball catching), But Also For Ball Stealing!", textColor));
+										
+										
+										actions.addAction(new Action() {
+
+											@Override
+											public boolean act() {
+												map.spawnPlayers(1, 0);
+												map.setHoldingPlayer(map.getTeammates().get(1));
+												
+												tempVec.y = map.getMainPlayer().getHeight() / 2;
+												map.getMainPlayer().setCopyTransform(tempMx.setToTranslation(tempVec));
+												map.getTeammates().get(1).setCopyTransform(tempMx.setToTranslation(tempVec.cpy().scl(-1, 1, 1)));
+												
+												map.getMainPlayer().lookAt(map.getTeammates().get(1).getPosition(), false);
+												
+												return true;
+											}
+
+											@Override
+											public boolean isGameDependent() {
+												
+												return false;
+											}
+											
+										});
+										
+										actions.addAction(new TutorialAction("Passing & Catching", "Now Go To The Red Basket By Passing The Ball With Your Teammate! For Walking For 0.75 Seconds Without Passing You'll Be Returned To The Blue Basket! Pass The Ball TO Your Teammate At Least 3 Times!", textColor));
+										
+										actions.addAction(new Action() {
+											final float defaultTime = 0.75f;
+											float time = defaultTime;
+											int passes;
+											boolean wait;
+											
+											
+											@Override
+											public boolean act() {
+												if((map.getMainPlayer().isAimingOrShooting() || map.getTeammates().get(1).isAimingOrShooting()) && !wait || map.getHoldingPlayer() == null) {
+													if (map.getMainPlayer().isAimingOrShooting()) {
+														passes++;
+														wait = true;
+													}
+													time = defaultTime;
+												}else if(!map.getMainPlayer().isShooting() && wait)
+													wait = false;
+												
+												if(map.getMainPlayer().getAwayThreePointZone().checkZone(map.getBall().getPosition())) {
+													if(passes >= 3) {
+														reset();
+														
+														return true;
+													}
+													else 
+														returnPlayers();
+												}else if(time < 0) {
+													returnPlayers();
+												}else if(map.getHoldingPlayer() != null && !map.getHoldingPlayer().equals(map.getTeammates().get(1))) time -= Gdx.graphics.getDeltaTime();
+												
+												return false;
+											}
+											
+											private void reset() {
+												passes = 0;
+												wait = false;
+												time = defaultTime;
+											}
+											
+											private void returnPlayers() {
+												map.setHoldingPlayer(map.getTeammates().get(1));
+												
+												
+												map.getMainPlayer().setCopyTransform(tempMx.setToTranslation(tempVec));
+												map.getTeammates().get(1).setCopyTransform(tempMx.setToTranslation(tempVec.scl(-1, 1, 1)));
+												
+												reset();
+											}
+											
+											@Override
+											public boolean isGameDependent() {
+												return true;
+											}
+											
+										});
 										
 									}
 
 									@Override
 									public boolean updatePlayersNormalAI() {
 										
-										return false;
+										return true;
 									}
 
 									@Override
@@ -451,7 +543,7 @@ public class TutorialLevels extends Levels {
 
 					@Override
 					public void setup() {
-						map.spawnPlayers(2, 2);
+						map.spawnPlayers(1, 0);
 					}
 					
 				}

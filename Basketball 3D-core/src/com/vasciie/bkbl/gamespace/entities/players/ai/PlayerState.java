@@ -165,21 +165,24 @@ public enum PlayerState implements State<Player> {
 					brain.performShooting(tempAimVec);
 				else {
 					if (mem.getDribbleTime() > 0.7f) {
-						ArrayList<Player> tempOpp;
-						if(player instanceof Teammate)
-							tempOpp = player.getMap().getOpponents();
-						else tempOpp = player.getMap().getTeammates();
-						
-						Player closestPlayer = GameTools.getClosestPlayer(player.getPosition(), tempOpp, null);
-						
-						Vector3 leftHandPos = player.calcTransformFromNodesTransform(player.getModelInstance().getNode("handL").globalTransform).getTranslation(new Vector3());
-						Vector3 rightHandPos = player.calcTransformFromNodesTransform(player.getModelInstance().getNode("handR").globalTransform).getTranslation(new Vector3());
-						
-						if (closestPlayer.getPosition().dst(leftHandPos) >= closestPlayer.getPosition().dst(rightHandPos))
-							player.interactWithBallL();
-						else
-							player.interactWithBallR();
+						if (player.getMap().getOpponents().size() > 0) {
+							ArrayList<Player> tempOpp;
+							if (player instanceof Teammate)
+								tempOpp = player.getMap().getOpponents();
+							else
+								tempOpp = player.getMap().getTeammates();
 
+							Player closestPlayer = GameTools.getClosestPlayer(player.getPosition(), tempOpp, null);
+
+							Vector3 leftHandPos = player.calcTransformFromNodesTransform(player.getModelInstance().getNode("handL").globalTransform).getTranslation(new Vector3());
+							Vector3 rightHandPos = player.calcTransformFromNodesTransform(player.getModelInstance().getNode("handR").globalTransform).getTranslation(new Vector3());
+
+							if (closestPlayer.getPosition().dst(leftHandPos) >= closestPlayer.getPosition().dst(rightHandPos))
+								player.interactWithBallL();
+							else
+								player.interactWithBallR();
+						}
+						
 						mem.setDribbleTime(0);
 					} else
 						mem.setDribbleTime(mem.getDribbleTime() + Gdx.graphics.getDeltaTime());

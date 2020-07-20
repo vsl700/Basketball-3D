@@ -376,7 +376,7 @@ public abstract class Player extends Entity {
 				if (!running)
 					leftPointBall = true;
 
-				if (!leftHoldingBall && leftHandBall)
+				if (leftHandBall)
 					catchBall(true);
 			} else if (ballColl)
 				catchBall(true);
@@ -395,7 +395,7 @@ public abstract class Player extends Entity {
 				if (!running)
 					rightPointBall = true;
 
-				if (!rightHoldingBall && rightHandBall)
+				if (rightHandBall)
 					catchBall(false);
 			} else if (ballColl)
 				catchBall(false);
@@ -1834,6 +1834,10 @@ public abstract class Player extends Entity {
 		return leftThrowBall || rightThrowBall;
 	}
 	
+	public boolean isAimingOrShooting() {
+		return isCurrentlyAiming() || isShooting();
+	}
+	
 	public boolean isPointing() {
 		return leftPointBall || rightPointBall;
 	}
@@ -1848,6 +1852,10 @@ public abstract class Player extends Entity {
 	
 	public boolean isRightHolding() {
 		return rightHoldingBall || dribbleR || rightThrowBall;
+	}
+	
+	public boolean isDataBallHolding() {
+		return isLeftHolding() || isRightHolding();
 	}
 	
 	/**

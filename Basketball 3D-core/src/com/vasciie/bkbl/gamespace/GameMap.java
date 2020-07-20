@@ -144,7 +144,7 @@ public class GameMap {
     boolean ruleTriggeredActing;//Whether the players are currently acting like after a broken rule (for example during a throw-in, until the thrower throws the ball and another player catches it, this boolean stays true)
     boolean playersReady; //Whether the players are in positions
 
-    int index = 0, lastIndex, ballIndex, lastBallIndex;
+    int index = 0, lastIndex;
     
     boolean interrupted = false;
     
@@ -354,7 +354,11 @@ public class GameMap {
     }
 
     public void spawnPlayers(int countTeam, int countOpp) {
-        int index2 = index;
+        int index2;
+        if(getAllPlayers().size() == 0)
+        	index2 = index;
+        else index2 = lastIndex + 1;
+        
         int playerIndex = 1;
 
         for (int i = 0; i < countTeam; i++) {
@@ -485,7 +489,7 @@ public class GameMap {
     }
 
     private void createBall() {
-        ballIndex = index;
+        //ballIndex = index;
 
         /*if(ball == null)*/
         ball = (Ball) EntityType.createEntity(EntityType.BALL.getId(), this, new Vector3(0, 0, 0));
@@ -499,7 +503,7 @@ public class GameMap {
 			ball.manuallySetCollTransform();
 		}*/
         
-        lastBallIndex = index - 1;
+        
         
         if(MyGdxGame.TESTING)
         	return;
@@ -533,6 +537,10 @@ public class GameMap {
 
             index++;
         }
+        
+        lastIndex = index - 1;
+        
+        //lastBallIndex = index - 1;
     }
 
     public void clear() {
@@ -921,6 +929,9 @@ public class GameMap {
     public void setHoldingPlayer(Player player) {
         currentPlayerHoldTeam = teammates.indexOf(player);
         currentPlayerHoldOpp = opponents.indexOf(player);
+        
+        if(!player.isDataBallHolding())
+        	player.catchBall(true);
     }
 
     public void playerReleaseBall() {
