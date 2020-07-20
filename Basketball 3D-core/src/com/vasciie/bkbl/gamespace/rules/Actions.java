@@ -72,7 +72,7 @@ public class Actions{
 		return false;
 	}
 	
-	public static abstract class Action{
+	public static abstract class Action implements Cloneable{
 		public Action next;
 		
 		/**
@@ -86,6 +86,18 @@ public class Actions{
 		 * @return true if the action is dependent on the game and the game should start (it doesn't clear the broken rule or rule breaker)
 		 */
 		public abstract boolean isGameDependent();
+		
+		public Action copyAction() {
+			try {
+				Action temp = (Action) clone();
+				temp.next = null;
+				
+				return temp;
+			} catch (CloneNotSupportedException e) {
+				e.printStackTrace();
+				return null;
+			}
+		}
 		
 	}
 }

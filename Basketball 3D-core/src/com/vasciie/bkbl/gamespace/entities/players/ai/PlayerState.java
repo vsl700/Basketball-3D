@@ -216,7 +216,7 @@ public enum PlayerState implements State<Player> {
 				player.setMoveVector(Player.steering.linear);
 			
 			if(!brain.isShooting() && !mem.isBallJustShot())
-				player.lookAt(basket.getPosition(), false);
+				player.lookAt(brain.getPursueBallInHand().getTarget().getPosition(), false);
 
 			// Setting the distances from the target (when a player gets in
 			// front of this player)
@@ -358,7 +358,8 @@ public enum PlayerState implements State<Player> {
 			//brain.getPlayerBasketInterpose().setInterpositionRatio(0.3f);
 			
 			brain.getPlayerBasketInterpose().setAgentA(holdingPlayer);
-			brain.getPlayerBasketInterpose().setAgentB(holdingPlayer.getTargetBasket());
+			if(brain.getPlayerBasketInterpose().getAgentB() == null)
+				brain.getPlayerBasketInterpose().setAgentB(holdingPlayer.getTargetBasket());
 			
 			mem.setTargetPlayer(holdingPlayer);
 		}

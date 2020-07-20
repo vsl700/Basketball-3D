@@ -7,6 +7,7 @@ import com.badlogic.gdx.math.Vector3;
 import com.vasciie.bkbl.GameMessageListener;
 import com.vasciie.bkbl.GameMessageSender;
 import com.vasciie.bkbl.gamespace.GameMap;
+import com.vasciie.bkbl.gamespace.entities.Player;
 import com.vasciie.bkbl.gamespace.rules.Actions;
 import com.vasciie.bkbl.gamespace.rules.Actions.Action;
 
@@ -459,17 +460,29 @@ public class TutorialLevels extends Levels {
 											
 										});
 										
-										actions.addAction(new TutorialAction("Passing & Catching", "Now Go To The Red Basket By Passing The Ball With Your Teammate! For Walking For 0.75 Seconds Without Passing You'll Be Returned To The Blue Basket! Pass The Ball TO Your Teammate At Least 3 Times!", textColor));
+										actions.addAction(new TutorialAction("Passing & Catching", "Now Go To The Red Basket By Passing The Ball With Your Teammate! For Moving For 0.75 Seconds Without Passing You'll Be Returned To The Blue Basket! Pass The Ball TO Your Teammate At Least 3 Times!", textColor));
 										
-										actions.addAction(new Action() {
+										Action tempAction = new Action() {
 											final float defaultTime = 0.75f;
 											float time = defaultTime;
 											int passes;
 											boolean wait;
+											boolean opposite, checked;
+											
+											Player tempMain;//That's if the user gets out of the game during this action
 											
 											
 											@Override
 											public boolean act() {
+												if (!checked || tempMain != null && !tempMain.equals(map.getMainPlayer())) {
+													if (map.getMainPlayer().getPosition().z == -tempVec.z)
+														opposite = true;
+													else
+														opposite = false;
+													
+													checked = true;
+												}
+												
 												if((map.getMainPlayer().isAimingOrShooting() || map.getTeammates().get(1).isAimingOrShooting()) && !wait || map.getHoldingPlayer() == null) {
 													if (map.getMainPlayer().isAimingOrShooting()) {
 														passes++;
@@ -479,10 +492,11 @@ public class TutorialLevels extends Levels {
 												}else if(!map.getMainPlayer().isShooting() && wait)
 													wait = false;
 												
-												if(map.getMainPlayer().getAwayThreePointZone().checkZone(map.getBall().getPosition())) {
+												if(!opposite && map.getMainPlayer().getAwayThreePointZone().checkZone(map.getBall().getPosition()) || opposite && map.getMainPlayer().getHomeThreePointZone().checkZone(map.getBall().getPosition())) {
 													if(passes >= 3) {
 														reset();
 														
+														checked = false;
 														return true;
 													}
 													else 
@@ -503,9 +517,12 @@ public class TutorialLevels extends Levels {
 											private void returnPlayers() {
 												map.setHoldingPlayer(map.getTeammates().get(1));
 												
+												Vector3 temp = new Vector3(tempVec);
+												if(opposite)
+													temp.scl(1, 1, -1);
 												
-												map.getMainPlayer().setCopyTransform(tempMx.setToTranslation(tempVec));
-												map.getTeammates().get(1).setCopyTransform(tempMx.setToTranslation(tempVec.scl(-1, 1, 1)));
+												map.getMainPlayer().setCopyTransform(tempMx.setToTranslation(temp));
+												map.getTeammates().get(1).setCopyTransform(tempMx.setToTranslation(temp.scl(-1, 1, 1)));
 												
 												reset();
 											}
@@ -515,7 +532,41 @@ public class TutorialLevels extends Levels {
 												return true;
 											}
 											
+										};
+										
+										actions.addAction(tempAction);
+										
+										actions.addAction(new TutorialAction("Passing & Catching", "Good! Now The Same Way To The Blue Basket!", textColor));
+										
+										actions.addAction(new Action() {
+
+											@Override
+											public boolean act() {
+												tempVec.y = map.getMainPlayer().getHeight() / 2;
+												
+												Vector3 temp = tempVec.cpy().scl(1, 1, -1);
+												map.getMainPlayer().setCopyTransform(tempMx.setToTranslation(temp));
+												map.getTeammates().get(1).setCopyTransform(tempMx.setToTranslation(temp.scl(-1, 1, 1)));
+												
+												map.setHoldingPlayer(map.getTeammates().get(1));
+												
+												map.getMainPlayer().lookAt(map.getTeammates().get(1).getPosition(), false);
+												
+												map.getTeammates().get(1).getBrain().getPursueBallInHand().setTarget(map.getHomeBasket());
+												map.getTeammates().get(1).getBrain().getPlayerBasketInterpose().setAgentB(map.getHomeBasket());
+												
+												return true;
+											}
+
+											@Override
+											public boolean isGameDependent() {
+												
+												return false;
+											}
+											
 										});
+										
+										actions.addAction(tempAction.copyAction());
 										
 									}
 
