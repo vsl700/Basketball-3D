@@ -520,12 +520,16 @@ public enum PlayerState implements State<Player> {
 			brain.getMemory().setTargetPlayer(targetPlayer);
 			
 			brain.getPlayerBasketInterpose().setAgentA(targetPlayer);
-			brain.getPlayerBasketInterpose().setAgentB(targetPlayer.getTargetBasket());
+			
+			if(brain.getPlayerBasketInterpose().getAgentB() == null)
+				brain.getPlayerBasketInterpose().setAgentB(targetPlayer.getTargetBasket());
 			
 			brain.getPlayerBasketInterpose().setEnabled(true);
 			brain.getAllPlayerSeparate().setEnabled(true);
 			
-			player.getBrain().getPlayerBasketInterpose().setInterpositionRatio(0.5f);
+			if(brain.getMemory().isCheckZones())
+				brain.getPlayerBasketInterpose().setInterpositionRatio(0.5f);
+			else brain.getPlayerBasketInterpose().setInterpositionRatio(0.3f);
 		}
 		
 		@Override
@@ -545,7 +549,7 @@ public enum PlayerState implements State<Player> {
 			Player chased = mem.getTargetPlayer();
 			
 
-			if (chased.getPosition().dst(player.getPosition()) <= chased.getPosition().dst(chased.getTargetBasket().getPosition()) / 2 - 3)
+			if (mem.isCheckZones() && chased.getPosition().dst(player.getPosition()) <= chased.getPosition().dst(chased.getTargetBasket().getPosition()) / 2 - 3 || !mem.isCheckZones())
 				player.setRunning();
 			
 			brain.getPSShooting().calculateSteering(Player.steering);

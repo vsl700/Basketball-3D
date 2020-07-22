@@ -8,6 +8,7 @@ import com.vasciie.bkbl.GameMessageListener;
 import com.vasciie.bkbl.GameMessageSender;
 import com.vasciie.bkbl.gamespace.GameMap;
 import com.vasciie.bkbl.gamespace.entities.Player;
+import com.vasciie.bkbl.gamespace.entities.players.Opponent;
 import com.vasciie.bkbl.gamespace.rules.Actions;
 import com.vasciie.bkbl.gamespace.rules.Actions.Action;
 
@@ -26,7 +27,7 @@ public class TutorialLevels extends Levels {
 					protected LevelPart[] createLevelParts() {
 						
 						return new LevelPart[] {
-								new LevelPart("movement", "1.1 Movement", map, messageListener) {
+								new LevelPart("movement", "Movement", map, messageListener) {
 
 									@Override
 									protected void createActions() {
@@ -115,7 +116,7 @@ public class TutorialLevels extends Levels {
 									
 								},
 								
-								new LevelPart("ball_taking", "1.2 Ball Taking", map, messageListener) {
+								new LevelPart("ball_taking", "Ball Taking", map, messageListener) {
 
 									@Override
 									protected void createActions() {
@@ -145,7 +146,7 @@ public class TutorialLevels extends Levels {
 											public boolean act() {
 												map.playerReleaseBall();
 												
-												map.getBall().setCopyTransform(tempMx.setToTranslation(0, 0.5f, 25));
+												map.getBall().setWorldTransform(tempMx.setToTranslation(0, 0.5f, 25));
 												
 												return true;
 											}
@@ -194,7 +195,7 @@ public class TutorialLevels extends Levels {
 									
 								},
 								
-								new LevelPart("ball_dribble", "1.3 Ball Dribbling", map, messageListener) {
+								new LevelPart("ball_dribble", "Ball Dribbling", map, messageListener) {
 
 									@Override
 									protected void createActions() {
@@ -226,7 +227,7 @@ public class TutorialLevels extends Levels {
 													
 													messageListener.sendMessage("", "", textColor, null, skippable, false);
 												}else if((time < 0 || timeMove < 0) && map.getMainPlayer().isHoldingBall()) {
-													map.getMainPlayer().setCopyTransform(tempMx.setToTranslation(0, map.getMainPlayer().getHeight() / 1.5f, 25));
+													map.getMainPlayer().setWorldTransform(tempMx.setToTranslation(0, map.getMainPlayer().getHeight() / 1.5f, 25));
 													time = defaultTime;
 													timeMove = defaultTimeMove;
 													
@@ -271,7 +272,7 @@ public class TutorialLevels extends Levels {
 													time = defaultTime;
 													timeMove = defaultTimeMove;
 												}else if((time < 0 || timeMove < 0) && map.getMainPlayer().isHoldingBall()) {
-													map.getMainPlayer().setCopyTransform(tempMx.setToTranslation(0, map.getMainPlayer().getHeight() / 1.5f, -25));
+													map.getMainPlayer().setWorldTransform(tempMx.setToTranslation(0, map.getMainPlayer().getHeight() / 1.5f, -25));
 													time = defaultTime;
 													timeMove = defaultTimeMove;
 												}else if(!map.getMainPlayer().getPrevMoveVec().isZero() || !map.getMainPlayer().getMoveVector().isZero())
@@ -316,7 +317,7 @@ public class TutorialLevels extends Levels {
 									
 								}, 
 								
-								new LevelPart("ball_shoot", "1.4 Ball Shooting", map, messageListener) {
+								new LevelPart("ball_shoot", "Ball Shooting", map, messageListener) {
 
 									@Override
 									protected void createActions() {
@@ -384,7 +385,7 @@ public class TutorialLevels extends Levels {
 									
 								},
 								
-								new LevelPart("practising", "1.5 Level Practising", map, messageListener) {
+								new LevelPart("practising", "Level Practising", map, messageListener) {
 
 									@Override
 									protected void createActions() {
@@ -436,13 +437,14 @@ public class TutorialLevels extends Levels {
 				}, 
 				
 				new TutorialLevel("player_interact", "Level 2: Interacting With Players", map, messageListener) {
-
+					final Vector3 tempVec = new Vector3(7, 0, 25);
+					
 					@Override
 					protected LevelPart[] createLevelParts() {
 						
 						return new LevelPart[] {
 								new LevelPart("pass_catch", "Passing & Catching", map, messageListener) {
-									final Vector3 tempVec = new Vector3(7, 0, 25);
+									
 									
 									@Override
 									protected void createActions() {
@@ -465,8 +467,8 @@ public class TutorialLevels extends Levels {
 												map.setHoldingPlayer(teammate);
 												
 												tempVec.y = map.getMainPlayer().getHeight() / 2;
-												map.getMainPlayer().setCopyTransform(tempMx.setToTranslation(tempVec));
-												teammate.setCopyTransform(tempMx.setToTranslation(tempVec.cpy().scl(-1, 1, 1)));
+												map.getMainPlayer().setWorldTransform(tempMx.setToTranslation(tempVec));
+												teammate.setWorldTransform(tempMx.setToTranslation(tempVec.cpy().scl(-1, 1, 1)));
 												
 												map.getMainPlayer().lookAt(teammate.getPosition(), false);
 												
@@ -565,8 +567,8 @@ public class TutorialLevels extends Levels {
 												if(opposite)
 													temp.scl(1, 1, -1);
 												
-												map.getMainPlayer().setCopyTransform(tempMx.setToTranslation(temp));
-												map.getTeammates().get(1).setCopyTransform(tempMx.setToTranslation(temp.scl(-1, 1, 1)));
+												map.getMainPlayer().setWorldTransform(tempMx.setToTranslation(temp));
+												map.getTeammates().get(1).setWorldTransform(tempMx.setToTranslation(temp.scl(-1, 1, 1)));
 												
 												reset();
 											}
@@ -589,8 +591,8 @@ public class TutorialLevels extends Levels {
 												tempVec.y = map.getMainPlayer().getHeight() / 2;
 												
 												Vector3 temp = tempVec.cpy().scl(1, 1, -1);
-												map.getMainPlayer().setCopyTransform(tempMx.setToTranslation(temp));
-												map.getTeammates().get(1).setCopyTransform(tempMx.setToTranslation(temp.scl(-1, 1, 1)));
+												map.getMainPlayer().setWorldTransform(tempMx.setToTranslation(temp));
+												map.getTeammates().get(1).setWorldTransform(tempMx.setToTranslation(temp.scl(-1, 1, 1)));
 												
 												map.setHoldingPlayer(map.getTeammates().get(1));
 												
@@ -614,7 +616,6 @@ public class TutorialLevels extends Levels {
 										actions.addAction(new TutorialAction("Passing & Catching", "Great! I Suppose You've Got The Mechanics You Needed!", textColor));
 										
 										actions.addAction(new TutorialAction("Passing & Catching", "Note That In The Real Games Players Pass Their Teammates According To The Game! I Mean If A Player's Pass Is Going To Trigger A Foul Or It's Going To Cause The Ball To Be Stolen, That Player Is Not Gonna Pass Anyone! Enough About That For Now!", textColor));
-										
 									}
 
 									@Override
@@ -635,6 +636,348 @@ public class TutorialLevels extends Levels {
 										return true;
 									}
 									
+								},
+								
+								new LevelPart("ball_steal_prevent", "Preventing Ball Stealing", map, messageListener) {
+
+									@Override
+									protected void createActions() {
+										actions.addAction(new Action() {
+
+											@Override
+											public boolean act() {
+												if(map.getTeammates().size() == 2)
+													map.removePlayer(map.getTeammates().get(1));
+												
+												return true;
+											}
+
+											@Override
+											public boolean isGameDependent() {
+												
+												return false;
+											}
+											
+										});
+										
+										actions.addAction(new TutorialAction("Preventing Ball Stealing!", "To Prevent Your Opponents From Stealing Your Ball You Can Either Pass The Ball To Someone Else, Or Just Run & Dribble, Which Is Used When Playing With Only 1 Opponent!", textColor));
+										
+										actions.addAction(new TutorialAction("Preventing Ball Stealing!", "This Tutorial Part Will Be Kinda Long, So Please Be Patient!", textColor));
+										
+										actions.addAction(new Action() {
+
+											@Override
+											public boolean act() {
+												map.spawnPlayers(0, 1);
+												
+												Player opponent = map.getOpponents().get(0);
+												if(map.getHoldingPlayer() == null || !map.getHoldingPlayer().equals(map.getMainPlayer()))
+													map.setHoldingPlayer(map.getMainPlayer());
+												
+												tempVec.y = map.getMainPlayer().getHeight() / 2;
+												map.getMainPlayer().setWorldTransform(tempMx.setToTranslation(tempVec));
+												opponent.setWorldTransform(tempMx.setToTranslation(tempVec.cpy().scl(-1, 1, 1)));
+												
+												map.getMainPlayer().lookAt(opponent.getPosition(), false);
+												
+												opponent.getBrain().getMemory().setCheckZones(false);
+												
+												return true;
+											}
+
+											@Override
+											public boolean isGameDependent() {
+												
+												return false;
+											}
+											
+										});
+										
+										actions.addAction(new TutorialAction("Preventing Ball Stealing!", "First I'm Gonna Teach You Preventing The Ball From Stealing Without Any Passes! In This Case You'll Be Playing With Only One Opponent!", textColor));
+										
+										actions.addAction(new TutorialAction("Preventing Ball Stealing!", "First You'll Have To Go To The Red Basket Without The Ball Being Stolen! Remember That You Can Switch Hands Any Time!", textColor));
+										
+										actions.addAction(new TutorialAction("Preventing Ball Stealing!", "If Your Opponent Steals Your Ball Or You Don't Dribble, You'll Be Returned Back To The Blue Basket! Dribble Messages Will Appear When Needed!", textColor));
+										
+										TutorialAction tempAction = new TutorialAction("", "", textColor) {
+											final float defaultTime = 3, defaultTimeMove = 0.75f;
+											float time = defaultTime, timeMove = defaultTimeMove;
+											
+											boolean opposite, checked;
+											
+											Player tempMain;//That's if the user gets out of the game during this action
+											
+											
+											@Override
+											protected void sendMessage() {
+												messageListener.sendMessage(heading, desc, textColor, null, skippable, true);
+											}
+											
+											@Override
+											public boolean act() {
+												if (!checked || tempMain != null && !tempMain.equals(map.getMainPlayer())) {
+													if (map.getMainPlayer().getPosition().z < 0)
+														opposite = true;
+													else
+														opposite = false;
+													
+													tempMain = map.getMainPlayer();
+													
+													checked = true;
+												}
+												
+												if(time < 0 || timeMove < 0 || !map.getMainPlayer().isHoldingBall()) {
+													returnPlayers();
+												}else {
+													if(!opposite && map.getMainPlayer().isInAwayThreePointZone() || opposite && map.getMainPlayer().isInHomeThreePointZone()) {
+														reset();
+														return true;
+													}else if(map.getMainPlayer().isDribbling()) {
+														reset();
+													} else {
+														if (map.getMainPlayer().getPrevMoveVec().isZero() && map.getMainPlayer().getMoveVector().isZero())
+															time -= Gdx.graphics.getDeltaTime();
+														else
+															timeMove -= Gdx.graphics.getDeltaTime();
+														
+														if(time < 0.5f || timeMove < 0.5f)
+															messageListener.sendMessage("Dribble!", "", textColor, this, skippable, false);
+													}
+												}
+												
+												return false;
+											}
+											
+											private void reset() {
+												time = defaultTime;
+												timeMove = defaultTimeMove;
+												
+												messageListener.sendMessage("", "", textColor, null, skippable, false);
+											}
+											
+											private void returnPlayers() {
+												map.setHoldingPlayer(map.getMainPlayer());
+												
+												Vector3 temp = new Vector3(tempVec);
+												if(opposite)
+													temp.scl(1, 1, -1);
+												
+												map.getMainPlayer().setWorldTransform(tempMx.setToTranslation(temp));
+												map.getOpponents().get(0).setWorldTransform(tempMx.setToTranslation(temp.scl(-1, 1, 1)));
+												
+												reset();
+											}
+											
+											@Override
+											public boolean isGameDependent() {
+												return true;
+											}
+											
+										};
+										
+										actions.addAction(tempAction);
+										
+										actions.addAction(new TutorialAction("Preventing Ball Stealing!", "Kinda Tough Thing, huh? Don't Worry! You'll Learn It! That's Why You'll Have To Go Back To The Blue Basket Now!", textColor));
+										
+										actions.addAction(new Action() {
+
+											@Override
+											public boolean act() {
+												Player opponent = map.getOpponents().get(0);
+												if(map.getHoldingPlayer() == null || !map.getHoldingPlayer().equals(map.getMainPlayer()))
+													map.setHoldingPlayer(map.getMainPlayer());
+												
+												Vector3 temp = tempVec.cpy().scl(1, 1, -1);
+												map.getMainPlayer().setWorldTransform(tempMx.setToTranslation(temp));
+												opponent.setWorldTransform(tempMx.setToTranslation(temp.scl(-1, 1, 1)));
+												
+												map.getMainPlayer().lookAt(opponent.getPosition(), false);
+												
+												opponent.getBrain().getMemory().setCheckZones(false);
+												
+												return true;
+											}
+
+											@Override
+											public boolean isGameDependent() {
+												
+												return false;
+											}
+											
+										});
+										
+										actions.addAction(tempAction.copyAction());
+										
+										actions.addAction(new TutorialAction("Preventing Ball Stealing!", "You Sick From This Tutorial Level Part? Don't Worry! It's Almost Over! Just A Little Bit More!", textColor));
+										
+										actions.addAction(new TutorialAction("Preventing Ball Stealing!", "Let Me Calm You Down! In EASY Gamemode Of The Normal Game The Chance For Opponents To Steal Any Ball Is Much Much LOWER Than Now!", textColor));
+										
+										actions.addAction(new TutorialAction("Preventing Ball Stealing!", "I Just Want To Teach You Comprehend The Hard Parts Of The Game First So That You Easily Play The Rest And Easily Adapt To The Game!", textColor));
+										
+										actions.addAction(new Action() {
+
+											@Override
+											public boolean act() {
+												map.spawnPlayers(1, 1);
+												
+												map.setHoldingPlayer(map.getMainPlayer());
+												
+												map.getMainPlayer().setWorldTransform(tempMx.setToTranslation(tempVec));
+												map.getTeammates().get(1).setWorldTransform(tempMx.setToTranslation(tempVec.cpy().sub(0, 0, 3)));
+												map.getOpponents().get(0).setWorldTransform(tempMx.setToTranslation(tempVec.cpy().scl(-1, 1, 1)));
+												map.getOpponents().get(1).setWorldTransform(tempMx.setToTranslation(tempVec.cpy().scl(-1, 1, 1).sub(0, 0, 3)));
+												
+												map.getTeammates().get(1).getBrain().getMemory().setCheckZones(false);
+												
+												return true;
+											}
+
+											@Override
+											public boolean isGameDependent() {
+												
+												return false;
+											}
+											
+										});
+										
+										actions.addAction(new TutorialAction("Preventing Ball Stealing!", "Now I Spawned You 1 More Opponent And 1 Teammate So That You Learn Keeping Ball Unstolen By Passing It With Your Teammate! Pass It At Least 3 Times!", textColor));
+										
+										actions.addAction(new TutorialAction("Preventing Ball Stealing!", "If You Pass It Less Times Than You Should Or An Opponent Steals It You'll Be Returned Back To The Blue Basket! It Doesn't Matter How Long You Are Holding It!", textColor));
+										
+										TutorialAction tempAction2 = new TutorialAction("0 Passes!", "", textColor, false) {
+											int passes;
+											boolean wait;
+											boolean opposite, checked;
+											
+											Player tempMain;//That's if the user gets out of the game during this action
+											
+											
+											@Override
+											public boolean act() {
+												if (!checked || tempMain != null && !tempMain.equals(map.getMainPlayer())) {
+													if (map.getMainPlayer().getPosition().z < 0)
+														opposite = true;
+													else
+														opposite = false;
+													
+													tempMain = map.getMainPlayer();
+													
+													checked = true;
+												}
+												
+												if(opposite) {
+													map.getTeammates().get(1).getBrain().getPlayerBasketInterpose().setAgentB(map.getHomeBasket());
+													map.getOpponents().get(0).getBrain().getPlayerBasketInterpose().setAgentB(map.getHomeBasket());
+													map.getOpponents().get(1).getBrain().getPlayerBasketInterpose().setAgentB(map.getHomeBasket());
+												}
+												
+												if(map.getHoldingPlayer() != null && map.getHoldingPlayer() instanceof Opponent) {
+													returnPlayers();
+												}else {
+													if((map.getMainPlayer().isShooting()) && !wait) {
+															passes++;
+															wait = true;
+															
+															messageListener.sendMessage(passes + (passes == 1 ? " Pass!" : " Passes!"), "", textColor, this, false, true);
+													}else if(!map.getMainPlayer().isShooting() && wait)
+														wait = false;
+													
+													if(!opposite && map.getMainPlayer().getAwayThreePointZone().checkZone(map.getBall().getPosition()) || opposite && map.getMainPlayer().getHomeThreePointZone().checkZone(map.getBall().getPosition())) {
+														if(passes >= 3) {
+															passes = 0;
+															return true;
+														}
+														
+														returnPlayers();
+													}
+												}
+												
+												return false;
+											}
+											
+											private void reset() {
+												passes = 0;
+												//wait = false;
+												
+												messageListener.sendMessage("0 Passes!", "", textColor, this, false, true);
+											}
+											
+											private void returnPlayers() {
+												map.setHoldingPlayer(map.getMainPlayer());
+												
+												Vector3 temp = new Vector3(tempVec);
+												if(opposite)
+													temp.scl(1, 1, -1);
+												
+												map.getMainPlayer().setWorldTransform(tempMx.setToTranslation(temp));
+												map.getTeammates().get(1).setWorldTransform(tempMx.setToTranslation(temp.cpy().sub(0, 0, 3)));
+												map.getOpponents().get(0).setWorldTransform(tempMx.setToTranslation(temp.scl(-1, 1, 1)));
+												map.getOpponents().get(1).setWorldTransform(tempMx.setToTranslation(temp.sub(0, 0, 3)));
+												
+												reset();
+											}
+											
+											@Override
+											public boolean isGameDependent() {
+												return true;
+											}
+											
+										};
+										
+										actions.addAction(tempAction2);
+										
+										actions.addAction(new TutorialAction("Preventing Ball Stealing!", "Excellent! Now To Ensure You've Learned It, Go Back To The Blue Basket! This Is The Last Part From Preventing Ball Stealing!", textColor));
+										
+										actions.addAction(new Action() {
+
+											@Override
+											public boolean act() {
+												map.setHoldingPlayer(map.getMainPlayer());
+												
+												Vector3 temp = tempVec.cpy().scl(1, 1, -1);
+												map.getMainPlayer().setWorldTransform(tempMx.setToTranslation(temp));
+												map.getTeammates().get(1).setWorldTransform(tempMx.setToTranslation(temp.cpy().sub(0, 0, 3)));
+												map.getOpponents().get(0).setWorldTransform(tempMx.setToTranslation(temp.scl(-1, 1, 1)));
+												map.getOpponents().get(1).setWorldTransform(tempMx.setToTranslation(temp.sub(0, 0, 3)));
+												
+												map.getTeammates().get(1).getBrain().getPursueBallInHand().setTarget(map.getHomeBasket());
+												map.getOpponents().get(0).getBrain().getPursueBallInHand().setTarget(map.getHomeBasket());
+												map.getTeammates().get(1).getBrain().getPursueBallInHand().setTarget(map.getHomeBasket());
+												
+												return true;
+											}
+
+											@Override
+											public boolean isGameDependent() {
+												
+												return false;
+											}
+											
+										});
+										
+										actions.addAction(tempAction2.copyAction());
+										
+										actions.addAction(new TutorialAction("Preventing Ball Stealing!", "That Was It! You Can Either Repeat This Part Of Level 2 Or Continue To The Ball Stealing Part Where YOU'll Be Stealing The Ball From Opponents!", textColor));
+									}
+
+									@Override
+									public boolean updatePlayersNormalAI() {
+										
+										return true;
+									}
+
+									@Override
+									public boolean usesOriginalRules() {
+										
+										return false;
+									}
+
+									@Override
+									public boolean showPower() {
+										
+										return false;
+									}
+									
 								}
 						};
 					}
@@ -642,6 +985,7 @@ public class TutorialLevels extends Levels {
 					@Override
 					public void setup() {
 						map.spawnPlayers(1, 0);
+						map.setDifficulty(2);
 					}
 					
 				}

@@ -775,6 +775,7 @@ public class GameMap {
     		dynamicsWorld.removeCollisionObject(obj);
     		obj.dispose();
     	}
+    	//FIXME Think about index changing!
     }
 
     public void onRuleTriggered(GameRule rule) {
