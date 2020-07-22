@@ -525,15 +525,15 @@ public class TutorialLevels extends Levels {
 													map.getTeammates().get(1).getBrain().getPlayerBasketInterpose().setAgentB(map.getHomeBasket());
 												}
 												
-												if((map.getMainPlayer().isAimingOrShooting() || map.getTeammates().get(1).isAimingOrShooting()) && !wait || map.getHoldingPlayer() == null) {
-													if (map.getMainPlayer().isAimingOrShooting()) {
+												if((map.getMainPlayer().isShooting() || map.getTeammates().get(1).isShooting()) && !wait || map.getHoldingPlayer() == null) {
+													if (map.getMainPlayer().isShooting()) {
 														passes++;
 														wait = true;
 														
 														messageListener.sendMessage(passes + (passes == 1 ? " Pass!" : " Passes!"), "", textColor, this, false, true);
 													}
 													time = defaultTime;
-												}else if(!map.getMainPlayer().isAimingOrShooting() && wait)
+												}else if(!map.getMainPlayer().isShooting() && wait)
 													wait = false;
 												
 												if(!opposite && map.getMainPlayer().getAwayThreePointZone().checkZone(map.getBall().getPosition()) || opposite && map.getMainPlayer().getHomeThreePointZone().checkZone(map.getBall().getPosition())) {
