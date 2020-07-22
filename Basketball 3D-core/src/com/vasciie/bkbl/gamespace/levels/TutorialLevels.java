@@ -204,25 +204,44 @@ public class TutorialLevels extends Levels {
 										
 										actions.addAction(new TutorialAction("Ball Dribble!", "First, Run To The Red Basket While Dribbling The Ball! Like I Said, Left Mouse Button Controls Left Hand While Right Button Controls Right Hand!", textColor));
 										
-										actions.addAction(new TutorialAction("Ball Dribble!", "Controlling The Hand You Are Not Holding The Ball With Makes The Player To Dribble The Ball TO His Other Hand (Or Hand Switching)!", textColor));
+										actions.addAction(new TutorialAction("Ball Dribble!", "Controlling The Hand You Are Not Holding The Ball With Makes The Player To Dribble The Ball TO His Other Hand (Or Hand Switching)! Otherwise, He Does A Normal Dribble!", textColor));
 										
-										actions.addAction(new TutorialAction("Ball Dribble!", "Try This Out And At The Same Time Run To The Red Basket! Make Sure You Dribble For 0.75 Seconds While Moving Or 3 While Not Moving!", textColor, false) {
+										actions.addAction(new TutorialAction("Ball Dribble!", "Try This Out And At The Same Time Run To The Red Basket! Make Sure You Dribble For 0.75 Seconds While Moving Or 3 While Not Moving! When Dribble Time Is About To Run Out You'll Get A Message To Dribble!", textColor));
+										
+										actions.addAction(new TutorialAction("", "", textColor) {
 											final float defaultTime = 3, defaultTimeMove = 0.75f;
 											float time = defaultTime, timeMove = defaultTimeMove;
 											
+											
+											@Override
+											protected void sendMessage() {
+												messageListener.sendMessage(heading, desc, textColor, null, skippable, false);
+											}
 											
 											@Override
 											public boolean act() {
 												if(map.getMainPlayer().isDribbling()) {
 													time = defaultTime;
 													timeMove = defaultTimeMove;
+													
+													messageListener.sendMessage("", "", textColor, null, skippable, false);
 												}else if((time < 0 || timeMove < 0) && map.getMainPlayer().isHoldingBall()) {
 													map.getMainPlayer().setCopyTransform(tempMx.setToTranslation(0, map.getMainPlayer().getHeight() / 1.5f, 25));
 													time = defaultTime;
 													timeMove = defaultTimeMove;
-												}else if(!map.getMainPlayer().getPrevMoveVec().isZero() || !map.getMainPlayer().getMoveVector().isZero())
+													
+													messageListener.sendMessage("", "", textColor, null, skippable, false);
+												}else if(!map.getMainPlayer().getPrevMoveVec().isZero() || !map.getMainPlayer().getMoveVector().isZero()) {
 													timeMove -= Gdx.graphics.getDeltaTime();
-												else time -= Gdx.graphics.getDeltaTime();
+													
+													if(timeMove < 0.5f && map.getMainPlayer().isHoldingBall())
+														messageListener.sendMessage("Dribble!", "", textColor, this, skippable, false);
+												}else {
+													time -= Gdx.graphics.getDeltaTime();
+													
+													if(time < 0.5f && map.getMainPlayer().isHoldingBall())
+														messageListener.sendMessage("Dribble!", "", textColor, this, skippable, false);
+												}
 												
 												if(map.getMainPlayer().isInAwayThreePointZone()) {
 													time = defaultTime;
@@ -240,7 +259,7 @@ public class TutorialLevels extends Levels {
 											
 										});
 										
-										actions.addAction(new TutorialAction("Ball Dribble!", "Perfect! Now The Same Way You Should Walk Or Run Back To The Blue Basket By Dribbling The Ball!", textColor));
+										actions.addAction(new TutorialAction("Ball Dribble!", "Perfect! Now The Same Way You Should Walk Or Run Back To The Blue Basket By Dribbling The Ball! I Won't Help You With Messages This Time!", textColor));
 										
 										actions.addAction(new Action() {
 											final float defaultTime = 3, defaultTimeMove = 0.75f;
@@ -303,7 +322,7 @@ public class TutorialLevels extends Levels {
 									protected void createActions() {
 										actions.addAction(new TutorialAction("Ball Shooting!", "The Last Important Thing You Can Do With The Ball Is Shooting It No Matter To The Basket Or To A Player!", textColor));
 										
-										actions.addAction(new TutorialAction("Ball Shooting!", "For Now You Will Just Learn How To Shoot The Ball To Anywhere!", textColor));
+										actions.addAction(new TutorialAction("Ball Shooting!", "For Now You Will Just Learn How To Shoot The Ball To A Basket!", textColor));
 										
 										actions.addAction(new TutorialAction("Ball Shooting!", "It's Important That You Measure The Shot According To THE HAND You Hold The Ball With!", textColor));
 										
