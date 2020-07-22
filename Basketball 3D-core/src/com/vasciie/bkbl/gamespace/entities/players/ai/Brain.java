@@ -14,6 +14,7 @@ import com.badlogic.gdx.ai.fsm.DefaultStateMachine;
 import com.badlogic.gdx.ai.fsm.StateMachine;
 import com.badlogic.gdx.ai.steer.Steerable;
 import com.badlogic.gdx.ai.steer.SteerableAdapter;
+import com.badlogic.gdx.ai.steer.SteeringBehavior;
 import com.badlogic.gdx.ai.steer.behaviors.Arrive;
 import com.badlogic.gdx.ai.steer.behaviors.BlendedSteering;
 import com.badlogic.gdx.ai.steer.behaviors.CollisionAvoidance;
@@ -48,7 +49,7 @@ public class Brain {
 	Interpose<Vector3> playerBasketInterpose;
 	Separation<Vector3> ballSeparate, basketSeparate, playerSeparate, allPlayerSeparate, targetPlayerSeparate; //For player and basket surroundings and ball distance keeping
 	//RaycastObstacleAvoidance<Vector3> obstAvoid; //For invisible user.getMap().getTerrain() walls
-	PrioritySteering<Vector3> pSBallChasePart, pSCoop, pSSurround, pSShooting, pSCustom;
+	PrioritySteering<Vector3> pSBallChasePart, pSCoop, pSSurround, pSShooting, pSCustom, pSCustom2;
 	BlendedSteering<Vector3> mSBallChase, mSBallInHand, mSSurround;	//Groups of behaviors for each state
 	
 	
@@ -192,7 +193,7 @@ public class Brain {
 		memory.setResetTime(memory.getResetTime() + Gdx.graphics.getDeltaTime());
 		
 		//The state switcher
-		if((user.getMap().isTutorialMode() && user.getMap().getCurrentTutorialLevel().getCurrentPart().updatePlayersNormalAI() || !user.getMap().isTutorialMode()) && user.getMap().isGameRunning() && !user.getMap().isRuleTriggeredActing()) {
+		if(pSCustom2 == null && ((user.getMap().isTutorialMode() && user.getMap().getCurrentTutorialLevel().getCurrentPart().updatePlayersNormalAI() || !user.getMap().isTutorialMode()) && user.getMap().isGameRunning() && !user.getMap().isRuleTriggeredActing())) {
 			//If the current player is holding the ball
 			if(user.isHoldingBall()) {
 				if(!stateMachine.isInState(PlayerState.BALL_IN_HAND)) stateMachine.changeState(PlayerState.BALL_IN_HAND);
@@ -540,6 +541,20 @@ public class Brain {
 		else 
 			return targetBasket.getTabCenterPartTrans(1).getTranslation(new Vector3());
 	}
+	
+	public void addCustomBHV(SteeringBehavior<Vector3> behavior) {
+		if(pSCustom2 == null)
+			pSCustom2 = new PrioritySteering<Vector3>(user);
+		
+		pSCustom2.add(behavior);
+	}
+	
+	/**
+	 * USE IT BEFORE ANY NEW USAGE OF THE CUSTOM BEHAVIOR!
+	 */
+	public void clearCustomBHV() {
+		pSCustom2 = null;
+	}
 
 	public StateMachine<Player, PlayerState> getStateMachine() {
 		return stateMachine;
@@ -627,6 +642,10 @@ public class Brain {
 
 	public PrioritySteering<Vector3> getPSCustom(){
 		return pSCustom;
+	}
+	
+	public PrioritySteering<Vector3> getPSCustom2(){
+		return pSCustom2;
 	}
 	
 }

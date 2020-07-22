@@ -441,13 +441,23 @@ public class TutorialLevels extends Levels {
 											@Override
 											public boolean act() {
 												map.spawnPlayers(1, 0);
-												map.setHoldingPlayer(map.getTeammates().get(1));
+												
+												Player teammate = map.getTeammates().get(1);
+												map.setHoldingPlayer(teammate);
 												
 												tempVec.y = map.getMainPlayer().getHeight() / 2;
 												map.getMainPlayer().setCopyTransform(tempMx.setToTranslation(tempVec));
-												map.getTeammates().get(1).setCopyTransform(tempMx.setToTranslation(tempVec.cpy().scl(-1, 1, 1)));
+												teammate.setCopyTransform(tempMx.setToTranslation(tempVec.cpy().scl(-1, 1, 1)));
 												
-												map.getMainPlayer().lookAt(map.getTeammates().get(1).getPosition(), false);
+												map.getMainPlayer().lookAt(teammate.getPosition(), false);
+												
+												teammate.getBrain().getMemory().setCheckZones(false);
+												
+												/*teammate.getBrain().addCustomBHV(teammate.getBrain().getPursue());
+												teammate.getBrain().addCustomBHV(teammate.getBrain().getPursueBallInHand());
+												teammate.getBrain().addCustomBHV(teammate.getBrain().getPlayerBasketInterpose());
+												teammate.getBrain().getPlayerBasketInterpose().setAgentA(map.getMainPlayer());
+												teammate.getBrain().getPlayerBasketInterpose().setAgentB(map.getAwayBasket());*/
 												
 												return true;
 											}
@@ -462,7 +472,7 @@ public class TutorialLevels extends Levels {
 										
 										actions.addAction(new TutorialAction("Passing & Catching", "Now Go To The Red Basket By Passing The Ball With Your Teammate! For Moving For 0.75 Seconds Without Passing You'll Be Returned To The Blue Basket! Pass The Ball TO Your Teammate At Least 3 Times!", textColor));
 										
-										Action tempAction = new Action() {
+										Action tempAction = new TutorialAction("0 Passes!", "", textColor, false) {
 											final float defaultTime = 0.75f;
 											float time = defaultTime;
 											int passes;
@@ -473,23 +483,36 @@ public class TutorialLevels extends Levels {
 											
 											
 											@Override
+											protected void sendMessage() {
+												messageListener.sendMessage(heading, desc, textColor, this, skippable, true);
+											}
+											
+											@Override
 											public boolean act() {
 												if (!checked || tempMain != null && !tempMain.equals(map.getMainPlayer())) {
-													if (map.getMainPlayer().getPosition().z == -tempVec.z)
+													if (map.getMainPlayer().getPosition().z < 0)
 														opposite = true;
 													else
 														opposite = false;
 													
+													tempMain = map.getMainPlayer();
+													
 													checked = true;
+												}
+												
+												if(opposite && map.getMainPlayer().isHoldingBall()) {
+													map.getTeammates().get(1).getBrain().getPlayerBasketInterpose().setAgentB(map.getHomeBasket());
 												}
 												
 												if((map.getMainPlayer().isAimingOrShooting() || map.getTeammates().get(1).isAimingOrShooting()) && !wait || map.getHoldingPlayer() == null) {
 													if (map.getMainPlayer().isAimingOrShooting()) {
 														passes++;
 														wait = true;
+														
+														messageListener.sendMessage(passes + (passes == 1 ? " Pass!" : " Passes!"), "", textColor, this, false, true);
 													}
 													time = defaultTime;
-												}else if(!map.getMainPlayer().isShooting() && wait)
+												}else if(!map.getMainPlayer().isAimingOrShooting() && wait)
 													wait = false;
 												
 												if(!opposite && map.getMainPlayer().getAwayThreePointZone().checkZone(map.getBall().getPosition()) || opposite && map.getMainPlayer().getHomeThreePointZone().checkZone(map.getBall().getPosition())) {
@@ -503,7 +526,7 @@ public class TutorialLevels extends Levels {
 														returnPlayers();
 												}else if(time < 0) {
 													returnPlayers();
-												}else if(map.getHoldingPlayer() != null && !map.getHoldingPlayer().equals(map.getTeammates().get(1))) time -= Gdx.graphics.getDeltaTime();
+												}else if(!wait && map.getHoldingPlayer() != null && !map.getHoldingPlayer().equals(map.getTeammates().get(1))) time -= Gdx.graphics.getDeltaTime();
 												
 												return false;
 											}
@@ -512,6 +535,8 @@ public class TutorialLevels extends Levels {
 												passes = 0;
 												wait = false;
 												time = defaultTime;
+												
+												messageListener.sendMessage("0 Passes!", "", textColor, this, false, true);
 											}
 											
 											private void returnPlayers() {
@@ -553,7 +578,6 @@ public class TutorialLevels extends Levels {
 												map.getMainPlayer().lookAt(map.getTeammates().get(1).getPosition(), false);
 												
 												map.getTeammates().get(1).getBrain().getPursueBallInHand().setTarget(map.getHomeBasket());
-												map.getTeammates().get(1).getBrain().getPlayerBasketInterpose().setAgentB(map.getHomeBasket());
 												
 												return true;
 											}
@@ -567,6 +591,10 @@ public class TutorialLevels extends Levels {
 										});
 										
 										actions.addAction(tempAction.copyAction());
+										
+										actions.addAction(new TutorialAction("Passing & Catching", "Great! I Suppose You've Got The Mechanics You Needed!", textColor));
+										
+										actions.addAction(new TutorialAction("Passing & Catching", "Note That In The Real Games Players Pass Their Teammates According To The Game! I Mean If A Player's Pass Is Going To Trigger A Foul Or It's Going To Cause The Ball To Be Stolen, That Player Is Not Gonna Pass Anyone! Enough About That For Now!", textColor));
 										
 									}
 

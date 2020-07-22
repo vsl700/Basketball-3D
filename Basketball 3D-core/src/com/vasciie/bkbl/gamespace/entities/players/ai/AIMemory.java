@@ -30,8 +30,11 @@ public class AIMemory {
 	
 	boolean missStealing;
 	
+	boolean checkZones;
+	
 	public AIMemory() {
 		shootTime = 20;
+		checkZones = true;
 	}
 
 	public Player getTargetPlayer() {
@@ -157,6 +160,14 @@ public class AIMemory {
 
 	public void setMissStealing(boolean missStealing) {
 		this.missStealing = missStealing;
+	}
+
+	public boolean isCheckZones() {
+		return checkZones;
+	}
+
+	public void setCheckZones(boolean checkZones) {
+		this.checkZones = checkZones;
 	}
 
 	public void clear() {
