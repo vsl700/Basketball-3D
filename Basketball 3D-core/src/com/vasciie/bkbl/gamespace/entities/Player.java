@@ -1445,7 +1445,7 @@ public abstract class Player extends Entity {
 		}
 		
 		else {
-			if (!prevIdArmL.equals("aimLArmL") && !prevIdArmL.equals("aimRArmL") || (prevIdArmL.equals("aimLArmL") || prevIdArmL.equals("aimRArmL")) && !isCurrentlyAiming()) {
+			if (!prevIdArmL.equals("aimLArmL") && !prevIdArmL.equals("aimRArmL") || !isCurrentlyAiming() && !isHoldingBall()) {
 				
 				if (!leftHoldingBall && !prevIdArmL.equals("stayArmL") && !dribbleL && !prevIdArmL.contains("dribble") && !leftPointBall) {
 					armLController.animate("stayArmL", 0.25f);

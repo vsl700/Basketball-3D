@@ -984,7 +984,6 @@ public class Rules implements GameMessageSender {
 						Player holdingPlayer = map.getHoldingPlayer();
 						if(holdingPlayer == null || !holdingPlayer.isCurrentlyAiming() && !holdingPlayer.isShooting()) {
 							time = defaultTime;
-							System.out.println("No WalkShoot!");
 							return false;
 						}
 						
@@ -1023,7 +1022,6 @@ public class Rules implements GameMessageSender {
 							
 							return true;
 						}else if(!holdingPlayer.getPrevMoveVec().isZero() || !holdingPlayer.getMoveVector().isZero()) {
-							System.out.println("WalkShoot Time Ticking");
 							time -= Gdx.graphics.getDeltaTime();
 						}
 							

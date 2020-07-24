@@ -179,8 +179,10 @@ public class GameScreen implements Screen, GameMessageListener, GUIRenderer {
 	}
 
 	private void updateGUI(float delta){
-		homeScore.update();
-		awayScore.update();
+		if(!map.isTutorialMode()) {
+			homeScore.update();
+			awayScore.update();
+		}
 
 		if (!paused()) {
 			boolean temp = map.isGameRunning() && sender == null;
