@@ -91,8 +91,8 @@ public class Rules implements GameMessageSender {
 									basketUpsideDown = false;
 									occurPlace.set(map.getBall().getPosition()).add(occurPlace.cpy().scl(-1).nor().scl(3)).y = recentHolder.getPosition().y;
 									
-									if(!recentHolder.isCurrentlyAiming() && !recentHolder.isShooting())
-										map.playerReleaseBall();
+									/*if(!recentHolder.isCurrentlyAiming() && !recentHolder.isShooting())
+										map.playerReleaseBall();*/
 									
 									return true;
 								}
@@ -630,8 +630,6 @@ public class Rules implements GameMessageSender {
 								timer = defaultTime;
 
 								ruleTriggerer = temp;
-								if(!temp.isAiming() && !temp.isShooting())
-									map.playerReleaseBall();
 								
 								ArrayList<Vector3> wallPositions = new ArrayList<Vector3>(8);
 								Terrain terrain = map.getTerrain();
@@ -729,8 +727,6 @@ public class Rules implements GameMessageSender {
 									timer = defaultTime;
 
 									ruleTriggerer = temp;
-									if(!temp.isAiming() && !temp.isShooting())
-										map.playerReleaseBall();
 									
 									ArrayList<Vector3> wallPositions = new ArrayList<Vector3>(8);
 									Terrain terrain = map.getTerrain();
@@ -867,6 +863,22 @@ public class Rules implements GameMessageSender {
 
 							@Override
 							public boolean act() {
+								map.playerReleaseBall();
+								
+								return true;
+							}
+
+							@Override
+							public boolean isGameDependent() {
+								return false;
+							}
+							
+						});
+						
+						actions.addAction(new Action() {
+
+							@Override
+							public boolean act() {
 								Player actor;
 								
 								if(ruleTriggerer instanceof Teammate)
@@ -972,6 +984,7 @@ public class Rules implements GameMessageSender {
 						Player holdingPlayer = map.getHoldingPlayer();
 						if(holdingPlayer == null || !holdingPlayer.isCurrentlyAiming() && !holdingPlayer.isShooting()) {
 							time = defaultTime;
+							System.out.println("No WalkShoot!");
 							return false;
 						}
 						
@@ -1009,7 +1022,8 @@ public class Rules implements GameMessageSender {
 							occurPlace.set(GameTools.getShortestDistanceWVectors(holdingPlayer.getPosition(), wallPositions));
 							
 							return true;
-						}else if(!holdingPlayer.getMoveVector().isZero()) {
+						}else if(!holdingPlayer.getPrevMoveVec().isZero() || !holdingPlayer.getMoveVector().isZero()) {
+							System.out.println("WalkShoot Time Ticking");
 							time -= Gdx.graphics.getDeltaTime();
 						}
 							
@@ -1155,9 +1169,6 @@ public class Rules implements GameMessageSender {
 										return false;
 									
 									ruleTriggerer = recentHolder;
-
-									if (!recentHolder.isAiming() && !recentHolder.isShooting())
-										map.playerReleaseBall();
 
 									ArrayList<Vector3> wallPositions = new ArrayList<Vector3>(8);
 									Terrain terrain = map.getTerrain();
@@ -1374,9 +1385,6 @@ public class Rules implements GameMessageSender {
 						if (time < 0) {
 							if (recentHolder.getHomeZone().checkZone(ball.getPosition(), ball.getDimensions())) {
 								ruleTriggerer = recentHolder;
-
-								if (!recentHolder.isAiming() && !recentHolder.isShooting())
-									map.playerReleaseBall();
 
 								ArrayList<Vector3> wallPositions = new ArrayList<Vector3>(4);
 								Terrain terrain = map.getTerrain();

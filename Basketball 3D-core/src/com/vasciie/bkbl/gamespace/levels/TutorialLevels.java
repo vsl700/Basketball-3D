@@ -11,6 +11,7 @@ import com.vasciie.bkbl.gamespace.entities.Player;
 import com.vasciie.bkbl.gamespace.entities.players.Opponent;
 import com.vasciie.bkbl.gamespace.rules.Actions;
 import com.vasciie.bkbl.gamespace.rules.Actions.Action;
+import com.vasciie.bkbl.gamespace.rules.Rules.GameRule;
 
 public class TutorialLevels extends Levels {
 	
@@ -474,6 +475,8 @@ public class TutorialLevels extends Levels {
 												
 												teammate.getBrain().getMemory().setCheckZones(false);
 												
+												map.setDifficulty(1);
+												
 												/*teammate.getBrain().addCustomBHV(teammate.getBrain().getPursue());
 												teammate.getBrain().addCustomBHV(teammate.getBrain().getPursueBallInHand());
 												teammate.getBrain().addCustomBHV(teammate.getBrain().getPlayerBasketInterpose());
@@ -491,16 +494,13 @@ public class TutorialLevels extends Levels {
 											
 										});
 										
-										actions.addAction(new TutorialAction("Passing & Catching!", "Now Go To The Red Basket By Passing The Ball With Your Teammate! For Moving For 0.75 Seconds Without Passing You'll Be Returned To The Blue Basket! Pass The Ball TO Your Teammate At Least 3 Times!", textColor));
+										actions.addAction(new TutorialAction("Passing & Catching!", "Now Go To The Red Basket By Passing The Ball With Your Teammate! For Moving For 0.75 Seconds Without Passing Or 1 Second While Shooting You'll Be Returned To The Blue Basket! Pass The Ball TO Your Teammate At Least 3 Times!", textColor));
 										
 										Action tempAction = new TutorialAction("0 Passes!", "", textColor, false) {
 											final float defaultTime = 0.75f;
 											float time = defaultTime;
 											int passes;
 											boolean wait;
-											boolean opposite, checked;
-											
-											Player tempMain;//That's if the user gets out of the game during this action
 											
 											
 											@Override
@@ -510,19 +510,16 @@ public class TutorialLevels extends Levels {
 											
 											@Override
 											public boolean act() {
-												if (!checked || tempMain != null && !tempMain.equals(map.getMainPlayer())) {
-													if (map.getMainPlayer().getPosition().z < 0)
-														opposite = true;
-													else
-														opposite = false;
+												if (map.getRules().update()) {
+													GameRule rule = map.getRules().getTriggeredRule();
+													map.getRules().clearTriggeredRuleWRuleBreaker();
 													
-													tempMain = map.getMainPlayer();
+													System.out.println(rule.getId());
 													
-													checked = true;
-												}
-												
-												if(opposite && map.getMainPlayer().isHoldingBall()) {
-													map.getTeammates().get(1).getBrain().getPlayerBasketInterpose().setAgentB(map.getHomeBasket());
+													if (map.getTeammates().get(1).getBrain().getMemory().isCheckZones() && rule.getId().equals("backcourt_violation") || rule.getId().equals("walk_shoot") || rule.getId().equals("shoot_catch")) {
+														returnPlayers();
+														return false;
+													}
 												}
 												
 												if((map.getMainPlayer().isShooting() || map.getTeammates().get(1).isShooting()) && !wait || map.getHoldingPlayer() == null) {
@@ -536,18 +533,17 @@ public class TutorialLevels extends Levels {
 												}else if(!map.getMainPlayer().isShooting() && wait)
 													wait = false;
 												
-												if(!opposite && map.getMainPlayer().getAwayThreePointZone().checkZone(map.getBall().getPosition()) || opposite && map.getMainPlayer().getHomeThreePointZone().checkZone(map.getBall().getPosition())) {
+												if(map.getMainPlayer().getAwayThreePointZone().checkZone(map.getBall().getPosition())) {
 													if(passes >= 3) {
 														reset();
 														
-														checked = false;
 														return true;
 													}
 													else 
 														returnPlayers();
 												}else if(time < 0) {
 													returnPlayers();
-												}else if(!wait && map.getHoldingPlayer() != null && !map.getHoldingPlayer().equals(map.getTeammates().get(1))) time -= Gdx.graphics.getDeltaTime();
+												}else if(!wait && map.getHoldingPlayer() != null && !map.getMainPlayer().isHoldingBall() && map.getMainPlayer().isAimingOrShooting()) time -= Gdx.graphics.getDeltaTime();
 												
 												return false;
 											}
@@ -563,12 +559,8 @@ public class TutorialLevels extends Levels {
 											private void returnPlayers() {
 												map.setHoldingPlayer(map.getTeammates().get(1));
 												
-												Vector3 temp = new Vector3(tempVec);
-												if(opposite)
-													temp.scl(1, 1, -1);
-												
-												map.getMainPlayer().setWorldTransform(tempMx.setToTranslation(temp));
-												map.getTeammates().get(1).setWorldTransform(tempMx.setToTranslation(temp.scl(-1, 1, 1)));
+												map.getMainPlayer().setWorldTransform(tempMx.setToTranslation(tempVec));
+												map.getTeammates().get(1).setWorldTransform(tempMx.setToTranslation(tempVec.cpy().scl(-1, 1, 1)));
 												
 												reset();
 											}
@@ -582,7 +574,9 @@ public class TutorialLevels extends Levels {
 										
 										actions.addAction(tempAction);
 										
-										actions.addAction(new TutorialAction("Passing & Catching!", "Good! Now The Same Way To The Blue Basket!", textColor));
+										actions.addAction(new TutorialAction("Passing & Catching!", "Good! Now The Same Way To The Red Basket Again! This Time We'll Enable The Backcourt Violation Rule!", textColor));
+										
+										actions.addAction(new TutorialAction("Passing & Catching!", "Backcourt Violation Means That Once The Ball Crosses The Midcourt Line Of The Terrain And Gets Into The Opposite Team's Zone, It Cannot Cross The Midcourt Line Again Before The Other Team Catches The Ball! Otherwise The Rule Triggers And The Ball Is Awarded To The Opposite Team!", textColor));
 										
 										actions.addAction(new Action() {
 
@@ -590,15 +584,14 @@ public class TutorialLevels extends Levels {
 											public boolean act() {
 												tempVec.y = map.getMainPlayer().getHeight() / 2;
 												
-												Vector3 temp = tempVec.cpy().scl(1, 1, -1);
-												map.getMainPlayer().setWorldTransform(tempMx.setToTranslation(temp));
-												map.getTeammates().get(1).setWorldTransform(tempMx.setToTranslation(temp.scl(-1, 1, 1)));
+												map.getMainPlayer().setWorldTransform(tempMx.setToTranslation(tempVec));
+												map.getTeammates().get(1).setWorldTransform(tempMx.setToTranslation(tempVec.cpy().scl(-1, 1, 1)));
 												
 												map.setHoldingPlayer(map.getTeammates().get(1));
 												
 												map.getMainPlayer().lookAt(map.getTeammates().get(1).getPosition(), false);
 												
-												map.getTeammates().get(1).getBrain().getPursueBallInHand().setTarget(map.getHomeBasket());
+												map.getTeammates().get(1).getBrain().getMemory().setCheckZones(true);
 												
 												return true;
 											}
@@ -696,6 +689,8 @@ public class TutorialLevels extends Levels {
 										actions.addAction(new TutorialAction("Preventing Ball Stealing!", "First I'm Gonna Teach You Preventing The Ball From Stealing Without Any Passes! In This Case You'll Be Playing With Only One Opponent!", textColor));
 										
 										actions.addAction(new TutorialAction("Preventing Ball Stealing!", "First You'll Have To Go To The Red Basket Without The Ball Being Stolen! Remember That You Can Switch Hands Any Time!", textColor));
+										
+										actions.addAction(new TutorialAction("Preventing Ball Stealing!", "Note That When A Player Is Holding The Ball He Walks With Normal Speed, But He Runs A Bit Slower Which Makes It Easy For Its Opponents To Reach Him!", textColor));
 										
 										actions.addAction(new TutorialAction("Preventing Ball Stealing!", "If Your Opponent Steals Your Ball Or You Don't Dribble, You'll Be Returned Back To The Blue Basket! Dribble Messages Will Appear When Needed!", textColor));
 										
@@ -842,11 +837,13 @@ public class TutorialLevels extends Levels {
 										
 										actions.addAction(new TutorialAction("Preventing Ball Stealing!", "Now I Spawned You 1 More Opponent And 1 Teammate So That You Learn Keeping Ball Unstolen By Passing It With Your Teammate! Pass It At Least 3 Times!", textColor));
 										
+										actions.addAction(new TutorialAction("Preventing Ball Stealing!", "If You Pass It Less Times Than You Should Or An Opponent Steals It You'll Be Returned Back To The Blue Basket! It Doesn't Matter How Long You Are Holding It!", textColor));
+										
 										actions.addAction(new TutorialAction("Preventing Ball Stealing!", "Note That When A Player's Opponent Tries To Interpose Between It And Its Target, The Shooting Player Shoots The Ball Much Higher Than Needed In Order To Prevent Its Opponent From Stealing!", textColor));
 										
 										actions.addAction(new TutorialAction("Preventing Ball Stealing!", "For Example If An Opponent Gets Between You And Your Teammate When Your Teammate Is Passing You, The Teammate Is Gonna Shoot The Ball Higher To Prevent The Opponent From Stealing!", textColor));
 										
-										actions.addAction(new TutorialAction("Preventing Ball Stealing!", "If You Pass It Less Times Than You Should Or An Opponent Steals It You'll Be Returned Back To The Blue Basket! It Doesn't Matter How Long You Are Holding It!", textColor));
+										actions.addAction(new TutorialAction("Preventing Ball Stealing!", "Ok, You Can Go Now!", textColor));
 										
 										TutorialAction tempAction2 = new TutorialAction("0 Passes!", "", textColor, false) {
 											int passes;

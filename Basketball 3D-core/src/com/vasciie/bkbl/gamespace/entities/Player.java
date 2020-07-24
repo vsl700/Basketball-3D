@@ -1250,7 +1250,8 @@ public abstract class Player extends Entity {
 	@Override
 	public void update(float delta) {
 		
-		if(!isHoldingBall()) {
+		if(!isHoldingBall() && !isShooting()) {
+			readyBall = false;
 			dribbleL = dribbleR = false;
 			leftHoldingBall = rightHoldingBall = false;
 			map.getBall().getMainBody().setGravity(map.getDynamicsWorld().getGravity());
@@ -1347,6 +1348,7 @@ public abstract class Player extends Entity {
 				else
 					time+= delta;
 			}
+			readyBall = false;
 		}
 		else if(!leftHandInWorld || !rightHandInWorld)
 			time = 0;
@@ -1443,7 +1445,7 @@ public abstract class Player extends Entity {
 		}
 		
 		else {
-			if (!prevIdArmL.equals("aimLArmL") && !prevIdArmL.equals("aimRArmL")) {
+			if (!prevIdArmL.equals("aimLArmL") && !prevIdArmL.equals("aimRArmL") || (prevIdArmL.equals("aimLArmL") || prevIdArmL.equals("aimRArmL")) && !isCurrentlyAiming()) {
 				
 				if (!leftHoldingBall && !prevIdArmL.equals("stayArmL") && !dribbleL && !prevIdArmL.contains("dribble") && !leftPointBall) {
 					armLController.animate("stayArmL", 0.25f);
