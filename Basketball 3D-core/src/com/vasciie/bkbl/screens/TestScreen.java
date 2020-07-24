@@ -30,8 +30,8 @@ public class TestScreen implements Screen {
 
 	@Override
 	public void show() {
-		
-
+		game.getPCam().position.set(-0.1522632f,5.0042458f,13.894746f);
+		game.getPCam().direction.set(0.008421174f,-0.25880882f,-0.9658913f);
 	}
 
 	@Override
@@ -40,6 +40,7 @@ public class TestScreen implements Screen {
 
 		
 		System.out.println(game.getPCam().position);
+		System.out.println(game.getPCam().direction);
 	}
 
 	@Override
