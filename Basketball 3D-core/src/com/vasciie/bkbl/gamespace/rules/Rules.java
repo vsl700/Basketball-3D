@@ -1519,19 +1519,17 @@ public class Rules implements GameMessageSender {
 		
 	}
 	
-	public void update() {
+	public boolean update() {
 		if(triggeredRule == null) {
 			for (GameRule rule : gameRules) {
 				if (rule.checkRule()) {
-					// A rule has been t
+					// A rule has been triggered
 					triggeredRule = rule;
-					map.onRuleTriggered(rule);
-					rulesListener.sendMessage(rule.getName(), rule.getDescription(), rule.getTextColor(), this, true, false);
 	
 					for(GameRule rule1 : gameRules)
 						rule1.resetRule();
 					
-					break;
+					return true;
 				}
 			}
 
@@ -1548,6 +1546,8 @@ public class Rules implements GameMessageSender {
 		else {
 			triggeredRule.managePlayers();
 		}
+		
+		return false;
 	}
 	
 	public void setTriggeredRule(GameRule rule) {

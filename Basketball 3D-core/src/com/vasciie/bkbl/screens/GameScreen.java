@@ -203,7 +203,7 @@ public class GameScreen implements Screen, GameMessageListener, GUIRenderer {
 				}
 			} 
 			if (!temp) {
-				if (map.getTimer() >= 0 && map.isPlayersReady() && !map.isTutorialMode()) {
+				if (map.getTimer() > 0 && map.isPlayersReady() && !map.isTutorialMode()) {
 					if ((int) map.getTimer() == 0)
 						timer.setText("GO!");
 					else if (map.getTimer() <= 4)
@@ -230,7 +230,7 @@ public class GameScreen implements Screen, GameMessageListener, GUIRenderer {
 								}
 							}
 							
-							map.onMessageContinue(sender);
+							sender.messageReceived();
 							sender = null;
 						}
 					} else if(contTimer > 0)
@@ -287,6 +287,9 @@ public class GameScreen implements Screen, GameMessageListener, GUIRenderer {
 		}
 		
 		ignorePause = false;
+		
+		if(!game.getScreen().equals(this))
+			reset();
 	}
 
 	@Override
@@ -387,6 +390,13 @@ public class GameScreen implements Screen, GameMessageListener, GUIRenderer {
 
 	@Override
 	public void sendMessage(String heading, String desc, Color textColor, GameMessageSender sender, boolean skippable, boolean showPower) {
+		if(heading.equals("/")) {
+			if(desc.equals("main")) {
+				game.setScreen(game.main);
+				return;
+			}
+		}
+		
 		ruleHeading.setText(heading);
 		ruleHeading.setColor(textColor);
 		

@@ -52,7 +52,7 @@ import com.vasciie.bkbl.gamespace.zones.Zones;
 import com.vasciie.bkbl.gui.GUIRenderer;
 import com.vasciie.bkbl.screens.SettingsScreen;
 
-public class GameMap {
+public class GameMap implements GameMessageSender {
 
     final static float[][] spawnCoords = {{0, 0.1f, 4},
             {5, 0.1f, 2},
@@ -93,6 +93,8 @@ public class GameMap {
     private VEThread physicsThread;
     Runnable dynamicsWorldRunnable;
 
+    GameMessageListener rulesListener;
+    
     Rules rules;
     Zones zones;
     
@@ -163,6 +165,8 @@ public class GameMap {
 
 			physicsThread = new VEThread(dynamicsWorldRunnable);
 		}
+		
+		rulesListener = messageListener;
 		
         inputs = new InputController(guiRenderer);
 
@@ -705,8 +709,14 @@ public class GameMap {
     private void updateFullGame(float delta) {
         ball.update(delta);
 
-        if(isTutorialMode() && currentTutorialLevel.getCurrentPart().usesOriginalRules() || !isTutorialMode())
-        	rules.update();
+        if(isTutorialMode() && currentTutorialLevel.getCurrentPart().usesOriginalRules() || !isTutorialMode()) {
+        	if(rules.update()) {
+        		GameRule rule = rules.getTriggeredRule();
+        		
+        		onRuleTriggered(rule);
+				rulesListener.sendMessage(rule.getName(), rule.getDescription(), rule.getTextColor(), this, true, false);
+        	}
+        }
 
         updatePlayers(delta);
 
@@ -794,18 +804,16 @@ public class GameMap {
         }
     }
 
-    public void onMessageContinue(GameMessageSender sender) {    	
-		if (ruleTriggered) {
-			ruleTriggered = false;
-			ruleTriggeredActing = true;
-			startTimer = 0.9f;
+    public void onMessageContinue() {
+		ruleTriggered = false;
+		ruleTriggeredActing = true;
+		startTimer = 0.9f;
 
-			if (difficulty > 0) {
-				Player triggerer = rules.getTriggeredRule().getRuleTriggerer();
-				if (triggerer.getFouls() == 7)
-					removePlayer(triggerer);
-			}
-		}else sender.messageReceived();
+		if (difficulty > 0) {
+			Player triggerer = rules.getTriggeredRule().getRuleTriggerer();
+			if (triggerer.getFouls() == 7)
+				removePlayer(triggerer);
+		}
     }
 
     /**
@@ -1308,5 +1316,10 @@ public class GameMap {
 
         return tempObj;
     }
+
+	@Override
+	public void messageReceived() {
+		onMessageContinue();
+	}
 
 }

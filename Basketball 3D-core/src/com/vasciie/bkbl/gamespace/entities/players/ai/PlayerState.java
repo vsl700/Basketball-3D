@@ -103,7 +103,7 @@ public enum PlayerState implements State<Player> {
 
 			Array<Player> tempPlayers = null;
 			
-			if(player.isFocusing() || player.getMap().getTeammates().size() > 1 && 
+			if(player.isFocusing() || (player.getMap().getTeammates().size() > 1 && player instanceof Teammate || player instanceof Opponent && player.getMap().getOpponents().size() > 1) && 
 					(mem.isCheckZones() && (player.isInHomeThreePointZone() || player.isBehindBasket()) || (mem.getDribbleTime() > 0.7f && mem.isCheckZones() && !player.isInAwayThreePointZone() || mem.getDribbleTime() > 0.7f && !mem.isCheckZones()) && (isAnOpponentClose(player) || player.getMap().getOpponents().size() == 0) && 
 							(mem.isCheckZones() && (player.getAwayZone().checkZone(ball.getPosition(), ball.getDimensions()) && GameTools.playersInZone(player, player.getAwayZone()).size > 0) || !mem.isCheckZones()))) {
 				

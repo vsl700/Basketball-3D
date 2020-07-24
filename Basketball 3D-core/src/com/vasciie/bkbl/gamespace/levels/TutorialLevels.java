@@ -450,11 +450,11 @@ public class TutorialLevels extends Levels {
 									protected void createActions() {
 										actions.addAction(new TutorialAction("Interacting With Players!", "In This Level We're Gonna Look Into Important Things You Should Be Able To Do With Other Players!", textColor));
 										
-										actions.addAction(new TutorialAction("Passing & Catching", "First We Are Gonna Look Into Passing To Players And Also Catching Their Passes!", textColor));
+										actions.addAction(new TutorialAction("Passing & Catching!", "First We Are Gonna Look Into Passing To Players And Also Catching Their Passes!", textColor));
 										
-										actions.addAction(new TutorialAction("Passing & Catching", "If You Were Practising In Tutorial Level 1 You Had Probably Noticed That When The Ball Is In The Air, You Can Only Catch It With The End Of Your Arm!", textColor));
+										actions.addAction(new TutorialAction("Passing & Catching!", "If You Were Practising In Tutorial Level 1 You Had Probably Noticed That When The Ball Is In The Air, You Can Only Catch It With The End Of Your Arm!", textColor));
 										
-										actions.addAction(new TutorialAction("Passing & Catching", "That's An Important Thing Not Only For Catching Passes (or any ball catching), But Also For Ball Stealing!", textColor));
+										actions.addAction(new TutorialAction("Passing & Catching!", "That's An Important Thing Not Only For Catching Passes (or any ball catching), But Also For Ball Stealing!", textColor));
 										
 										
 										actions.addAction(new Action() {
@@ -491,7 +491,7 @@ public class TutorialLevels extends Levels {
 											
 										});
 										
-										actions.addAction(new TutorialAction("Passing & Catching", "Now Go To The Red Basket By Passing The Ball With Your Teammate! For Moving For 0.75 Seconds Without Passing You'll Be Returned To The Blue Basket! Pass The Ball TO Your Teammate At Least 3 Times!", textColor));
+										actions.addAction(new TutorialAction("Passing & Catching!", "Now Go To The Red Basket By Passing The Ball With Your Teammate! For Moving For 0.75 Seconds Without Passing You'll Be Returned To The Blue Basket! Pass The Ball TO Your Teammate At Least 3 Times!", textColor));
 										
 										Action tempAction = new TutorialAction("0 Passes!", "", textColor, false) {
 											final float defaultTime = 0.75f;
@@ -582,7 +582,7 @@ public class TutorialLevels extends Levels {
 										
 										actions.addAction(tempAction);
 										
-										actions.addAction(new TutorialAction("Passing & Catching", "Good! Now The Same Way To The Blue Basket!", textColor));
+										actions.addAction(new TutorialAction("Passing & Catching!", "Good! Now The Same Way To The Blue Basket!", textColor));
 										
 										actions.addAction(new Action() {
 
@@ -613,9 +613,9 @@ public class TutorialLevels extends Levels {
 										
 										actions.addAction(tempAction.copyAction());
 										
-										actions.addAction(new TutorialAction("Passing & Catching", "Great! I Suppose You've Got The Mechanics You Needed!", textColor));
+										actions.addAction(new TutorialAction("Passing & Catching!", "Great! I Suppose You've Got The Mechanics You Needed!", textColor));
 										
-										actions.addAction(new TutorialAction("Passing & Catching", "Note That In The Real Games Players Pass Their Teammates According To The Game! I Mean If A Player's Pass Is Going To Trigger A Foul Or It's Going To Cause The Ball To Be Stolen, That Player Is Not Gonna Pass Anyone! Enough About That For Now!", textColor));
+										actions.addAction(new TutorialAction("Passing & Catching!", "Note That In The Real Games Players Pass Their Teammates According To The Game! I Mean If A Player's Pass Is Going To Trigger A Foul Or It's Going To Cause The Ball To Be Stolen, That Player Is Not Gonna Pass Anyone! Enough About That For Now!", textColor));
 									}
 
 									@Override
@@ -710,7 +710,7 @@ public class TutorialLevels extends Levels {
 											
 											@Override
 											protected void sendMessage() {
-												messageListener.sendMessage(heading, desc, textColor, null, skippable, true);
+												messageListener.sendMessage(heading, desc, textColor, null, skippable, false);
 											}
 											
 											@Override
@@ -842,6 +842,10 @@ public class TutorialLevels extends Levels {
 										
 										actions.addAction(new TutorialAction("Preventing Ball Stealing!", "Now I Spawned You 1 More Opponent And 1 Teammate So That You Learn Keeping Ball Unstolen By Passing It With Your Teammate! Pass It At Least 3 Times!", textColor));
 										
+										actions.addAction(new TutorialAction("Preventing Ball Stealing!", "Note That When A Player's Opponent Tries To Interpose Between It And Its Target, The Shooting Player Shoots The Ball Much Higher Than Needed In Order To Prevent Its Opponent From Stealing!", textColor));
+										
+										actions.addAction(new TutorialAction("Preventing Ball Stealing!", "For Example If An Opponent Gets Between You And Your Teammate When Your Teammate Is Passing You, The Teammate Is Gonna Shoot The Ball Higher To Prevent The Opponent From Stealing!", textColor));
+										
 										actions.addAction(new TutorialAction("Preventing Ball Stealing!", "If You Pass It Less Times Than You Should Or An Opponent Steals It You'll Be Returned Back To The Blue Basket! It Doesn't Matter How Long You Are Holding It!", textColor));
 										
 										TutorialAction tempAction2 = new TutorialAction("0 Passes!", "", textColor, false) {
@@ -851,6 +855,11 @@ public class TutorialLevels extends Levels {
 											
 											Player tempMain;//That's if the user gets out of the game during this action
 											
+											
+											@Override
+											protected void sendMessage() {
+												messageListener.sendMessage(heading, desc, textColor, this, skippable, true);
+											}
 											
 											@Override
 											public boolean act() {
@@ -958,6 +967,250 @@ public class TutorialLevels extends Levels {
 										actions.addAction(tempAction2.copyAction());
 										
 										actions.addAction(new TutorialAction("Preventing Ball Stealing!", "That Was It! You Can Either Repeat This Part Of Level 2 Or Continue To The Ball Stealing Part Where YOU'll Be Stealing The Ball From Opponents!", textColor));
+									}
+
+									@Override
+									public boolean updatePlayersNormalAI() {
+										
+										return true;
+									}
+
+									@Override
+									public boolean usesOriginalRules() {
+										
+										return false;
+									}
+
+									@Override
+									public boolean showPower() {
+										
+										return true;
+									}
+									
+								},
+								
+								new LevelPart("ball_steal", "Ball Stealing", map, messageListener) {
+
+									@Override
+									protected void createActions() {
+										actions.addAction(new TutorialAction("Ball Stealing!", "Ball Stealing Requires Players To Track Whether Their Opponents Are Supposed To Make A Dribble Or Catch The Ball Before It Gets Caught By The Opponent's Teammate!", textColor));
+										
+										actions.addAction(new TutorialAction("Ball Stealing!", "Simply In This Tutorial You And Your Opponents Will Switch Places! They'll Try To Dribble Or Pass The Ball And You'll Try To Steal It!", textColor));
+										
+										actions.addAction(new Action() {
+
+											@Override
+											public boolean act() {
+												if(map.getOpponents().size() == 0)
+													map.spawnPlayers(0, 2);
+												
+												if(map.getTeammates().size() > 1)
+													map.removePlayer(map.getTeammates().get(1));
+												
+												map.setHoldingPlayer(map.getOpponents().get(0));
+												
+												map.getMainPlayer().setWorldTransform(tempMx.setToTranslation(tempVec));
+												map.getOpponents().get(0).setWorldTransform(tempMx.setToTranslation(tempVec.cpy().scl(-1, 1, 1)));
+												map.getOpponents().get(1).setWorldTransform(tempMx.setToTranslation(tempVec.cpy().scl(-1, 1, 1).sub(0, 0, 3)));
+												
+												map.getOpponents().get(0).getBrain().getMemory().setCheckZones(false);
+												map.getOpponents().get(1).getBrain().getMemory().setCheckZones(false);
+												
+												map.getOpponents().get(0).getBrain().getPursueBallInHand().setTarget(map.getAwayBasket());
+												map.getOpponents().get(1).getBrain().getPursueBallInHand().setTarget(map.getAwayBasket());
+												
+												return true;
+											}
+
+											@Override
+											public boolean isGameDependent() {
+												
+												return false;
+											}
+											
+										});
+										
+										actions.addAction(new TutorialAction("Ball Stealing!", "Let's Start With Stealing The Ball From A Pass! As Soon As An Opponent Shoots Go And Steal The Ball Before The Other Opponent Catches It!", textColor));
+										
+										actions.addAction(new TutorialAction("Ball Stealing!", "Now You Can Try Stealing The Ball And If The Ball Gets In The Red Basket Zone Or You Touch The Ball While It's Still In An Opponent's Hand (Reached In rule) You'll Be Returned To The Blue Basket!", textColor));
+										
+										
+										Action tempAction = new Action() {
+											
+											boolean opposite, checked;
+											
+											Player tempMain;
+											
+											
+											@Override
+											public boolean act() {
+												if (!checked || tempMain != null && !tempMain.equals(map.getMainPlayer())) {
+													if (map.getMainPlayer().getPosition().z < 0)
+														opposite = true;
+													else
+														opposite = false;
+													
+													tempMain = map.getMainPlayer();
+													
+													checked = true;
+												}
+												
+												if(!opposite) {
+													map.getOpponents().get(0).getBrain().getPlayerBasketInterpose().setAgentB(map.getAwayBasket());
+													if(map.getOpponents().size() > 1)
+														map.getOpponents().get(1).getBrain().getPlayerBasketInterpose().setAgentB(map.getAwayBasket());
+												}
+												
+												if(map.getRules().update()) {
+													if(map.getRules().getTriggeredRule().getId().equals("incorrect_ball_steal"))
+														returnPlayers();
+													
+													map.getRules().clearTriggeredRuleWRuleBreaker();
+													return false;
+												}else if(!opposite && map.getMainPlayer().getAwayThreePointZone().checkZone(map.getBall().getPosition()) || opposite && map.getMainPlayer().getHomeThreePointZone().checkZone(map.getBall().getPosition()))
+													returnPlayers();
+												
+												if(map.getMainPlayer().isHoldingBall()) {
+													checked = false;
+													
+													return true;
+												}
+												
+												return false;
+											}
+											
+											private void returnPlayers() {
+												map.setHoldingPlayer(map.getOpponents().get(0));
+												
+												Vector3 temp = new Vector3(tempVec);
+												if(opposite)
+													temp.scl(1, 1, -1);
+												
+												map.getMainPlayer().setWorldTransform(tempMx.setToTranslation(temp));
+												map.getOpponents().get(0).setWorldTransform(tempMx.setToTranslation(temp.scl(-1, 1, 1)));
+												
+												if(map.getOpponents().size() > 1)
+													map.getOpponents().get(1).setWorldTransform(tempMx.setToTranslation(temp.sub(0, 0, 3)));
+											}
+
+											@Override
+											public boolean isGameDependent() {
+												
+												return true;
+											}
+											
+										};
+										
+										actions.addAction(tempAction);
+										
+										actions.addAction(new TutorialAction("Ball Stealing!", "Well Done! Now You Should Do The Same Thing Before The Ball Gets To The Blue Basket!", textColor));
+										
+										actions.addAction(new Action() {
+
+											@Override
+											public boolean act() {
+												map.setHoldingPlayer(map.getOpponents().get(0));
+												
+												
+												Vector3 temp = new Vector3(tempVec).scl(1, 1, -1);
+												
+												map.getMainPlayer().setWorldTransform(tempMx.setToTranslation(temp));
+												map.getOpponents().get(0).setWorldTransform(tempMx.setToTranslation(temp.scl(-1, 1, 1)));
+												map.getOpponents().get(1).setWorldTransform(tempMx.setToTranslation(temp.sub(0, 0, 3)));
+												
+												map.getOpponents().get(0).getBrain().getPursueBallInHand().setTarget(map.getHomeBasket());
+												map.getOpponents().get(1).getBrain().getPursueBallInHand().setTarget(map.getHomeBasket());
+												
+												return true;
+											}
+
+											@Override
+											public boolean isGameDependent() {
+												
+												return false;
+											}
+											
+										});
+										
+										actions.addAction(tempAction.copyAction());
+										
+										actions.addAction(new TutorialAction("Ball Stealing!", "Perfect! We're Almost Done With The Tutorial!", textColor));
+										
+										actions.addAction(new TutorialAction("Ball Stealing!", "The Last Thing You're About To Exercise Is To Steal The Ball From A Dribbling Opponent!", textColor));
+										
+										actions.addAction(new TutorialAction("Ball Stealing!", "It Is Done By Pointing Your Arm (with the mouse button hand controls) To The Ball And Making The End Of The Arm Collide With The Ball While Your Opponent Is Dribbling!", textColor));
+										
+										actions.addAction(new TutorialAction("Ball Stealing!", "However, If You Point Your Arm To And Collide Its End With The Ball While The Opponent Isn't Dribbling, It Counts As Reach-In And The Penalty Would Be An Opponent To Go To The Basket And Try To Score!", textColor));
+										
+										actions.addAction(new Action() {
+
+											@Override
+											public boolean act() {
+												map.removePlayer(map.getOpponents().get(1));
+												map.setHoldingPlayer(map.getOpponents().get(0));
+												
+												map.getMainPlayer().setWorldTransform(tempMx.setToTranslation(tempVec));
+												map.getOpponents().get(0).setWorldTransform(tempMx.setToTranslation(tempVec.cpy().scl(-1, 1, 1)));
+												
+												map.getOpponents().get(0).getBrain().getPursueBallInHand().setTarget(map.getAwayBasket());
+												
+												return true;
+											}
+
+											@Override
+											public boolean isGameDependent() {
+												
+												return false;
+											}
+											
+										});
+										
+										actions.addAction(new TutorialAction("Ball Stealing!", "Now Try To Steal Your Opponent's Ball While He's Dribbling! If The Ball Reaches The Red Basket, You'll Be Returned Back Here!", textColor));
+										
+										actions.addAction(tempAction.copyAction());
+										
+										actions.addAction(new TutorialAction("Ball Stealing!", "Cool! Now To Ensure You've Learned It, Do It Again Before The Ball Reaches The Blue Basket!", textColor));
+										
+										actions.addAction(new Action() {
+
+											@Override
+											public boolean act() {
+												map.setHoldingPlayer(map.getOpponents().get(0));
+												
+												Vector3 temp = new Vector3(tempVec).scl(1, 1, -1);
+												
+												map.getMainPlayer().setWorldTransform(tempMx.setToTranslation(temp));
+												map.getOpponents().get(0).setWorldTransform(tempMx.setToTranslation(temp.scl(-1, 1, 1)));
+												
+												map.getOpponents().get(0).getBrain().getPursueBallInHand().setTarget(map.getHomeBasket());
+												
+												return true;
+											}
+
+											@Override
+											public boolean isGameDependent() {
+												
+												return false;
+											}
+											
+										});
+										
+										actions.addAction(tempAction.copyAction());
+										
+										actions.addAction(new TutorialAction("The End!", "Aaaand That Was All Of It! Unfortunately I Will Not Be Able To Train You Anymore!", textColor));
+										
+										actions.addAction(new TutorialAction("The End!", "I Mean I Won't Be Able To Train You Play According To The Rules Of The Game, So You Should Adapt To Them By The Game Itself!", textColor));
+										
+										actions.addAction(new TutorialAction("The End!", "But I Can Reveal All Of Them! Meet Me In Tutorial Level 3 Where I'll Just Explain All Of Them!", textColor));
+										
+										actions.addAction(new TutorialAction("/", "main", textColor) {
+											
+											@Override
+											protected void sendMessage() {
+												messageListener.sendMessage(heading, desc, textColor, null, skippable, true);
+											}
+											
+										});
 									}
 
 									@Override
@@ -1095,6 +1348,10 @@ public class TutorialLevels extends Levels {
 			
 			public abstract boolean updatePlayersNormalAI();
 			
+			/**
+			 * Makes the GameMap update and manage the rules itself and prints messages for any triggered rule
+			 * @return
+			 */
 			public abstract boolean usesOriginalRules();
 			
 			public abstract boolean showPower();
