@@ -752,7 +752,12 @@ public class GameMap implements GameMessageSender {
 
         mBatch.end();
         
-        //System.out.println(zones.isInZone("red-zone", pCam.position));
+        /*if(mainPlayer == null)
+        	System.out.println(zones.isInZone("three-point-team", pCam.position));
+        else {
+        	System.out.println(mainPlayer.isInHomeThreePointZone());
+        	System.out.println(mainPlayer.getPosition());
+        }*/
     }
 
     public void updateController(){

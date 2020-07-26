@@ -12,15 +12,19 @@ import com.vasciie.bkbl.gamespace.entities.players.Opponent;
 import com.vasciie.bkbl.gamespace.rules.Actions;
 import com.vasciie.bkbl.gamespace.rules.Actions.Action;
 import com.vasciie.bkbl.gamespace.rules.Rules.GameRule;
+import com.vasciie.bkbl.gamespace.tools.GameTools;
 
 public class TutorialLevels extends Levels {
 	
 	private static final Color textColor = Color.BLUE;
+	
+	private static final Matrix4 tempMx = new Matrix4();
+	private static final Vector3 tempVec = new Vector3();
 
 	public TutorialLevels(GameMap map, GameMessageListener messageListener) {
 		super(map, messageListener);
 		
-		final Matrix4 tempMx = new Matrix4();
+		
 		gameLevels = new TutorialLevel[] {
 				new TutorialLevel("basics", "Level 1: Basics", map, messageListener) {
 
@@ -328,15 +332,12 @@ public class TutorialLevels extends Levels {
 										
 										actions.addAction(new TutorialAction("Ball Shooting!", "It's Important That You Measure The Shot According To THE HAND You Hold The Ball With!", textColor));
 										
-										actions.addAction(new TutorialAction("Ball Shooting!", "You Can Now Try Putting The Ball In The Blue Basket! Just Hold The CTRL Button And Release It After You Aim At The Basket! Scroll Wheel Or Q & E Keys Are For The Shooting Power! Score At Least 3 Points On The Basket!", textColor));
+										actions.addAction(new TutorialAction("Ball Shooting!", "You Can Now Try Putting The Ball In Any Basket! Just Hold The CTRL Button And Release It After You Aim At The Basket! Scroll Wheel Or Q & E Keys Are For The Shooting Power! Score At Least 3 Points On Any Basket!", textColor));
 										
-										TutorialAction tempAction = new TutorialAction("0 Scores!", "", textColor, false) {
+										actions.addAction(new TutorialAction("0 Scores!", "", textColor, false) {
 											int scores;
 											boolean shootPowerReg;
 											boolean wait;
-											boolean opposite, checked;
-											
-											Player tempMain;
 											
 											
 											@Override
@@ -346,29 +347,17 @@ public class TutorialLevels extends Levels {
 											
 											@Override
 											public boolean act() {
-												if (!checked || tempMain != null && !tempMain.equals(map.getMainPlayer())) {
-													if (map.getMainPlayer().getPosition().z < 0)
-														opposite = true;
-													else
-														opposite = false;
-													
-													tempMain = map.getMainPlayer();
-													
-													checked = true;
-												}
-												
 												if(!shootPowerReg)
 													map.getMainPlayer().setShootingPower(10);
 												
 												shootPowerReg = true;
 												
 												if (!wait) {
-													if (!opposite && map.getBall().isCollidedWTeamBasket() || opposite && map.getBall().isCollidedWOppBasket()) {
+													if (map.getBall().isCollidedWTeamBasket() || map.getBall().isCollidedWOppBasket()) {
 														if(map.getBall().getLinearVelocity().y < 0) {
-															if (scores == 2 || opposite && scores == 1) {
+															if (scores == 2) {
 																scores = 0;
 																shootPowerReg = false;
-																checked = false;
 
 																return true;
 															}
@@ -390,30 +379,7 @@ public class TutorialLevels extends Levels {
 												return true;
 											}
 											
-										};
-										actions.addAction(tempAction);
-										
-										actions.addAction(new TutorialAction("Ball Shooting!", "Great! Now Score At Least 2 Points On The Red Basket!", textColor));
-										
-										actions.addAction(new Action() {
-
-											@Override
-											public boolean act() {
-												map.getMainPlayer().setWorldTransform(tempMx.setToTranslation(new Vector3(0, map.getMainPlayer().getHeight() / 2, -25)));
-												map.setHoldingPlayer(map.getMainPlayer());
-												
-												return true;
-											}
-
-											@Override
-											public boolean isGameDependent() {
-												
-												return false;
-											}
-											
 										});
-										
-										actions.addAction(tempAction.copyAction());
 										
 										actions.addAction(new TutorialAction("Excellent!", "Well Done! You've Learned The Basics Of Basketball-3D! Now You Can Either Remain In This Level To Practise The Way You Want To Or Get Out And Start The Next One!", textColor));
 										
@@ -493,7 +459,7 @@ public class TutorialLevels extends Levels {
 				}, 
 				
 				new TutorialLevel("player_interact", "Level 2: Interacting With Players", map, messageListener) {
-					final Vector3 tempVec = new Vector3(7, 0, 25);
+					final Vector3 tempPos = new Vector3(7, 0, 25);
 					
 					@Override
 					protected LevelPart[] createLevelParts() {
@@ -522,9 +488,9 @@ public class TutorialLevels extends Levels {
 												Player teammate = map.getTeammates().get(1);
 												map.setHoldingPlayer(teammate);
 												
-												tempVec.y = map.getMainPlayer().getHeight() / 2;
-												map.getMainPlayer().setWorldTransform(tempMx.setToTranslation(tempVec));
-												teammate.setWorldTransform(tempMx.setToTranslation(tempVec.cpy().scl(-1, 1, 1)));
+												tempPos.y = map.getMainPlayer().getHeight() / 2;
+												map.getMainPlayer().setWorldTransform(tempMx.setToTranslation(tempPos));
+												teammate.setWorldTransform(tempMx.setToTranslation(tempPos.cpy().scl(-1, 1, 1)));
 												
 												map.getMainPlayer().lookAt(teammate.getPosition(), false);
 												
@@ -612,8 +578,8 @@ public class TutorialLevels extends Levels {
 											private void returnPlayers() {
 												map.setHoldingPlayer(map.getTeammates().get(1));
 												
-												map.getMainPlayer().setWorldTransform(tempMx.setToTranslation(tempVec));
-												map.getTeammates().get(1).setWorldTransform(tempMx.setToTranslation(tempVec.cpy().scl(-1, 1, 1)));
+												map.getMainPlayer().setWorldTransform(tempMx.setToTranslation(tempPos));
+												map.getTeammates().get(1).setWorldTransform(tempMx.setToTranslation(tempPos.cpy().scl(-1, 1, 1)));
 												
 												reset();
 											}
@@ -637,10 +603,10 @@ public class TutorialLevels extends Levels {
 
 											@Override
 											public boolean act() {
-												tempVec.y = map.getMainPlayer().getHeight() / 2;
+												tempPos.y = map.getMainPlayer().getHeight() / 2;
 												
-												map.getMainPlayer().setWorldTransform(tempMx.setToTranslation(tempVec));
-												map.getTeammates().get(1).setWorldTransform(tempMx.setToTranslation(tempVec.cpy().scl(-1, 1, 1)));
+												map.getMainPlayer().setWorldTransform(tempMx.setToTranslation(tempPos));
+												map.getTeammates().get(1).setWorldTransform(tempMx.setToTranslation(tempPos.cpy().scl(-1, 1, 1)));
 												
 												map.setHoldingPlayer(map.getTeammates().get(1));
 												
@@ -726,9 +692,9 @@ public class TutorialLevels extends Levels {
 												if(map.getHoldingPlayer() == null || !map.getHoldingPlayer().equals(map.getMainPlayer()))
 													map.setHoldingPlayer(map.getMainPlayer());
 												
-												tempVec.y = map.getMainPlayer().getHeight() / 2;
-												map.getMainPlayer().setWorldTransform(tempMx.setToTranslation(tempVec));
-												opponent.setWorldTransform(tempMx.setToTranslation(tempVec.cpy().scl(-1, 1, 1)));
+												tempPos.y = map.getMainPlayer().getHeight() / 2;
+												map.getMainPlayer().setWorldTransform(tempMx.setToTranslation(tempPos));
+												opponent.setWorldTransform(tempMx.setToTranslation(tempPos.cpy().scl(-1, 1, 1)));
 												
 												map.getMainPlayer().lookAt(opponent.getPosition(), false);
 												
@@ -812,7 +778,7 @@ public class TutorialLevels extends Levels {
 											private void returnPlayers() {
 												map.setHoldingPlayer(map.getMainPlayer());
 												
-												Vector3 temp = new Vector3(tempVec);
+												Vector3 temp = new Vector3(tempPos);
 												if(opposite)
 													temp.scl(1, 1, -1);
 												
@@ -841,7 +807,7 @@ public class TutorialLevels extends Levels {
 												if(map.getHoldingPlayer() == null || !map.getHoldingPlayer().equals(map.getMainPlayer()))
 													map.setHoldingPlayer(map.getMainPlayer());
 												
-												Vector3 temp = tempVec.cpy().scl(1, 1, -1);
+												Vector3 temp = tempPos.cpy().scl(1, 1, -1);
 												map.getMainPlayer().setWorldTransform(tempMx.setToTranslation(temp));
 												opponent.setWorldTransform(tempMx.setToTranslation(temp.scl(-1, 1, 1)));
 												
@@ -876,10 +842,10 @@ public class TutorialLevels extends Levels {
 												
 												map.setHoldingPlayer(map.getMainPlayer());
 												
-												map.getMainPlayer().setWorldTransform(tempMx.setToTranslation(tempVec));
-												map.getTeammates().get(1).setWorldTransform(tempMx.setToTranslation(tempVec.cpy().sub(0, 0, 3)));
-												map.getOpponents().get(0).setWorldTransform(tempMx.setToTranslation(tempVec.cpy().scl(-1, 1, 1)));
-												map.getOpponents().get(1).setWorldTransform(tempMx.setToTranslation(tempVec.cpy().scl(-1, 1, 1).sub(0, 0, 3)));
+												map.getMainPlayer().setWorldTransform(tempMx.setToTranslation(tempPos));
+												map.getTeammates().get(1).setWorldTransform(tempMx.setToTranslation(tempPos.cpy().sub(0, 0, 3)));
+												map.getOpponents().get(0).setWorldTransform(tempMx.setToTranslation(tempPos.cpy().scl(-1, 1, 1)));
+												map.getOpponents().get(1).setWorldTransform(tempMx.setToTranslation(tempPos.cpy().scl(-1, 1, 1).sub(0, 0, 3)));
 												
 												map.getTeammates().get(1).getBrain().getMemory().setCheckZones(false);
 												
@@ -960,10 +926,10 @@ public class TutorialLevels extends Levels {
 											private void returnPlayers() {
 												map.setHoldingPlayer(map.getMainPlayer());
 												
-												map.getMainPlayer().setWorldTransform(tempMx.setToTranslation(tempVec));
-												map.getTeammates().get(1).setWorldTransform(tempMx.setToTranslation(tempVec.cpy().sub(0, 0, 3)));
-												map.getOpponents().get(0).setWorldTransform(tempMx.setToTranslation(tempVec.cpy().scl(-1, 1, 1)));
-												map.getOpponents().get(1).setWorldTransform(tempMx.setToTranslation(tempVec.cpy().scl(-1, 1, 1).sub(0, 0, 3)));
+												map.getMainPlayer().setWorldTransform(tempMx.setToTranslation(tempPos));
+												map.getTeammates().get(1).setWorldTransform(tempMx.setToTranslation(tempPos.cpy().sub(0, 0, 3)));
+												map.getOpponents().get(0).setWorldTransform(tempMx.setToTranslation(tempPos.cpy().scl(-1, 1, 1)));
+												map.getOpponents().get(1).setWorldTransform(tempMx.setToTranslation(tempPos.cpy().scl(-1, 1, 1).sub(0, 0, 3)));
 												
 												reset();
 											}
@@ -985,7 +951,7 @@ public class TutorialLevels extends Levels {
 											public boolean act() {
 												map.setHoldingPlayer(map.getMainPlayer());
 												
-												Vector3 temp = new Vector3(tempVec);
+												Vector3 temp = new Vector3(tempPos);
 												map.getMainPlayer().setWorldTransform(tempMx.setToTranslation(temp));
 												map.getTeammates().get(1).setWorldTransform(tempMx.setToTranslation(temp.cpy().sub(0, 0, 3)));
 												map.getOpponents().get(0).setWorldTransform(tempMx.setToTranslation(temp.scl(-1, 1, 1)));
@@ -1047,9 +1013,9 @@ public class TutorialLevels extends Levels {
 												
 												map.setHoldingPlayer(map.getOpponents().get(0));
 												
-												map.getMainPlayer().setWorldTransform(tempMx.setToTranslation(tempVec));
-												map.getOpponents().get(0).setWorldTransform(tempMx.setToTranslation(tempVec.cpy().scl(-1, 1, 1)));
-												map.getOpponents().get(1).setWorldTransform(tempMx.setToTranslation(tempVec.cpy().scl(-1, 1, 1).sub(0, 0, 3)));
+												map.getMainPlayer().setWorldTransform(tempMx.setToTranslation(tempPos));
+												map.getOpponents().get(0).setWorldTransform(tempMx.setToTranslation(tempPos.cpy().scl(-1, 1, 1)));
+												map.getOpponents().get(1).setWorldTransform(tempMx.setToTranslation(tempPos.cpy().scl(-1, 1, 1).sub(0, 0, 3)));
 												
 												map.getOpponents().get(0).getBrain().getMemory().setCheckZones(false);
 												map.getOpponents().get(1).getBrain().getMemory().setCheckZones(false);
@@ -1124,7 +1090,7 @@ public class TutorialLevels extends Levels {
 											private void returnPlayers() {
 												map.setHoldingPlayer(map.getOpponents().get(0));
 												
-												Vector3 temp = new Vector3(tempVec);
+												Vector3 temp = new Vector3(tempPos);
 												if(opposite)
 													temp.scl(1, 1, -1);
 												
@@ -1154,7 +1120,7 @@ public class TutorialLevels extends Levels {
 												map.setHoldingPlayer(map.getOpponents().get(0));
 												
 												
-												Vector3 temp = new Vector3(tempVec).scl(1, 1, -1);
+												Vector3 temp = new Vector3(tempPos).scl(1, 1, -1);
 												
 												map.getMainPlayer().setWorldTransform(tempMx.setToTranslation(temp));
 												map.getOpponents().get(0).setWorldTransform(tempMx.setToTranslation(temp.scl(-1, 1, 1)));
@@ -1191,8 +1157,8 @@ public class TutorialLevels extends Levels {
 												map.removePlayer(map.getOpponents().get(1));
 												map.setHoldingPlayer(map.getOpponents().get(0));
 												
-												map.getMainPlayer().setWorldTransform(tempMx.setToTranslation(tempVec.cpy().scl(0, 1, 1)));
-												map.getOpponents().get(0).setWorldTransform(tempMx.setToTranslation(tempVec.cpy().scl(-1, 1, 1)));
+												map.getMainPlayer().setWorldTransform(tempMx.setToTranslation(tempPos.cpy().scl(0, 1, 1)));
+												map.getOpponents().get(0).setWorldTransform(tempMx.setToTranslation(tempPos.cpy().scl(-1, 1, 1)));
 												
 												map.getOpponents().get(0).getBrain().getPursueBallInHand().setTarget(map.getAwayBasket());
 												
@@ -1221,7 +1187,7 @@ public class TutorialLevels extends Levels {
 											public boolean act() {
 												map.setHoldingPlayer(map.getOpponents().get(0));
 												
-												Vector3 temp = new Vector3(tempVec).scl(1, 1, -1);
+												Vector3 temp = new Vector3(tempPos).scl(1, 1, -1);
 												
 												map.getMainPlayer().setWorldTransform(tempMx.setToTranslation(temp.cpy().scl(0, 1, 1)));
 												map.getOpponents().get(0).setWorldTransform(tempMx.setToTranslation(temp.scl(-1, 1, 1)));
@@ -1247,7 +1213,7 @@ public class TutorialLevels extends Levels {
 										
 										actions.addAction(new TutorialAction("The End!", "I Mean I Won't Be Able To Train You Play According To The Rules Of The Game, So You Should Adapt To Them By The Game Itself!", textColor));
 										
-										actions.addAction(new TutorialAction("The End!", "But I Can Reveal All Of Them! Meet Me In Tutorial Level 3 Where I'll Just Explain All Of Them!", textColor));
+										actions.addAction(new TutorialAction("The End!", "But I Can Reveal All The 10 Of Them! Meet Me In Tutorial Level 3 Where I'll Just Explain All Of Them!", textColor));
 										
 										actions.addAction(new TutorialAction("/", "main", textColor) {
 											
@@ -1296,28 +1262,74 @@ public class TutorialLevels extends Levels {
 						
 						return new LevelPart[] {
 								new LevelPart("reveal", "All The Rules In This Game", map, messageListener) {
-
+									
 									@Override
 									protected void createActions() {
-										actions.addAction(new TutorialAction("The Rules!", "Like I Said, I'm Just Gonna Explain The Rules You Should Obey While Playing!", textColor));
+										actions.addAction(new TutorialAction("The Rules!", "Like I Said, I'm Just Gonna Explain The 10 Primary Rules You Should Obey While Playing!", textColor));
 										
-										actions.addAction(new TutorialAction("1. Out Of Bounds", "Like You Probably Assume, This Rule Triggers When The Ball Gets Out Of The Terrain's Borders (the lines you see at the ends of the terrain)!", textColor));
+										actions.addAction(new TutorialAction("1. SCORE", "I Suggest Starting With That Rule! As You Probably Assume, It Triggers When A Player Scores!", textColor));
 										
-										actions.addAction(new TutorialAction("1. Out Of Bounds", "And Not Only Then! The Rule Also Triggers If The Ball Goes Through The Basket As It Enters From Its Bottom!", textColor));
+										actions.addAction(new TutorialAction("1. SCORE", "However, There Are Different Ways Of Scoring A Shot To The Basket! It's All According To The Terrain Zone You Were In While Shooting The Ball!", textColor));
 										
-										actions.addAction(new TutorialAction("1. Out Of Bounds", "The Penalty Of This Rule Is A Throw-in, In Which A Player From The Opposite Of The Rule Triggerer's Team Throws The Ball Inside The Terrain, As He Tries To Pass It To One Of His Teammates!", textColor));
+										actions.addAction(new ZoneShowingAction("1. SCORE- 1 Point", "If You Go To The Blue Basket, You'll See The Ball Marking The Free Throw Zone! If You Shoot The Ball From There And It Goes Through The Basket, Your Team Gets 1 Point!", textColor, "free-throw-team"));
 										
-										actions.addAction(new TutorialAction("1. Out Of Bounds", "This Rule Has Some Inner Rules Which Work Only During The Throw-in!", textColor));
+										actions.addAction(new ZoneShowingAction("1. SCORE- 2 Points", "The Zone That The Ball Is Marking Now Is Called The Three-Point Zone! Yeah, It Sounds Like It Gives You 3 Points, But It Actually Gives You 2 According To The Basketball Rulebook!", textColor, "three-point-team"));
 										
-										actions.addAction(new TutorialAction("1.1. Moved Out", "This Inner Rule Triggers When The Thrower Moves For A Total Of 1 Second During The Throw-in!", textColor));
+										actions.addAction(new Action() {
+
+											@Override
+											public boolean act() {
+												map.getBall().setWorldTransform(tempMx.setToTranslation(tempVec.setZero().add(0, map.getBall().getHeight() / 2, 0)));
+												
+												return true;
+											}
+
+											@Override
+											public boolean isGameDependent() {
+												return false;
+											}
+											
+										});
 										
-										actions.addAction(new TutorialAction("1.2. Time Out", "This Inner Rule Triggers When The Thrower Doesn't Manage To Release The Ball Within 5 Seconds!", textColor));
+										actions.addAction(new TutorialAction("1. SCORE- 3 Points", "And Finally If You Score By Shooting From Anywhere Outside The Three-Point Zone, Your Team Gets 3 Points!", textColor));
 										
-										actions.addAction(new TutorialAction("2. Reached In", "This Rule Triggers When A Player Tries To Steal The Ball From A Player That's Holding The Ball, But It's Not Currently Dribbling It!", textColor));
+										actions.addAction(new TutorialAction("2. Out Of Bounds", "Like You Probably Assume, This Rule Triggers When The Ball Gets Out Of The Terrain's Borders (the lines you see at the ends of the terrain)!", textColor));
 										
-										actions.addAction(new TutorialAction("2. Reached In", "The Penalty Of This Rule Is A Rule Triggerer's Opponent To Go To The Rule Triggerer's Basket And Try To Score!", textColor));
+										actions.addAction(new TutorialAction("2. Out Of Bounds", "And Not Only Then! The Rule Also Triggers If The Ball Goes Through The Basket As It Enters From Its Bottom!", textColor));
 										
-										actions.addAction(new TutorialAction("3. Dribble Violation", "", textColor));
+										actions.addAction(new TutorialAction("2. Out Of Bounds", "The Penalty Of This Rule Is A Throw-in, In Which A Player From The Opposite Of The Rule Triggerer's Team Throws The Ball Inside The Terrain, As He Tries To Pass It To One Of His Teammates! Throw-in Doesn't Work When The Thrower-in Is Alone In His Team!", textColor));
+										
+										actions.addAction(new TutorialAction("2. Out Of Bounds", "This Rule Has Some Inner Rules Which Work Only During The Throw-in!", textColor));
+										
+										actions.addAction(new TutorialAction("2.1. Moved Out", "This Inner Rule Triggers When The Thrower Moves For A Total Of 1 Second During The Throw-in!", textColor));
+										
+										actions.addAction(new TutorialAction("2.2. Time Out", "This Inner Rule Triggers When The Thrower Doesn't Manage To Release The Ball Within 5 Seconds!", textColor));
+										
+										actions.addAction(new TutorialAction("3. Reached In", "This Rule Triggers When A Player Tries To Steal The Ball From A Player That's Holding The Ball, But It's Not Currently Dribbling It!", textColor));
+										
+										actions.addAction(new TutorialAction("3. Reached In", "For The Penalty Of This Rule A Rule Triggerer's Opponen Goes To The Rule Triggerer's Basket And Tries To Score!", textColor));
+										
+										actions.addAction(new TutorialAction("4. Dribble Violation", "This Rule Triggers If The Ball Holding Player Doesn't Dribble For 0.75 Seconds While Moving Or 3 While Not Moving! The Penalty Is A Throw-in Done By The Opposite Team!", textColor));
+										
+										actions.addAction(new TutorialAction("5. Backcourt Violation", "This Rule Triggers If Your Team (for example) Owns The Ball And The Ball Gets Into Your Opposite Team's Zone As It Crosses The Midcourt Line, But Then It Gets Back To Your Team's Zone While Your Team Still Owns The Ball!", textColor));
+										
+										actions.addAction(new TutorialAction("5. Backcourt Violation", "For The Penalty Of This Rule The Ball Is Awarded To The Opposite Team Of The Team Of The Rule Triggerer (the last player who has touched the ball before the rule triggered) At The Midcourt Line Without A Throw-in!", textColor));
+										
+										actions.addAction(new TutorialAction("6. Walk Shooting", "A Shooting Player Cannot Move For More Than A Total Of 1 Second! The Penalty Is A Throw-in Done By The Opposite Team!", textColor));
+										
+										actions.addAction(new TutorialAction("7. Catch Violation", "A Player That Has Just Shot The Ball Cannot Catch It Right Away Again Before Anyone Else Did! An Exception Is The Moment In Which The Player Is Alone In His Team! The Penalty Is A Throw-in By The Opposite Team!", textColor));
+										
+										actions.addAction(new TutorialAction("8. Movement Violation", "This Rule Triggers If A Player Is Moving The Ball Without Holding Or Dribbling It! The Penalty Is A Throw-in By The Opposite Team!", textColor));
+										
+										actions.addAction(new TutorialAction("9. Time Out", "This Rule Triggers If The Ball Stays In Its Owner Team's Zone For More Than 6 Seconds! Or In Other Words, Each Team Has 6 Seconds To Bring The Ball In Their Opposite Team's Zone!", textColor));
+										
+										actions.addAction(new TutorialAction("9. Time Out", "This Rule Doesn't Work In EASY Gamemode! The Penalty Is A Throw-in By The Opposite Team!", textColor));
+										
+										actions.addAction(new TutorialAction("10. Free Throw Violation", "This Rule Triggers If The Ball Shooting Player Gets Out Of The Free Throw Zone After Shooting The Ball Inside It!", textColor));
+										
+										actions.addAction(new TutorialAction("10. Free Throw Violation", "He Can Only Get Out Of The Zone As Soon As The Ball Touches The Rim Of The Basket Or Anyone Else Catches The Ball!", textColor));
+										
+										actions.addAction(new TutorialAction("10. Free Throw Violation", "This Rule Works Only In VERY HARD Gamemode! The Penalty Is A Throw-in By The Triggerer's Opposite Team!", textColor));
 									}
 
 									@Override
@@ -1518,6 +1530,43 @@ public class TutorialLevels extends Levels {
 				}
 				
 				return super.act();
+			}
+			
+		}
+		
+		public class ZoneShowingAction extends TutorialAction implements GameMessageSender {
+			String zoneId;
+			
+			int index;
+			final float defaultTime = 0.15f;
+			float time = defaultTime;
+			
+			
+			public ZoneShowingAction(String heading, String desc, Color textColor, String zoneId) {
+				super(heading, desc, textColor);
+				
+				this.zoneId = zoneId;
+			}
+			
+			@Override
+			public boolean act() {
+				if(time < 0) {
+					time = defaultTime;
+					
+					if(map.getZones().getZone(zoneId).getPositions().length == index + 1)
+						index = 0;
+					else index++;
+				}else time -= Gdx.graphics.getDeltaTime();
+				
+				map.getBall().setWorldTransform(tempMx.setToTranslation(GameTools.toVector3(map.getZones().getZone(zoneId).getPositions()[index], tempVec).add(0, map.getBall().getHeight() / 2, 0)));
+				map.getBall().getMainBody().setLinearVelocity(Vector3.Zero);
+				
+				return super.act();
+			}
+			
+			@Override
+			public boolean isGameDependent() {
+				return true;
 			}
 			
 		}
