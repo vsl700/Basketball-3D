@@ -1213,7 +1213,7 @@ public class TutorialLevels extends Levels {
 										
 										actions.addAction(new TutorialAction("The End!", "I Mean I Won't Be Able To Train You Play According To The Rules Of The Game, So You Should Adapt To Them By The Game Itself!", textColor));
 										
-										actions.addAction(new TutorialAction("The End!", "But I Can Reveal All The 10 Of Them! Meet Me In Tutorial Level 3 Where I'll Just Explain All Of Them!", textColor));
+										actions.addAction(new TutorialAction("The End!", "But I Can Reveal All The 12 Of Them! Meet Me In Tutorial Level 3 Where I'll Just Explain All Of Them!", textColor));
 										
 										actions.addAction(new TutorialAction("/", "main", textColor) {
 											
@@ -1265,15 +1265,15 @@ public class TutorialLevels extends Levels {
 									
 									@Override
 									protected void createActions() {
-										actions.addAction(new TutorialAction("The Rules!", "Like I Said, I'm Just Gonna Explain The 10 Primary Rules You Should Obey While Playing!", textColor));
+										actions.addAction(new TutorialAction("The Rules!", "Like I Said, I'm Just Gonna Explain All The 12 Rules You Should Obey While Playing!", textColor));
 										
 										actions.addAction(new TutorialAction("1. SCORE", "I Suggest Starting With That Rule! As You Probably Assume, It Triggers When A Player Scores!", textColor));
 										
 										actions.addAction(new TutorialAction("1. SCORE", "However, There Are Different Ways Of Scoring A Shot To The Basket! It's All According To The Terrain Zone You Were In While Shooting The Ball!", textColor));
 										
-										actions.addAction(new ZoneShowingAction("1. SCORE- 1 Point", "If You Go To The Blue Basket, You'll See The Ball Marking The Free Throw Zone! If You Shoot The Ball From There And It Goes Through The Basket, Your Team Gets 1 Point!", textColor, "free-throw-team"));
+										actions.addAction(new ZoneShowingAction("1. SCORE- 1 Point", "If You Go To The Blue Basket, You'll See The Ball Marking The Free Throw Zone! If A Player Shoots The Ball From There And It Goes Through The Basket, His Team Gets 1 Point!", textColor, "free-throw-team"));
 										
-										actions.addAction(new ZoneShowingAction("1. SCORE- 2 Points", "The Zone That The Ball Is Marking Now Is Called The Three-Point Zone! Yeah, It Sounds Like It Gives You 3 Points, But It Actually Gives You 2 According To The Basketball Rulebook!", textColor, "three-point-team"));
+										actions.addAction(new ZoneShowingAction("1. SCORE- 2 Points", "The Zone That The Ball Is Marking Now Is Called The Three-Point Zone! Yeah, It Sounds Like It Gives 3 Points, But It Actually Gives 2 According To The Basketball Rulebook!", textColor, "three-point-team"));
 										
 										actions.addAction(new Action() {
 
@@ -1291,7 +1291,7 @@ public class TutorialLevels extends Levels {
 											
 										});
 										
-										actions.addAction(new TutorialAction("1. SCORE- 3 Points", "And Finally If You Score By Shooting From Anywhere Outside The Three-Point Zone, Your Team Gets 3 Points!", textColor));
+										actions.addAction(new TutorialAction("1. SCORE- 3 Points", "And Finally If A Player Scores By Shooting From Anywhere Outside Of The Three-Point Zone, His Team Gets 3 Points!", textColor));
 										
 										actions.addAction(new TutorialAction("2. Out Of Bounds", "Like You Probably Assume, This Rule Triggers When The Ball Gets Out Of The Terrain's Borders (the lines you see at the ends of the terrain)!", textColor));
 										
@@ -1299,15 +1299,15 @@ public class TutorialLevels extends Levels {
 										
 										actions.addAction(new TutorialAction("2. Out Of Bounds", "The Penalty Of This Rule Is A Throw-in, In Which A Player From The Opposite Of The Rule Triggerer's Team Throws The Ball Inside The Terrain, As He Tries To Pass It To One Of His Teammates! Throw-in Doesn't Work When The Thrower-in Is Alone In His Team!", textColor));
 										
-										actions.addAction(new TutorialAction("2. Out Of Bounds", "This Rule Has Some Inner Rules Which Work Only During The Throw-in!", textColor));
+										actions.addAction(new TutorialAction("2. Out Of Bounds", "The Throw-in However Has Some Own Rules Which Work Only During The Throw-in!", textColor));
 										
-										actions.addAction(new TutorialAction("2.1. Moved Out", "This Inner Rule Triggers When The Thrower Moves For A Total Of 1 Second During The Throw-in!", textColor));
+										actions.addAction(new TutorialAction("2.1. Moved Out", "This Inner Rule Triggers When The Thrower Moves For A Total Of 1 Second During The Throw-in! The Penalty Is A Throw-in By The Other Team!", textColor));
 										
-										actions.addAction(new TutorialAction("2.2. Time Out", "This Inner Rule Triggers When The Thrower Doesn't Manage To Release The Ball Within 5 Seconds!", textColor));
+										actions.addAction(new TutorialAction("2.2. Time Out", "This Inner Rule Triggers When The Thrower Doesn't Manage To Release The Ball Within 5 Seconds! The Penalty Is A Throw-in By The Other Team!", textColor));
 										
 										actions.addAction(new TutorialAction("3. Reached In", "This Rule Triggers When A Player Tries To Steal The Ball From A Player That's Holding The Ball, But It's Not Currently Dribbling It!", textColor));
 										
-										actions.addAction(new TutorialAction("3. Reached In", "For The Penalty Of This Rule A Rule Triggerer's Opponen Goes To The Rule Triggerer's Basket And Tries To Score!", textColor));
+										actions.addAction(new TutorialAction("3. Reached In", "For The Penalty Of This Rule A Rule Triggerer's Opponent Goes To The Rule Triggerer's Basket And Tries To Score!", textColor));
 										
 										actions.addAction(new TutorialAction("4. Dribble Violation", "This Rule Triggers If The Ball Holding Player Doesn't Dribble For 0.75 Seconds While Moving Or 3 While Not Moving! The Penalty Is A Throw-in Done By The Opposite Team!", textColor));
 										
@@ -1327,9 +1327,20 @@ public class TutorialLevels extends Levels {
 										
 										actions.addAction(new TutorialAction("10. Free Throw Violation", "This Rule Triggers If The Ball Shooting Player Gets Out Of The Free Throw Zone After Shooting The Ball Inside It!", textColor));
 										
-										actions.addAction(new TutorialAction("10. Free Throw Violation", "He Can Only Get Out Of The Zone As Soon As The Ball Touches The Rim Of The Basket Or Anyone Else Catches The Ball!", textColor));
+										actions.addAction(new TutorialAction("10. Free Throw Violation", "He Can't Get Out Of The Zone Until The Ball Touches The Rim Of The Basket Or Anyone Else Catches The Ball!", textColor));
 										
 										actions.addAction(new TutorialAction("10. Free Throw Violation", "This Rule Works Only In VERY HARD Gamemode! The Penalty Is A Throw-in By The Triggerer's Opposite Team!", textColor));
+										
+										actions.addAction(new TutorialAction("Fin!", "And Finally That's It! Now You Can Either Try Playing On The EASY Gamemode Or Go Back And Revive Something From The Tutorials!", textColor));
+										
+										actions.addAction(new TutorialAction("/", "main", textColor) {
+											
+											@Override
+											protected void sendMessage() {
+												messageListener.sendMessage(heading, desc, textColor, null, skippable, true);
+											}
+											
+										});
 									}
 
 									@Override
