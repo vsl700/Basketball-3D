@@ -32,14 +32,14 @@ public class Zones {
 			tempOppFree[i] = tempTeamFree[i].cpy().scl(1, -1);
 		}
 		
-		Vector2[] tempTeamThree = new Vector2[] {new Vector2(1.7919577f, 11.742527f), new Vector2(-1.5362037f, 11.742527f), new Vector2(-2.7052748f, 11.907272f), new Vector2(-3.5413492f, 12.016001f),
-				new Vector2(-4.043659f, 12.180585f), new Vector2(-4.542652f, 12.417303f), new Vector2(-5.1205544f, 12.647329f), new Vector2(-5.4438825f, 12.877891f), new Vector2(-6.048061f, 13.203553f),
-				new Vector2(-6.3040233f, 13.501618f), new Vector2(-6.5534277f, 13.672493f), new Vector2(-6.87086f, 13.9120035f), new Vector2(-7.0578227f, 14.158667f), 
+		Vector2[] tempTeamThree = new Vector2[] {new Vector2(1.583448f, 11.885692f), new Vector2(-1.583448f, 11.885692f), new Vector2(-4.1226497f, 12.503972f), new Vector2(-5.787121f, 13.309863f),
+				new Vector2(-6.946278f, 14.224272f), new Vector2(-8.111437f, 15.451321f), new Vector2(-9.015614f, 16.829515f), new Vector2(-9.639332f, 18.239443f), new Vector2(-10.24686f, 21.927698f),
+				/*new Vector2(-6.3040233f, 13.501618f), new Vector2(-6.5534277f, 13.672493f), new Vector2(-6.87086f, 13.9120035f), new Vector2(-7.0578227f, 14.158667f), 
 				new Vector2(-7.218311f, 14.416079f), new Vector2(-7.4736457f, 14.621986f), new Vector2(-7.719531f, 14.799216f), new Vector2(-7.868765f, 14.963927f), new Vector2(-8.043922f, 15.1564455f),
 				new Vector2(-8.208387f, 15.429901f), new Vector2(-8.375041f, 15.660322f), new Vector2(-8.538396f, 15.867058f), new Vector2(-8.712505f, 16.1703f), new Vector2(-9.536805f, 17.554167f),
-				new Vector2(-10.208837f, 19.707685f), new Vector2(-10.299844f, 28.70149f)};
+				new Vector2(-10.208837f, 19.707685f),*/ new Vector2(-10.299844f, 28.70149f)};
 		
-		for(int i = 0; i < tempTeamThree.length - 1; i++) { //We apply a little bit correction (it's System println's fault)
+		/*for(int i = 0; i < tempTeamThree.length - 1; i++) { //We apply a little bit correction
 			if(i < 2) {
 				tempTeamThree[i].sub(0, 1.5f);
 				continue;
@@ -57,7 +57,7 @@ public class Zones {
 			}
 			
 			tempTeamThree[i].sub(1.1f, 1.8f);
-		}
+		}*/
 		
 		Vector2[] realTeamThree = new Vector2[tempTeamThree.length * 2 - 2]; //We miss the first item
 		
