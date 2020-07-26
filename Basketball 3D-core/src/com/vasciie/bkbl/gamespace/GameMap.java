@@ -946,6 +946,8 @@ public class GameMap implements GameMessageSender {
         
         if(!player.isDataBallHolding())
         	player.catchBall(true);
+        
+        ball.getMainBody().setLinearVelocity(Vector3.Zero);
     }
 
     public void playerReleaseBall() {

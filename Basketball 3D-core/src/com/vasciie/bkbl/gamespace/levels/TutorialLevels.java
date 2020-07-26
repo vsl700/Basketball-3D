@@ -1213,7 +1213,7 @@ public class TutorialLevels extends Levels {
 										
 										actions.addAction(new TutorialAction("The End!", "I Mean I Won't Be Able To Train You Play According To The Rules Of The Game, So You Should Adapt To Them By The Game Itself!", textColor));
 										
-										actions.addAction(new TutorialAction("The End!", "But I Can Reveal All The 12 Of Them! Meet Me In Tutorial Level 3 Where I'll Just Explain All Of Them!", textColor));
+										actions.addAction(new TutorialAction("The End!", "But I Can Reveal All The 12 Of Them! Meet Me In The Last Tutorial Level Where I'll Just Explain All Of Them!", textColor));
 										
 										actions.addAction(new TutorialAction("/", "main", textColor) {
 											

@@ -195,7 +195,7 @@ public class MyGdxGame extends Game {
 		if (!getScreen().equals(spScreen1) && !getScreen().equals(spScreen2) && !game.paused()) {
 			batch.setProjectionMatrix(cam.combined);
 			batch.begin();
-			font.draw(batch, Gdx.graphics.getFramesPerSecond() + " fps; SN:15/07/20-v1.0", 0, font.getLineHeight());
+			font.draw(batch, Gdx.graphics.getFramesPerSecond() + " fps; SN:26/07/20-v1.0", 0, font.getLineHeight());
 			batch.end();
 		}
 	}
