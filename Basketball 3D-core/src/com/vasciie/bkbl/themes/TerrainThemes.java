@@ -786,34 +786,28 @@ public enum TerrainThemes {
 			chairBack.translation.set(0, chairSize / 2, 0);
 			BoxShapeBuilder.build(mb.part(chairBack.id, GL20.GL_TRIANGLES, VertexAttributes.Usage.Position | VertexAttributes.Usage.Normal, chairMaterial), chairSize, chairSize2, chairSize);
 			
-			Model chairM = mb.end(), teamM = EntityType.TEAMMATE.createEntityModel(), oppM = EntityType.OPPONENT.createEntityModel();//We're creating brand new player models as we have to make them sit (change their nodes transforms)
-			
+			Model chairM = mb.end();
+			Model[] playerModels = new Model[] {EntityType.TEAMMATE.createEntityModel(), EntityType.TEAMMATE.createEntityModel(), EntityType.TEAMMATE.createEntityModel(), EntityType.TEAMMATE.createEntityModel(), EntityType.TEAMMATE.createEntityModel(), EntityType.OPPONENT.createEntityModel()};// We're creating brand new player models as we have to make them sit (change their nodes transforms)
+			playerModels[0].materials.get(0).set(ColorAttribute.createDiffuse(Color.BROWN));
+			playerModels[1].materials.get(0).set(ColorAttribute.createDiffuse(Color.CORAL));
+			playerModels[2].materials.get(0).set(ColorAttribute.createDiffuse(Color.ORANGE));
+			playerModels[3].materials.get(0).set(ColorAttribute.createDiffuse(Color.SALMON));
 			
 			float elbowDegrees = -83, shoulderDg = 15;
 			
-			teamM.getNode("hipL").rotation.setEulerAngles(0, -90, 0);
-			teamM.getNode("hipR").rotation.setEulerAngles(0, -90, 0);
-			
-			teamM.getNode("shoulderL").rotation.setEulerAngles(-shoulderDg, 0, 0);
-			teamM.getNode("shoulderR").rotation.setEulerAngles(shoulderDg, 0, 0);
-			
-			teamM.getNode("elbowL").rotation.setEulerAngles(0, elbowDegrees, 0);
-			teamM.getNode("elbowR").rotation.setEulerAngles(0, elbowDegrees, 0);
-			
-			teamM.getNode("kneeL").rotation.setEulerAngles(0, 90, 0);
-			teamM.getNode("kneeR").rotation.setEulerAngles(0, 90, 0);
-			
-			oppM.getNode("hipL").rotation.setEulerAngles(0, -90, 0);
-			oppM.getNode("hipR").rotation.setEulerAngles(0, -90, 0);
-			
-			oppM.getNode("shoulderL").rotation.setEulerAngles(-shoulderDg, 0, 0);
-			oppM.getNode("shoulderR").rotation.setEulerAngles(shoulderDg, 0, 0);
-			
-			oppM.getNode("elbowL").rotation.setEulerAngles(0, elbowDegrees, 0);
-			oppM.getNode("elbowR").rotation.setEulerAngles(0, elbowDegrees, 0);
-			
-			oppM.getNode("kneeL").rotation.setEulerAngles(0, 90, 0);
-			oppM.getNode("kneeR").rotation.setEulerAngles(0, 90, 0);
+			for(Model model : playerModels) {
+				model.getNode("hipL").rotation.setEulerAngles(0, -90, 0);
+				model.getNode("hipR").rotation.setEulerAngles(0, -90, 0);
+				
+				model.getNode("shoulderL").rotation.setEulerAngles(-shoulderDg, 0, 0);
+				model.getNode("shoulderR").rotation.setEulerAngles(shoulderDg, 0, 0);
+				
+				model.getNode("elbowL").rotation.setEulerAngles(0, elbowDegrees, 0);
+				model.getNode("elbowR").rotation.setEulerAngles(0, elbowDegrees, 0);
+				
+				model.getNode("kneeL").rotation.setEulerAngles(0, 90, 0);
+				model.getNode("kneeR").rotation.setEulerAngles(0, 90, 0);
+			}
 			
 			
 			float temp, chairYOffset = chairSize / 4 - chairSize2 / 2, chairZOffset = chairSize / 4;
@@ -824,13 +818,13 @@ public enum TerrainThemes {
 					modelInstances.add(tempChair);
 					
 					Vector3 tempVecOff = new Vector3(0, 0, -1.5f);
-					createPlayerInstance(teamM, oppM, tempChair, tempVecOff);
+					createPlayerInstance(playerModels, tempChair, tempVecOff, true);
 					
 					ModelInstance tempChair2 = new ModelInstance(chairM, temp, standH / 2 + standD * i + worldPlate.translation.y + chairSize - chairYOffset, -(worldPlateDepth / 2 + standD / 2 + standD * i + chairZOffset));
 					tempChair2.transform.rotate(0, 1, 0, 0);
 					modelInstances.add(tempChair2);
 					
-					createPlayerInstance(teamM, oppM, tempChair2, tempVecOff.scl(1, 1, -1));
+					createPlayerInstance(playerModels, tempChair2, tempVecOff.scl(1, 1, -1), false);
 				}
 				
 				for (int j = 0; (temp = -worldPlateDepth / 2 + chairSize / 2 + chairSpace * j) < worldPlateDepth / 2 - chairSize / 2; j++) {
@@ -839,28 +833,30 @@ public enum TerrainThemes {
 					modelInstances.add(tempChair);
 					
 					Vector3 tempVecOff = new Vector3(-1.5f, 0, 0);
-					createPlayerInstance(teamM, oppM, tempChair, tempVecOff);
+					createPlayerInstance(playerModels, tempChair, tempVecOff, true);
 					
 					ModelInstance tempChair2 = new ModelInstance(chairM, -(worldPlateWidth / 2 + standD / 2 + standD * i + chairZOffset), standH / 2 + standD * i + worldPlate.translation.y + chairSize - chairYOffset, temp);
 					tempChair2.transform.rotate(0, 1, 0, 90);
 					modelInstances.add(tempChair2);
 					
-					createPlayerInstance(teamM, oppM, tempChair2, tempVecOff.scl(-1, 1, 1));
+					createPlayerInstance(playerModels, tempChair2, tempVecOff.scl(-1, 1, 1), false);
 				}
 			}
 			
 		}
 		
-		private void createPlayerInstance(Model teamM, Model oppM, ModelInstance tempChair, Vector3 offset) {
+		private void createPlayerInstance(Model[] models, ModelInstance tempChair, Vector3 offset, boolean team) {
 			float playerYOffset = Player.scale3;
 			
 			if (MathUtils.random(1, 10) > 2) {
-				Model tempPlayerM;
+				int index = MathUtils.random(models.length - 2);
+				if(index == models.length - 2) {
+					if(!team)
+						index++;
+				}
+				
+				Model tempPlayerM = models[index];
 				ModelInstance tempPlayer;
-				if (MathUtils.randomBoolean())
-					tempPlayerM = teamM;
-				else
-					tempPlayerM = oppM;
 
 				tempPlayer = new ModelInstance(tempPlayerM, tempChair.transform.cpy().trn(0, playerYOffset, 0).trn(offset));
 				inGameModelInstances.add(tempPlayer);
