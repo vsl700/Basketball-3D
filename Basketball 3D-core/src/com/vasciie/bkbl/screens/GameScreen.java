@@ -290,7 +290,7 @@ public class GameScreen implements Screen, GameMessageListener, GUIRenderer {
 		
 		ignorePause = false;
 		
-		if(!game.getScreen().equals(this))
+		if(!paused() && !game.getScreen().equals(this) && !game.getScreen().equals(game.settings))
 			reset();
 	}
 
