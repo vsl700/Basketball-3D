@@ -11,7 +11,7 @@ public class CheckButton extends Button {
 
 	private static final float textFromBtnSpace = 13;
 	
-	boolean toggled;
+	//boolean toggled;
 	
 	public CheckButton(String text, BitmapFont font, Color color, boolean mark, boolean filled, GUIRenderer guiRenderer) {
 		super(text, font, color, mark, filled, guiRenderer);
@@ -89,13 +89,13 @@ public class CheckButton extends Button {
 		renderText();
 	}
 	
-	public void setToggled(boolean toggled) {
+	/*public void setToggled(boolean toggled) {
 		this.toggled = toggled;
 	}
 	
 	public boolean isToggled() {
 		return toggled;
-	}
+	}*/
 	
 	public float getTotalWidth() {
 		return width + textFromBtnSpace + textSize(font, text);

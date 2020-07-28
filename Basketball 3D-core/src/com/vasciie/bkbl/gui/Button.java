@@ -212,12 +212,12 @@ public class Button extends GUI {
     public boolean justLocalTouched() {
         OrthographicCamera cam = guiRenderer.getCam();
 
-        if (multitouch == -1) {
+        if (multitouch == -1 && Gdx.input.justTouched()) {
             for (int i = 0; i < 3; i++) {
                 Vector3 touchPos = new Vector3(Gdx.input.getX(i), Gdx.input.getY(i), 0);
                 cam.unproject(touchPos);
 
-                boolean touch = Gdx.input.isTouched(i) && touchPos.x >= x && touchPos.x <= x + width && touchPos.y <= y + height && touchPos.y >= y;
+                boolean touch = touchPos.x >= x && touchPos.x <= x + width && touchPos.y <= y + height && touchPos.y >= y;
 
                 if (touch) {
                     if (toggle)

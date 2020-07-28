@@ -70,11 +70,14 @@ public class ChallengeLevelScreen implements Screen, GUIRenderer {
 						
 				for(int j = 0; j < challengeOptions[i].length; j++) {
 					challengeOptions[i][j] = new CheckButton(level.getChallengeLevelsNames()[j], checkBtnFont, Color.ORANGE.cpy().sub(0, 0.3f, 0, 1), true, true, this);
+					
+					if(j == 0)
+						challengeOptions[i][j].setToggled(true);
 				}
 			}
+			
+			challengeName.setText(game.getMap().getChallenges().getGameLevel(index).getName());
 		}
-		
-		challengeName.setText(game.getMap().getChallenges().getGameLevel(index).getName());
 
 	}
 
@@ -86,7 +89,16 @@ public class ChallengeLevelScreen implements Screen, GUIRenderer {
 			for(int j = 0; j < challengeOptions[index].length; j++) {
 				challengeOptions[index][j].update();
 				
-				
+				if(index == i && challengeOptions[i][j].justTouched()) {
+					if (challengeOptions[index][j].isToggled()) {
+						for (int k = 0; k < challengeOptions[index].length; k++) {
+							if (k == j)
+								continue;
+
+							challengeOptions[index][k].setToggled(false);
+						}
+					}else challengeOptions[index][j].setToggled(true);
+				}
 			}
 			
 			if(challengePages[i].justReleased()) {

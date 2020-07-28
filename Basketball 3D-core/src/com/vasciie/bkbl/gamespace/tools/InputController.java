@@ -45,7 +45,7 @@ public class InputController implements InputProcessor {
     boolean dribble;
 
     public InputController(GUIRenderer guiRenderer) {
-        if (Gdx.app.getType().equals(Application.ApplicationType.Android)) {
+        //if (Gdx.app.getType().equals(Application.ApplicationType.Android)) {
             movementStick = new Stick(Color.BLACK, guiRenderer);
             movementStick.setSize(300, 300);
             movementStick.setPos(100, 70);
@@ -75,7 +75,7 @@ public class InputController implements InputProcessor {
 
             focusBtn.setSize(shootBtn.getWidth(), shootBtn.getHeight());
             focusBtn.setPos(shootBtn.getX(), shootBtn.getY() + focusBtn.getHeight() * 2);
-        }
+        //}
     }
 
     /**
