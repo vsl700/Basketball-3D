@@ -49,7 +49,7 @@ public class GameScreen implements Screen, GameMessageListener, GUIRenderer {
 	
 	PauseScreen pause;
 	
-	Label homeScore, awayScore, timer, power, powerNum;
+	Label homeScore, awayScore, minorMessage, power, powerNum;
 	Label ruleHeading, ruleDesc, clickToCont, playerRemove;
 	
 	int amount; //Player amount per team
@@ -60,6 +60,7 @@ public class GameScreen implements Screen, GameMessageListener, GUIRenderer {
 	
 	boolean ignorePause;
 	boolean skippableMessage, showPower;
+	boolean minorMessageRec;
 
 	public GameScreen(MyGdxGame mg) {
 		game = mg;
@@ -107,7 +108,7 @@ public class GameScreen implements Screen, GameMessageListener, GUIRenderer {
 		
 		homeScore = new Label("0", textFont, Color.BLUE, Color.CYAN, false, this);
 		awayScore = new Label("0", textFont, Color.RED, Color.ORANGE, false, this);
-		timer = new Label("", textFont, Color.ORANGE, false, this);
+		minorMessage = new Label("", textFont, Color.ORANGE, false, this);
 		power = new Label("POWER", textFont, Color.RED, false, this);
 		powerNum = new Label("x1", powFont, Color.WHITE, Color.RED, false, this);
 		
@@ -175,7 +176,8 @@ public class GameScreen implements Screen, GameMessageListener, GUIRenderer {
 		clickToCont.draw();
 		playerRemove.draw();
 
-		timer.draw();
+		minorMessage.draw();
+		minorMessageRec = false;
 	}
 
 	private void updateGUI(float delta){
@@ -207,36 +209,44 @@ public class GameScreen implements Screen, GameMessageListener, GUIRenderer {
 			if (!temp) {
 				if (map.getTimer() > 0 && map.isPlayersReady() && !map.isTutorialMode()) {
 					if ((int) map.getTimer() == 0)
-						timer.setText("GO!");
+						minorMessage.setText("GO!");
 					else if (map.getTimer() <= 4)
-						timer.setText((int) map.getTimer() + "");
+						minorMessage.setText((int) map.getTimer() + "");
 					else
-						timer.setText("Ready?");
+						minorMessage.setText("Ready?");
 
-					timer.update();
-				} else if (map.isTutorialMode() || map.isRuleTriggered()) { // If the game is not running and there is no timer counting down
-					ruleHeading.update();
-					ruleDesc.update();
+					minorMessage.update();
+				} else{ 
+					if(minorMessageRec)
+						minorMessage.update();
 					
-					if(map.getDifficulty() > 0 && map.isRuleTriggered() && map.getRules().getTriggeredRule().getRuleTriggerer().getFouls() == 7)
-						playerRemove.update();
+					if (map.isTutorialMode() || map.isRuleTriggered()) { // If the game is not running and there is no timer counting down
+						ruleHeading.update();
+						ruleDesc.update();
 
-					if (contTimer <= 0 && skippableMessage) {
-						clickToCont.update();
+						if (map.getDifficulty() > 0 && map.isRuleTriggered() && map.getRules().getTriggeredRule().getRuleTriggerer().getFouls() == 7)
+							playerRemove.update();
 
-						if (Gdx.app.getType().equals(Application.ApplicationType.Android) && Gdx.input.justTouched() || Gdx.input.isKeyJustPressed(Keys.E)) {
-							if (map.isRuleTriggered()) {
-								Player triggerer = map.getRules().getTriggeredRule().getRuleTriggerer();
-								if (triggerer.getFouls() == 7 && triggerer.isMainPlayer() || map.getTeamScore() >= 15 || map.getOppScore() >= 15) {
-									game.setScreen(game.gameOver);
+						if (contTimer <= 0 && skippableMessage) {
+							clickToCont.update();
+
+							if (Gdx.app.getType().equals(Application.ApplicationType.Android) && Gdx.input.justTouched() || Gdx.input.isKeyJustPressed(Keys.E)) {
+								if (map.isRuleTriggered()) {
+									Player triggerer = map.getRules().getTriggeredRule().getRuleTriggerer();
+									if (triggerer.getFouls() == 7 && triggerer.isMainPlayer() || (map.getTeamScore() >= 15 || map.getOppScore() >= 15) && !map.isChallenge()) {
+										game.setScreen(game.gameOver);
+									}
 								}
+								
+								if(map.getChallenges().isAChallengeBroken() && !map.isRuleTriggered())
+									game.setScreen(game.gameOver);
+								
+								sender.messageReceived();
+								sender = null;
 							}
-							
-							sender.messageReceived();
-							sender = null;
-						}
-					} else if(contTimer > 0)
-						contTimer -= delta;
+						} else if (contTimer > 0)
+							contTimer -= delta;
+					}
 				}
 
 			}
@@ -304,7 +314,7 @@ public class GameScreen implements Screen, GameMessageListener, GUIRenderer {
 		
 		homeScore.setPosAndSize(0, height - 70, 70, 70);
 		awayScore.setPosAndSize(width - 70, height - 70, 70, 70);
-		timer.setPosAndSize(width / 2, height - 120, 10);
+		minorMessage.setPosAndSize(width / 2, height - 120, 10);
 		power.setPosAndSize(width / 2, getPowerY(), 10);
 		powerNum.setSize(power.textSize(), 26);
 		powerNum.setPos(width / 2 - powerNum.getWidth() / 2 + 5, getPowerNumY());
@@ -432,5 +442,11 @@ public class GameScreen implements Screen, GameMessageListener, GUIRenderer {
 	@Override
 	public OrthographicCamera getCam() {
 		return cam;
+	}
+
+	@Override
+	public void sendMinorMessage(String message) {
+		minorMessage.setText(message);
+		minorMessageRec = true;
 	}
 }

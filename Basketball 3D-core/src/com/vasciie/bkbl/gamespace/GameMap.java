@@ -8,6 +8,7 @@ import com.badlogic.gdx.Application;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.ai.GdxAI;
 import com.badlogic.gdx.ai.steer.SteerableAdapter;
+import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.PerspectiveCamera;
 import com.badlogic.gdx.graphics.g3d.Environment;
 import com.badlogic.gdx.graphics.g3d.ModelBatch;
@@ -35,6 +36,7 @@ import com.vasciie.bkbl.gamespace.entities.Ball;
 import com.vasciie.bkbl.gamespace.entities.Entity;
 import com.vasciie.bkbl.gamespace.entities.EntityType;
 import com.vasciie.bkbl.gamespace.entities.Player;
+import com.vasciie.bkbl.gamespace.levels.Challenges;
 import com.vasciie.bkbl.gamespace.levels.TutorialLevels;
 import com.vasciie.bkbl.gamespace.levels.TutorialLevels.TutorialLevel;
 import com.vasciie.bkbl.gamespace.objects.Basket;
@@ -100,6 +102,8 @@ public class GameMap implements GameMessageSender {
     
     TutorialLevels tutorial;
     TutorialLevel currentTutorialLevel;
+    
+    Challenges challenges;
 
     ArrayList<Player> teammates;
     ArrayList<Player> opponents;
@@ -138,8 +142,6 @@ public class GameMap implements GameMessageSender {
     float startTimer;
     
     float gameSpeed = 1;
-
-    boolean challenge;
     
     boolean gameRunning;//Whether or not the players can play
     boolean ruleTriggered;
@@ -173,6 +175,8 @@ public class GameMap implements GameMessageSender {
         rules = new Rules(this, messageListener);
         
         tutorial = new TutorialLevels(this, messageListener);
+        
+        challenges = new Challenges(this, messageListener);
         
         zones = new Zones(this);
 
@@ -568,6 +572,8 @@ public class GameMap implements GameMessageSender {
         if(isTutorialMode())
         	currentTutorialLevel.reset();
         currentTutorialLevel = null;
+        
+        challenges.reset();
 
         if (rules.getTriggeredRule() != null) {
             rules.getTriggeredRule().clearRuleTriggerer();
@@ -716,6 +722,8 @@ public class GameMap implements GameMessageSender {
         		onRuleTriggered(rule);
 				rulesListener.sendMessage(rule.getName(), rule.getDescription(), rule.getTextColor(), this, true, false);
         	}
+        	
+        	
         }
 
         updatePlayers(delta);
@@ -812,6 +820,12 @@ public class GameMap implements GameMessageSender {
     public void onMessageContinue() {
 		ruleTriggered = false;
 		ruleTriggeredActing = true;
+		
+		if(challenges.isAChallengeBroken()) {
+    		rulesListener.sendMessage(challenges.getBrokenChallenge().getName(), "According To This Challenge The Game Is Over!", Color.RED, this, true, false);
+    		return;
+    	}
+		
 		startTimer = 0.9f;
 
 		if (difficulty > 0) {
@@ -1112,6 +1126,10 @@ public class GameMap implements GameMessageSender {
 	public TutorialLevel getCurrentTutorialLevel() {
 		return currentTutorialLevel;
 	}
+	
+	public Challenges getChallenges() {
+		return challenges;
+	}
 
 	public Player getMainPlayer() {
         return mainPlayer;
@@ -1223,11 +1241,7 @@ public class GameMap implements GameMessageSender {
     }
 
     public boolean isChallenge() {
-		return challenge;
-	}
-
-	public void setChallenge(boolean challenge) {
-		this.challenge = challenge;
+		return challenges.getCurrentChallenges() != null;
 	}
 
 	public boolean isTutorialMode() {

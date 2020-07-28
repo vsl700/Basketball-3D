@@ -44,6 +44,10 @@ public abstract class Levels {
 		return -1;
 	}
 	
+	public int getSize() {
+		return gameLevels.length;
+	}
+	
 	
 	public static abstract class GameLevel {
 		GameMap map;

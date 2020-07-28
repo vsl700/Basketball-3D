@@ -7,6 +7,7 @@ import com.vasciie.bkbl.gamespace.GameMap;
 public class Challenges extends Levels {
 
 	ChallengeLevel[] currentChallenges;
+	ChallengeLevel brokenChallenge;
 	
 	
 	public Challenges(GameMap map, GameMessageListener messageListener) {
@@ -35,7 +36,7 @@ public class Challenges extends Levels {
 					@Override
 					public String[] getChallengeLevelsNames() {
 						
-						return null;
+						return new String[] {"Power of 10", "Power of 11", "Power of 12"};
 					}					
 				}, 
 				
@@ -206,37 +207,29 @@ public class Challenges extends Levels {
 	public ChallengeLevel update() {
 		for(int i = 0; i < currentChallenges.length; i++) {
 			if(currentChallenges[i].update())
-				return currentChallenges[i];
+				return brokenChallenge = currentChallenges[i];
 		}
 		
 		return null;
-	}/*
+	}
 	
-	public static abstract class RuledChallengeLevel extends ChallengeLevel{
-
-		Rules customRules;
-		
-		public RuledChallengeLevel(String id, String name, GameMap map, GameMessageListener messageListener) {
-			super(id, name, map, messageListener);
-			
-			customRules = new Rules(map, messageListener, createCustomRules());
-		}
-		
-		*//**
-		 * I did it with a method for more clear code
-		 * @return the custom game rules included in the following challenge
-		 *//*
-		public abstract GameRule[] createCustomRules();
-		
-		public Rules getCustomRules() {
-			return customRules;
-		}
-		
-		public boolean update() {
-			return customRules.update();
-		}
-		
-	}*/
+	public void reset() {
+		currentChallenges = null;
+		brokenChallenge = null;
+	}
+	
+	public ChallengeLevel getBrokenChallenge() {
+		return brokenChallenge;
+	}
+	
+	public boolean isAChallengeBroken() {
+		return brokenChallenge != null;
+	}
+	
+	public ChallengeLevel[] getCurrentChallenges() {
+		return currentChallenges;
+	}
+	
 	
 	public static abstract class ChallengeLevel extends GameLevel{
 		int challengeLevel;
@@ -249,8 +242,8 @@ public class Challenges extends Levels {
 		
 		public abstract void setup();
 		
-		public int getMaxChallengeLevels() {
-			return getChallengeLevelsNames().length;
+		public int getChallengeLevelsAmount() {
+			return getChallengeLevelsNames() != null ? getChallengeLevelsNames().length : 0;
 		}
 		
 		public boolean hasChallengeLevels() {
@@ -258,7 +251,7 @@ public class Challenges extends Levels {
 		}
 		
 		public void setChallengeLevel(int level) {
-			challengeLevel = Math.max(0, Math.min(getMaxChallengeLevels(), level));
+			challengeLevel = Math.max(0, Math.min(getChallengeLevelsAmount(), level));
 		}
 		
 		public abstract String[] getChallengeLevelsNames();

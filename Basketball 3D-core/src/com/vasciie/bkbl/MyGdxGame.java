@@ -43,6 +43,7 @@ public class MyGdxGame extends Game {
 	public MainScreen main;
 	public LevelScreen level;
 	public TutorialLevelScreen tutorial;
+	public ChallengeLevelScreen challenge;
 	public GameTypeScreen gameType;
 	public GameScreen game;
 	public GameOverScreen gameOver;
@@ -90,6 +91,7 @@ public class MyGdxGame extends Game {
 		main = new MainScreen(this);		
 		level = new LevelScreen(this);
 		tutorial = new TutorialLevelScreen(this);
+		challenge = new ChallengeLevelScreen(this);
 		gameType = new GameTypeScreen(this);
 		game = new GameScreen(this);
 		gameOver = new GameOverScreen(this);

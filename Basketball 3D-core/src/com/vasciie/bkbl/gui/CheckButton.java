@@ -47,7 +47,7 @@ public class CheckButton extends Button {
 
 		Color tempColor = shape.getColor().cpy();
 		
-		font.setColor(shape.getColor().cpy());
+		//font.setColor(shape.getColor().cpy());
 
 		shape.setColor(renderColor);
 		shape.rect(x, y, width, height);
@@ -70,17 +70,17 @@ public class CheckButton extends Button {
 	private void renderText() {
 		SpriteBatch batch = guiRenderer.getSpriteBatch();
 
-		float r2 = font.getColor().r;
+		/*float r2 = font.getColor().r;
 		float g2 = font.getColor().g;
 		float b2 = font.getColor().b;
-		float a2 = font.getColor().a;
+		float a2 = font.getColor().a;*/
 		
 		batch.setProjectionMatrix(guiRenderer.getCam().combined);
 		batch.begin();
 		font.draw(batch, text, x + width + textFromBtnSpace, y + height / 2 + font.getLineHeight() / 3);
 		batch.end();
 		
-		font.setColor(r2, g2, b2, a2);
+		//font.setColor(r2, g2, b2, a2);
 	}
 	
 	@Override

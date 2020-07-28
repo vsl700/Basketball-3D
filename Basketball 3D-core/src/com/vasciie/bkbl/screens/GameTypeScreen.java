@@ -59,6 +59,8 @@ public class GameTypeScreen implements Screen, GUIRenderer {
 			game.setScreen(game.level);
 		}else if(tutorial.justReleased()) {
 			game.setScreen(game.tutorial);
+		}else if(challenge.justReleased()) {
+			game.setScreen(game.challenge);
 		}else if(goBack.justReleased()) {
 			game.setScreen(game.main);
 		}

@@ -1384,10 +1384,6 @@ public class TutorialLevels extends Levels {
 			((TutorialLevel) level).reset();
 	}
 	
-	public int getSize() {
-		return gameLevels.length;
-	}
-	
 	@Override
 	public GameLevel getGameLevel(int i) {
 		resetLevels();
