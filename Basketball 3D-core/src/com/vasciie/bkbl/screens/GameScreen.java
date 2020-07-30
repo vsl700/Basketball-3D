@@ -130,6 +130,8 @@ public class GameScreen implements Screen, GameMessageListener, GUIRenderer {
 
 	@Override
 	public void show() {
+		ignorePause = false;
+		
 		if(map == null) {
 			if(game.getMap() == null)
 				game.load3DGraphics();//If the default menus setting is just to show a simple picture of the game instead of the game world
@@ -138,7 +140,6 @@ public class GameScreen implements Screen, GameMessageListener, GUIRenderer {
 		}else {
 			if(map.getTeammates().size() > 0) {
 				ignorePause = true;
-				return;
 			}
 			
 			
@@ -161,7 +162,7 @@ public class GameScreen implements Screen, GameMessageListener, GUIRenderer {
 		
 		environment = game.getEnvironment();
 		
-		if(!map.isTutorialMode()) {
+		if(!map.isTutorialMode() && !ignorePause) {
 			map.setDifficulty(game.level.getDifficulty());
 			
 			if(!map.isChallenge() || !map.getChallenges().containsCurrentChallenge("alone"))

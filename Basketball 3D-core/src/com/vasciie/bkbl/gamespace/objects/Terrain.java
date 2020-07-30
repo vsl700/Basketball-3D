@@ -53,7 +53,7 @@ public class Terrain extends GameObject {
 		if(theme != null) {
 			TerrainThemes temp = TerrainThemes.chooseTheme(this, false);
 			
-			if(temp != null && !temp.equals(theme) || temp == null || temp.equals(TerrainThemes.CHALLENGE)) {//Challenge theme is always the same option
+			if(temp != null && !temp.equals(theme) || temp == null || temp.equals(TerrainThemes.CHALLENGE) || map.isTutorialMode()) {//Challenge theme is always the same option
 				clearTheme();
 				
 				loadTheme(temp);
@@ -66,7 +66,7 @@ public class Terrain extends GameObject {
 		theme = newTheme;
 		
 		if(theme != null) {
-			theme.createModels(this);
+			theme.create(this);
 		}
 	}
 	

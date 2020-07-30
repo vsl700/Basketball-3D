@@ -879,24 +879,21 @@ public enum TerrainThemes {
 	
 	CHALLENGE{
 		TerrainThemes theme;
-		int difficulty;
 		
 		@Override
 		public void createModels(Terrain terrain) {
 			//TerrainThemes tempTheme = chooseTheme(terrain, true);
 			//if(!tempTheme.equals(theme)) {
-			if (difficulty != terrain.getMap().getDifficulty() || theme == null) {
-				theme = chooseTheme(terrain, true);
-				theme.createModels(terrain);
-				difficulty = terrain.getMap().getDifficulty();
-			}
+			theme = chooseTheme(terrain, true);
+			theme.createModels(terrain);
+			difficulty = terrain.getMap().getDifficulty();
 				//theme = tempTheme;
 			//}
 		}
 		
 		@Override
 		public void dispose(Terrain terrain) {
-			if(difficulty != terrain.getMap().getDifficulty())
+			if(difficulty != terrain.getMap().getDifficulty() || terrain.getMap().isTutorialMode())
 				super.dispose(terrain);
 		}
 
@@ -939,9 +936,16 @@ public enum TerrainThemes {
 	private static Model customTerrainModel;
 	public static final ArrayList<ModelInstance> modelInstances = new ArrayList<ModelInstance>();
 	public static final ArrayList<ModelInstance> inGameModelInstances = new ArrayList<ModelInstance>();
-	
+	static int difficulty = -1;
 	
 	public abstract void createModels(Terrain terrain);
+	
+	public void create(Terrain terrain) {
+		if(difficulty != terrain.getMap().getDifficulty()/* && !this.equals(CHALLENGE)*/ || modelInstances.isEmpty()) {
+			createModels(terrain);
+			difficulty = terrain.getMap().getDifficulty();
+		}
+	}
 	
 	public abstract Color getThemeColor();
 	
@@ -967,6 +971,10 @@ public enum TerrainThemes {
 	}
 	
 	public void dispose(Terrain terrain) {
+		if(difficulty == terrain.getMap().getDifficulty() && !terrain.getMap().isTutorialMode())
+			return;
+
+		System.out.println("Disposed");
 		if(customTerrainModel != null) {
 			customTerrainModel.dispose();
 			customTerrainModel = null;

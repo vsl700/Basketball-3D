@@ -487,6 +487,7 @@ public class GameMap implements GameMessageSender {
         terrain.createTheme();
         if(terrain.getTheme() != null)
         	MyGdxGame.setColor(terrain.getTheme().getThemeColor());
+        else MyGdxGame.clearColor();
         
         createCache();
         
