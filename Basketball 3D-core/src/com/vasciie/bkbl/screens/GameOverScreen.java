@@ -65,14 +65,20 @@ public class GameOverScreen implements Screen, GUIRenderer {
 		totalScore = new Label(totalScoreText, resultsFont, Color.WHITE, false, this);
 	}
 	
+	private boolean checkChallenge() {
+		GameMap map = game.getMap();
+		
+		return (map.isChallenge() && !map.getChallenges().getBrokenChallenge().isLosable() && (map.getChallenges().getBrokenChallenge().getId().equals("team_score") || !map.getChallenges().containsCurrentChallenge("team_score")) || !map.isChallenge());
+	}
+	
 	@Override
 	public void show() {
 		GameMap map = game.getMap();
 		
-		if(map.getTeamScore() > map.getOppScore() || map.getOpponents().size() == 0) {
+		if(checkChallenge() && (map.getTeamScore() > map.getOppScore() || map.getOpponents().size() == 0)) {
 			winInfo.setText("You Win!");
 			winInfo.setColor(Color.BLUE);
-		}else if(map.getTeamScore() == map.getOppScore() && map.getTeammates().size() > 0) {
+		}else if(checkChallenge() && map.getTeamScore() == map.getOppScore() && map.getTeammates().size() > 0) {
 			winInfo.setText("Draw Game!");
 			winInfo.setColor(Color.ORANGE);
 		}else {
@@ -83,7 +89,7 @@ public class GameOverScreen implements Screen, GUIRenderer {
 		int basketDiff = Math.max(map.getTeamScore() - map.getOppScore(), 0);
 		int teammatesLeft = map.getTeammates().size();
 		int mainPlayerSc = map.getMainPlayerScore();
-		int total = basketDiff * 10 * teammatesLeft + mainPlayerSc * 10;
+		int total = checkChallenge() ? basketDiff * 10 * teammatesLeft + mainPlayerSc * 10 : 0;
 		
 		
 		String level = map.getDifficulty() + "" + game.game.getAmount();
@@ -125,6 +131,7 @@ public class GameOverScreen implements Screen, GUIRenderer {
 		}else if(quit.justReleased()) {
 			game.setScreen(game.main);
 			game.game.reset();
+			game.getMap().getChallenges().reset();
 			return;
 		}
 		

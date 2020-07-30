@@ -41,7 +41,7 @@ public class GameScreen implements Screen, GameMessageListener, GUIRenderer {
 	SpriteBatch batch;
 	ShapeRenderer shape;
 	OrthographicCamera cam;
-	BitmapFont textFont, powFont;
+	BitmapFont textFont, powFont, font;
 
 	GameMap map;
 
@@ -51,6 +51,7 @@ public class GameScreen implements Screen, GameMessageListener, GUIRenderer {
 	
 	Label homeScore, awayScore, minorMessage, power, powerNum;
 	Label ruleHeading, ruleDesc, clickToCont, playerRemove;
+	Label[] challenges, currentChallenges;
 	
 	int amount; //Player amount per team
 	
@@ -104,6 +105,9 @@ public class GameScreen implements Screen, GameMessageListener, GUIRenderer {
 		powFont = new BitmapFont();
 		powFont.getData().setScale(2);
 		
+		font = new BitmapFont();
+		font.getData().setScale(1.5f);
+		
 		pause = new PauseScreen(mg);
 		
 		homeScore = new Label("0", textFont, Color.BLUE, Color.CYAN, false, this);
@@ -140,11 +144,29 @@ public class GameScreen implements Screen, GameMessageListener, GUIRenderer {
 			
 		}
 		
+		if(challenges == null) {
+			challenges = new Label[map.getChallenges().getSize()];
+			
+			for(int i = 0; i < challenges.length; i++) {
+				challenges[i] = new Label(map.getChallenges().getGameLevel(i).getName(), font, Color.RED.cpy().sub(0.3f, 0, 0, 0), false, this);
+			}
+		}
+		
+		if (map.isChallenge()) {
+			currentChallenges = new Label[map.getChallenges().getCurrentChallenges().length];
+			for (int i = 0; i < currentChallenges.length; i++) {
+				currentChallenges[i] = challenges[map.getChallenges().indexOf(map.getChallenges().getCurrentChallenges()[i])];
+			}
+		}else currentChallenges = new Label[0];
+		
 		environment = game.getEnvironment();
 		
 		if(!map.isTutorialMode()) {
 			map.setDifficulty(game.level.getDifficulty());
-			map.spawnPlayers(amount, amount);
+			
+			if(!map.isChallenge() || !map.getChallenges().containsCurrentChallenge("alone"))
+				map.spawnPlayers(amount, amount);
+			else map.spawnPlayers(1, amount);
 		}
 	}
 
@@ -164,6 +186,9 @@ public class GameScreen implements Screen, GameMessageListener, GUIRenderer {
 		
 		homeScore.draw();
 		awayScore.draw();
+		
+		for(Label lbl : currentChallenges)
+			lbl.draw();
 
 		power.draw();
 		powerNum.draw();
@@ -185,6 +210,9 @@ public class GameScreen implements Screen, GameMessageListener, GUIRenderer {
 			homeScore.update();
 			awayScore.update();
 		}
+		
+		for(Label lbl : currentChallenges)
+			lbl.update();
 
 		if (!paused()) {
 			boolean temp = map.isGameRunning() && sender == null;
@@ -206,21 +234,22 @@ public class GameScreen implements Screen, GameMessageListener, GUIRenderer {
 					powerNum.setY(getPowerNumY());
 				}
 			} 
-			if (!temp) {
-				if (map.getTimer() > 0 && map.isPlayersReady() && !map.isTutorialMode()) {
-					if ((int) map.getTimer() == 0)
-						minorMessage.setText("GO!");
-					else if (map.getTimer() <= 4)
-						minorMessage.setText((int) map.getTimer() + "");
-					else
-						minorMessage.setText("Ready?");
-
+			if (!temp || minorMessageRec) {
+				if (map.getTimer() > 0 && map.isPlayersReady() && !map.isTutorialMode() || minorMessageRec && map.isGameRunning()) {
+					if (!minorMessageRec) {
+						if ((int) map.getTimer() == 0)
+							minorMessage.setText("GO!");
+						else if (map.getTimer() <= 4)
+							minorMessage.setText((int) map.getTimer() + "");
+						else
+							minorMessage.setText("Ready?");
+					}
+					
 					minorMessage.update();
 				} else{ 
-					if(minorMessageRec)
-						minorMessage.update();
 					
-					if (map.isTutorialMode() || map.isRuleTriggered()) { // If the game is not running and there is no timer counting down
+					
+					if (map.isTutorialMode() || map.isRuleTriggered() || map.getChallenges().isAChallengeBroken()) { // If the game is not running and there is no timer counting down
 						ruleHeading.update();
 						ruleDesc.update();
 
@@ -241,8 +270,11 @@ public class GameScreen implements Screen, GameMessageListener, GUIRenderer {
 								if(map.getChallenges().isAChallengeBroken() && !map.isRuleTriggered())
 									game.setScreen(game.gameOver);
 								
+								GameMessageSender tempSender = sender;
 								sender.messageReceived();
-								sender = null;
+								
+								if(tempSender.equals(sender))
+									sender = null;
 							}
 						} else if (contTimer > 0)
 							contTimer -= delta;
@@ -300,8 +332,8 @@ public class GameScreen implements Screen, GameMessageListener, GUIRenderer {
 		
 		ignorePause = false;
 		
-		if(!paused() && !game.getScreen().equals(this) && !game.getScreen().equals(game.settings))
-			reset();
+		//if(!paused() && !game.getScreen().equals(this) && !game.getScreen().equals(game.settings))
+			//reset();
 	}
 
 	@Override
@@ -314,10 +346,15 @@ public class GameScreen implements Screen, GameMessageListener, GUIRenderer {
 		
 		homeScore.setPosAndSize(0, height - 70, 70, 70);
 		awayScore.setPosAndSize(width - 70, height - 70, 70, 70);
-		minorMessage.setPosAndSize(width / 2, height - 120, 10);
+		minorMessage.setPosAndSize(width / 2, height - 140, 10);
 		power.setPosAndSize(width / 2, getPowerY(), 10);
 		powerNum.setSize(power.textSize(), 26);
 		powerNum.setPos(width / 2 - powerNum.getWidth() / 2 + 5, getPowerNumY());
+		
+		for(int i = 0; i < currentChallenges.length; i++) {
+			currentChallenges[i].setY(font.getLineHeight() * (i + 1));
+			currentChallenges[i].setX(width - currentChallenges[i].textSize() / 2);
+		}
 		
 		resizeMessageText(width, height);
 		
@@ -390,6 +427,7 @@ public class GameScreen implements Screen, GameMessageListener, GUIRenderer {
 		shape.dispose();
 		textFont.dispose();
 		powFont.dispose();
+		font.dispose();
 	}
 	
 	public void setPlayersAmount(int amount) {

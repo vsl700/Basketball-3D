@@ -36,6 +36,21 @@ public final class GameTools {
 		return textW;
 	}*/
 	
+	private static final StringBuilder sb = new StringBuilder();
+	public static String convertTimeToString(float time) {
+		sb.append((int) time / 60);
+		sb.append(":");
+		int secs = ((int) time - ((int) time / 60) * 60);
+		if(secs < 10)
+			sb.append(0);
+		sb.append(secs);
+		
+		String temp = sb.toString();
+		sb.delete(0, sb.length());
+		
+		return temp;
+	}
+	
 	private static final Vector3 tempVec = new Vector3();
 	public static boolean isObjectVisibleToScreen(Camera cam, ModelInstance instance, Vector3 dimensions) {
 		instance.transform.getTranslation(tempVec);

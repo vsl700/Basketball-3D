@@ -81,6 +81,7 @@ public class PauseScreen implements Screen, GUIRenderer {
 		else if(quit.justReleased()) {
 			exit();
 			game.game.reset();
+			game.getMap().getChallenges().reset();
 			game.setScreen(game.main);
 			return;
 		}

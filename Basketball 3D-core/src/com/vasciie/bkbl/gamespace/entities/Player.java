@@ -1757,10 +1757,6 @@ public abstract class Player extends Entity {
 		return playerIndex;
 	}
 	
-	public void setShootingPower(int shoot) {
-		shootingPower = Math.min(Math.max(10, shoot), 20); //Needs to be between 10 and 20.
-	}
-	
 	public int getShootingPower() {
 		return shootingPower;
 	}

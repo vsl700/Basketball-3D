@@ -492,6 +492,9 @@ public class GameMap implements GameMessageSender {
         
         firstShown = false;
         
+        if(isChallenge())
+        	challenges.setup();
+        
         /*currentTutorialLevel = (TutorialLevel) tutorial.getGameLevel(difficulty);
         currentTutorialLevel.setLevelPart(0);*/
     }
@@ -565,7 +568,7 @@ public class GameMap implements GameMessageSender {
         //terrain.clearTheme();
         createCache();
         
-        MyGdxGame.clearColor();
+        //MyGdxGame.clearColor();
 
         teamScore = oppScore = mainPlayerScore = 0;
         
@@ -573,7 +576,7 @@ public class GameMap implements GameMessageSender {
         	currentTutorialLevel.reset();
         currentTutorialLevel = null;
         
-        challenges.reset();
+        //challenges.reset();
 
         if (rules.getTriggeredRule() != null) {
             rules.getTriggeredRule().clearRuleTriggerer();
@@ -665,7 +668,7 @@ public class GameMap implements GameMessageSender {
                     startTimer -= delta;
             }
         }
-        if (ruleTriggeredActing) {
+        if (ruleTriggeredActing && !challenges.isAChallengeBroken()) {
             updateFullGame(delta2);
 
             if (rules.getTriggeredRule() == null) {
@@ -715,7 +718,7 @@ public class GameMap implements GameMessageSender {
     private void updateFullGame(float delta) {
         ball.update(delta);
 
-        if(isTutorialMode() && currentTutorialLevel.getCurrentPart().usesOriginalRules() || !isTutorialMode()) {
+        if(!challenges.isAChallengeBroken() && (isTutorialMode() && currentTutorialLevel.getCurrentPart().usesOriginalRules() || !isTutorialMode())) {
         	if(rules.update()) {
         		GameRule rule = rules.getTriggeredRule();
         		
@@ -723,7 +726,11 @@ public class GameMap implements GameMessageSender {
 				rulesListener.sendMessage(rule.getName(), rule.getDescription(), rule.getTextColor(), this, true, false);
         	}
         	
-        	
+        	if(isChallenge() && challenges.update()) {
+        		gameRunning = playersReady = false;
+        		
+        		sendChallengeMessage();
+        	}
         }
 
         updatePlayers(delta);
@@ -816,15 +823,20 @@ public class GameMap implements GameMessageSender {
 	        	rule.getRuleTriggerer().addFoul();
         }
     }
+    
+    private void sendChallengeMessage() {
+    	rulesListener.sendMessage(challenges.getBrokenChallenge().getName(), "According To This Challenge The Game Is Over!", Color.RED, this, true, false);
+    }
 
     public void onMessageContinue() {
 		ruleTriggered = false;
-		ruleTriggeredActing = true;
 		
 		if(challenges.isAChallengeBroken()) {
-    		rulesListener.sendMessage(challenges.getBrokenChallenge().getName(), "According To This Challenge The Game Is Over!", Color.RED, this, true, false);
+    		sendChallengeMessage();
     		return;
     	}
+		
+		ruleTriggeredActing = true;
 		
 		startTimer = 0.9f;
 

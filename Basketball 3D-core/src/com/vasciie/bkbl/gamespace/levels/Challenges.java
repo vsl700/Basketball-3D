@@ -3,6 +3,7 @@ package com.vasciie.bkbl.gamespace.levels;
 import com.badlogic.gdx.Gdx;
 import com.vasciie.bkbl.GameMessageListener;
 import com.vasciie.bkbl.gamespace.GameMap;
+import com.vasciie.bkbl.gamespace.tools.GameTools;
 
 public class Challenges extends Levels {
 
@@ -14,7 +15,7 @@ public class Challenges extends Levels {
 		super(map, messageListener);
 		
 		gameLevels = new ChallengeLevel[] {
-				new ChallengeLevel("shoot_power", "Constantly Low Shooting Power", map, messageListener) {
+				new ChallengeLevel("shoot_power", "Constant Shooting Power", map, messageListener) {
 					int shootPower;
 					
 					
@@ -28,7 +29,7 @@ public class Challenges extends Levels {
 						/*if(map.getMainPlayer().getShootingPower() != shootPower)
 							return true;*/
 						
-						map.getMainPlayer().setShootingPower(shootPower);
+						map.getMainPlayer().setShootPower(shootPower);
 						
 						return false;
 					}
@@ -37,12 +38,17 @@ public class Challenges extends Levels {
 					public String[] getChallengeLevelsNames() {
 						
 						return new String[] {"Power of 10", "Power of 11", "Power of 12"};
+					}
+
+					@Override
+					public boolean isLosable() {
+						
+						return false;
 					}					
 				}, 
 				
-				new ChallengeLevel("time", "Playing Until Timer Runs Out", map, messageListener) {
+				new ChallengeLevel("time", "Playing Until Timer Runs Out ", map, messageListener) {
 					float time;
-					
 					
 					@Override
 					public void setup() {
@@ -55,7 +61,11 @@ public class Challenges extends Levels {
 
 					@Override
 					public boolean update() {
-						time -= Gdx.graphics.getDeltaTime();
+						if(map.isGameRunning()) {
+							time -= Gdx.graphics.getDeltaTime();
+							
+							messageListener.sendMinorMessage(GameTools.convertTimeToString(time));
+						}
 						
 						return time < 0;
 					}
@@ -64,6 +74,12 @@ public class Challenges extends Levels {
 					public String[] getChallengeLevelsNames() {
 						
 						return new String[] {"5:00 minutes", "3:30 minutes", "2:00 minutes"};
+					}
+
+					@Override
+					public boolean isLosable() {
+						
+						return false;
 					}
 					
 				},
@@ -83,6 +99,12 @@ public class Challenges extends Levels {
 					public String[] getChallengeLevelsNames() {
 						
 						return null;
+					}
+
+					@Override
+					public boolean isLosable() {
+						
+						return true;
 					}					
 				},
 				
@@ -94,13 +116,19 @@ public class Challenges extends Levels {
 
 					@Override
 					public boolean update() {
-						return map.isRuleTriggered();
+						return map.isRuleTriggered() && map.getRules().getTriggeredRule().getRuleTriggerer().equals(map.getMainPlayer());
 					}
 
 					@Override
 					public String[] getChallengeLevelsNames() {
 						
 						return null;
+					}
+
+					@Override
+					public boolean isLosable() {
+						
+						return true;
 					}
 					
 				},
@@ -127,26 +155,46 @@ public class Challenges extends Levels {
 						
 						return new String[] {"5 points", "10 points", "15 points"};
 					}
+
+					@Override
+					public boolean isLosable() {
+						
+						return false;
+					}
 					
 				},
 				
 				new ChallengeLevel("one_hand", "Playing With Only One Hand", map, messageListener) {
 					boolean left;
+					boolean wait;
 					
 					@Override
 					public void setup() {
 						left = challengeLevel == 0;
+						wait = false;
 					}
 
 					@Override
 					public boolean update() {
-						return !left && map.getMainPlayer().isLeftHolding() || left && map.getMainPlayer().isRightHolding();
+						boolean temp  = !left && map.getMainPlayer().isLeftHolding() || left && map.getMainPlayer().isRightHolding();
+						if(!wait) {
+							if(!map.isGameRunning() && temp)
+								wait = true;
+						}else if(!temp) wait = false;
+						
+						return temp && !wait;
 					}
 
 					@Override
 					public String[] getChallengeLevelsNames() {
 						
 						return new String[] {"Left hand", "Right hand"};
+					}
+
+					@Override
+					public boolean isLosable() {
+						
+						return true;
 					}
 					
 				},
@@ -160,13 +208,19 @@ public class Challenges extends Levels {
 
 					@Override
 					public boolean update() {
-						return map.getMainPlayer().isCurrentlyRunning();
+						return map.isGameRunning() && map.getMainPlayer().isCurrentlyRunning();
 					}
 
 					@Override
 					public String[] getChallengeLevelsNames() {
 						
 						return null;
+					}
+
+					@Override
+					public boolean isLosable() {
+						
+						return true;
 					}
 					
 				},
@@ -175,7 +229,7 @@ public class Challenges extends Levels {
 					
 					@Override
 					public void setup() {
-						map.spawnPlayers(1, 0);
+						
 					}
 
 					@Override
@@ -188,29 +242,60 @@ public class Challenges extends Levels {
 						
 						return null;
 					}
+
+					@Override
+					public boolean isLosable() {
+						
+						return false;
+					}
 					
 				}
 		};
 	}
 	
-	public void setChallenge(ChallengeLevel[] chosenChallenges){
-		currentChallenges = chosenChallenges;
+	public void setup() {
+		brokenChallenge = null;
 		
-		for(ChallengeLevel ch : chosenChallenges)
+		for(ChallengeLevel ch : currentChallenges)
 			ch.setup();
 	}
 	
+	public void setChallenge(ChallengeLevel[] chosenChallenges){
+		currentChallenges = chosenChallenges;
+	}
+	
+	public boolean containsCurrentChallenge(String id) {
+		for(ChallengeLevel lvl : currentChallenges)
+			if(lvl.id.equals(id))
+				return true;
+		
+		return false;
+	}
+	
+	/*public void setChallenge(int[][] challenges) {
+		currentChallenges = new ChallengeLevel[challenges.length];
+		
+		for(int i = 0; i < challenges.length; i++) {
+			currentChallenges[i] = (ChallengeLevel) gameLevels[challenges[i][0]];
+			
+			if(challenges[i].length > 1)
+				currentChallenges[i].setChallengeLevel(challenges[i][1]);
+		}
+	}*/
+	
 	/**
 	 * 
-	 * @return a challenge level if it gets broken
+	 * @return true if a challenge is broken
 	 */
-	public ChallengeLevel update() {
+	public boolean update() {
 		for(int i = 0; i < currentChallenges.length; i++) {
-			if(currentChallenges[i].update())
-				return brokenChallenge = currentChallenges[i];
+			if(currentChallenges[i].update()) {
+				brokenChallenge = currentChallenges[i];
+				return true;
+			}
 		}
 		
-		return null;
+		return false;
 	}
 	
 	public void reset() {
@@ -241,6 +326,8 @@ public class Challenges extends Levels {
 		public abstract boolean update();
 		
 		public abstract void setup();
+		
+		public abstract boolean isLosable();
 		
 		public int getChallengeLevelsAmount() {
 			return getChallengeLevelsNames() != null ? getChallengeLevelsNames().length : 0;

@@ -53,7 +53,7 @@ public class Terrain extends GameObject {
 		if(theme != null) {
 			TerrainThemes temp = TerrainThemes.chooseTheme(this, false);
 			
-			if(temp != null && !temp.equals(theme) || temp == null) {
+			if(temp != null && !temp.equals(theme) || temp == null || temp.equals(TerrainThemes.CHALLENGE)) {//Challenge theme is always the same option
 				clearTheme();
 				
 				loadTheme(temp);
@@ -71,7 +71,7 @@ public class Terrain extends GameObject {
 	}
 	
 	public void clearTheme() {
-		theme.dispose();
+		theme.dispose(this);
 		theme = null;
 	}
 	
@@ -112,7 +112,7 @@ public class Terrain extends GameObject {
 		super.dispose();
 		
 		if(theme != null)
-			theme.dispose();
+			theme.dispose(this);
 	}
 
 	@Override

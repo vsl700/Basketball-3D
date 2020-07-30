@@ -6,6 +6,7 @@ import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.g2d.BitmapFont;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
+import com.badlogic.gdx.utils.Array;
 import com.vasciie.bkbl.MyGdxGame;
 import com.vasciie.bkbl.gamespace.levels.Challenges.ChallengeLevel;
 import com.vasciie.bkbl.gui.Button;
@@ -25,8 +26,8 @@ public class ChallengeLevelScreen implements Screen, GUIRenderer {
 	Button play, goBack;
 	Button[] challengePages;
 	CheckButton[][] challengeOptions;
-	CheckButton playChallenge;
-	Label challengeName;
+	CheckButton[] playChallenge;
+	Label challengeName, losableChallenge, urgedChallenge;
 	
 	int index;
 	
@@ -51,18 +52,23 @@ public class ChallengeLevelScreen implements Screen, GUIRenderer {
 		play = new Button("Play", font, Color.ORANGE.cpy().sub(0, 0.3f, 0, 1), true, true, this);
 		goBack = new Button("Go Back", font, Color.ORANGE.cpy().sub(0, 0.3f, 0, 1), true, true, this);
 		
-		playChallenge = new CheckButton("Play This Challenge", font, Color.ORANGE.cpy().sub(0, 0.3f, 0, 1), true, true, this);
+		//playChallenge = new CheckButton("Play This Challenge", font, Color.ORANGE.cpy().sub(0, 0.3f, 0, 1), true, true, this);
 		
 		challengeName = new Label("", medFont, Color.RED, false, this);
+		losableChallenge = new Label("IF THIS CHALLENGE BREAKS, YOU LOSE!", checkBtnFont, Color.RED, false, this);
+		urgedChallenge = new Label("YOU WIN ONLY IF THIS CHALLENGE BREAKS!", checkBtnFont, Color.RED, false, this);
 	}
 	
 	@Override
 	public void show() {
 		if(challengePages == null) {
 			challengePages = new Button[game.getMap().getChallenges().getSize()];
+			playChallenge = new CheckButton[challengePages.length];
 			challengeOptions = new CheckButton[challengePages.length][];
 			
 			for(int i = 0; i < challengePages.length; i++) {
+				playChallenge[i] = new CheckButton("Play This Challenge", font, Color.ORANGE.cpy().sub(0, 0.3f, 0, 1), true, true, this);
+				
 				ChallengeLevel level = (ChallengeLevel) game.getMap().getChallenges().getGameLevel(i);
 				
 				challengePages[i] = new Button(i + 1 + "", font, Color.ORANGE.cpy().sub(0, 0.3f, 0, 1), true, true, this);
@@ -89,7 +95,7 @@ public class ChallengeLevelScreen implements Screen, GUIRenderer {
 			for(int j = 0; j < challengeOptions[index].length; j++) {
 				challengeOptions[index][j].update();
 				
-				if(index == i && challengeOptions[i][j].justTouched()) {
+				if(index == i && challengeOptions[index][j].justTouched()) {
 					if (challengeOptions[index][j].isToggled()) {
 						for (int k = 0; k < challengeOptions[index].length; k++) {
 							if (k == j)
@@ -114,10 +120,42 @@ public class ChallengeLevelScreen implements Screen, GUIRenderer {
 		
 		challengeName.update();
 		
-		playChallenge.update();
+		playChallenge[index].update();
+		
+		if(((ChallengeLevel) game.getMap().getChallenges().getGameLevel(index)).isLosable())
+			losableChallenge.update();
+		else if(game.getMap().getChallenges().getGameLevel(index).getId().equals("team_score"))
+			urgedChallenge.update();
 		
 		if(goBack.justReleased()) {
 			game.setScreen(game.gameType);
+			game.getMap().getChallenges().reset();
+		}else if(play.justReleased()) {
+			Array<ChallengeLevel> tempCh = new Array<ChallengeLevel>(playChallenge.length);
+			for(int i = 0; i < playChallenge.length; i++) {
+				if(playChallenge[i].isToggled()) {
+					ChallengeLevel temp = (ChallengeLevel) game.getMap().getChallenges().getGameLevel(i);
+					tempCh.add(temp);
+					
+					if(temp.hasChallengeLevels()) {
+						for(int j = 0; j < challengeOptions[i].length; j++) {
+							if(challengeOptions[i][j].isToggled()) {
+								temp.setChallengeLevel(j);
+								break;
+							}
+						}
+					}
+				}
+			}
+			
+			if (tempCh.size > 0) {
+				ChallengeLevel[] tempChArr = new ChallengeLevel[tempCh.size];
+				for (int i = 0; i < tempCh.size; i++)
+					tempChArr[i] = tempCh.get(i);
+
+				game.getMap().getChallenges().setChallenge(tempChArr);//toArray() doesn't work on any ArrayList class (List, Array, ArrayList...)
+				game.setScreen(game.level);
+			}
 		}
 		
 		
@@ -136,7 +174,10 @@ public class ChallengeLevelScreen implements Screen, GUIRenderer {
 		
 		challengeName.draw();
 		
-		playChallenge.draw();
+		playChallenge[index].draw();
+		
+		losableChallenge.draw();
+		urgedChallenge.draw();
 
 	}
 
@@ -167,8 +208,11 @@ public class ChallengeLevelScreen implements Screen, GUIRenderer {
 		//challengeName.setWidth(btnWidth);
 		challengeName.setPos(width / 2/* - challengeName.getWidth() / 2*/, firstLevelY - 26 * 2);
 		
+		losableChallenge.setPos(width / 2, challengeName.getY() - 30);
+		urgedChallenge.setPos(losableChallenge.getX(), losableChallenge.getY());
+		
 		float checkBtnSize = 40;
-		float optionY = challengeName.getY() - checkBtnSize * 2;
+		float optionY = losableChallenge.getY() - checkBtnSize * 2;
 		
 		for (int i = 0; i < challengeOptions[index].length; i++) {
 			CheckButton btn = challengeOptions[index][i];
@@ -177,8 +221,8 @@ public class ChallengeLevelScreen implements Screen, GUIRenderer {
 			btn.setPos(width / 2 + btnSpace / 2 - (challengeOptions[index].length / 2.0f - i) * (btn.getTotalWidth() + btnSpace), optionY);
 		}
 		
-		playChallenge.setSize(checkBtnSize, checkBtnSize);
-		playChallenge.setPos(challengeName.getX() + challengeName.textSize() / 2 + checkBtnSize, challengeName.getY() - checkBtnSize / 2);
+		playChallenge[index].setSize(checkBtnSize, checkBtnSize);
+		playChallenge[index].setPos(challengeName.getX() + challengeName.textSize() / 2 + checkBtnSize, challengeName.getY() - checkBtnSize / 2);
 
 		for(int i = parts; i < challengePages.length; i++) {
 			challengePages[i].setSize(btnWidth2, btnHeight);

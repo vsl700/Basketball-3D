@@ -348,7 +348,7 @@ public class TutorialLevels extends Levels {
 											@Override
 											public boolean act() {
 												if(!shootPowerReg)
-													map.getMainPlayer().setShootingPower(10);
+													map.getMainPlayer().setShootPower(10);
 												
 												shootPowerReg = true;
 												

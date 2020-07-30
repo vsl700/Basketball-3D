@@ -879,10 +879,25 @@ public enum TerrainThemes {
 	
 	CHALLENGE{
 		TerrainThemes theme;
+		int difficulty;
+		
 		@Override
 		public void createModels(Terrain terrain) {
-			theme = chooseTheme(terrain, true);
-			theme.createModels(terrain);
+			//TerrainThemes tempTheme = chooseTheme(terrain, true);
+			//if(!tempTheme.equals(theme)) {
+			if (difficulty != terrain.getMap().getDifficulty() || theme == null) {
+				theme = chooseTheme(terrain, true);
+				theme.createModels(terrain);
+				difficulty = terrain.getMap().getDifficulty();
+			}
+				//theme = tempTheme;
+			//}
+		}
+		
+		@Override
+		public void dispose(Terrain terrain) {
+			if(difficulty != terrain.getMap().getDifficulty())
+				super.dispose(terrain);
 		}
 
 		@Override
@@ -933,7 +948,7 @@ public enum TerrainThemes {
 	public abstract boolean hasOwnTerrain();
 	
 	public static TerrainThemes chooseTheme(Terrain terrain, boolean local) {
-		if (!terrain.getMap().isTutorialMode() && (local && terrain.getMap().isChallenge() || !terrain.getMap().isChallenge() || !terrain.getMap().isTutorialMode()))
+		if (!terrain.getMap().isTutorialMode() && (local && terrain.getMap().isChallenge() || !terrain.getMap().isChallenge()))
 			switch (terrain.getMap().getDifficulty()) {
 			case 0:
 				return TerrainThemes.EASY;
@@ -951,7 +966,7 @@ public enum TerrainThemes {
 		return null;
 	}
 	
-	public void dispose() {
+	public void dispose(Terrain terrain) {
 		if(customTerrainModel != null) {
 			customTerrainModel.dispose();
 			customTerrainModel = null;

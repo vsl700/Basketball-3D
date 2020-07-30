@@ -93,11 +93,14 @@ public class LevelScreen implements Screen, GUIRenderer, UpDownListener {
 		
 		tmPlAmount.update();
 		difficulty.update();
-		highscore.update();
+		if(!game.getMap().isChallenge())
+			highscore.update();
 		
-		if(back.justReleased())
-			game.setScreen(game.gameType);
-		else if(play.justReleased()) {
+		if(back.justReleased()) {
+			if(game.getMap().isChallenge())
+				game.setScreen(game.challenge);
+			else game.setScreen(game.gameType);
+		}else if(play.justReleased()) {
 			game.game.setPlayersAmount(numUpDown.getOption());
 			game.setScreen(game.game);
 		}
@@ -178,7 +181,8 @@ public class LevelScreen implements Screen, GUIRenderer, UpDownListener {
 
 	@Override
 	public void onOptionChanged(UpDown upDown, int newValue) {
-		highscore.setText(highscoreText + SettingsPrefsIO.readSettingInteger(getDifficulty() + "" + numUpDown.getOption()));
+		if(!game.getMap().isChallenge())
+			highscore.setText(highscoreText + SettingsPrefsIO.readSettingInteger(getDifficulty() + "" + numUpDown.getOption()));
 		
 	}
 }

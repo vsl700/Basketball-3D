@@ -1457,7 +1457,7 @@ public class Rules implements GameMessageSender {
 						if(holdingPlayer != null || recentHolder != null && (recentHolder.isCurrentlyAiming() || recentHolder.isShooting())) {
 							recentHolder = holdingPlayer;
 							
-							holderInZone = holdingPlayer.isInAwayBasketZone();
+							holderInZone = recentHolder.isInAwayBasketZone();
 							if(!holderInZone)
 								holderInThreePoint = holdingPlayer.isInAwayThreePointZone();
 							else holderInThreePoint = true;
@@ -1517,7 +1517,7 @@ public class Rules implements GameMessageSender {
 
 					@Override
 					public void resetRule() {
-						
+						recentHolder = null;
 					}
 					
 				}
