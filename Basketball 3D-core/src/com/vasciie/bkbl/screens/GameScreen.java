@@ -493,4 +493,16 @@ public class GameScreen implements Screen, GameMessageListener, GUIRenderer {
 		minorMessage.setText(message);
 		minorMessageRec = true;
 	}
+
+	@Override
+	public void sendMessage(String heading, String description, Color textColor, GameMessageSender sender, boolean skippable) {
+		
+		
+	}
+
+	@Override
+	public void sendMessage(String message, Color textColor, GameMessageSender sender, boolean skippable) {
+		
+		
+	}
 }

@@ -17,21 +17,28 @@ import com.badlogic.gdx.graphics.g3d.ModelBatch;
 import com.badlogic.gdx.graphics.g3d.attributes.ColorAttribute;
 import com.badlogic.gdx.graphics.g3d.environment.DirectionalLight;
 import com.badlogic.gdx.graphics.g3d.environment.PointLight;
+import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 import com.badlogic.gdx.math.Matrix4;
 import com.badlogic.gdx.math.Vector3;
 import com.vasciie.bkbl.gamespace.GameMap;
 import com.vasciie.bkbl.gamespace.levels.Challenges.ChallengeLevel;
+import com.vasciie.bkbl.gui.Button;
+import com.vasciie.bkbl.gui.GUI;
+import com.vasciie.bkbl.gui.GUIBox;
+import com.vasciie.bkbl.gui.GUIRenderer;
+import com.vasciie.bkbl.gui.Label;
 import com.vasciie.bkbl.screens.*;
 
-public class MyGdxGame extends Game {
+public class MyGdxGame extends Game implements GameMessageListener, GUIRenderer {
 	
 	public static Color defaultColor = new Color(0, 0.7f, 0.8f, 1), currentColor;
 	public static final boolean TESTING = false;
 	
 	Matrix4 spinMx;
 	
+	ShapeRenderer shape;
 	SpriteBatch batch;
-	BitmapFont font;
+	BitmapFont font, textFont, btnFont;
 	OrthographicCamera cam;
 	
 	ModelBatch mBatch;
@@ -62,6 +69,14 @@ public class MyGdxGame extends Game {
 	
 	boolean beautifulBack = true;
 	
+	GameMessageSender sender;
+	
+	GUIBox messageBox;
+	Label messageLabel;
+	Button messageCont;
+	float messageTime;
+	
+	
 	@Override
 	public void create () {
 		assets = new AssetManager();
@@ -81,10 +96,28 @@ public class MyGdxGame extends Game {
 			GUI_SCALE = 1.5f;
 		else GUI_SCALE = 1;
 
-		batch = new SpriteBatch();
-		
-		font = new BitmapFont();
-		font.getData().setScale(1);
+		if (!TESTING) {
+			spinMx = new Matrix4();
+			
+			font = new BitmapFont();
+			font.getData().setScale(1);
+			
+			textFont = new BitmapFont();
+			textFont.getData().setScale(2);
+			
+			btnFont = new BitmapFont();
+			btnFont.getData().setScale(GUI_SCALE);
+			
+			messageLabel = new Label("", textFont, true, this);
+			
+			messageCont = new Button("OK!", btnFont, Color.RED, true, true, this);
+			
+			batch = new SpriteBatch();
+			shape = new ShapeRenderer();
+			
+			
+			messageBox = new GUIBox(this, new GUI[] {messageLabel, messageCont});
+		}
 		
 		cam = new OrthographicCamera();
 		
@@ -106,7 +139,7 @@ public class MyGdxGame extends Game {
 		
 		setScreen(spScreen1);
 		
-		spinMx = new Matrix4();
+		
 	}
 	
 	private void loadTexture() {
@@ -208,6 +241,21 @@ public class MyGdxGame extends Game {
 		System.out.println(Gdx.graphics.getFramesPerSecond() + " fps");
 		System.out.println();*/
 		
+		if(sender != null) {
+			messageLabel.update();
+			if(messageTime < 0)
+				messageCont.update();
+			else messageTime -= Gdx.graphics.getDeltaTime();
+			messageBox.update();
+			
+			if(messageCont.justTouched())
+				sender = null;
+			
+			messageBox.draw();
+			messageLabel.draw();
+			messageCont.draw();
+		}
+		
 		if (!getScreen().equals(spScreen1) && !getScreen().equals(spScreen2) && !game.paused()) {
 			batch.setProjectionMatrix(cam.combined);
 			batch.begin();
@@ -287,10 +335,27 @@ public class MyGdxGame extends Game {
 		return tempStr;
 	}
 	
+	private void messageResize() {
+		float width = cam.viewportWidth;
+		float height = cam.viewportHeight;
+		
+		messageLabel.setWidth(Math.min(messageLabel.textSize(), width - 20));
+		messageLabel.setPos(width / 2 - messageLabel.getWidth() / 2, height - 80 - messageLabel.getRows() * 30);
+		
+		messageCont.setSize(pixelXByCurrentSize(223 * MyGdxGame.GUI_SCALE), pixelYByCurrentSize(30 * MyGdxGame.GUI_SCALE));
+		messageCont.setPos(width / 2 - messageCont.getWidth() / 2, messageLabel.getY() - messageCont.getHeight() - 40);
+		
+		messageBox.setSize(width, (height - messageCont.getY()));
+		messageBox.setPos(width / 2 - messageBox.getWidth() / 2, height - 20 - messageBox.getHeight());
+	}
+	
 	@Override
 	public void resize(int width, int height) {
-		if(!MyGdxGame.TESTING)
+		if(!TESTING) {
 			cam.setToOrtho(false, width, height);
+			
+			messageResize();
+		}
 		
 		if(pCam != null) {
 			pCam.viewportWidth = width;
@@ -299,7 +364,7 @@ public class MyGdxGame extends Game {
 		
 		getScreen().resize(width, height); //That method doesn't automatically call in the screen so we have to call it manually
 		
-		if(!MyGdxGame.TESTING)
+		if(!TESTING)
 			if (game.paused())
 				game.resize(width, height);
 	}
@@ -309,6 +374,10 @@ public class MyGdxGame extends Game {
 		if (!TESTING) {
 			batch.dispose();
 			logo.dispose();
+			shape.dispose();
+			font.dispose();
+			textFont.dispose();
+			btnFont.dispose();
 		}
 		
 		if(map != null) {
@@ -351,5 +420,50 @@ public class MyGdxGame extends Game {
 	public float pixelYByCurrentSize(float value) {
 		
 		return value * cam.viewportHeight / 720;
+	}
+
+	@Override
+	public void sendMessage(String heading, String description, Color textColor, GameMessageSender sender, boolean skippable, boolean showPower) {
+		
+	}
+
+	@Override
+	public void sendMinorMessage(String message) {
+		
+	}
+
+	@Override
+	public void sendMessage(String heading, String description, Color textColor, GameMessageSender sender, boolean skippable) {
+		
+		
+	}
+
+	@Override
+	public void sendMessage(String message, Color textColor, GameMessageSender sender, boolean skippable) {
+		this.sender = sender;
+		messageLabel.setColor(textColor);
+		messageLabel.setText(message);
+		
+		messageResize();
+		
+		messageTime = 1;
+	}
+
+	@Override
+	public SpriteBatch getSpriteBatch() {
+		
+		return batch;
+	}
+
+	@Override
+	public ShapeRenderer getShapeRenderer() {
+		
+		return shape;
+	}
+
+	@Override
+	public OrthographicCamera getCam() {
+		
+		return cam;
 	}
 }

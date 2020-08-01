@@ -8,11 +8,13 @@ import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.g2d.BitmapFont;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
+import com.vasciie.bkbl.GameMessageSender;
 import com.vasciie.bkbl.MyGdxGame;
+import com.vasciie.bkbl.gamespace.tools.SettingsPrefsIO;
 import com.vasciie.bkbl.gui.Button;
 import com.vasciie.bkbl.gui.GUIRenderer;
 
-public class MainScreen implements Screen, GUIRenderer {
+public class MainScreen implements Screen, GUIRenderer, GameMessageSender {
 	
 	MyGdxGame game;
 	
@@ -41,7 +43,10 @@ public class MainScreen implements Screen, GUIRenderer {
 
 	@Override
 	public void show() {
-
+		if(!SettingsPrefsIO.readSettingBool("welcome")) {
+			game.sendMessage("Hello And Welcome To Basketball-3D, A Free Basketball 3D Simulator With A Kinda Realistic Gameplay! Don't Get Scared By Hearing Realistic Gameplay! There's A Tutorial Menu Right Behind The Play Button Below (Play>TutorialLevels)! The Tutorials Are Very Special And, Trust Me, You ARE Going To Learn How To Play Basketball-3D! Just Go Through All Of Them!", Color.RED, this, true);
+			SettingsPrefsIO.writeSettingBool("welcome", true);
+		}
 	}
 
 	@Override
@@ -127,5 +132,10 @@ public class MainScreen implements Screen, GUIRenderer {
 	@Override
 	public OrthographicCamera getCam() {
 		return cam;
+	}
+
+	@Override
+	public void messageReceived() {
+		
 	}
 }
