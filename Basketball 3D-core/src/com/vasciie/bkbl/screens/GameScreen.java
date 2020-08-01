@@ -305,11 +305,15 @@ public class GameScreen implements Screen, GameMessageListener, GUIRenderer {
 		if(SettingsScreen.multithreadOption)
 			updateThread.waitToFinish();
 
-		map.getMainPlayer().getFocusTransform().mul(tempMatrix.setToTranslation(0, map.getMainPlayer().getHeight(), -10)).getTranslation(pCam.position);
-		game.customLookAt(pCam, tempMatrix.set(map.getMainPlayer().getModelInstance().transform).mul(tempMatrix2.setToTranslation(0, map.getMainPlayer().getHeight(), 0)).getTranslation(tempVec));
+		pCam.position.set(map.getCamera().getPosition());
 		pCam.update();
 		map.render(mBatch, environment, pCam);
-
+		
+		map.getMainPlayer().getFocusTransform().mul(tempMatrix.setToTranslation(0, map.getMainPlayer().getHeight(), -10)).getTranslation(pCam.position);
+		game.customLookAt(pCam, tempMatrix.set(map.getMainPlayer().getModelInstance().transform).mul(tempMatrix2.setToTranslation(0, map.getMainPlayer().getHeight(), 0)).getTranslation(tempVec));
+		map.getCamera().setPosition(pCam.position);
+		map.getCamera().setDirection(pCam.direction);
+		
 		if (!paused()) {
 			if(Gdx.app.getType().equals(Application.ApplicationType.Android))
 				map.updateController();
@@ -318,6 +322,7 @@ public class GameScreen implements Screen, GameMessageListener, GUIRenderer {
 				updateThread.start();
 			else updateRunnable.run();
 		}
+		map.updateCamera();
 
 		updateGUI(delta);
 

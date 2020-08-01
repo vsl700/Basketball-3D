@@ -400,6 +400,12 @@ public enum TerrainThemes {
 			return //new Color(0.6f, 0.5f, 0, 1);
 					null;
 		}
+
+		@Override
+		public boolean hasWallModels() {
+			
+			return false;
+		}
 		
 	},
 	
@@ -644,6 +650,12 @@ public enum TerrainThemes {
 			
 			return null;
 		}
+
+		@Override
+		public boolean hasWallModels() {
+			
+			return true;
+		}
 		
 	},
 	
@@ -874,6 +886,12 @@ public enum TerrainThemes {
 			
 			return new Color(0, 0.3f, 0.3f, 1);
 		}
+
+		@Override
+		public boolean hasWallModels() {
+			
+			return false;
+		}
 		
 	},
 	
@@ -908,6 +926,12 @@ public enum TerrainThemes {
 			
 			return new Color(0.3f, 0.3f, 0, 1);
 		}
+
+		@Override
+		public boolean hasWallModels() {
+			
+			return theme.hasWallModels();
+		}
 		
 	},
 	
@@ -930,6 +954,12 @@ public enum TerrainThemes {
 			
 			return null;
 		}
+
+		@Override
+		public boolean hasWallModels() {
+			
+			return false;
+		}
 		
 	};
 	
@@ -950,6 +980,8 @@ public enum TerrainThemes {
 	public abstract Color getThemeColor();
 	
 	public abstract boolean hasOwnTerrain();
+	
+	public abstract boolean hasWallModels();
 	
 	public static TerrainThemes chooseTheme(Terrain terrain, boolean local) {
 		if (!terrain.getMap().isTutorialMode() && (local && terrain.getMap().isChallenge() || !terrain.getMap().isChallenge()))

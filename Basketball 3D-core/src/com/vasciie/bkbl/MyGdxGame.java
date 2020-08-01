@@ -17,6 +17,7 @@ import com.badlogic.gdx.graphics.g3d.ModelBatch;
 import com.badlogic.gdx.graphics.g3d.attributes.ColorAttribute;
 import com.badlogic.gdx.graphics.g3d.environment.DirectionalLight;
 import com.badlogic.gdx.graphics.g3d.environment.PointLight;
+import com.badlogic.gdx.math.Matrix4;
 import com.badlogic.gdx.math.Vector3;
 import com.vasciie.bkbl.gamespace.GameMap;
 import com.vasciie.bkbl.gamespace.levels.Challenges.ChallengeLevel;
@@ -26,6 +27,8 @@ public class MyGdxGame extends Game {
 	
 	public static Color defaultColor = new Color(0, 0.7f, 0.8f, 1), currentColor;
 	public static final boolean TESTING = false;
+	
+	Matrix4 spinMx;
 	
 	SpriteBatch batch;
 	BitmapFont font;
@@ -102,6 +105,8 @@ public class MyGdxGame extends Game {
 			settings = new SettingsScreen(this);
 		
 		setScreen(spScreen1);
+		
+		spinMx = new Matrix4();
 	}
 	
 	private void loadTexture() {
@@ -119,7 +124,6 @@ public class MyGdxGame extends Game {
 		environment.add(new PointLight().set(1, 1, 1, 0, 13, 0, 150));
 
 		pCam = new PerspectiveCamera(40, Gdx.graphics.getWidth(), Gdx.graphics.getHeight());
-		pCam.position.set(0, 9, 25);
 		pCam.far = 200;
 		pCam.near = 0.1f;
 		
@@ -132,6 +136,8 @@ public class MyGdxGame extends Game {
 		currentColor = defaultColor.cpy();
 	}
 
+	private static final Matrix4 tempMx = new Matrix4();
+	private static final Vector3 tempVec = new Vector3();
 	@Override
 	public void render () {
 		if(getScreen().equals(tester)) {
@@ -159,14 +165,21 @@ public class MyGdxGame extends Game {
 				Gdx.gl.glClearColor(currentColor.r, currentColor.g, currentColor.b, currentColor.a);
 				Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT | GL20.GL_DEPTH_BUFFER_BIT);
 
+				pCam.position.set(spinMx.cpy().mul(tempMx.setToTranslation(0, 9, 25)).getTranslation(tempVec));
+				customLookAt(pCam, Vector3.Zero);
+				if(map.getTerrain().getTheme() != null && map.getTerrain().getTheme().hasWallModels()) {
+					map.getCamera().setPosition(pCam.position);
+					map.getCamera().setDirection(pCam.direction);
+					map.updateCamera();
+					pCam.position.set(map.getCamera().getPosition());
+				}
+				
 				pCam.update();
 				//mBatch.begin(pCam);
 				map.render(mBatch, environment, pCam);
 				
+				spinMx.rotate(0, 1, 0, 10 * Gdx.graphics.getDeltaTime());
 				//mBatch.end();
-				
-				pCam.rotateAround(new Vector3(), new Vector3(0, 1, 0), 10 * Gdx.graphics.getDeltaTime());
-				customLookAt(pCam, new Vector3());
 			} else {
 				if (background == null) {
 					loadTexture();

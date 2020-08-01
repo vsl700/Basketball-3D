@@ -640,6 +640,10 @@ public class GameMap implements GameMessageSender {
     		p.updateAnimations(delta);
     }
     
+    public void updateCamera() {
+    	camera.updateCamera();
+    }
+    
     public void update(float delta) {
         //camera.setWorldTransform(new Matrix4(mainPlayer.getModelInstance().transform).mul(mainPlayer.getCamMatrix()).mul(new Matrix4().setToTranslation(0, mainPlayer.getHeight(), -10)));
     	float delta2 = delta * gameSpeed;
@@ -647,12 +651,10 @@ public class GameMap implements GameMessageSender {
     	if(SettingsScreen.multithreadOption)
     		physicsThread.waitToFinish();
     	else dynamicsWorldRunnable.run();
+    	
 
     	if(isTutorialMode()) {
     		tutorial.act(currentTutorialLevel);
-    		/*if(tutorial.act(currentTutorialLevel)) {
-    			//TODO Add gameover here!
-    		}*/
     		
     		startTimer = 0;
     	}
@@ -965,8 +967,9 @@ public class GameMap implements GameMessageSender {
         }
     }
 
+    private static final Vector3 tempVec = new Vector3();
     public void setCameraTrans(Matrix4 trans) {
-        camera.getBodies().get(0).proceedToTransform(trans);
+        camera.setPosition(trans.getTranslation(tempVec));
 
     }
 
