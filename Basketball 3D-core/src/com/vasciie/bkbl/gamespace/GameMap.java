@@ -726,8 +726,11 @@ public class GameMap implements GameMessageSender {
         		onRuleTriggered(rule);
 				rulesListener.sendMessage(rule.getName(), rule.getDescription(), rule.getTextColor(), this, true, false);
         	}
+
+        	if(isChallenge())
+        		challenges.update();
         	
-        	if(isChallenge() && challenges.update()) {
+        	if(!ruleTriggered && challenges.isAChallengeBroken()) {
         		gameRunning = playersReady = false;
         		
         		sendChallengeMessage();

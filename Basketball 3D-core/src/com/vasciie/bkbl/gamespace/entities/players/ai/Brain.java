@@ -361,7 +361,7 @@ public class Brain {
 			if(memory.getAimingTime() <= maxShootingTime) {
 				performShooting();
 			}
-			else if (memory.getAimingTime() > maxShootingTime) {
+			else {
 				//System.out.println(memory.getShootVec());
 				memory.setShootTime(0);
 				memory.setCatchTime(0);

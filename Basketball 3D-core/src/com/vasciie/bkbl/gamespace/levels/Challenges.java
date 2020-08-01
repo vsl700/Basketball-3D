@@ -116,7 +116,7 @@ public class Challenges extends Levels {
 
 					@Override
 					public boolean update() {
-						return map.isRuleTriggered() && map.getRules().getTriggeredRule().getRuleTriggerer().equals(map.getMainPlayer());
+						return map.isRuleTriggered() && !map.getRules().getTriggeredRule().getId().equals("basket_score") && map.getRules().getTriggeredRule().getRuleTriggerer().equals(map.getMainPlayer());
 					}
 
 					@Override

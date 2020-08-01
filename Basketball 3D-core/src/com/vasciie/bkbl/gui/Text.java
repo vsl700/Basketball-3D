@@ -49,6 +49,10 @@ public abstract class Text extends GUI {
 			textChangeListener.onTextChanged(text);
 	}
 	
+	public String getText() {
+		return text;
+	}
+	
 	public void setTextChangeListener(TextChangeListener listener) {
 		textChangeListener = listener;
 	}

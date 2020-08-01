@@ -271,10 +271,10 @@ public class GameScreen implements Screen, GameMessageListener, GUIRenderer {
 								if(map.getChallenges().isAChallengeBroken() && !map.isRuleTriggered())
 									game.setScreen(game.gameOver);
 								
-								GameMessageSender tempSender = sender;
+								String tempText = ruleHeading.getText();
 								sender.messageReceived();
 								
-								if(tempSender.equals(sender))
+								if(ruleHeading.getText().equals(tempText))
 									sender = null;
 							}
 						} else if (contTimer > 0)
