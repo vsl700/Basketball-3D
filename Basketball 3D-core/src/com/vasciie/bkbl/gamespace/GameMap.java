@@ -277,22 +277,6 @@ public class GameMap implements GameMessageSender {
         }
     }
 
-    private void addCameraCollObjects() {
-        for (btRigidBody co : camera.getBodies()) {
-            co.setUserValue(index);
-            co.setCollisionFlags(co.getCollisionFlags() | btCollisionObject.CollisionFlags.CF_CUSTOM_MATERIAL_CALLBACK);
-            dynamicsWorld.addRigidBody(co, CAMERA_FLAG, GROUND_FLAG);
-            co.setContactCallbackFlag(CAMERA_FLAG);
-            co.setContactCallbackFilter(GROUND_FLAG);
-
-            objectsMap.put(index, ObjectType.CAMERA.getId());
-            collObjsInObjectMap.put(co, camera);
-            collObjsValsMap.put(index, co);
-
-            index++;
-        }
-    }
-
     private void addTerrainCollObjects() {
         for (btRigidBody co : terrain.getBodies()) {
             co.setUserValue(index);
@@ -333,7 +317,6 @@ public class GameMap implements GameMessageSender {
 
 		if (!MyGdxGame.TESTING) {
 			camera = (Camera) ObjectType.createGameObject(ObjectType.CAMERA.getId(), this, 0, 0, 0);
-			addCameraCollObjects();
 		}
 
         basket1 = ObjectType.createBasket(ObjectType.HOMEBASKET.getId(), this, 0.1f, 0, 27);
@@ -609,7 +592,6 @@ public class GameMap implements GameMessageSender {
         
         index = 0;
         addTerrainCollObjects();
-        addCameraCollObjects();
         addBasketsCollObjects();
 
         //index = ballIndex;
