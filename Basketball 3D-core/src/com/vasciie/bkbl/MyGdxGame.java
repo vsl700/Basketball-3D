@@ -19,6 +19,7 @@ import com.badlogic.gdx.graphics.g3d.environment.DirectionalLight;
 import com.badlogic.gdx.graphics.g3d.environment.PointLight;
 import com.badlogic.gdx.math.Vector3;
 import com.vasciie.bkbl.gamespace.GameMap;
+import com.vasciie.bkbl.gamespace.levels.Challenges.ChallengeLevel;
 import com.vasciie.bkbl.screens.*;
 
 public class MyGdxGame extends Game {
@@ -250,6 +251,27 @@ public class MyGdxGame extends Game {
 		//if (!tmpVec.isZero()) {
 		pCam.direction.set(trans.cpy().sub(pCam.position).nor());
 		//}
+	}
+	
+	public String getChallengeDataStr() {
+		StringBuilder sb = new StringBuilder();
+		for(int i = 0; i < map.getChallenges().getCurrentChallenges().length; i++) {
+			ChallengeLevel lvl = map.getChallenges().getCurrentChallenges()[i];
+			sb.append(lvl.getId());
+			
+			if(lvl.hasChallengeLevels())
+				sb.append(lvl.getChallengeLevel());
+			
+			if(i + 1 < map.getChallenges().getCurrentChallenges().length)
+				sb.append(';');
+		}
+		
+		sb.append(':');
+		sb.append(level.getDifficulty());
+		sb.append(level.getPlayersAmount());
+		
+		String tempStr = sb.toString();
+		return tempStr;
 	}
 	
 	@Override

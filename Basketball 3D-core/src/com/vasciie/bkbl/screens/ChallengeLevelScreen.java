@@ -153,7 +153,7 @@ public class ChallengeLevelScreen implements Screen, GUIRenderer {
 				for (int i = 0; i < tempCh.size; i++)
 					tempChArr[i] = tempCh.get(i);
 
-				game.getMap().getChallenges().setChallenge(tempChArr);//toArray() doesn't work on any ArrayList class (List, Array, ArrayList...)
+				game.getMap().getChallenges().setChallenge(tempChArr);//toArray() doesn't work on any Array class (Array, ArrayList...)
 				game.setScreen(game.level);
 			}
 		}

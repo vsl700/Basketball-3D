@@ -34,7 +34,7 @@ public class LevelScreen implements Screen, GUIRenderer, UpDownListener {
 	Label tmPlAmount, difficulty; //tmPlAmount - team players amount description
 	Label highscore;
 	
-	private static final String highscoreText = "Highscore For The Level Combination Below: ";
+	private static final String highscoreText = "Highscore For The Game Level Combination Below: ", highscoreChText = "Highscore For The Challenge & Game Level Combination: ";
 	
 	
 	public LevelScreen(MyGdxGame mg) {
@@ -74,12 +74,18 @@ public class LevelScreen implements Screen, GUIRenderer, UpDownListener {
 		difficulty = new Label("THE DIFFICULTY OF THE GAME", btnFont, Color.BROWN, true, this);
 		
 		highscore = new Label(highscoreText, textFont, Color.GREEN, false, this);
-		highscore.setText(highscoreText + SettingsPrefsIO.readSettingInteger(getDifficulty() + "" + numUpDown.getOption()));
+		
 	}
 	
 	@Override
 	public void show() {
-
+		setHighscoreText();
+	}
+	
+	private void setHighscoreText() {
+		if(game.getMap().isChallenge()) {
+			highscore.setText(highscoreChText + SettingsPrefsIO.readSettingInteger(game.getChallengeDataStr()));
+		}else highscore.setText(highscoreText + SettingsPrefsIO.readSettingInteger(getDifficulty() + "" + getPlayersAmount()));
 	}
 
 	@Override
@@ -93,8 +99,7 @@ public class LevelScreen implements Screen, GUIRenderer, UpDownListener {
 		
 		tmPlAmount.update();
 		difficulty.update();
-		if(!game.getMap().isChallenge())
-			highscore.update();
+		highscore.update();
 		
 		if(back.justReleased()) {
 			if(game.getMap().isChallenge())
@@ -163,6 +168,10 @@ public class LevelScreen implements Screen, GUIRenderer, UpDownListener {
 	public int getDifficulty() {
 		return textUpDown.getOption();
 	}
+	
+	public int getPlayersAmount() {
+		return numUpDown.getOption();
+	}
 
 	@Override
 	public SpriteBatch getSpriteBatch() {
@@ -181,8 +190,7 @@ public class LevelScreen implements Screen, GUIRenderer, UpDownListener {
 
 	@Override
 	public void onOptionChanged(UpDown upDown, int newValue) {
-		if(!game.getMap().isChallenge())
-			highscore.setText(highscoreText + SettingsPrefsIO.readSettingInteger(getDifficulty() + "" + numUpDown.getOption()));
+		setHighscoreText();
 		
 	}
 }

@@ -92,7 +92,11 @@ public class GameOverScreen implements Screen, GUIRenderer {
 		int total = checkChallenge() ? basketDiff * 10 * teammatesLeft + mainPlayerSc * 10 : 0;
 		
 		
-		String level = map.getDifficulty() + "" + game.game.getAmount();
+		String level;
+		if(map.isChallenge())
+			level = game.getChallengeDataStr();
+		else level = map.getDifficulty() + "" + game.game.getAmount();
+		
 		int prevScore = SettingsPrefsIO.readSettingInteger(level);
 		if(prevScore < total) {
 			if(prevScore > 0) {

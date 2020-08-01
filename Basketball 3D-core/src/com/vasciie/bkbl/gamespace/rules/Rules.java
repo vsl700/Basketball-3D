@@ -844,7 +844,7 @@ public class Rules implements GameMessageSender {
 							}
 						}else if(recentHolder.getBrain().getMemory().isBallJustShot() && ball.getPosition().dst(recentHolder.getPosition()) >= recentHolder.getHeight() / 1.5f || !recentHolder.getBrain().getMemory().isBallJustShot()) {
 							crossed = holdingPlayer != null && holdingPlayer.isInAwayZone() || holdingPlayer == null && recentHolder.getAwayZone().checkZone(ball.getPosition(), ball.getDimensions());
-						}
+						}//FIXME Doesn't change recentHolder after very fast ball stealings or something
 						
 						//System.out.println(crossed);
 						

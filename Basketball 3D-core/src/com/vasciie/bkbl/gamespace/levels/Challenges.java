@@ -199,7 +199,7 @@ public class Challenges extends Levels {
 					
 				},
 				
-				new ChallengeLevel("no_running", "Playing Without Running (main player only)", map, messageListener) {
+				new ChallengeLevel("no_running", "Playing Without Running", map, messageListener) {
 					
 					@Override
 					public void setup() {
@@ -339,6 +339,10 @@ public class Challenges extends Levels {
 		
 		public void setChallengeLevel(int level) {
 			challengeLevel = Math.max(0, Math.min(getChallengeLevelsAmount(), level));
+		}
+		
+		public int getChallengeLevel() {
+			return challengeLevel;
 		}
 		
 		public abstract String[] getChallengeLevelsNames();
