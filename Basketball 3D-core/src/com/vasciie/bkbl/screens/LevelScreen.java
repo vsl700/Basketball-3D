@@ -26,13 +26,14 @@ public class LevelScreen implements Screen, GUIRenderer, UpDownListener {
 	SpriteBatch batch;
 	ShapeRenderer shape;
 	OrthographicCamera cam;
-	BitmapFont btnFont, textFont;
+	BitmapFont btnFont, textFont, descFont;
 	
 	NumUpDown numUpDown;
 	TextUpDown textUpDown;
 	Button play, back;
 	Label tmPlAmount, difficulty; //tmPlAmount - team players amount description
 	Label highscore;
+	Label[][] difficultyDesc;
 	
 	private static final String highscoreText = "Highscore For The Game Level Combination Below: ", highscoreChText = "Highscore For The Challenge & Game Level Combination: ";
 	
@@ -50,6 +51,9 @@ public class LevelScreen implements Screen, GUIRenderer, UpDownListener {
 		
 		textFont = new BitmapFont();
 		textFont.getData().setScale(2 * MyGdxGame.GUI_SCALE);
+		
+		descFont = new BitmapFont();
+		descFont.getData().setScale(1.25f * MyGdxGame.GUI_SCALE);
 		
 		createGui();
 	}
@@ -75,6 +79,25 @@ public class LevelScreen implements Screen, GUIRenderer, UpDownListener {
 		
 		highscore = new Label(highscoreText, textFont, Color.GREEN, false, this);
 		
+		
+		difficultyDesc = new Label[3][];
+		
+		Color tempColor = Color.BROWN;
+		difficultyDesc[0] = new Label[] {new Label("Auto-dribble", descFont, tempColor, false, this), 
+				new Label("Opponent Bots Easily Make Fouls", descFont, tempColor, false, this),
+				new Label("Players Dribble Longer Than Usual For Easier Stealing", descFont, tempColor, false, this),
+				new Label("Opponents Steal The Ball Much Harder (originally always)", descFont, tempColor, false, this),
+				new Label("No Fouls Limit Per Player", descFont, tempColor, false, this)};
+		
+		difficultyDesc[1] = new Label[] {new Label("Auto-dribble", descFont, tempColor, false, this), 
+				new Label("Bots Don't Make Fouls", descFont, tempColor, false, this),
+				new Label("'Time Out' Rule Included", descFont, tempColor, false, this),
+				new Label("Fouls Limit Of 7 Per Player", descFont, tempColor, false, this)};
+		
+		difficultyDesc[2] = new Label[] {new Label("Teammate Bots Easily Make Fouls", descFont, tempColor, false, this),
+				new Label("'Time Out' Rule Included", descFont, tempColor, false, this),
+				new Label("'Free Throw Violation' Rule Included", descFont, tempColor, false, this),
+				new Label("Fouls Limit Of 7 Per Player", descFont, tempColor, false, this)};
 	}
 	
 	@Override
@@ -101,6 +124,9 @@ public class LevelScreen implements Screen, GUIRenderer, UpDownListener {
 		difficulty.update();
 		highscore.update();
 		
+		for(Label lbl : difficultyDesc[getDifficulty()])
+			lbl.update();
+		
 		if(back.justReleased()) {
 			if(game.getMap().isChallenge())
 				game.setScreen(game.challenge);
@@ -120,6 +146,9 @@ public class LevelScreen implements Screen, GUIRenderer, UpDownListener {
 		tmPlAmount.draw();
 		difficulty.draw();
 		highscore.draw();
+		
+		for(Label lbl : difficultyDesc[getDifficulty()])
+			lbl.draw();
 	}
 
 	@Override
@@ -140,6 +169,19 @@ public class LevelScreen implements Screen, GUIRenderer, UpDownListener {
 		tmPlAmount.setPosAndSize(numUpDown.getX() + numUpDown.getTotalWidth() / 2 / MyGdxGame.GUI_SCALE - 164 / 2, numUpDown.getY() + numUpDown.getHeight() + 10, 164 * MyGdxGame.GUI_SCALE);
 		difficulty.setPosAndSize(textUpDown.getX() + textUpDown.getTotalWidth() / 2 / MyGdxGame.GUI_SCALE - 164 / 2, textUpDown.getY() + textUpDown.getHeight() + 10, 164 * MyGdxGame.GUI_SCALE);
 		highscore.setPos(width / 2 - 13, game.getLogoY() - 13 * MyGdxGame.GUI_SCALE);
+		
+		resizeDifficultyDesc();
+	}
+	
+	private void resizeDifficultyDesc() {
+		//float width = cam.viewportWidth, height = cam.viewportHeight;
+		
+		for(int i = 0; i < difficultyDesc[getDifficulty()].length; i++) {
+			Label lbl = difficultyDesc[getDifficulty()][i];
+			
+			lbl.setY(textUpDown.getY() - 13 * 1.25f * MyGdxGame.GUI_SCALE * (i + 1));
+			lbl.setX(textUpDown.getX() + lbl.textSize() / 2);
+		}
 	}
 
 	@Override
@@ -163,6 +205,7 @@ public class LevelScreen implements Screen, GUIRenderer, UpDownListener {
 		shape.dispose();
 		btnFont.dispose();
 		textFont.dispose();
+		descFont.dispose();
 	}
 	
 	public int getDifficulty() {
@@ -191,6 +234,9 @@ public class LevelScreen implements Screen, GUIRenderer, UpDownListener {
 	@Override
 	public void onOptionChanged(UpDown upDown, int newValue) {
 		setHighscoreText();
+		
+		if(upDown.equals(textUpDown))
+			resizeDifficultyDesc();
 		
 	}
 }
