@@ -12,12 +12,14 @@ import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 public class GUIBox extends GUI {
 	
 	GUI[] guis;
+	float border;
 	
 
-	public GUIBox(GUIRenderer guiRenderer, GUI[] guis) {
+	public GUIBox(GUIRenderer guiRenderer, GUI[] guis, float border) {
 		super(guiRenderer);
 		
 		this.guis = guis;
+		this.border = border;
 	}
 
 	@Override
@@ -25,7 +27,7 @@ public class GUIBox extends GUI {
 		ShapeRenderer shape = guiRenderer.getShapeRenderer();
         OrthographicCamera cam = guiRenderer.getCam();
         
-        /*float minX = guis[0].getX(), minY = guis[0].getY();
+        float minX = guis[0].getX(), minY = guis[0].getY();
     	float maxX = guis[0].getX() + guis[0].getWidth(), maxY = guis[0].getY() + guis[0].getHeight();
         for(int i = 1; i < guis.length; i++) {
         	GUI gui = guis[i];
@@ -42,12 +44,12 @@ public class GUIBox extends GUI {
 				minY = gui.getY();
 			else if(gui.getY() + gui.getHeight() > maxY) 
 				maxY = gui.getY() + gui.getHeight();
-		}*/
+		}
         
         shape.begin(ShapeRenderer.ShapeType.Filled);
         shape.setColor(Color.ORANGE.cpy().sub(0, 0.3f, 0, 1));
         shape.setProjectionMatrix(cam.combined);
-        shape.rect(x, y, width, height);
+        shape.rect(minX - border, minY - border, maxX - minX + border, maxY - minY + border);
         shape.end();
         
         for(GUI gui : guis)

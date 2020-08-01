@@ -116,7 +116,7 @@ public class MyGdxGame extends Game implements GameMessageListener, GUIRenderer 
 			shape = new ShapeRenderer();
 			
 			
-			messageBox = new GUIBox(this, new GUI[] {messageLabel, messageCont});
+			messageBox = new GUIBox(this, new GUI[] {messageLabel, messageCont}, 10);
 		}
 		
 		cam = new OrthographicCamera();
@@ -340,13 +340,14 @@ public class MyGdxGame extends Game implements GameMessageListener, GUIRenderer 
 		float height = cam.viewportHeight;
 		
 		messageLabel.setWidth(Math.min(messageLabel.textSize(), width - 20));
+		messageLabel.setHeight(messageLabel.getRows() * 13 * textFont.getLineHeight());
 		messageLabel.setPos(width / 2 - messageLabel.getWidth() / 2, height - 80 - messageLabel.getRows() * 30);
 		
 		messageCont.setSize(pixelXByCurrentSize(223 * MyGdxGame.GUI_SCALE), pixelYByCurrentSize(30 * MyGdxGame.GUI_SCALE));
 		messageCont.setPos(width / 2 - messageCont.getWidth() / 2, messageLabel.getY() - messageCont.getHeight() - 40);
 		
-		messageBox.setSize(width, (height - messageCont.getY()));
-		messageBox.setPos(width / 2 - messageBox.getWidth() / 2, height - 20 - messageBox.getHeight());
+		/*messageBox.setSize(width, (height - messageCont.getY()));
+		messageBox.setPos(width / 2 - messageBox.getWidth() / 2, height - 20 - messageBox.getHeight());*/
 	}
 	
 	@Override

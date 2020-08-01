@@ -43,10 +43,10 @@ public class MainScreen implements Screen, GUIRenderer, GameMessageSender {
 
 	@Override
 	public void show() {
-		if(!SettingsPrefsIO.readSettingBool("welcome")) {
-			game.sendMessage("Hello And Welcome To Basketball-3D, A Free Basketball 3D Simulator With A Kinda Realistic Gameplay! Don't Get Scared By Hearing Realistic Gameplay! There's A Tutorial Menu Right Behind The Play Button Below (Play>TutorialLevels)! The Tutorials Are Very Special And, Trust Me, You ARE Going To Learn How To Play Basketball-3D! Just Go Through All Of Them!", Color.RED, this, true);
-			SettingsPrefsIO.writeSettingBool("welcome", true);
-		}
+		//if(!SettingsPrefsIO.readSettingBool("welcome")) {
+			game.sendMessage("Hello And Welcome To Basketball-3D, A Free 3D Basketball Simulator! There Are Some Tutorial Levels In 'Play>Tutorial Levels', Which I Highly Recommend Going Through First! They Are Not Harder Than The Game Itself, But They Will Make You Get Attatched To The Game Much Easier! Try Them Out!", Color.RED, this, true);
+			//SettingsPrefsIO.writeSettingBool("welcome", true);
+		//}
 	}
 
 	@Override
