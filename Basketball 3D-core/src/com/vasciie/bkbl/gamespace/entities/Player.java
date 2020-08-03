@@ -640,6 +640,8 @@ public abstract class Player extends Entity {
 		bodyController.setAnimation(id + "Body", -1);
 	}
 	
+	private static final Vector3 targetDir = new Vector3();
+	private static boolean achieved;
 	private void throwBall() {
 		Vector3 shootVec = brain.getMemory().getShootVec();
 		if(shootVec != null) {
@@ -670,6 +672,8 @@ public abstract class Player extends Entity {
 		}
 		
 		map.getBall().getMainBody().setLinearVelocity(tempVec);
+		targetDir.set(tempVec);
+		achieved = false;
 	}
 	
 	/**
@@ -1264,6 +1268,12 @@ public abstract class Player extends Entity {
 		
 		if(!leftHoldingBall && !rightHoldingBall || !leftAimBall && !rightAimBall) {
 			leftCurrentAim = rightCurrentAim = false;
+			
+			if(!achieved) {
+				if(map.getBall().getMainBody().getLinearVelocity().idt(targetDir))
+					achieved = true;
+				else map.getBall().getMainBody().setLinearVelocity(targetDir);
+			}
 			//leftThrowBall = rightThrowBall = false;
 		}
 		

@@ -801,7 +801,7 @@ public class Rules implements GameMessageSender {
 				},
 				
 				new GameRule(this, null, "backcourt_violation", "Backcourt Violation!", map) {
-					Player recentHolder;
+					Player recentHolder, prevHoldingPlayer;
 					boolean crossed, justTouched;
 					
 					@Override
@@ -809,12 +809,16 @@ public class Rules implements GameMessageSender {
 						Player holdingPlayer = map.getHoldingPlayer();
 						Ball ball = map.getBall();
 						
+						//System.out.println(holdingPlayer);
 						if (holdingPlayer == null) {
 							for (btCollisionObject obj : map.getBall().getOutsideColliders()) {
 								for (Player player : map.getAllPlayers()) {
 									if (player.getAllCollObjects().contains(obj)) {
-										if(recentHolder != null && (recentHolder instanceof Teammate && player instanceof Opponent || recentHolder instanceof Opponent && player instanceof Teammate))
+										if(recentHolder != null && (recentHolder instanceof Teammate && player instanceof Opponent || recentHolder instanceof Opponent && player instanceof Teammate)) {
 											crossed = false;
+											/*System.out.println("Cross Cleared");
+											System.out.println();*/
+										}
 											
 										recentHolder = player;// Make the recent holder a player that has recently just touched the ball
 										justTouched = true;
@@ -822,12 +826,18 @@ public class Rules implements GameMessageSender {
 								}
 							}
 						}else {
-							if(recentHolder instanceof Teammate && holdingPlayer instanceof Opponent || recentHolder instanceof Opponent && holdingPlayer instanceof Teammate)
-								crossed = false;
+							if(prevHoldingPlayer == null || recentHolder instanceof Teammate && holdingPlayer instanceof Opponent || recentHolder instanceof Opponent && holdingPlayer instanceof Teammate) {
+								crossed = holdingPlayer.isInAwayZone();
+								/*System.out.println("Cross Reset");
+								System.out.println(crossed);
+								System.out.println();*/
+							}
 							
 							recentHolder = holdingPlayer;
 							justTouched = false;
 						}
+						
+						prevHoldingPlayer = holdingPlayer;
 						
 						if(recentHolder == null)
 							return false;
@@ -842,8 +852,14 @@ public class Rules implements GameMessageSender {
 								
 								return true;
 							}
-						}else if(recentHolder.getBrain().getMemory().isBallJustShot() && ball.getPosition().dst(recentHolder.getPosition()) >= recentHolder.getHeight() / 1.5f || !recentHolder.getBrain().getMemory().isBallJustShot()) {
+						}else/* if(recentHolder.getBrain().getMemory().isBallJustShot() && ball.getPosition().dst(recentHolder.getPosition()) >= recentHolder.getHeight() / 1.5f || !recentHolder.getBrain().getMemory().isBallJustShot())*/ {
 							crossed = holdingPlayer != null && holdingPlayer.isInAwayZone() || holdingPlayer == null && recentHolder.getAwayZone().checkZone(ball.getPosition(), ball.getDimensions());
+							/*if(crossed) {
+								System.out.println("Cross Changed");
+								System.out.println(holdingPlayer);
+								System.out.println(recentHolder);
+								System.out.println();
+							}*/
 						}//FIXME Doesn't change recentHolder after very fast ball stealings or something
 						
 						//System.out.println(crossed);
@@ -895,6 +911,7 @@ public class Rules implements GameMessageSender {
 										return true;
 									
 									actor.getBrain().setCustomVecTarget(occurPlace, true);
+									actor.getBrain().getCustomPursue().setArrivalTolerance(2);
 								}
 								
 								
@@ -931,7 +948,7 @@ public class Rules implements GameMessageSender {
 						String text = "The Team That Has The Ball Cannot Let The Ball Cross The Midcourt Line Once It Got In Their Opposite's Team Zone!";
 						if(justTouched) {
 							String temp;
-							if(recentHolder instanceof Teammate)
+							if(ruleTriggerer instanceof Teammate)
 								temp = "A Teammate";
 							else temp = "An Opponent";
 							
@@ -946,6 +963,7 @@ public class Rules implements GameMessageSender {
 					public void resetRule() {
 						crossed = false;
 						recentHolder = null;
+						prevHoldingPlayer = null;
 					}
 				},
 
@@ -1032,7 +1050,7 @@ public class Rules implements GameMessageSender {
 					@Override
 					public String getDescription() {
 						
-						return "A Shooting Player Cannot Walk At The Same Time For More Than 1 Second!";
+						return "A Shooting Player Cannot Walk At The Same Time For More Than A Total Of 1 Second!";
 					}
 					
 				},

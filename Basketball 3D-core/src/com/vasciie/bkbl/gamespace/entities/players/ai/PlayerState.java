@@ -90,9 +90,15 @@ public enum PlayerState implements State<Player> {
 			
 			int difficulty = player.getMap().getDifficulty();
 			if(mem.isRandomFoulTime()) {
-				if (difficulty == 0 && player instanceof Opponent && MathUtils.random(0, 100) <= 60) {
+				int multiplier;
+				if(player instanceof Teammate)
+					multiplier = player.getMap().getTeammates().size();
+				else multiplier = player.getMap().getOpponents().size();
+				
+				int chance = 55 + 5 * multiplier;
+				if (difficulty == 0 && player instanceof Opponent && MathUtils.random(0, 100) <= chance) {
 					mem.setDribbleTime(mem.getDribbleTime() - Gdx.graphics.getDeltaTime() * 2.1f);
-				}else if(difficulty == 2 && player instanceof Teammate && MathUtils.random(0, 100) <= 60) {
+				}else if(difficulty == 2 && player instanceof Teammate && MathUtils.random(0, 100) <= chance) {
 					mem.setDribbleTime(mem.getDribbleTime() - Gdx.graphics.getDeltaTime() * 2.1f);
 				}
 				
