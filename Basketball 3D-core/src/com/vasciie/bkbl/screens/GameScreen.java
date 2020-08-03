@@ -23,6 +23,8 @@ import com.vasciie.bkbl.gamespace.entities.Player;
 import com.vasciie.bkbl.GameMessageListener;
 import com.vasciie.bkbl.GameMessageSender;
 import com.vasciie.bkbl.gamespace.tools.VEThread;
+import com.vasciie.bkbl.gui.GUI;
+import com.vasciie.bkbl.gui.GUIBox;
 import com.vasciie.bkbl.gui.GUIRenderer;
 import com.vasciie.bkbl.gui.Label;
 
@@ -53,11 +55,13 @@ public class GameScreen implements Screen, GameMessageListener, GUIRenderer {
 	Label ruleHeading, ruleDesc, clickToCont, playerRemove;
 	Label[] challenges, currentChallenges;
 	
+	GUIBox messageBox;
+	
 	int amount; //Player amount per team
 	
 	float contTimer;//clickToCont timer
 	
-	float messageBarWidth, messageBarHeight;
+	//float messageBarWidth, messageBarHeight;
 	
 	boolean ignorePause;
 	boolean skippableMessage, showPower;
@@ -126,6 +130,8 @@ public class GameScreen implements Screen, GameMessageListener, GUIRenderer {
 		clickToCont = new Label(message, powFont, Color.WHITE, true, this);
 		
 		playerRemove = new Label("Rule Triggerer Will Be Removed From The Game As He Just Got His 7th Foul!", powFont, Color.RED, true, this);
+		
+		messageBox = new GUIBox(this, new GUI[] {ruleHeading, ruleDesc, clickToCont, playerRemove}, 0);
 	}
 
 	@Override
@@ -172,8 +178,8 @@ public class GameScreen implements Screen, GameMessageListener, GUIRenderer {
 	}
 
 	private void renderGUI(){
-		if(!paused() && (map.isRuleTriggered() || sender != null)) {
-			shape.begin(ShapeRenderer.ShapeType.Filled);
+		//if(!paused() && (map.isRuleTriggered() || sender != null)) {
+			/*shape.begin(ShapeRenderer.ShapeType.Filled);
 			shape.setColor(Color.ORANGE.cpy().sub(0, 0.3f, 0, 1));
 			
 			float tempHeight;
@@ -182,8 +188,10 @@ public class GameScreen implements Screen, GameMessageListener, GUIRenderer {
 			else tempHeight = messageBarHeight;
 			
 			shape.rect(cam.viewportWidth / 2 - messageBarWidth / 2, cam.viewportHeight - 20 - tempHeight, messageBarWidth, tempHeight);
-			shape.end();
-		}
+			shape.end();*/
+			
+			messageBox.draw();
+		//}
 		
 		homeScore.draw();
 		awayScore.draw();
@@ -227,7 +235,7 @@ public class GameScreen implements Screen, GameMessageListener, GUIRenderer {
 				powerNum.update();
 				
 				if(!temp) {
-					power.setY(getPowerY() - messageBarHeight - 13);
+					power.setY(getPowerY() - messageBox.getHeight() - 13);
 					powerNum.setY(getPowerNumY());
 				}
 				else {
@@ -251,6 +259,7 @@ public class GameScreen implements Screen, GameMessageListener, GUIRenderer {
 					
 					
 					if (map.isTutorialMode() || map.isRuleTriggered() || map.getChallenges().isAChallengeBroken()) { // If the game is not running and there is no timer counting down
+						messageBox.update();
 						ruleHeading.update();
 						ruleDesc.update();
 
@@ -381,13 +390,13 @@ public class GameScreen implements Screen, GameMessageListener, GUIRenderer {
 	
 	private void resizeMessageText(int width, int height) {
 		float diff = 140;
-		ruleHeading.setPosAndSize(width / 2 - (width - diff) / 2, height - 80, width - diff);
+		ruleHeading.setPosAndSize(width / 2 - (width - diff) / 2, height - 80, width - diff, ruleHeading.getRows() * textFont.getLineHeight());
 		ruleDesc.setPosAndSize(width / 2 - (width - diff) / 2, ruleHeading.getY() - 30 * ruleDesc.getRows(), width - diff);
 		clickToCont.setPosAndSize(width / 2 - (width - diff) / 2, ruleDesc.getY() - 40 * clickToCont.getRows(), width - diff);
 		playerRemove.setPosAndSize(width / 2 - (width - diff) / 2, clickToCont.getY() - 30 * playerRemove.getRows(), width - diff);
 		
-		messageBarWidth = width - diff;
-		messageBarHeight = ruleHeading.getRows() * 39 + 26.5f * (ruleDesc.getRows() + (skippableMessage ? clickToCont.getRows() : 0) + playerRemove.getRows()) + 13;
+		//messageBarWidth = width - diff;
+		//messageBarHeight = ruleHeading.getRows() * 39 + 26.5f * (ruleDesc.getRows() + (skippableMessage ? clickToCont.getRows() : 0) + playerRemove.getRows()) + 13;
 	}
 	
 	public boolean paused() {

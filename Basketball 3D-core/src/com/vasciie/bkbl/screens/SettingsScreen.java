@@ -9,6 +9,7 @@ import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.g2d.BitmapFont;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
+import com.vasciie.bkbl.GameMessageSender;
 import com.vasciie.bkbl.MyGdxGame;
 import com.vasciie.bkbl.gamespace.tools.SettingsPrefsIO;
 import com.vasciie.bkbl.gui.Button;
@@ -19,7 +20,7 @@ import com.vasciie.bkbl.gui.NumUpDown;
 import com.vasciie.bkbl.gui.UpDown;
 import com.vasciie.bkbl.gui.UpDownListener;
 
-public class SettingsScreen implements Screen, UpDownListener, GUIRenderer {
+public class SettingsScreen implements Screen, UpDownListener, GUIRenderer, GameMessageSender {
 
 	MyGdxGame game;
 	
@@ -132,7 +133,11 @@ public class SettingsScreen implements Screen, UpDownListener, GUIRenderer {
 	
 	@Override
 	public void show() {
-		
+		if(!SettingsPrefsIO.readSettingBool("editablePanels")) {
+			game.sendMessage("Note That The Menu Elements Like The One For The Max FPS Below (that contain number values) Can Also Be Edited By Keyboard! Just Click On Them, Type An Accessible By The Element Number And Click Enter Or Anywhere On The Screen To Confirm The Changes!", Color.RED, this, true);
+			SettingsPrefsIO.writeSettingBool("editablePanels", true);
+			SettingsPrefsIO.flush();
+		}
 		
 	}
 
@@ -159,9 +164,9 @@ public class SettingsScreen implements Screen, UpDownListener, GUIRenderer {
 		//resUpDown.render(batch, shape, cam);
 		//resLabel.render(batch, shape, cam);
 		
-		if(beautifulGfx.justTouched())
+		if(beautifulGfx.justTouched() && !game.isThereAMessage())
 			game.setBeautifulBack(beautifulGfx.isToggled());
-		else if(goBack.justReleased()) {
+		else if(goBack.justReleased() && !game.isThereAMessage()) {
 			//changeRes();
 			
 			if (fullscreen.isToggled()) {
@@ -173,11 +178,11 @@ public class SettingsScreen implements Screen, UpDownListener, GUIRenderer {
 			game.setScreen(prevScreen);
 		}
 		
-		if(invX.justTouched())
+		if(invX.justTouched() && !game.isThereAMessage())
 			invertX = invX.isToggled();
-		if(invY.justTouched())
+		if(invY.justTouched() && !game.isThereAMessage())
 			invertY = invY.isToggled();
-		if(multithread.justTouched())
+		if(multithread.justTouched() && !game.isThereAMessage())
 			multithreadOption = multithread.isToggled();
 
 		game.renderLogo(batch, cam);
@@ -202,7 +207,8 @@ public class SettingsScreen implements Screen, UpDownListener, GUIRenderer {
 		SettingsPrefsIO.writeSettingBool("multithread", multithread.isToggled());
 		SettingsPrefsIO.writeSettingBool("invertX", invertX);
 		SettingsPrefsIO.writeSettingBool("invertY", invertY);
-		SettingsPrefsIO.writeSettingInt("fps", fpsUpDown.getOption());
+		if(fpsUpDown.getOption() == 0 || fpsUpDown.getOption() > 19)
+			SettingsPrefsIO.writeSettingInt("fps", fpsUpDown.getOption());
 		SettingsPrefsIO.flush();
 	}
 	
@@ -318,6 +324,11 @@ public class SettingsScreen implements Screen, UpDownListener, GUIRenderer {
 	@Override
 	public OrthographicCamera getCam() {
 		return cam;
+	}
+
+	@Override
+	public void messageReceived() {
+		
 	}
 
 }

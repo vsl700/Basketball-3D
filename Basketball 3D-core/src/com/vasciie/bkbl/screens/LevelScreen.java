@@ -8,6 +8,7 @@ import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.g2d.BitmapFont;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
+import com.vasciie.bkbl.GameMessageSender;
 import com.vasciie.bkbl.MyGdxGame;
 import com.vasciie.bkbl.gamespace.tools.SettingsPrefsIO;
 import com.vasciie.bkbl.gui.Button;
@@ -19,7 +20,7 @@ import com.vasciie.bkbl.gui.UpDown;
 import com.vasciie.bkbl.gui.UpDownListener;
 
 
-public class LevelScreen implements Screen, GUIRenderer, UpDownListener {
+public class LevelScreen implements Screen, GUIRenderer, UpDownListener, GameMessageSender {
 
 	MyGdxGame game;
 	
@@ -103,6 +104,10 @@ public class LevelScreen implements Screen, GUIRenderer, UpDownListener {
 	@Override
 	public void show() {
 		setHighscoreText();
+		
+		if(!SettingsPrefsIO.readSettingBool("maxPoints")) {
+			game.sendMessage("The Normal Matches In This Game Last Until One Of The Teams Passes 15 Points! After That, The Game Is Over And If Your Team Has More Points Than The Other, You Win And You Get Much More Points Which Are Being Saved If They're More Than The Previous! Otherwise You Only Get Points If YOU Had Earned Any Points For Your Team!", Color.RED, this, true);
+		}
 	}
 	
 	private void setHighscoreText() {
@@ -127,11 +132,11 @@ public class LevelScreen implements Screen, GUIRenderer, UpDownListener {
 		for(Label lbl : difficultyDesc[getDifficulty()])
 			lbl.update();
 		
-		if(back.justReleased()) {
+		if(back.justReleased() && !game.isThereAMessage()) {
 			if(game.getMap().isChallenge())
 				game.setScreen(game.challenge);
 			else game.setScreen(game.gameType);
-		}else if(play.justReleased()) {
+		}else if(play.justReleased() && !game.isThereAMessage()) {
 			game.game.setPlayersAmount(numUpDown.getOption());
 			game.setScreen(game.game);
 		}
@@ -238,5 +243,18 @@ public class LevelScreen implements Screen, GUIRenderer, UpDownListener {
 		if(upDown.equals(textUpDown))
 			resizeDifficultyDesc();
 		
+	}
+
+	@Override
+	public void messageReceived() {
+		if(!SettingsPrefsIO.readSettingBool("maxPoints")) {
+			game.sendMessage("Oh, And Also If You Are Playing A Gamemode In Which The Players Have A Limited Amount Of Fouls To Make And A Player Reaches It, The Game Removes Him From The Game! If The Game Removes YOU, You Directly LOSE!", Color.RED, this, true);
+			SettingsPrefsIO.writeSettingBool("maxPoints", true);
+			SettingsPrefsIO.flush();
+		}else if(!SettingsPrefsIO.readSettingBool("editablePanels")) {
+			game.sendMessage("Note That The Menu Elements Like The One For The Amount Of Players Below (that contain number values) Can Also Be Edited By Keyboard! Just Click On Them, Type An Accessible By The Element Number And Click Enter Or Anywhere On The Screen To Confirm The Changes!", Color.RED, this, true);
+			SettingsPrefsIO.writeSettingBool("editablePanels", true);
+			SettingsPrefsIO.flush();
+		}
 	}
 }

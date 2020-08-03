@@ -7,14 +7,16 @@ import com.badlogic.gdx.graphics.g2d.BitmapFont;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 import com.badlogic.gdx.utils.Array;
+import com.vasciie.bkbl.GameMessageSender;
 import com.vasciie.bkbl.MyGdxGame;
 import com.vasciie.bkbl.gamespace.levels.Challenges.ChallengeLevel;
+import com.vasciie.bkbl.gamespace.tools.SettingsPrefsIO;
 import com.vasciie.bkbl.gui.Button;
 import com.vasciie.bkbl.gui.CheckButton;
 import com.vasciie.bkbl.gui.GUIRenderer;
 import com.vasciie.bkbl.gui.Label;
 
-public class ChallengeLevelScreen implements Screen, GUIRenderer {
+public class ChallengeLevelScreen implements Screen, GUIRenderer, GameMessageSender {
 
 	MyGdxGame game;
 	
@@ -83,6 +85,12 @@ public class ChallengeLevelScreen implements Screen, GUIRenderer {
 			}
 			
 			challengeName.setText(game.getMap().getChallenges().getGameLevel(index).getName());
+			
+			if(!SettingsPrefsIO.readSettingBool("challenges")) {
+				game.sendMessage("Note That You Can Combine The Challenges Below To Make The Game You Probably Want To Make!", Color.RED, this, true);
+				SettingsPrefsIO.writeSettingBool("challenges", true);
+				SettingsPrefsIO.flush();
+			}
 		}
 
 	}
@@ -271,6 +279,11 @@ public class ChallengeLevelScreen implements Screen, GUIRenderer {
 	@Override
 	public OrthographicCamera getCam() {
 		return cam;
+	}
+
+	@Override
+	public void messageReceived() {
+		
 	}
 
 }

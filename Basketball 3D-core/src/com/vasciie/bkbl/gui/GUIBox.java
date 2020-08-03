@@ -14,6 +14,7 @@ public class GUIBox extends GUI {
 	GUI[] guis;
 	float border;
 	
+	float minX, minY, maxX, maxY;
 
 	public GUIBox(GUIRenderer guiRenderer, GUI[] guis, float border) {
 		super(guiRenderer);
@@ -27,8 +28,10 @@ public class GUIBox extends GUI {
 		ShapeRenderer shape = guiRenderer.getShapeRenderer();
         OrthographicCamera cam = guiRenderer.getCam();
         
-        float minX = guis[0].getX(), minY = guis[0].getY();
-    	float maxX = guis[0].getX() + guis[0].getWidth(), maxY = guis[0].getY() + guis[0].getHeight();
+        minX = guis[0].getX();
+        minY = guis[0].getY();
+    	maxX = guis[0].getX() + guis[0].getWidth();
+    	maxY = guis[0].getY() + guis[0].getHeight();
         for(int i = 1; i < guis.length; i++) {
         	GUI gui = guis[i];
         	
@@ -49,11 +52,21 @@ public class GUIBox extends GUI {
         shape.begin(ShapeRenderer.ShapeType.Filled);
         shape.setColor(Color.ORANGE.cpy().sub(0, 0.3f, 0, 1));
         shape.setProjectionMatrix(cam.combined);
-        shape.rect(minX - border, minY - border, maxX - minX + border, maxY - minY + border);
+        shape.rect(minX - border, minY - border, maxX - minX + border * 2, maxY - minY + border * 2);
         shape.end();
         
         for(GUI gui : guis)
         	gui.draw();
+	}
+	
+	@Override
+	public float getWidth() {
+		return maxX - minX + border * 2;
+	}
+	
+	@Override
+	public float getHeight() {
+		return maxY - minY + border * 2;
 	}
 
 	@Override

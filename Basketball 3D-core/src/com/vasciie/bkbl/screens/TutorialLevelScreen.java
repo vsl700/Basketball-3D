@@ -6,13 +6,15 @@ import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.g2d.BitmapFont;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
+import com.vasciie.bkbl.GameMessageSender;
 import com.vasciie.bkbl.MyGdxGame;
 import com.vasciie.bkbl.gamespace.levels.TutorialLevels.TutorialLevel;
+import com.vasciie.bkbl.gamespace.tools.SettingsPrefsIO;
 import com.vasciie.bkbl.gui.Button;
 import com.vasciie.bkbl.gui.GUIRenderer;
 import com.vasciie.bkbl.gui.Label;
 
-public class TutorialLevelScreen implements Screen, GUIRenderer {
+public class TutorialLevelScreen implements Screen, GUIRenderer, GameMessageSender {
 
 	MyGdxGame game;
 	
@@ -57,6 +59,12 @@ public class TutorialLevelScreen implements Screen, GUIRenderer {
 					levelParts[i][j] = new Button(level.getPart(j).getName(), btnFont, Color.ORANGE.cpy().sub(0, 0.3f, 0, 1), true, true, this);
 				}
 			}
+			
+			if(!SettingsPrefsIO.readSettingBool("tutorial")) {
+				game.sendMessage("Note That Each Tutorial Level Is Splitted On Parts And If You Just Want To Revive Something You Can Simply Start The Level From Where You Want To! After A Tutorial Level's Part Finishes, The Tutorial Goes To The Next Part! Hitting The New Game Button Sends You To The First Part Of The Level!", Color.RED, this, true);
+				SettingsPrefsIO.writeSettingBool("tutorial", true);
+				SettingsPrefsIO.flush();
+			}
 		}
 
 	}
@@ -72,13 +80,13 @@ public class TutorialLevelScreen implements Screen, GUIRenderer {
 		
 		goBack.update();
 		
-		if(goBack.justReleased())
+		if(goBack.justReleased() && !game.isThereAMessage())
 			game.setScreen(game.gameType);
 		else {
 			for(int i = 0; i < levelParts.length; i++) {
 				boolean flag = false;
 				for(int j = 0; j < levelParts[i].length; j++)
-					if(levelParts[i][j].justReleased()) {
+					if(levelParts[i][j].justReleased() && !game.isThereAMessage()) {
 						game.getMap().setTutorialLevel(i, j);
 						game.setScreen(game.game);
 						flag = true;
@@ -168,6 +176,11 @@ public class TutorialLevelScreen implements Screen, GUIRenderer {
 	@Override
 	public OrthographicCamera getCam() {
 		return cam;
+	}
+
+	@Override
+	public void messageReceived() {
+		game.sendMessage("Oh, And Make Sure To Read Every Single Message You'll See (not only in the tutorial)!", Color.RED, this, true);
 	}
 
 }

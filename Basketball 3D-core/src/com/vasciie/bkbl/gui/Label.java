@@ -10,7 +10,7 @@ public class Label extends Text {
 	float textWidth;
 	float fR, fG, fB, fA;
 
-	boolean multiline, textShorten;
+	boolean multiline, textShorten, fill;
 
 	public Label(String text, BitmapFont font, boolean multiline, GUIRenderer guiRenderer) {
 		super(guiRenderer);
@@ -38,12 +38,14 @@ public class Label extends Text {
 		fG = fillColor.g;
 		fB = fillColor.b;
 		fA = fillColor.a;
+		
+		fill = true;
 	}
 	
 	private void renderShapes() {
 		ShapeRenderer shape = guiRenderer.getShapeRenderer();
 
-		if (shape != null) {
+		if (shape != null && fill) {
 			Color tempColor = shape.getColor().cpy();
 			
 			shape.setColor(fR, fG, fB, fA);

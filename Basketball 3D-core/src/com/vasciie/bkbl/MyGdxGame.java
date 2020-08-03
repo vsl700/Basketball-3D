@@ -116,7 +116,7 @@ public class MyGdxGame extends Game implements GameMessageListener, GUIRenderer 
 			shape = new ShapeRenderer();
 			
 			
-			messageBox = new GUIBox(this, new GUI[] {messageLabel, messageCont}, 10);
+			messageBox = new GUIBox(this, new GUI[] {messageLabel, messageCont}, 20);
 		}
 		
 		cam = new OrthographicCamera();
@@ -248,12 +248,15 @@ public class MyGdxGame extends Game implements GameMessageListener, GUIRenderer 
 			else messageTime -= Gdx.graphics.getDeltaTime();
 			messageBox.update();
 			
-			if(messageCont.justTouched())
-				sender = null;
+			if(messageCont.justReleased()) {
+				String temp = messageLabel.getText();
+				sender.messageReceived();
+				
+				if(messageLabel.getText().equals(temp))
+					sender = null;
+			}
 			
 			messageBox.draw();
-			messageLabel.draw();
-			messageCont.draw();
 		}
 		
 		if (!getScreen().equals(spScreen1) && !getScreen().equals(spScreen2) && !game.paused()) {
@@ -339,10 +342,10 @@ public class MyGdxGame extends Game implements GameMessageListener, GUIRenderer 
 		float width = cam.viewportWidth;
 		float height = cam.viewportHeight;
 		
-		messageLabel.setWidth(Math.min(messageLabel.textSize(), width - 20));
-		messageLabel.setHeight(messageLabel.getRows() * 13 * textFont.getLineHeight());
+		messageLabel.setWidth(width - 80);
+		messageLabel.setHeight(messageLabel.getRows() * textFont.getLineHeight());
 		messageLabel.setPos(width / 2 - messageLabel.getWidth() / 2, height - 80 - messageLabel.getRows() * 30);
-		
+		//System.out.println((messageLabel.getRows() * textFont.getLineHeight()));
 		messageCont.setSize(pixelXByCurrentSize(223 * MyGdxGame.GUI_SCALE), pixelYByCurrentSize(30 * MyGdxGame.GUI_SCALE));
 		messageCont.setPos(width / 2 - messageCont.getWidth() / 2, messageLabel.getY() - messageCont.getHeight() - 40);
 		
@@ -421,6 +424,10 @@ public class MyGdxGame extends Game implements GameMessageListener, GUIRenderer 
 	public float pixelYByCurrentSize(float value) {
 		
 		return value * cam.viewportHeight / 720;
+	}
+	
+	public boolean isThereAMessage() {
+		return sender != null;
 	}
 
 	@Override

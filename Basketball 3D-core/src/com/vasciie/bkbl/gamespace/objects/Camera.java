@@ -55,7 +55,7 @@ public class Camera extends GameObject {
 	
 	public void updateCamera() {
 		Vector3 tempPosition = position.cpy();
-		float scl = 3.5f, scl2 = 4;
+		float scl = 3.5f, scl2 = 4.25f;
 		if(position.x < 0)
 			position.x -= getWidth() * scl;
 		else position.x += getWidth() * scl;

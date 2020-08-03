@@ -43,10 +43,11 @@ public class MainScreen implements Screen, GUIRenderer, GameMessageSender {
 
 	@Override
 	public void show() {
-		//if(!SettingsPrefsIO.readSettingBool("welcome")) {
+		if(!SettingsPrefsIO.readSettingBool("welcome")) {
 			game.sendMessage("Hello And Welcome To Basketball-3D, A Free 3D Basketball Simulator! There Are Some Tutorial Levels In 'Play>Tutorial Levels', Which I Highly Recommend Going Through First! They Are Not Harder Than The Game Itself, But They Will Make You Get Attatched To The Game Much Easier! Try Them Out!", Color.RED, this, true);
-			//SettingsPrefsIO.writeSettingBool("welcome", true);
-		//}
+			SettingsPrefsIO.writeSettingBool("welcome", true);
+			SettingsPrefsIO.flush();
+		}
 	}
 
 	@Override
@@ -60,13 +61,13 @@ public class MainScreen implements Screen, GUIRenderer, GameMessageSender {
 			settings.update();
 		quit.update();
 		
-		if(quit.justReleased())
+		if(quit.justReleased() && !game.isThereAMessage())
 			Gdx.app.exit();
-		else if(!Gdx.app.getType().equals(Application.ApplicationType.Android) && settings.justReleased()) {
+		else if(!Gdx.app.getType().equals(Application.ApplicationType.Android) && settings.justReleased() && !game.isThereAMessage()) {
 			game.settings.setPreviousScreen(this);
 			game.setScreen(game.settings);
 		}
-		else if(play.justReleased())
+		else if(play.justReleased() && !game.isThereAMessage())
 			game.setScreen(game.gameType);
 
 		game.renderLogo(batch, cam);
