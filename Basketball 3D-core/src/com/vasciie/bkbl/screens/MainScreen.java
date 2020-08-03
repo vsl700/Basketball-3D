@@ -26,7 +26,7 @@ public class MainScreen implements Screen, GUIRenderer, GameMessageSender {
 	BitmapFont font;
 	
 	Button play, settings, quit;
-	ImageButton facebook, twitter;
+	ImageButton /*facebook, */twitter;
 	
 	public MainScreen(MyGdxGame mg) {
 		game = mg;
@@ -43,7 +43,7 @@ public class MainScreen implements Screen, GUIRenderer, GameMessageSender {
 			settings = new Button("Settings", font, Color.ORANGE.cpy().sub(0, 0.3f, 0, 1), true, true, this);
 		quit = new Button("Quit", font, Color.ORANGE.cpy().sub(0, 0.3f, 0, 1), true, true, this);
 		
-		facebook = new ImageButton(this, new Texture(Gdx.files.internal("application/facebook_logo.png")));
+		//facebook = new ImageButton(this, new Texture(Gdx.files.internal("application/facebook_logo.png")));
 		twitter = new ImageButton(this, new Texture(Gdx.files.internal("application/twitter_logo.png")));
 	}
 
@@ -67,7 +67,7 @@ public class MainScreen implements Screen, GUIRenderer, GameMessageSender {
 			settings.update();
 		quit.update();
 		
-		facebook.update();
+		//facebook.update();
 		twitter.update();
 		
 		if(quit.justReleased() && !game.isThereAMessage())
@@ -78,8 +78,8 @@ public class MainScreen implements Screen, GUIRenderer, GameMessageSender {
 		}
 		else if(play.justReleased() && !game.isThereAMessage())
 			game.setScreen(game.gameType);
-		else if(facebook.justReleased() && !game.isThereAMessage())
-			Gdx.net.openURI("");
+		/*else if(facebook.justReleased() && !game.isThereAMessage())
+			Gdx.net.openURI("");*/
 		else if(twitter.justReleased() && !game.isThereAMessage())
 			Gdx.net.openURI("https://twitter.com/VasciiE");
 
@@ -91,14 +91,14 @@ public class MainScreen implements Screen, GUIRenderer, GameMessageSender {
 
 		quit.draw();
 		
-		facebook.draw();
+		//facebook.draw();
 		twitter.draw();
 		//batch.end();
 	}
 	
 	public void sendWebPageMessage() {
 		if(!SettingsPrefsIO.readSettingBool("webpage")) {
-			game.sendMessage("So How's The Game Performing? If You Like It You Can Follow Us On Facebook And Twitter To Hear About Updates And Incoming Features! The Buttons In The Bottom-Right Will Lead You To Our Pages!", Color.RED, this, true);
+			game.sendMessage("So How's The Game Performing? If You Like It You Can Follow Us On Twitter To Hear About Updates And Incoming Features! The Buttons In The Bottom-Right Will Lead You To Our Pages!", Color.RED, this, true);
 			SettingsPrefsIO.writeSettingBool("webpage", true);
 			SettingsPrefsIO.flush();
 		}
@@ -122,7 +122,7 @@ public class MainScreen implements Screen, GUIRenderer, GameMessageSender {
 		quit.setPos(width * 3 / 4 - play.getWidth() / 2, play.getY());
 		
 		twitter.setPos(width - twitter.getWidth(), 0);
-		facebook.setPos(width - facebook.getWidth() - twitter.getWidth(), 0);
+		//facebook.setPos(width - facebook.getWidth() - twitter.getWidth(), 0);
 	}
 
 	@Override
