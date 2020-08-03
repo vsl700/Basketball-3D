@@ -262,7 +262,7 @@ public class MyGdxGame extends Game implements GameMessageListener, GUIRenderer 
 		if (!getScreen().equals(spScreen1) && !getScreen().equals(spScreen2) && !game.paused()) {
 			batch.setProjectionMatrix(cam.combined);
 			batch.begin();
-			font.draw(batch, Gdx.graphics.getFramesPerSecond() + " fps; SN:30/07/20-v1.0", 0, font.getLineHeight());
+			font.draw(batch, Gdx.graphics.getFramesPerSecond() + " fps; v1.0.0.0", 0, font.getLineHeight());
 			batch.end();
 		}
 	}

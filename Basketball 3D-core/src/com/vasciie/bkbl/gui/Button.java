@@ -51,10 +51,12 @@ public class Button extends GUI {
             this.mark = mark;
         this.filled = filled;
 
-        r = color.r;
-        g = color.g;
-        b = color.b;
-        a = color.a;
+		if (color != null) {
+			r = color.r;
+			g = color.g;
+			b = color.b;
+			a = color.a;
+		}
 
 
     }
@@ -87,7 +89,7 @@ public class Button extends GUI {
     public void update(){
         super.update();
 
-        if(this instanceof CheckButton || this instanceof Stick)
+        if(this instanceof CheckButton || this instanceof Stick || this instanceof ImageButton)
             return;
 
         if (Gdx.app.getType().equals(Application.ApplicationType.Android) || isMouseOn()) {

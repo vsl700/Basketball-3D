@@ -136,6 +136,7 @@ public class GameOverScreen implements Screen, GUIRenderer {
 			game.setScreen(game.main);
 			game.game.reset();
 			game.getMap().getChallenges().reset();
+			game.main.sendWebPageMessage();
 			return;
 		}
 		

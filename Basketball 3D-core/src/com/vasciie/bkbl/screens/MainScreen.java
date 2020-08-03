@@ -5,6 +5,7 @@ import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Screen;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.OrthographicCamera;
+import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.BitmapFont;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
@@ -13,6 +14,7 @@ import com.vasciie.bkbl.MyGdxGame;
 import com.vasciie.bkbl.gamespace.tools.SettingsPrefsIO;
 import com.vasciie.bkbl.gui.Button;
 import com.vasciie.bkbl.gui.GUIRenderer;
+import com.vasciie.bkbl.gui.ImageButton;
 
 public class MainScreen implements Screen, GUIRenderer, GameMessageSender {
 	
@@ -24,6 +26,7 @@ public class MainScreen implements Screen, GUIRenderer, GameMessageSender {
 	BitmapFont font;
 	
 	Button play, settings, quit;
+	ImageButton facebook, twitter;
 	
 	public MainScreen(MyGdxGame mg) {
 		game = mg;
@@ -39,6 +42,9 @@ public class MainScreen implements Screen, GUIRenderer, GameMessageSender {
 		if(!Gdx.app.getType().equals(Application.ApplicationType.Android))
 			settings = new Button("Settings", font, Color.ORANGE.cpy().sub(0, 0.3f, 0, 1), true, true, this);
 		quit = new Button("Quit", font, Color.ORANGE.cpy().sub(0, 0.3f, 0, 1), true, true, this);
+		
+		facebook = new ImageButton(this, new Texture(Gdx.files.internal("application/facebook_logo.png")));
+		twitter = new ImageButton(this, new Texture(Gdx.files.internal("application/twitter_logo.png")));
 	}
 
 	@Override
@@ -61,6 +67,9 @@ public class MainScreen implements Screen, GUIRenderer, GameMessageSender {
 			settings.update();
 		quit.update();
 		
+		facebook.update();
+		twitter.update();
+		
 		if(quit.justReleased() && !game.isThereAMessage())
 			Gdx.app.exit();
 		else if(!Gdx.app.getType().equals(Application.ApplicationType.Android) && settings.justReleased() && !game.isThereAMessage()) {
@@ -69,6 +78,10 @@ public class MainScreen implements Screen, GUIRenderer, GameMessageSender {
 		}
 		else if(play.justReleased() && !game.isThereAMessage())
 			game.setScreen(game.gameType);
+		else if(facebook.justReleased() && !game.isThereAMessage())
+			Gdx.net.openURI("");
+		else if(twitter.justReleased() && !game.isThereAMessage())
+			Gdx.net.openURI("https://twitter.com/VasciiE");
 
 		game.renderLogo(batch, cam);
 
@@ -77,7 +90,18 @@ public class MainScreen implements Screen, GUIRenderer, GameMessageSender {
 			settings.draw();
 
 		quit.draw();
+		
+		facebook.draw();
+		twitter.draw();
 		//batch.end();
+	}
+	
+	public void sendWebPageMessage() {
+		if(!SettingsPrefsIO.readSettingBool("webpage")) {
+			game.sendMessage("So How's The Game Performing? If You Like It You Can Follow Us On Facebook And Twitter To Hear About Updates And Incoming Features! The Buttons In The Bottom-Right Will Lead You To Our Pages!", Color.RED, this, true);
+			SettingsPrefsIO.writeSettingBool("webpage", true);
+			SettingsPrefsIO.flush();
+		}
 	}
 
 	@Override
@@ -96,6 +120,9 @@ public class MainScreen implements Screen, GUIRenderer, GameMessageSender {
 		
 		quit.setSize(game.pixelXByCurrentSize(223 * MyGdxGame.GUI_SCALE), game.pixelYByCurrentSize(30 * MyGdxGame.GUI_SCALE));
 		quit.setPos(width * 3 / 4 - play.getWidth() / 2, play.getY());
+		
+		twitter.setPos(width - twitter.getWidth(), 0);
+		facebook.setPos(width - facebook.getWidth() - twitter.getWidth(), 0);
 	}
 
 	@Override
