@@ -344,7 +344,7 @@ public class MyGdxGame extends Game implements GameMessageListener, GUIRenderer 
 		
 		messageLabel.setWidth(width - 80);
 		messageLabel.setHeight(messageLabel.getRows() * textFont.getLineHeight());
-		messageLabel.setPos(width / 2 - messageLabel.getWidth() / 2, height - 80 - messageLabel.getRows() * 30);
+		messageLabel.setPos(width / 2 - messageLabel.getWidth() / 2, height - 40 - messageLabel.getRows() * textFont.getLineHeight());
 		//System.out.println((messageLabel.getRows() * textFont.getLineHeight()));
 		messageCont.setSize(pixelXByCurrentSize(223 * MyGdxGame.GUI_SCALE), pixelYByCurrentSize(30 * MyGdxGame.GUI_SCALE));
 		messageCont.setPos(width / 2 - messageCont.getWidth() / 2, messageLabel.getY() - messageCont.getHeight() - 40);

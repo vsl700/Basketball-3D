@@ -115,7 +115,7 @@ public class ChallengeLevelScreen implements Screen, GUIRenderer, GameMessageSen
 				}
 			}
 			
-			if(challengePages[i].justReleased()) {
+			if(challengePages[i].justReleased() && !game.isThereAMessage()) {
 				index = i;
 				challengeName.setText(game.getMap().getChallenges().getGameLevel(index).getName());
 				
@@ -135,10 +135,10 @@ public class ChallengeLevelScreen implements Screen, GUIRenderer, GameMessageSen
 		else if(game.getMap().getChallenges().getGameLevel(index).getId().equals("team_score"))
 			urgedChallenge.update();
 		
-		if(goBack.justReleased()) {
+		if(goBack.justReleased() && !game.isThereAMessage()) {
 			game.setScreen(game.gameType);
 			game.getMap().getChallenges().reset();
-		}else if(play.justReleased()) {
+		}else if(play.justReleased() && !game.isThereAMessage()) {
 			Array<ChallengeLevel> tempCh = new Array<ChallengeLevel>(playChallenge.length);
 			for(int i = 0; i < playChallenge.length; i++) {
 				if(playChallenge[i].isToggled()) {
