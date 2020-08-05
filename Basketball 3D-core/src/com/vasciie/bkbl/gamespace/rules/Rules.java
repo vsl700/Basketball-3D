@@ -335,7 +335,7 @@ public class Rules implements GameMessageSender {
 										
 										//float checkConst = /*Terrain.getWalldepth() * 1.6f*/ 3;
 										if(thrower.getPosition().dst(occurPlace) > 3.5f/* && throwerPos.dst(secondCloseWallPos) > checkConst*/) {
-											parent.setRuleTriggerer(thrower);
+											parent.setRuleTriggerer(ruleTriggerer = thrower);
 											//map.playerReleaseBall();
 											return true;
 										}
@@ -384,7 +384,7 @@ public class Rules implements GameMessageSender {
 									@Override
 									public boolean checkRule() {
 										if(time < 0) {
-											parent.setRuleTriggerer(thrower);
+											parent.setRuleTriggerer(ruleTriggerer = thrower);
 											map.playerReleaseBall();
 											
 											return true;
@@ -1740,7 +1740,7 @@ public class Rules implements GameMessageSender {
 
 	@Override
 	public void messageReceived() {
-		
+		map.onMessageContinue();
 		
 	}
 }

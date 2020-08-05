@@ -302,7 +302,7 @@ public abstract class Player extends Entity {
 	}
 	
 	public void walk(Vector3 dir) {
-		if(dir.isZero(0.00001f))
+		if(dir.isZero())
 			return;
 		
 		if(running && !isAiming() && !isShooting()) {
@@ -331,7 +331,7 @@ public abstract class Player extends Entity {
 			return;
 		}
 		
-		if(dir.isZero(0.00001f)) {
+		if(dir.isZero()) {
 			running = false;//In case we use the setRunning method which is used by the AI when the players are obligated to run
 			return;
 		}
@@ -1378,7 +1378,7 @@ public abstract class Player extends Entity {
 		
 		
 		float prevTime = armLController.current.time;
-		if (walking) {
+		if (walking && !moveVec.isZero()) {
 			if (!leftThrowBall && !rightThrowBall && !armLController.current.animation.id.equals("aimLArmL") && !armLController.current.animation.id.equals("aimRArmL")) {
 				if (!leftHoldingBall && !dribbleL && !armLController.current.animation.id.equals("walkArmL") && !leftPointBall) {
 					animateArmL("walk");
@@ -1416,7 +1416,7 @@ public abstract class Player extends Entity {
 				stopBodyAnim();
 		}
 		
-		else if(running) {
+		else if(running && !moveVec.isZero()) {
 			if (!armLController.current.animation.id.equals("runArmL") && !leftHoldingBall && !dribbleL && !leftPointBall) {
 				animateArmL("run");
 

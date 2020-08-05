@@ -76,7 +76,7 @@ public class Ball extends Entity {
 		 * When the ball gets around a basket, with its normal collision object the game would detect a collision even if the ball doesnt get in. This coll obj will 
 		 * detect if the center of the ball gets inside a basket.
 		 */
-		invisCollShapes.add(new btSphereShape(0.05f)); 
+		invisCollShapes.add(new btSphereShape(0.15f)); 
 		matrixes.add(matrixes.get(0));
 	}
 	

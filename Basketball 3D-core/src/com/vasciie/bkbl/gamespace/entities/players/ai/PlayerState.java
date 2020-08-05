@@ -588,7 +588,7 @@ public enum PlayerState implements State<Player> {
 			if(brain.getPSCustom2() != null) {
 				additionalUpdate(player, brain, memory, tempTarget);
 				
-				brain.getPSCustom().calculateSteering(Player.steering);
+				brain.getPSCustom2().calculateSteering(Player.steering);
 
 				player.setMoveVector(Player.steering.linear);
 				
