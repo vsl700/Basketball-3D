@@ -86,7 +86,7 @@ public abstract class Player extends Entity {
 	
 	float minRotateDegrees, maxRotateDegrees;
 	
-	float time;
+	float time, dribbleTimeOut;
 	
 	int playerIndex;
 	
@@ -368,8 +368,9 @@ public abstract class Player extends Entity {
 		if(isUnableToInteractWithHands())
 			return;
 		
-		if (!isShooting()) {
+		if (!isShooting() && !isDribbling()) {
 			if (leftHoldingBall || rightHoldingBall) {
+				//System.out.println(dribbleL);
 				if(isAbleToDribble())
 					dribbleL = true;
 			} else if (!map.getBall().isGrounded()) {
@@ -387,7 +388,7 @@ public abstract class Player extends Entity {
 		if(isUnableToInteractWithHands())
 			return;
 		
-		if (!isShooting()) {
+		if (!isShooting() && !isDribbling()) {
 			if (rightHoldingBall || leftHoldingBall) {
 				if(isAbleToDribble())
 					dribbleR = true;
@@ -477,9 +478,14 @@ public abstract class Player extends Entity {
 
 			map.getBall().getMainBody().setGravity(new Vector3());
 
-			map.setHoldingPlayer(this);
+			if(!this.equals(map.getHoldingPlayer()))
+				map.setHoldingPlayer(this);
 			
 			brain.getMemory().setCatchBall(false);
+			
+			dribbleL = dribbleR = false;
+			readyBall = false;
+			time = 0;
 		}
 	}
 	
@@ -700,6 +706,12 @@ public abstract class Player extends Entity {
 		map.getBall().getMainBody().setLinearVelocity(tempVec);
 	}
 	
+	public void releaseBall() {
+		if(leftHoldingBall)
+			releaseBall(bodiesMap.get("handL").getWorldTransform().cpy());
+		else if(rightHoldingBall) releaseBall(bodiesMap.get("handR").getWorldTransform().cpy());
+	}
+	
 	private void releaseBall(Matrix4 trans) {
 		map.getBall().getMainBody().setGravity(map.getDynamicsWorld().getGravity());
 		map.getBall().getMainBody().activate();
@@ -710,6 +722,17 @@ public abstract class Player extends Entity {
 		
 		if(!isDribbling())
 			map.playerReleaseBall();
+		
+		enableUpperBodyDynColl();
+		
+		if (!isDribbling()) {
+			if(!isShooting()) {
+				enableHandDynColl(true);
+				enableHandDynColl(false);
+			}
+			
+			shootingPower = 10;
+		}
 	}
 	
 	private Vector3 makeBallDribbleVelocity(boolean left) {
@@ -840,6 +863,7 @@ public abstract class Player extends Entity {
 						dribbleR = false;
 						readyBall = false;
 						time = 0;
+						dribbleTimeOut = 0.1f;
 					}
 
 				} else {
@@ -1253,6 +1277,8 @@ public abstract class Player extends Entity {
 	
 	@Override
 	public void update(float delta) {
+		if(dribbleTimeOut > 0)
+			dribbleTimeOut -= delta;
 		
 		if(!isHoldingBall() && !isShooting()) {
 			readyBall = false;
@@ -1809,8 +1835,8 @@ public abstract class Player extends Entity {
 	}
 
 	public boolean isAbleToDribble(){
-		return leftHoldingBall && armLController.current.animation.id.equals("dribbleIdleArmL") ||
-				rightHoldingBall && armRController.current.animation.id.equals("dribbleIdleArmR");
+		return dribbleTimeOut <= 0 && time <= 0 && (leftHoldingBall && armLController.current.animation.id.equals("dribbleIdleArmL") ||
+				rightHoldingBall && armRController.current.animation.id.equals("dribbleIdleArmR"));
 	}
 
 	public boolean isHoldingBall() {

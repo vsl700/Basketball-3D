@@ -902,9 +902,13 @@ public enum TerrainThemes {
 		public void createModels(Terrain terrain) {
 			//TerrainThemes tempTheme = chooseTheme(terrain, true);
 			//if(!tempTheme.equals(theme)) {
-			theme = chooseTheme(terrain, true);
-			theme.createModels(terrain);
-			difficulty = terrain.getMap().getDifficulty();
+			if(prevTheme != null && !prevTheme.equals(CHALLENGE) && difficulty == terrain.getMap().getDifficulty())
+				theme = prevTheme;
+			else {
+				theme = chooseTheme(terrain, true);
+				theme.createModels(terrain);
+				difficulty = terrain.getMap().getDifficulty();
+			}
 				//theme = tempTheme;
 			//}
 		}
@@ -963,6 +967,7 @@ public enum TerrainThemes {
 		
 	};
 	
+	private static TerrainThemes prevTheme;
 	private static Model customTerrainModel;
 	public static final ArrayList<ModelInstance> modelInstances = new ArrayList<ModelInstance>();
 	public static final ArrayList<ModelInstance> inGameModelInstances = new ArrayList<ModelInstance>();
@@ -971,10 +976,12 @@ public enum TerrainThemes {
 	public abstract void createModels(Terrain terrain);
 	
 	public void create(Terrain terrain) {
-		if(difficulty != terrain.getMap().getDifficulty()/* && !this.equals(CHALLENGE)*/ || modelInstances.isEmpty()) {
+		if(difficulty != terrain.getMap().getDifficulty()/* && !this.equals(CHALLENGE)*/ || modelInstances.isEmpty() || prevTheme != null && !prevTheme.equals(CHALLENGE)) {
 			createModels(terrain);
 			difficulty = terrain.getMap().getDifficulty();
 		}
+		
+		prevTheme = this;
 	}
 	
 	public abstract Color getThemeColor();

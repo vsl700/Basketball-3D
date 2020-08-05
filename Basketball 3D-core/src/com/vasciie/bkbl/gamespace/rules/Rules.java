@@ -415,7 +415,7 @@ public class Rules implements GameMessageSender {
 						String text = "The Ball Has Reached The Bounds Of The Terrain";
 						if(justTouched) {
 							String temp;
-							if(recentHolder instanceof Teammate)
+							if(ruleTriggerer instanceof Teammate)
 								temp = "A Teammate";
 							else temp = "An Opponent";
 							
@@ -1541,6 +1541,20 @@ public class Rules implements GameMessageSender {
 				}
 		};
 		
+	}
+	
+	public boolean update(GameRule[] rules) {
+		for(GameRule rule : rules)
+			if(rule.checkRule()) {
+				triggeredRule = rule;
+				
+				for(GameRule rule1 : gameRules)
+					rule1.resetRule();
+				
+				return true;
+			}
+		
+		return false;
 	}
 	
 	public boolean update() {

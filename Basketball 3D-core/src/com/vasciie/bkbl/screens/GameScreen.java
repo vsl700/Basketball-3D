@@ -175,6 +175,8 @@ public class GameScreen implements Screen, GameMessageListener, GUIRenderer {
 				map.spawnPlayers(amount, amount);
 			else map.spawnPlayers(1, amount);
 		}
+		
+		Gdx.input.setInputProcessor(map.getInputs());
 	}
 
 	private void renderGUI(){
@@ -226,7 +228,7 @@ public class GameScreen implements Screen, GameMessageListener, GUIRenderer {
 		if (!paused()) {
 			boolean temp = map.isGameRunning() && sender == null;
 			
-			if (((temp || showPower) && map.isTutorialMode() && map.getCurrentTutorialLevel().getCurrentPart().showPower() || !map.isTutorialMode() && (showPower || temp)) && map.getTimer() <= 0 && !Gdx.app.getType().equals(Application.ApplicationType.Android)) {
+			if (map.getMainPlayer().equals(map.getHoldingPlayer()) && (((temp || showPower) && map.isTutorialMode() && map.getCurrentTutorialLevel().getCurrentPart().showPower() || !map.isTutorialMode() && (showPower || temp)) && map.getTimer() <= 0) && !Gdx.app.getType().equals(Application.ApplicationType.Android)) {
 				int pow = map.getMainPlayer().getShootingPower() - 9;
 
 				power.update();
@@ -407,6 +409,10 @@ public class GameScreen implements Screen, GameMessageListener, GUIRenderer {
 	public void pause() {
 		pause.show();
 		recentlyPaused = true;
+	}
+	
+	public PauseScreen getPauseScreen() {
+		return pause;
 	}
 
 	@Override

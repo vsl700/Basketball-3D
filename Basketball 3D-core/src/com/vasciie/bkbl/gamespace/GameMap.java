@@ -458,7 +458,7 @@ public class GameMap implements GameMessageSender {
         //There is a separate function in player AI which should separate the player enough from the ball so that he can catch it
         //ball.setBoundingRadius(ball.getBoundingRadius() + mainPlayer.getWidth() / 2);
 
-        Gdx.input.setInputProcessor(inputs);
+        
 
         //TODO When using Android Studio, take the comment marks out of the lines below! Eclipse gives an error on this line!
         //if (Gdx.app.getType().equals(Application.ApplicationType.Android))
@@ -634,6 +634,12 @@ public class GameMap implements GameMessageSender {
     		physicsThread.waitToFinish();
     	else dynamicsWorldRunnable.run();
     	
+    	if(holdBall) {
+    		if(neededHolder.equals(getHoldingPlayer())) {
+    			holdBall = false;
+    			neededHolder = null;
+    		}else setHoldingPlayer(neededHolder);
+    	}
 
     	if(isTutorialMode()) {
     		tutorial.act(currentTutorialLevel);
@@ -955,14 +961,22 @@ public class GameMap implements GameMessageSender {
 
     }
 
+    Player neededHolder;
+    private boolean holdBall;
     public void setHoldingPlayer(Player player) {
+    	if(getHoldingPlayer() != null)
+    		getHoldingPlayer().releaseBall();
+    	
         currentPlayerHoldTeam = teammates.indexOf(player);
         currentPlayerHoldOpp = opponents.indexOf(player);
         
-        if(!player.isDataBallHolding())
+        //if(!player.isDataBallHolding())
         	player.catchBall(true);
         
         ball.getMainBody().setLinearVelocity(Vector3.Zero);
+        
+        neededHolder = player;
+        holdBall = true;
     }
 
     public void playerReleaseBall() {
@@ -1021,7 +1035,8 @@ public class GameMap implements GameMessageSender {
                 mainPlayer.walk(new Vector3(dirZ * -delta, 0, dirX * delta));
         }
 
-        mainPlayer.shootPowerScroll(inputs.getScroll());
+        if(mainPlayer.equals(getHoldingPlayer()))
+        	mainPlayer.shootPowerScroll(inputs.getScroll());
 
         if (inputs.isFocusPressed())
             mainPlayer.focus(false);
@@ -1048,12 +1063,14 @@ public class GameMap implements GameMessageSender {
 
             return;
         }
+        
+        float add = 0.05f;
         if (Math.abs(turnY) < Gdx.graphics.getWidth() / 4) {
-            mainPlayer.turnY(turnY * delta * 9);
+            mainPlayer.turnY(turnY * (delta + add));
         }
 
         if (Math.abs(turnX) < Gdx.graphics.getHeight() / 4) {
-            mainPlayer.turnX(turnX * delta * 9);
+            mainPlayer.turnX(turnX * (delta + add));
         }
 
         int substractor = 140;
@@ -1112,7 +1129,11 @@ public class GameMap implements GameMessageSender {
         return collObjsValsMap;
     }
     
-    public Zones getZones() {
+    public InputController getInputs() {
+		return inputs;
+	}
+
+	public Zones getZones() {
     	return zones;
     }
 

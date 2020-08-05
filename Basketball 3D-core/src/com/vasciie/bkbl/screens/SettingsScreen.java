@@ -4,6 +4,7 @@ import java.util.ArrayList;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Screen;
+import com.badlogic.gdx.Input.Keys;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.g2d.BitmapFont;
@@ -94,8 +95,8 @@ public class SettingsScreen implements Screen, UpDownListener, GUIRenderer, Game
 		invY = new CheckButton("Invert camera Y", font, Color.ORANGE.cpy().sub(0, 0.3f, 0, 1), true, true, this);
 		multithread = new CheckButton("Multithreaded Update", font, Color.ORANGE.cpy().sub(0, 0.3f, 0, 1), true, true, this);
 		
-		fpsUpDown = new NumUpDown(font, font2, Color.WHITE, Color.BROWN, new Color().set(0.8f, 0.4f, 0, 1), 0, 240, 10, this);
-		fpsUpDown.addException(0, "Inf.");
+		fpsUpDown = new NumUpDown(font, font2, Color.WHITE, Color.BROWN, new Color().set(0.8f, 0.4f, 0, 1), 20, 240, 10, this);
+		//fpsUpDown.addException(0, "Inf.");
 		fpsUpDown.setListener(this);
 		//fpsUpDown.setOption(60);
 		
@@ -166,7 +167,7 @@ public class SettingsScreen implements Screen, UpDownListener, GUIRenderer, Game
 		
 		if(beautifulGfx.justTouched() && !game.isThereAMessage())
 			game.setBeautifulBack(beautifulGfx.isToggled());
-		else if(goBack.justReleased() && !game.isThereAMessage()) {
+		else if((goBack.justReleased() || prevScreen.equals(game.game.getPauseScreen()) && Gdx.input.isKeyJustPressed(Keys.ESCAPE)) && !game.isThereAMessage()) {
 			//changeRes();
 			
 			if (fullscreen.isToggled()) {

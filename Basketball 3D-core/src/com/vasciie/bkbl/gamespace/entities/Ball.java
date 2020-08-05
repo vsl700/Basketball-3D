@@ -36,7 +36,7 @@ public class Ball extends Entity {
 	@Override
 	public void update(float delta) {
 		//System.out.println(getWidth() + " ball radius");
-		modelInstance.transform.set(getMainBody().getWorldTransform());
+		modelInstance.transform.set(getMainBody().getWorldTransform().cpy());
 		manuallySetCollTransform();
 		//getMainBody().getWorldTransform(); //For some reason I had to call this to make everything work :| (ball's modelInstance teleports into the main player's stomach)
 	}
@@ -68,7 +68,7 @@ public class Ball extends Entity {
 		/*
 		 * This is the main coll obj. It is used to detect collisions between the ball from its outside part to its center and the player's hands. IT CANNOT BE USED FOR BASKETS!
 		 */
-		invisCollShapes.add(new btSphereShape(0.5f));
+		invisCollShapes.add(new btSphereShape(0.6f));
 		matrixes.add(matrixes.get(0));
 		
 		//invisCollShapes = new ArrayList<btCollisionShape>();

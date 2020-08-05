@@ -460,6 +460,7 @@ public class TutorialLevels extends Levels {
 				
 				new TutorialLevel("player_interact", "Level 2: Interacting With Players", map, messageListener) {
 					final Vector3 tempPos = new Vector3(7, 0, 25);
+					GameRule[] tempRules;
 					
 					@Override
 					protected LevelPart[] createLevelParts() {
@@ -527,15 +528,19 @@ public class TutorialLevels extends Levels {
 											@Override
 											protected void sendMessage() {
 												messageListener.sendMessage(heading, desc, textColor, this, skippable, true);
+												
+												if(map.getTeammates().get(1).getBrain().getMemory().isCheckZones())
+													tempRules = new GameRule[] {map.getRules().getGameRuleById("backcourt_violation"), map.getRules().getGameRuleById("walk_shoot"), map.getRules().getGameRuleById("shoot_catch")};
+												else tempRules = new GameRule[] {map.getRules().getGameRuleById("walk_shoot"), map.getRules().getGameRuleById("shoot_catch")};
 											}
 											
 											@Override
 											public boolean act() {
-												if (map.getRules().update()) {
+												if (map.getRules().update(tempRules)) {
 													GameRule rule = map.getRules().getTriggeredRule();
 													map.getRules().clearTriggeredRuleWRuleBreaker();
 													
-													if (map.getTeammates().get(1).getBrain().getMemory().isCheckZones() && rule.getId().equals("backcourt_violation") || rule.getId().equals("walk_shoot") || rule.getId().equals("shoot_catch")) {
+													if (rule.getId().equals("walk_shoot") || rule.getId().equals("shoot_catch") || rule.getId().equals("backcourt_violation")) {
 														returnPlayers();
 														return false;
 													}
@@ -562,9 +567,17 @@ public class TutorialLevels extends Levels {
 														returnPlayers();
 												}else if(time < 0) {
 													returnPlayers();
-												}else if(!wait && map.getHoldingPlayer() != null && !map.getMainPlayer().isHoldingBall() && map.getMainPlayer().isAimingOrShooting()) time -= Gdx.graphics.getDeltaTime();
+												}
+												else if(!wait && map.getMainPlayer().equals(map.getHoldingPlayer()) && !map.getMainPlayer().isAimingOrShooting()) time -= Gdx.graphics.getDeltaTime();
 												
 												return false;
+											}
+											
+											@Override
+											public void resetMessage() {
+												super.resetMessage();
+												
+												reset();
 											}
 											
 											private void reset() {
@@ -746,7 +759,7 @@ public class TutorialLevels extends Levels {
 													checked = true;
 												}
 												
-												if(time < 0 || timeMove < 0 || !map.getMainPlayer().isHoldingBall()) {
+												if(time < 0 || timeMove < 0 || map.getHoldingPlayer() instanceof Opponent) {
 													returnPlayers();
 												}else {
 													if(!opposite && map.getMainPlayer().isInAwayThreePointZone() || opposite && map.getMainPlayer().isInHomeThreePointZone()) {
@@ -754,7 +767,7 @@ public class TutorialLevels extends Levels {
 														return true;
 													}else if(map.getMainPlayer().isDribbling()) {
 														reset();
-													} else {
+													} else if(map.getMainPlayer().isHoldingBall()){
 														if (map.getMainPlayer().getPrevMoveVec().isZero() && map.getMainPlayer().getMoveVector().isZero())
 															time -= Gdx.graphics.getDeltaTime();
 														else
@@ -766,6 +779,13 @@ public class TutorialLevels extends Levels {
 												}
 												
 												return false;
+											}
+											
+											@Override
+											public void resetMessage() {
+												super.resetMessage();
+												
+												reset();
 											}
 											
 											private void reset() {
@@ -843,9 +863,9 @@ public class TutorialLevels extends Levels {
 												map.setHoldingPlayer(map.getMainPlayer());
 												
 												map.getMainPlayer().setWorldTransform(tempMx.setToTranslation(tempPos));
-												map.getTeammates().get(1).setWorldTransform(tempMx.setToTranslation(tempPos.cpy().sub(0, 0, 3)));
+												map.getTeammates().get(1).setWorldTransform(tempMx.setToTranslation(tempPos.cpy().sub(0, 0, 5)));
 												map.getOpponents().get(0).setWorldTransform(tempMx.setToTranslation(tempPos.cpy().scl(-1, 1, 1)));
-												map.getOpponents().get(1).setWorldTransform(tempMx.setToTranslation(tempPos.cpy().scl(-1, 1, 1).sub(0, 0, 3)));
+												map.getOpponents().get(1).setWorldTransform(tempMx.setToTranslation(tempPos.cpy().scl(-1, 1, 1).sub(0, 0, 5)));
 												
 												map.getTeammates().get(1).getBrain().getMemory().setCheckZones(false);
 												
@@ -878,6 +898,8 @@ public class TutorialLevels extends Levels {
 											@Override
 											protected void sendMessage() {
 												messageListener.sendMessage(heading, desc, textColor, this, skippable, true);
+												
+												tempRules = new GameRule[] {map.getRules().getGameRuleById("walk_shoot"), map.getRules().getGameRuleById("shoot_catch")};
 											}
 											
 											@Override
@@ -885,7 +907,7 @@ public class TutorialLevels extends Levels {
 												if(map.getHoldingPlayer() != null && map.getHoldingPlayer() instanceof Opponent) {
 													returnPlayers();
 												}else {
-													if(map.getRules().update()) {
+													if(map.getRules().update(tempRules)) {
 														GameRule rule = map.getRules().getTriggeredRule();
 														map.getRules().clearTriggeredRuleWRuleBreaker();
 														
@@ -916,6 +938,13 @@ public class TutorialLevels extends Levels {
 												return false;
 											}
 											
+											@Override
+											public void resetMessage() {
+												super.resetMessage();
+												
+												reset();
+											}
+											
 											private void reset() {
 												passes = 0;
 												wait = false;
@@ -927,9 +956,9 @@ public class TutorialLevels extends Levels {
 												map.setHoldingPlayer(map.getMainPlayer());
 												
 												map.getMainPlayer().setWorldTransform(tempMx.setToTranslation(tempPos));
-												map.getTeammates().get(1).setWorldTransform(tempMx.setToTranslation(tempPos.cpy().sub(0, 0, 3)));
+												map.getTeammates().get(1).setWorldTransform(tempMx.setToTranslation(tempPos.cpy().sub(0, 0, 5)));
 												map.getOpponents().get(0).setWorldTransform(tempMx.setToTranslation(tempPos.cpy().scl(-1, 1, 1)));
-												map.getOpponents().get(1).setWorldTransform(tempMx.setToTranslation(tempPos.cpy().scl(-1, 1, 1).sub(0, 0, 3)));
+												map.getOpponents().get(1).setWorldTransform(tempMx.setToTranslation(tempPos.cpy().scl(-1, 1, 1).sub(0, 0, 5)));
 												
 												reset();
 											}
@@ -1008,10 +1037,10 @@ public class TutorialLevels extends Levels {
 												if(map.getOpponents().size() == 0)
 													map.spawnPlayers(0, 2);
 												
+												map.setHoldingPlayer(map.getOpponents().get(0));
+												
 												if(map.getTeammates().size() > 1)
 													map.removePlayer(map.getTeammates().get(1));
-												
-												map.setHoldingPlayer(map.getOpponents().get(0));
 												
 												map.getMainPlayer().setWorldTransform(tempMx.setToTranslation(tempPos));
 												map.getOpponents().get(0).setWorldTransform(tempMx.setToTranslation(tempPos.cpy().scl(-1, 1, 1)));
@@ -1061,6 +1090,8 @@ public class TutorialLevels extends Levels {
 													tempMain = map.getMainPlayer();
 													
 													checked = true;
+													
+													tempRules = new GameRule[] {map.getRules().getGameRuleById("incorrect_ball_steal")};
 												}
 												
 												if(!opposite) {
@@ -1069,9 +1100,8 @@ public class TutorialLevels extends Levels {
 														map.getOpponents().get(1).getBrain().getPlayerBasketInterpose().setAgentB(map.getAwayBasket());
 												}
 												
-												if(map.getRules().update()) {
-													if(map.getRules().getTriggeredRule().getId().equals("incorrect_ball_steal"))
-														returnPlayers();
+												if(map.getRules().update(tempRules)) {
+													returnPlayers();
 													
 													map.getRules().clearTriggeredRuleWRuleBreaker();
 													return false;
@@ -1490,7 +1520,7 @@ public class TutorialLevels extends Levels {
 				return actions.act();
 			}
 			
-			public void reset() {
+			public void reset() { 
 				actions.firstAction();
 			}
 			

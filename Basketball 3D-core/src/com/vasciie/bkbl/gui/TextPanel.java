@@ -164,7 +164,7 @@ public class TextPanel extends Text implements InputProcessor {
 			active = false;
 			cursor = false;
 
-			if ((min != 0 || max != 0) && text.equals("")) {
+			if ((min != 0 || max != 0) && (text.equals("") || Integer.decode(text) < min || Integer.decode(text) > max)) {
 				text = prevText.toString();
 				onResize();
 			}
@@ -267,7 +267,7 @@ public class TextPanel extends Text implements InputProcessor {
 		if(active) {
 			if(key.length() == 1) { //A letter or a number
 				if(isNumeric()) {
-					if(Character.isDigit(key.toCharArray()[0]) && Integer.parseInt(text + key) <= max && Integer.parseInt(text + key) >= min)
+					if(Character.isDigit(key.toCharArray()[0])/* && Integer.parseInt(text + key) <= max && Integer.parseInt(text + key) >= min*/)
 						text += key;
 				}
 				else {
