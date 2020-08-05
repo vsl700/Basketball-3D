@@ -200,6 +200,7 @@ public class Challenges extends Levels {
 				},
 				
 				new ChallengeLevel("no_running", "Playing Without Running", map, messageListener) {
+					boolean wait;
 					
 					@Override
 					public void setup() {
@@ -208,7 +209,12 @@ public class Challenges extends Levels {
 
 					@Override
 					public boolean update() {
-						return map.isGameRunning() && map.getMainPlayer().isCurrentlyRunning();
+						if(!map.isGameRunning())
+							wait = true;
+						else if(!map.getMainPlayer().isCurrentlyRunning())
+							wait = false;
+						
+						return !wait && map.getMainPlayer().isCurrentlyRunning();
 					}
 
 					@Override

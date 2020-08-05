@@ -66,6 +66,7 @@ public abstract class Player extends Entity {
 	public static final float scale6 = 0.35f;
 	public static final float scale7 = 0.315f;
 	public static final float handPercentage = 0.4f;
+	private static final float dribbleDefaultTime = 0.1f;
 
 	//Player's mechanics
 	boolean walking, running, currentRunning, jumping;
@@ -126,8 +127,6 @@ public abstract class Player extends Entity {
 			//stateMachine.changeState(PlayerState.IDLING);
 
 	}
-	
-	
 	
 	protected abstract Color getPlayerColor();
 	
@@ -486,6 +485,7 @@ public abstract class Player extends Entity {
 			dribbleL = dribbleR = false;
 			readyBall = false;
 			time = 0;
+			dribbleTimeOut = dribbleDefaultTime;
 		}
 	}
 	
@@ -863,7 +863,7 @@ public abstract class Player extends Entity {
 						dribbleR = false;
 						readyBall = false;
 						time = 0;
-						dribbleTimeOut = 0.1f;
+						dribbleTimeOut = dribbleDefaultTime;
 					}
 
 				} else {
@@ -877,7 +877,7 @@ public abstract class Player extends Entity {
 						Vector3 tempPlayerVec = new Vector3();
 						prevTrans.getTranslation(tempPlayerVec);
 						
-						//The difference between the player's previous translation
+						//The difference between the player's previous translation (we use the ball for that)
 						Vector3 ballSubPlayer = tempBallVec.cpy().sub(tempPlayerVec);
 						//Getting the player's previous rotation
 						Quaternion tempVecRot = new Quaternion();
