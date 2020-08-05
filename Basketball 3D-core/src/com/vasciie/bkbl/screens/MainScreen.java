@@ -98,7 +98,7 @@ public class MainScreen implements Screen, GUIRenderer, GameMessageSender {
 	
 	public void sendWebPageMessage() {
 		if(!SettingsPrefsIO.readSettingBool("webpage")) {
-			game.sendMessage("So How's The Game Performing? If You Like It You Can Follow Us On Twitter To Hear About Updates And Incoming Features! The Button In The Bottom-Right Will Lead You To Our Page!", Color.RED, this, true);
+			game.sendMessage("So How's The Game Performing? If You Like It You Can Follow Us On Twitter To Hear About Updates And Incoming Features! The Button In The Bottom-Right Will Lead You To Our Page! ALSO A LOCAL MULTIPLAYER IS COMING SOON (if the developer decides)!", Color.RED, this, true);
 			SettingsPrefsIO.writeSettingBool("webpage", true);
 			SettingsPrefsIO.flush();
 		}
