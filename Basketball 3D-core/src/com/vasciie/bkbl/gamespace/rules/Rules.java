@@ -1455,7 +1455,6 @@ public class Rules implements GameMessageSender {
 				},
 				
 				new GameRule(this, null, "basket_score", "SCORE!", map) {
-					Player recentHolder;
 					boolean holderInZone = false, holderInThreePoint = false;
 					
 					boolean teamScore = false;
@@ -1482,28 +1481,25 @@ public class Rules implements GameMessageSender {
 
 					@Override
 					public boolean checkRule() {
-						Player holdingPlayer = map.getHoldingPlayer();
-						if(holdingPlayer != null || recentHolder != null && (recentHolder.isCurrentlyAiming() || recentHolder.isShooting())) {
-							if(holdingPlayer != null)
-								recentHolder = holdingPlayer;
+						if(map.getRecentHolder() != null && (map.getRecentHolder().isCurrentlyAiming() || map.getRecentHolder().isShooting())) {
 							
-							holderInZone = recentHolder.isInAwayBasketZone();
+							holderInZone = map.getRecentHolder().isInAwayBasketZone();
 							if(!holderInZone)
-								holderInThreePoint = holdingPlayer.isInAwayThreePointZone();
+								holderInThreePoint = map.getRecentHolder().isInAwayThreePointZone();
 							else holderInThreePoint = true;
 						}else if (map.getBall().getLinearVelocity().y < 0) {
 							if (map.getBall().isCollidedWTeamBasket()) {
 								teamScore = false;
-								map.scoreOpp(!holderInZone, !holderInThreePoint, recentHolder);
+								map.scoreOpp(!holderInZone, !holderInThreePoint, map.getRecentHolder());
 								
-								ruleTriggerer = recentHolder;
+								ruleTriggerer = map.getRecentHolder();
 								setOccurPlace();
 								return true;
 							} else if (map.getBall().isCollidedWOppBasket()) {
 								teamScore = true;
-								map.scoreTeam(!holderInZone, !holderInThreePoint, recentHolder);
+								map.scoreTeam(!holderInZone, !holderInThreePoint, map.getRecentHolder());
 
-								ruleTriggerer = recentHolder;
+								ruleTriggerer = map.getRecentHolder();
 								setOccurPlace();
 								return true;
 							}
@@ -1547,7 +1543,7 @@ public class Rules implements GameMessageSender {
 
 					@Override
 					public void resetRule() {
-						recentHolder = null;
+						
 					}
 					
 				}

@@ -662,9 +662,12 @@ public abstract class Player extends Entity {
 		
 		tempVec.y = (-camMatrix.getRotation(new Quaternion()).getPitch() / 100) * 2;
 		
-		tempVec.x *= shootingPower;
-		tempVec.y *= shootingPower * 1.4f;
-		tempVec.z *= shootingPower;
+		float tempShootPower;
+		if(isMainPlayer())
+			tempShootPower = shootingPower - 1;
+		else tempShootPower = shootingPower;
+		
+		tempVec.scl(tempShootPower, tempShootPower * 1.4f, tempShootPower);
 		
 		if(leftThrowBall) {
 			releaseBall(bodiesMap.get("handL").getWorldTransform().cpy());

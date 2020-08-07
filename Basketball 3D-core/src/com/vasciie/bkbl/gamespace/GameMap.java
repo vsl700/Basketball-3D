@@ -114,6 +114,8 @@ public class GameMap implements GameMessageSender {
     Basket basket1, basket2;
     Camera camera;
     
+    Player recentHolder;
+    
     ModelCache mCache;
 
     btCollisionConfiguration dynCollConfig;
@@ -570,7 +572,7 @@ public class GameMap implements GameMessageSender {
         
         ruleTriggered = false;
 
-        mainPlayer = null;
+        mainPlayer = recentHolder = null;
 
         /*for (int i = 0; i <= lastIndex; i++) {
             objectsMap.remove(i);
@@ -977,6 +979,8 @@ public class GameMap implements GameMessageSender {
         
         neededHolder = player;
         holdBall = true;
+        
+        recentHolder = player;
     }
 
     public void playerReleaseBall() {
@@ -1156,6 +1160,10 @@ public class GameMap implements GameMessageSender {
 	public Player getMainPlayer() {
         return mainPlayer;
     }
+	
+	public Player getRecentHolder() {
+		return recentHolder;
+	}
 
     public Player getTeammateHolding() {
         if (currentPlayerHoldTeam > -1 && currentPlayerHoldTeam < teammates.size())

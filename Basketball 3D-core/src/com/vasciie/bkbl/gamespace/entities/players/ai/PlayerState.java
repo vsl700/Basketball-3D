@@ -32,7 +32,7 @@ public enum PlayerState implements State<Player> {
 			
 			
 			for(Player p : tempOpp)
-				if(p.getPosition().dst(player/*.getMap().getBall()*/.getPosition()) <= 0.85f)
+				if(p.getPosition().dst(player/*.getMap().getBall()*/.getPosition()) <= p.getWidth() + 0.75f)
 					return true;
 			
 			return false;
@@ -90,12 +90,12 @@ public enum PlayerState implements State<Player> {
 			
 			int difficulty = player.getMap().getDifficulty();
 			if(mem.isRandomFoulTime()) {
-				int multiplier;
+				/*int multiplier;
 				if(player instanceof Teammate)
 					multiplier = player.getMap().getTeammates().size();
-				else multiplier = player.getMap().getOpponents().size();
+				else multiplier = player.getMap().getOpponents().size();*/
 				
-				int chance = 70 + 5 * multiplier;
+				int chance = 45/* + 5 * multiplier*/;
 				if (difficulty == 0 && player instanceof Opponent && MathUtils.random(0, 100) <= chance) {
 					mem.setDribbleTime(mem.getDribbleTime() - Gdx.graphics.getDeltaTime());
 				}else if(difficulty == 2 && player instanceof Teammate && MathUtils.random(0, 100) <= chance) {
