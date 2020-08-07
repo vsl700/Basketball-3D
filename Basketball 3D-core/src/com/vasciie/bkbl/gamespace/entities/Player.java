@@ -144,7 +144,7 @@ public abstract class Player extends Entity {
 		Matrix4 tempHandR = modelInstance.getNode("handR").globalTransform;
 		
 		Vector3 armVec = new Vector3(scale3 / 2, scale5 * (1 - handPercentage) / 2, scale4 / 2);
-		Vector3 handVec = new Vector3(scale3 / 2, scale5 * handPercentage / 2, scale4 / 2);
+		Vector3 handVec = new Vector3(scale3 / 2, scale5 * handPercentage / 2, scale4 / 2).add(0.2f);
 		
 		collisionShapes.add(new btBoxShape(new Vector3(scale2 / 2, getHeight(), getDepth() / 2)));
 		matrixes.add(modelInstance.transform);
@@ -1866,6 +1866,10 @@ public abstract class Player extends Entity {
 	
 	public boolean isShooting() {
 		return leftThrowBall || rightThrowBall;
+	}
+	
+	public boolean isShootingAchieved() {
+		return achieved;
 	}
 	
 	public boolean isAimingOrShooting() {

@@ -265,6 +265,11 @@ public class GameScreen implements Screen, GameMessageListener, GUIRenderer {
 						ruleHeading.update();
 						ruleDesc.update();
 
+						if(map.isRuleTriggered()) {
+							System.out.println(map.getRules().getTriggeredRule());
+							System.out.println(map.getRules().getTriggeredRule().getRuleTriggerer());
+						}
+						
 						if (map.getDifficulty() > 0 && map.isRuleTriggered() && map.getRules().getTriggeredRule().getRuleTriggerer().getFouls() == 7)
 							playerRemove.update();
 

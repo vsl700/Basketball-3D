@@ -171,6 +171,7 @@ public class Rules implements GameMessageSender {
 										p.getBrain().setCustomVecTarget(positionsCalc.cpy().mul(tempTrans).getTranslation(new Vector3()), true);
 										//p.getBrain().getMemory().setTargetFacing(p.getBrain().getMemory().getTargetPosition());
 										p.getBrain().getCustomPursue().setArrivalTolerance(thrower.getWidth() * 1.3f);
+										p.getBrain().getMemory().setTargetPlayer(thrower);
 									}
 								}
 								
@@ -502,6 +503,7 @@ public class Rules implements GameMessageSender {
 									p.getBrain().getMemory().setTargetFacing(holdingPlayer);
 									
 									p.getBrain().getCustomPursue().setArrivalTolerance(10);//See here!
+									p.getBrain().getMemory().setTargetPlayer(holdingPlayer);
 								}
 								
 								return true;
@@ -801,7 +803,7 @@ public class Rules implements GameMessageSender {
 				},
 				
 				new GameRule(this, null, "backcourt_violation", "Backcourt Violation!", map) {
-					Player recentHolder, prevHoldingPlayer;
+					Player recentHolder, prevHoldingPlayer, actor;
 					boolean crossed, justTouched;
 					
 					@Override
@@ -860,7 +862,7 @@ public class Rules implements GameMessageSender {
 								System.out.println(recentHolder);
 								System.out.println();
 							}*/
-						}//FIXME Doesn't change recentHolder after very fast ball stealings or something
+						}
 						
 						//System.out.println(crossed);
 						
@@ -895,17 +897,25 @@ public class Rules implements GameMessageSender {
 
 							@Override
 							public boolean act() {
-								Player actor;
-								
-								if(ruleTriggerer instanceof Teammate)
-									actor = GameTools.getClosestPlayer(map.getBall().getPosition(), map.getOpponents(), null);
-								else actor = GameTools.getClosestPlayer(map.getBall().getPosition(), map.getTeammates(), null);
+								if (actor == null) {
+									if (ruleTriggerer instanceof Teammate)
+										actor = GameTools.getClosestPlayer(map.getBall().getPosition(), map.getOpponents(), null);
+									else
+										actor = GameTools.getClosestPlayer(map.getBall().getPosition(), map.getTeammates(), null);
+								}
 								
 								if(!actor.isHoldingBall() && actor.getBrain().getMemory().getTargetPosition() == null) {
 									actor.getBrain().setCustomTarget(map.getBall());
 									actor.getBrain().getMemory().setTargetFacing(map.getBall());
 									actor.getBrain().getMemory().setCatchBall(true);
 									actor.getBrain().getCustomPursue().setArrivalTolerance(0);
+									
+									for(Player p : map.getAllPlayers()) {
+										if(p.equals(actor))
+											continue;
+										
+										p.getBrain().getMemory().setTargetPlayer(actor);
+									}
 								}else if (actor.isHoldingBall()){
 									if(actor.getPosition().dst(occurPlace) < 2.5f)
 										return true;
@@ -930,6 +940,7 @@ public class Rules implements GameMessageSender {
 
 							@Override
 							public boolean act() {
+								actor = null;
 								
 								return true;
 							}
@@ -1473,7 +1484,8 @@ public class Rules implements GameMessageSender {
 					public boolean checkRule() {
 						Player holdingPlayer = map.getHoldingPlayer();
 						if(holdingPlayer != null || recentHolder != null && (recentHolder.isCurrentlyAiming() || recentHolder.isShooting())) {
-							recentHolder = holdingPlayer;
+							if(holdingPlayer != null)
+								recentHolder = holdingPlayer;
 							
 							holderInZone = recentHolder.isInAwayBasketZone();
 							if(!holderInZone)

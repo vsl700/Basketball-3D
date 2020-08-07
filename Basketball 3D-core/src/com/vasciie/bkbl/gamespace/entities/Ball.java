@@ -68,7 +68,7 @@ public class Ball extends Entity {
 		/*
 		 * This is the main coll obj. It is used to detect collisions between the ball from its outside part to its center and the player's hands. IT CANNOT BE USED FOR BASKETS!
 		 */
-		invisCollShapes.add(new btSphereShape(0.6f));
+		invisCollShapes.add(new btSphereShape(0.55f));
 		matrixes.add(matrixes.get(0));
 		
 		//invisCollShapes = new ArrayList<btCollisionShape>();

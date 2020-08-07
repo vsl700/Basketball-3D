@@ -144,6 +144,7 @@ public class Brain {
 		pSShooting.add(collAvoid);
 		
 		pSCustom = new PrioritySteering<Vector3>(user);
+		pSCustom.add(targetPlayerSeparate);
 		pSCustom.add(collAvoid);
 		pSCustom.add(ballSeparate);
 		//pSCustom.add(basketSeparate);
@@ -226,6 +227,26 @@ public class Brain {
 		//Regular state updating
 		if(updateAI)
 			stateMachine.update();
+		
+		if (!user.isHoldingBall()) {
+			Player temp = user.getMap().getHoldingPlayer();
+			//System.out.println(GameTools.getDistanceBetweenLocations(temp = GameTools.getClosestPlayer(user.getPosition(), user.getMap().getAllPlayers(), null), user));
+			if (temp != null && Player.steering.linear.cpy().nor().scl(Gdx.graphics.getDeltaTime()).add(user.getPosition()).dst(temp.getPosition()) <= user.getWidth() + 0.3f) {
+				Player tempPlayer = memory.getTargetPlayer();
+				memory.setTargetPlayer(temp);
+				
+				boolean enabled = targetPlayerSeparate.isEnabled();
+				targetPlayerSeparate.setEnabled(true);
+				
+				targetPlayerSeparate.calculateSteering(Player.steering);
+				
+				if(canMove())
+					user.setMoveVector(Player.steering.linear);
+
+				memory.setTargetPlayer(tempPlayer);
+				targetPlayerSeparate.setEnabled(enabled);
+			}
+		}
 		
 		int difficulty = user.getMap().getDifficulty();
 		if(difficulty < 2 && user.isMainPlayer() && !user.isDribbling() && !user.isAiming() && !user.isShooting() && !stateMachine.isInState(PlayerState.IDLING)) {
@@ -479,10 +500,14 @@ public class Brain {
 		return targetVec.dst(homeBasketPos) <= checkConst || targetVec.dst(awayBasketPos) <= checkConst;
 	}
 	
+	public boolean canMove() {
+		return !memory.isBallJustShot() || user.isInAwayBasketZone() && user.getAwayBasketZone().checkZone(user.getPosition().add(Player.steering.linear.cpy().scl(7))) || !user.isInAwayBasketZone();
+	}
+	
 	public boolean shouldStopToCatch() {
 		Ball tempBall = user.getMap().getBall();
 		
-		return tempBall.getPosition().dst(user.getPosition()) <= user.getDepth() + tempBall.getDepth() / 2 + 0.7f && !tempBall.isGrounded();
+		return !(tempBall.getPosition().y < user.getHeight() * 1.5f || tempBall.getPosition().cpy().scl(1, 0, 1).dst(user.getPosition().cpy().scl(1, 0, 1)) > tempBall.getWidth() * 2.25f) || (tempBall.getPosition().dst(user.getPosition()) <= user.getDepth() + tempBall.getDepth() / 2 + 0.7f && !tempBall.isGrounded());
 	}
 	
 	public boolean tooCloseOrBehindBasket() {

@@ -63,6 +63,9 @@ public final class GameTools {
 	}
 	
 	public static float getDistanceBetweenLocations(Location<Vector3> st1, Location<Vector3> st2) {
+		if(st1 == null || st2 == null)
+			return 0;
+		
 		return st1.getPosition().dst(st2.getPosition());
 	}
 	

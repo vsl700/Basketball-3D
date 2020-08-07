@@ -1158,14 +1158,14 @@ public class GameMap implements GameMessageSender {
     }
 
     public Player getTeammateHolding() {
-        if (currentPlayerHoldTeam > -1)
+        if (currentPlayerHoldTeam > -1 && currentPlayerHoldTeam < teammates.size())
             return teammates.get(currentPlayerHoldTeam);
 
         return null;
     }
 
     public Player getOpponentHolding() {
-        if (currentPlayerHoldOpp > -1)
+        if (currentPlayerHoldOpp > -1 && currentPlayerHoldOpp < opponents.size())
             return opponents.get(currentPlayerHoldOpp);
 
         return null;
