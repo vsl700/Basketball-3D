@@ -308,9 +308,9 @@ public class InputController implements InputProcessor {
             case shoot:
                 shootPressed = true;
                 break;
-            case focus:
+            /*case focus:
                 focusPressed = true;
-                break;
+                break;*/
             case altDribbleL:
                 dribbleLPressed = true;
                 break;
@@ -352,9 +352,9 @@ public class InputController implements InputProcessor {
             case shoot:
                 shootPressed = false;
                 break;
-            case focus:
+            /*case focus:
                 focusPressed = false;
-                break;
+                break;*/
             case altDribbleL:
                 dribbleLPressed = false;
                 break;

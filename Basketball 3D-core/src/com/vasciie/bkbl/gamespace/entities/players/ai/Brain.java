@@ -229,9 +229,9 @@ public class Brain {
 			stateMachine.update();
 		
 		if (!user.isHoldingBall()) {
-			Player temp = user.getMap().getHoldingPlayer();
+			Player temp = user.getMap().getRecentHolder();
 			//System.out.println(GameTools.getDistanceBetweenLocations(temp = GameTools.getClosestPlayer(user.getPosition(), user.getMap().getAllPlayers(), null), user));
-			if (temp != null && Player.steering.linear.cpy().nor().scl(Gdx.graphics.getDeltaTime()).add(user.getPosition()).dst(temp.getPosition()) <= user.getWidth() + 0.3f) {
+			if (temp != null && !temp.isHoldingBall() && Player.steering.linear.cpy().nor().scl(Gdx.graphics.getDeltaTime()).add(user.getPosition()).dst(temp.getPosition()) <= user.getWidth() + 0.8f && canMove()) {
 				Player tempPlayer = memory.getTargetPlayer();
 				memory.setTargetPlayer(temp);
 				
@@ -239,9 +239,7 @@ public class Brain {
 				targetPlayerSeparate.setEnabled(true);
 				
 				targetPlayerSeparate.calculateSteering(Player.steering);
-				
-				if(canMove())
-					user.setMoveVector(Player.steering.linear);
+				user.setMoveVector(Player.steering.linear);
 
 				memory.setTargetPlayer(tempPlayer);
 				targetPlayerSeparate.setEnabled(enabled);
@@ -501,7 +499,12 @@ public class Brain {
 	}
 	
 	public boolean canMove() {
-		return !memory.isBallJustShot() || user.isInAwayBasketZone() && user.getAwayBasketZone().checkZone(user.getPosition().add(Player.steering.linear.cpy().scl(7))) || !user.isInAwayBasketZone();
+		float add = 7;
+		System.out.println(user.getPosition());
+		System.out.println(Player.steering.linear.cpy().scl(add));
+		System.out.println(user.getPosition().add(Player.steering.linear.cpy().scl(add)));
+		
+		return !memory.isBallJustShot() || user.isInAwayBasketZone() && user.getAwayBasketZone().checkZone(user.getPosition().add(Player.steering.linear.cpy().scl(add))) || !user.isInAwayBasketZone();
 	}
 	
 	public boolean shouldStopToCatch() {

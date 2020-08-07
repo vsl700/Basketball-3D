@@ -1571,7 +1571,7 @@ public abstract class Player extends Entity {
 		}else if(callback.equals(brain.getTargetPlayerSeparate())) {
 			Player targetPlayer = brain.getMemory().getTargetPlayer();
 			
-			if(targetPlayer != null && targetPlayer.getPosition().dst(getPosition()) <= 3)
+			if(targetPlayer != null && !targetPlayer.equals(this))
 				callback.reportNeighbor(targetPlayer);
 		}
 		else if(callback.equals(brain.getAllPlayerSeparate())) {

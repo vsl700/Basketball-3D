@@ -348,9 +348,10 @@ public abstract class Entity implements Proximity<Vector3>, Steerable<Vector3> {
 		return count;
 	}
 
+	private final Vector3 tempVec = new Vector3();
 	@Override
 	public Vector3 getPosition() {
-		return modelInstance.transform.getTranslation(new Vector3());
+		return modelInstance.transform.getTranslation(tempVec);
 	}
 
 	@Override

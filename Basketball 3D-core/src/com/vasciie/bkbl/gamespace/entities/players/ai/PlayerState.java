@@ -110,8 +110,8 @@ public enum PlayerState implements State<Player> {
 			Array<Player> tempPlayers = null;
 			
 			if(player.isFocusing() || (player.getMap().getTeammates().size() > 1 && player instanceof Teammate || player instanceof Opponent && player.getMap().getOpponents().size() > 1) && 
-					(mem.isCheckZones() && (player.isInHomeThreePointZone() || player.isBehindBasket()) || (mem.getDribbleTime() > 0.7f && mem.isCheckZones() && !player.isInAwayThreePointZone() || mem.getDribbleTime() > 0.7f && !mem.isCheckZones()) && (isAnOpponentClose(player) || player.getMap().getOpponents().size() == 0) && 
-							(mem.isCheckZones() && (player.getAwayZone().checkZone(ball.getPosition(), ball.getDimensions()) && GameTools.playersInZone(player, player.getAwayZone()).size > 0) || !mem.isCheckZones()))) {
+					(mem.isCheckZones() && (player.isInHomeThreePointZone() || player.isBehindBasket()) || (mem.getDribbleTime() > 0.7f && mem.isCheckZones() && !player.isInAwayThreePointZone() || mem.getDribbleTime() > 0.7f && !mem.isCheckZones()) && (player.getMap().getOpponents().size() == 0 || isAnOpponentClose(player)) && 
+							(mem.isCheckZones() && ((player.getAwayZone().checkZone(ball.getPosition(), ball.getDimensions()) && GameTools.playersInZone(player, player.getAwayZone()).size > 0) || player.getHomeZone().checkZone(ball.getPosition(), ball.getDimensions())) || !mem.isCheckZones()))) {
 				
 				/*Array<Player> tempPlayers = playersFurtherFromBasket(player);
 				
@@ -584,10 +584,10 @@ public enum PlayerState implements State<Player> {
 			AIMemory memory = brain.getMemory();
 			Location<Vector3> tempTarget = brain.getCustomPursue().getTarget();
 			
-			if(memory.getTargetPlayer() == null) {
+			/*if(memory.getTargetPlayer() == null) {
 				memory.setTargetPlayer(player.getMap().getHoldingPlayer());
 				brain.getTargetPlayerSeparate().setEnabled(false);
-			}else if(GameTools.getDistanceBetweenLocations(player, memory.getTargetPlayer()) < player.getWidth() * 1.1f) brain.getTargetPlayerSeparate().setEnabled(true);
+			}else*/ if(memory.getTargetPlayer() != null && !player.equals(memory.getTargetPlayer()) && GameTools.getDistanceBetweenLocations(player, memory.getTargetPlayer()) < player.getWidth() + 0.2f) brain.getTargetPlayerSeparate().setEnabled(true);
 			else brain.getTargetPlayerSeparate().setEnabled(false);
 			
 			if(brain.getPSCustom2() != null) {

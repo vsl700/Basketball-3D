@@ -810,6 +810,7 @@ public class GameMap implements GameMessageSender {
         ruleTriggered = true;
         playersReady = false;
         ruleTriggeredActing = false;
+        recentHolder = null;
 
         if(Gdx.app.getType().equals(Application.ApplicationType.Android))
             inputs.reset();
@@ -833,6 +834,7 @@ public class GameMap implements GameMessageSender {
     	}
 		
 		ruleTriggeredActing = true;
+		recentHolder = getHoldingPlayer();
 		
 		startTimer = 0.9f;
 
