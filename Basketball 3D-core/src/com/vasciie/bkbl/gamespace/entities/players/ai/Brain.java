@@ -228,8 +228,8 @@ public class Brain {
 		if(updateAI)
 			stateMachine.update();
 		
-		if(user.isHoldingBall())
-			memory.setBallJustShot(false);
+		/*if(user.isHoldingBall())
+			memory.setBallJustShot(false);*/
 		
 		if (!user.isHoldingBall()) {
 			Player temp = user.getMap().getRecentHolder();
