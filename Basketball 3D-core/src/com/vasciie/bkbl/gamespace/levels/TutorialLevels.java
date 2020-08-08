@@ -608,7 +608,7 @@ public class TutorialLevels extends Levels {
 										
 										actions.addAction(new TutorialAction("Passing & Catching!", "Good! Now The Same Way To The Red Basket Again! This Time We'll Enable The Backcourt Violation Rule!", textColor));
 										
-										actions.addAction(new TutorialAction("Passing & Catching!", "Backcourt Means That Once The Ball Crosses The Midcourt Line Of The Terrain And Gets Into The Opposite Team's Zone, It Cannot Cross The Midcourt Line Again Before The Other Team Catches The Ball! Otherwise The Rule Triggers And The Ball Is Awarded To The Opposite Team!", textColor));
+										actions.addAction(new TutorialAction("Passing & Catching!", "Backcourt Means That Once The Ball Crosses The Midcourt Line (or the middle) Of The Terrain And Gets Into The Opposite Team's Zone, It Cannot Cross The Midcourt Line Again Before The Other Team Catches The Ball! Otherwise The Rule Triggers And The Ball Is Awarded To The Opposite Team!", textColor));
 										
 										actions.addAction(new TutorialAction("Passing & Catching!", "At This Logic, If Your Teammate Has Crossed The Midcourt Line, But You Still Haven't, Your Teammate Will Not Pass You!", textColor));
 										
@@ -1178,7 +1178,7 @@ public class TutorialLevels extends Levels {
 										
 										actions.addAction(new TutorialAction("Ball Stealing!", "It Is Done By Pointing Your Arm (with the mouse button hand controls) To The Ball And Making The End Of The Arm Collide With The Ball While Your Opponent Is Dribbling!", textColor));
 										
-										actions.addAction(new TutorialAction("Ball Stealing!", "However, If You Point Your Arm To And Collide Its End With The Ball While The Opponent Isn't Dribbling, It Counts As Reach-In And The Penalty Would Be An Opponent To Go To The Basket And Try To Score!", textColor));
+										actions.addAction(new TutorialAction("Ball Stealing!", "However, If You Point Your Arm To And Collide Its End With The Ball While The Opponent Isn't Dribbling, It Counts As Reach-In And The Penalty Would Be An Opponent To Go To Your Team's Basket And Try To Score!", textColor));
 										
 										actions.addAction(new Action() {
 
@@ -1341,7 +1341,7 @@ public class TutorialLevels extends Levels {
 										
 										actions.addAction(new TutorialAction("4. Dribble Violation", "This Rule Triggers If The Ball Holding Player Doesn't Dribble For 0.75 Seconds While Moving Or 3 While Not Moving! The Penalty Is A Throw-in Done By The Opposite Team!", textColor));
 										
-										actions.addAction(new TutorialAction("5. Backcourt Violation", "This Rule Triggers If Your Team (for example) Owns The Ball And The Ball Gets Into Your Opposite Team's Zone As It Crosses The Midcourt Line, But Then It Gets Back To Your Team's Zone While Your Team Still Owns The Ball!", textColor));
+										actions.addAction(new TutorialAction("5. Backcourt Violation", "This Rule Triggers If Your Team (for example) Owns The Ball And The Ball Has Been Staying In Your Opposite Team's Zone As It Crosses The Midcourt Line, But Then It Got Back To Your Team's Zone While Your Team Still Owns The Ball!", textColor));
 										
 										actions.addAction(new TutorialAction("5. Backcourt Violation", "For The Penalty Of This Rule The Ball Is Awarded To The Opposite Team Of The Team Of The Rule Triggerer (the last player who has touched the ball before the rule triggered) At The Midcourt Line Without A Throw-in!", textColor));
 										

@@ -299,6 +299,8 @@ public enum PlayerState implements State<Player> {
 			// player.getBrain().lookAt.calculateSteering(Player.steering);
 			
 
+			if(!player.isAbleToCatch())
+				return;
 			//If the following player hadn't just thrown the ball or he's alone in team
 			if (player instanceof Teammate && player.getMap().getTeammates().size() == 1 || player instanceof Opponent && player.getMap().getOpponents().size() == 1 || !player.getBrain().getMemory().isBallJustShot()) {
 				if(tempBall.getLinearVelocity().y < 0 && player.getMap().getBall().getPosition().y > player.getHeight() * 2 && player.isProximityColliding(player.getMap().getBall()) || player.getPosition().dst(ballVec) < tempBall.getWidth() * 1.25f) {
@@ -485,7 +487,7 @@ public enum PlayerState implements State<Player> {
 				brain.getPlayerSeparate().setEnabled(false);
 			
 			if(player instanceof Teammate && player.getMap().getTeammates().size() == 1 || player instanceof Opponent && player.getMap().getOpponents().size() == 1) {
-				if(!player.isCurrentlyRunning() && player.getPosition().dst(chased.getPosition()) > player.getWidth() + 0.4f && !player.isCurrentlyPointing() || player.isCurrentlyRunning() && player.getPosition().dst(chased.getPosition()) > 1.78f)
+				if(!player.isCurrentlyRunning() && player.getPosition().dst(chased.getPosition()) > player.getWidth() + 0.6f && !player.isCurrentlyPointing() || player.isCurrentlyRunning() && player.getPosition().dst(chased.getPosition()) > 1.78f)
 					player.setRunning();
 			}else player.setRunning();
 			

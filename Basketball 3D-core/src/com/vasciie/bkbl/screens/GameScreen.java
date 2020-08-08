@@ -288,7 +288,7 @@ public class GameScreen implements Screen, GameMessageListener, GUIRenderer {
 								String tempText = ruleHeading.getText();
 								sender.messageReceived();
 								
-								if(map.getRules().getTriggeredRule() != null && (map.getTeammates().size() == 0 || map.getOpponents().size() == 0))
+								if(!map.isTutorialMode() && (map.getRules().getTriggeredRule() != null && (map.getTeammates().size() == 0 || map.getOpponents().size() == 0)))
 									game.setScreen(game.gameOver);
 								
 								if(ruleHeading.getText().equals(tempText))
@@ -355,8 +355,12 @@ public class GameScreen implements Screen, GameMessageListener, GUIRenderer {
 		
 		ignorePause = false;
 		
-		if(!paused() && !game.getScreen().equals(this) && !game.getScreen().equals(game.settings) && !game.getScreen().equals(game.gameOver))
+		if(!paused() && !game.getScreen().equals(this) && !game.getScreen().equals(game.settings) && !game.getScreen().equals(game.gameOver)) {
+			if(SettingsScreen.multithreadOption)
+				updateThread.waitToFinish();
+			
 			reset();
+		}
 	}
 
 	@Override

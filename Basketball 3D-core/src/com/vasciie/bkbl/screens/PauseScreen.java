@@ -23,7 +23,7 @@ public class PauseScreen implements Screen, GUIRenderer {
 	BitmapFont font;
 	OrthographicCamera cam;
 	
-	Button resume, newGame, settings, quit;
+	Button resume, newGame, settings, quit, backToTutorial;
 	
 	boolean active;
 	
@@ -42,6 +42,7 @@ public class PauseScreen implements Screen, GUIRenderer {
 		if(!Gdx.app.getType().equals(Application.ApplicationType.Android))
 			settings = new Button("Settings", font, Color.ORANGE.cpy().sub(0, 0.3f, 0, 1), true, true, this);
 		quit = new Button("Quit", font, Color.ORANGE.cpy().sub(0, 0.3f, 0, 1), true, true, this);
+		backToTutorial = new Button("Back To Tutorial Menu", font, Color.ORANGE.cpy().sub(0, 0.3f, 0, 1), true, true, this);
 	}
 	
 	@Override
@@ -55,7 +56,9 @@ public class PauseScreen implements Screen, GUIRenderer {
 		newGame.update();
 		if(!Gdx.app.getType().equals(Application.ApplicationType.Android))
 			settings.update();
-		quit.update();
+		if(game.getMap().isTutorialMode())
+			backToTutorial.update();
+		else quit.update();
 		
 		if(Gdx.input.isKeyJustPressed(Keys.ESCAPE) || Gdx.input.isKeyJustPressed(Keys.BACK) || resume.justReleased()) {
 			exit();
@@ -85,6 +88,10 @@ public class PauseScreen implements Screen, GUIRenderer {
 			game.setScreen(game.main);
 			game.main.sendWebPageMessage();
 			return;
+		}else if(backToTutorial.justReleased()) {
+			exit();
+			game.game.reset();
+			game.setScreen(game.tutorial);
 		}
 
 		game.renderLogo(batch, cam);
@@ -94,6 +101,7 @@ public class PauseScreen implements Screen, GUIRenderer {
 		if(settings != null)
 			settings.draw();
 		quit.draw();
+		backToTutorial.draw();
 
 		if(Gdx.app.getType().equals(ApplicationType.Android))
 			Gdx.graphics.setContinuousRendering(false);
@@ -129,6 +137,8 @@ public class PauseScreen implements Screen, GUIRenderer {
 
 		quit.setSize(game.pixelXByCurrentSize(223 * MyGdxGame.GUI_SCALE), game.pixelYByCurrentSize(30 * MyGdxGame.GUI_SCALE));
 		quit.setPos(width / 2 - quit.getWidth() / 2, game.pixelYByCurrentSize(spaceHeight-= 120));
+		
+		backToTutorial.setPosAndSize(quit.getX(), quit.getY(), quit.getWidth(), quit.getHeight());
 	}
 	
 	public boolean isActive() {
