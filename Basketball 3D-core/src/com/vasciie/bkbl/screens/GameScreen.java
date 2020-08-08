@@ -77,6 +77,10 @@ public class GameScreen implements Screen, GameMessageListener, GUIRenderer {
 
 
 				map.update(Gdx.graphics.getDeltaTime());
+				
+				if(SettingsScreen.multithreadOption && !paused() && !game.getScreen().equals(game.game) && !game.getScreen().equals(game.settings) && !game.getScreen().equals(game.gameOver)) {
+					reset();
+				}
 
 			}
 
@@ -355,10 +359,8 @@ public class GameScreen implements Screen, GameMessageListener, GUIRenderer {
 		
 		ignorePause = false;
 		
-		if(!paused() && !game.getScreen().equals(this) && !game.getScreen().equals(game.settings) && !game.getScreen().equals(game.gameOver)) {
-			if(SettingsScreen.multithreadOption)
-				updateThread.waitToFinish();
-			
+		
+		if(!SettingsScreen.multithreadOption && !paused() && !game.getScreen().equals(this) && !game.getScreen().equals(game.settings) && !game.getScreen().equals(game.gameOver)) {
 			reset();
 		}
 	}

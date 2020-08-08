@@ -638,7 +638,7 @@ public enum PlayerState implements State<Player> {
 		}
 		
 		private void additionalUpdate(Player player, Brain brain, AIMemory memory, Location<Vector3> tempTarget) {
-			if(!player.isHoldingBall() && player.getMap().getBall().getPosition().y > player.getHeight() * 2) {
+			if(!player.isHoldingBall() && player.getMap().getBall().getPosition().y > player.getHeight() * 2 || !player.isAbleToCatch() && !player.isHoldingBall() && !player.isShooting()) {
 				player.getBrain().getBallSeparate().setEnabled(true);
 				//player.getBrain().getBallSeparate().calculateSteering(Player.steering);
 				//player.getMoveVector().nor().add(Player.steering.linear.cpy().scl(2.5f));

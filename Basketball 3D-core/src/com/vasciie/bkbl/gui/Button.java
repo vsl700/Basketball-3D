@@ -52,10 +52,7 @@ public class Button extends GUI {
         this.filled = filled;
 
 		if (color != null) {
-			r = color.r;
-			g = color.g;
-			b = color.b;
-			a = color.a;
+			setColor(color);
 		}
 
 
@@ -263,6 +260,13 @@ public class Button extends GUI {
 
     public void setRenderable(boolean renderable){
         this.renderable = renderable;
+    }
+    
+    public void setColor(Color color) {
+    	r = color.r;
+    	g = color.g;
+    	b = color.b;
+    	a = color.a;
     }
 
     protected Color markColorClick() {

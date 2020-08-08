@@ -234,7 +234,7 @@ public class Brain {
 		if (!user.isHoldingBall()) {
 			Player temp = user.getMap().getRecentHolder();
 			//System.out.println(GameTools.getDistanceBetweenLocations(temp = GameTools.getClosestPlayer(user.getPosition(), user.getMap().getAllPlayers(), null), user));
-			if (temp != null && !temp.equals(user) && (!temp.isHoldingBall() || temp.isAimingOrShooting() || temp.isInAwayThreePointZone()) && Player.steering.linear.cpy().nor().scl(Gdx.graphics.getDeltaTime() * 11).add(user.getPosition()).dst(temp.getPosition()) <= user.getWidth() + 0.8f) {
+			if (temp != null && !temp.equals(user) && (!temp.isHoldingBall() || temp.isAimingOrShooting() || temp.isInAwayBasketZone()) && Player.steering.linear.cpy().nor().scl(Gdx.graphics.getDeltaTime() * 11).add(user.getPosition()).dst(temp.getPosition()) <= user.getWidth() + 0.8f) {
 				Player tempPlayer = memory.getTargetPlayer();
 				memory.setTargetPlayer(temp);
 				

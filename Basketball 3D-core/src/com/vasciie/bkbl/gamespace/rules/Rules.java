@@ -513,6 +513,7 @@ public class Rules implements GameMessageSender {
 				
 				new GameRule(this, null, "incorrect_ball_steal", "Reached In!", map) {
 					Player recentHolder;
+					boolean readyToCheck;
 					
 					@Override
 					public boolean checkRule() {
@@ -624,6 +625,8 @@ public class Rules implements GameMessageSender {
 							
 							@Override
 							public boolean act() {
+								readyToCheck = true;
+								
 								Player holdingPlayer = map.getHoldingPlayer();
 									
 								/*if(holdingPlayer == null && (map.getRecentHolder() != null && map.getRecentHolder().getBrain().getMemory().isBallJustShot() || map.getRecentHolder() == null)) {
@@ -640,6 +643,7 @@ public class Rules implements GameMessageSender {
 									}else if(!holdingPlayer.getBrain().isShooting() && map.getRecentHolder().getBrain().getMemory().isBallJustShot()) {
 										unlockRunning(holdingPlayer);
 										
+										readyToCheck = false;
 										return true;
 									}
 								}else if (tooCloseOrBehind) {
@@ -670,11 +674,72 @@ public class Rules implements GameMessageSender {
 						});
 						
 					}
+					
+					@Override
+					public boolean isInnerRulesGameDependent() {
+						
+						return false;
+					}
 
 					@Override
 					public GameRule[] createInnerRules() {
 						
-						return null;
+						return new GameRule[] {
+								new GameRule(rules, this, "score", "SCORE!", map) {
+
+									@Override
+									public void resetRule() {
+										
+										
+									}
+
+									@Override
+									public GameRule[] createInnerRules() {
+										
+										return null;
+									}
+
+									@Override
+									public void createActions() {
+										
+										
+									}
+									
+									@Override
+									public void managePlayers() {
+										GameRule switchRule = rules.getGameRuleById("basket_score");
+										switchRule.setRuleTriggerer(ruleTriggerer);
+										
+										rules.setTriggeredRule(switchRule, false);
+									}
+
+									@Override
+									public boolean checkRule() {
+										if(!readyToCheck)
+											return false;
+										
+										GameRule tempRule = rules.getGameRuleById("basket_score"); 
+										if(tempRule.checkRule()) {
+											ruleTriggerer = tempRule.getRuleTriggerer();
+											return true;
+										}
+										
+										return false;
+									}
+
+									@Override
+									public String getDescription() {
+										
+										return rules.getGameRuleById("basket_score").getDescription();
+									}
+									
+									@Override
+									public Color getTextColor() {
+										return rules.getGameRuleById("basket_score").getTextColor();
+									}
+									
+								}
+						};
 					}
 
 					@Override
@@ -685,8 +750,8 @@ public class Rules implements GameMessageSender {
 
 					@Override
 					public void resetRule() {
-						
-						
+						recentHolder = null;
+						readyToCheck = false;
 					}
 				},
 				
@@ -758,7 +823,7 @@ public class Rules implements GameMessageSender {
 						GameRule switchRule = rules.getGameRuleById("ball_out");
 						switchRule.setRuleTriggerer(ruleTriggerer);
 						
-						rules.setTriggeredRule(switchRule);
+						rules.setTriggeredRule(switchRule, false);
 					}
 
 					@Override
@@ -856,7 +921,7 @@ public class Rules implements GameMessageSender {
 						GameRule switchRule = rules.getGameRuleById("ball_out");
 						switchRule.setRuleTriggerer(ruleTriggerer);
 						
-						rules.setTriggeredRule(switchRule);
+						rules.setTriggeredRule(switchRule, false);
 					}
 
 					@Override
@@ -893,7 +958,7 @@ public class Rules implements GameMessageSender {
 						Ball ball = map.getBall();
 						
 						//System.out.println(holdingPlayer);
-						if (holdingPlayer == null) {
+						if (holdingPlayer == null && (recentHolder != null && recentHolder.isAbleToCatch() || recentHolder == null)) {
 							for (btCollisionObject obj : map.getBall().getOutsideColliders()) {
 								for (Player player : map.getAllPlayers()) {
 									if (player.getAllCollObjects().contains(obj)) {
@@ -908,7 +973,7 @@ public class Rules implements GameMessageSender {
 									}
 								}
 							}
-						}else {
+						}else if(holdingPlayer != null){
 							if(prevHoldingPlayer == null || recentHolder instanceof Teammate && holdingPlayer instanceof Opponent || recentHolder instanceof Opponent && holdingPlayer instanceof Teammate) {
 								crossed = holdingPlayer.isInAwayZone();
 								/*System.out.println("Cross Reset");
@@ -1080,7 +1145,7 @@ public class Rules implements GameMessageSender {
 						GameRule switchRule = rules.getGameRuleById("ball_out");
 						switchRule.setRuleTriggerer(ruleTriggerer);
 						
-						rules.setTriggeredRule(switchRule);
+						rules.setTriggeredRule(switchRule, false);
 					}
 					
 					@Override
@@ -1162,7 +1227,7 @@ public class Rules implements GameMessageSender {
 						GameRule switchRule = rules.getGameRuleById("ball_out");
 						switchRule.setRuleTriggerer(ruleTriggerer);
 						
-						rules.setTriggeredRule(switchRule);
+						rules.setTriggeredRule(switchRule, false);
 					}
 
 					@Override
@@ -1256,7 +1321,7 @@ public class Rules implements GameMessageSender {
 						GameRule switchRule = rules.getGameRuleById("ball_out");
 						switchRule.setRuleTriggerer(ruleTriggerer);
 						
-						rules.setTriggeredRule(switchRule);
+						rules.setTriggeredRule(switchRule, false);
 					}
 
 					@Override
@@ -1355,7 +1420,7 @@ public class Rules implements GameMessageSender {
 						GameRule switchRule = rules.getGameRuleById("ball_out");
 						switchRule.setRuleTriggerer(ruleTriggerer);
 						
-						rules.setTriggeredRule(switchRule);
+						rules.setTriggeredRule(switchRule, false);
 					}
 					
 					@Override
@@ -1453,7 +1518,7 @@ public class Rules implements GameMessageSender {
 						GameRule switchRule = rules.getGameRuleById("ball_out");
 						switchRule.setRuleTriggerer(ruleTriggerer);
 						
-						rules.setTriggeredRule(switchRule);
+						rules.setTriggeredRule(switchRule, false);
 					}
 
 					@Override
@@ -1564,7 +1629,7 @@ public class Rules implements GameMessageSender {
 						GameRule switchRule = rules.getGameRuleById("ball_out");
 						switchRule.setRuleTriggerer(ruleTriggerer);
 						
-						rules.setTriggeredRule(switchRule);
+						rules.setTriggeredRule(switchRule, false);
 					}
 
 					@Override
@@ -1684,8 +1749,8 @@ public class Rules implements GameMessageSender {
 		return false;
 	}
 	
-	public void setTriggeredRule(GameRule rule) {
-		if(rule.getParent() != null || triggeredRule == null) {
+	public void setTriggeredRule(GameRule rule, boolean forceMessage) {
+		if(forceMessage || rule.getParent() != null || triggeredRule == null) {
 			map.onRuleTriggered(rule);
 			rulesListener.sendMessage(rule.getName(), rule.getDescription(), rule.getTextColor(), this, true, false);
 		}
@@ -1762,6 +1827,10 @@ public class Rules implements GameMessageSender {
 		
 		public abstract void createActions();
 		
+		public boolean isInnerRulesGameDependent() {
+			return true;
+		}
+		
 		/**
 		 * To see if the following rule is broken, this method should be called to which should check that for each rule
 		 * @return true if the rule is broken
@@ -1784,7 +1853,7 @@ public class Rules implements GameMessageSender {
 		public void managePlayers() {
 			if(actions.act()) {
 				if(parent != null) {
-					rules.setTriggeredRule(parent);
+					rules.setTriggeredRule(parent, false);
 					//return false;
 				}
 				else rules.clearTriggeredRuleWRuleBreaker();
@@ -1793,10 +1862,12 @@ public class Rules implements GameMessageSender {
 				//return true;
 			}
 			
-			if(innerRules != null && map.isGameRunning())
+			if(innerRules != null && (map.isGameRunning() && isInnerRulesGameDependent() || !isInnerRulesGameDependent()))
 				for(GameRule r : innerRules)
 					if(r.checkRule()) {
-						rules.setTriggeredRule(r);
+						if(rules.getTriggeredRule().equals(this))
+							rules.setTriggeredRule(r, false);
+						
 						for(GameRule rule : innerRules)
 							rule.resetRule();
 						

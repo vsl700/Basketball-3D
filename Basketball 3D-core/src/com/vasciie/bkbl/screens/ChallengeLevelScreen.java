@@ -58,7 +58,7 @@ public class ChallengeLevelScreen implements Screen, GUIRenderer, GameMessageSen
 		
 		challengeName = new Label("", medFont, Color.RED, false, this);
 		losableChallenge = new Label("IF THIS CHALLENGE BREAKS, YOU LOSE!", checkBtnFont, Color.RED, false, this);
-		urgedChallenge = new Label("YOU WIN ONLY IF THIS CHALLENGE BREAKS!", checkBtnFont, Color.RED, false, this);
+		urgedChallenge = new Label("YOU WIN ONLY IF THIS CHALLENGE BREAKS!", checkBtnFont, Color.BLUE, false, this);
 	}
 	
 	@Override
@@ -129,6 +129,9 @@ public class ChallengeLevelScreen implements Screen, GUIRenderer, GameMessageSen
 		challengeName.update();
 		
 		playChallenge[index].update();
+		if(playChallenge[index].isToggled())
+			challengePages[index].setColor(Color.RED);
+		else challengePages[index].setColor(Color.ORANGE.cpy().sub(0, 0.3f, 0, 1));
 		
 		if(((ChallengeLevel) game.getMap().getChallenges().getGameLevel(index)).isLosable())
 			losableChallenge.update();
