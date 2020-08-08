@@ -836,6 +836,9 @@ public class GameMap implements GameMessageSender {
 		ruleTriggeredActing = true;
 		recentHolder = getHoldingPlayer();
 		
+		for(Player p : getAllPlayers())
+			p.getBrain().getMemory().setBallJustShot(false);
+		
 		startTimer = 0.9f;
 
 		if (difficulty > 0) {

@@ -55,7 +55,7 @@ public class Rules implements GameMessageSender {
 						if(thrower != null && !thrower.isBallFree())
 							return false;
 						
-						if (tempPlayer == null) {//If there is currently no holding player
+						if (tempPlayer == null && (recentHolder != null && recentHolder.isAbleToCatch() || recentHolder == null)) {//If there is currently no holding player
 							if((map.getBall().isCollidedWTeamBasket() || map.getBall().isCollidedWOppBasket()) && map.getBall().getLinearVelocity().y > 0.5f && map.getBall().getPosition().y - map.getHomeBasket().getBasketTargetTrans().getTranslation(new Vector3()).y < 0) {
 								ruleTriggerer = recentHolder;
 								basketUpsideDown = true;
@@ -71,13 +71,13 @@ public class Rules implements GameMessageSender {
 									}
 								}
 							}
-						}else {
+						}else if(tempPlayer != null) {
 							recentHolder = tempPlayer;
 							justTouched = false;
 						}
 						
-						/*if(thrower != null && thrower.equals(recentHolder))
-							return false;*/
+						if(thrower != null && thrower.equals(recentHolder))
+							return false;
 						
 						if (recentHolder != null) {//If the ball is still not ever touched, don't check for terrain bounds collision (CPU economy)
 							if(!recentHolder.isBallFree()) {
@@ -89,7 +89,36 @@ public class Rules implements GameMessageSender {
 								if (map.getTerrain().getInvisBodies().contains(obj)) {
 									ruleTriggerer = recentHolder;
 									basketUpsideDown = false;
-									occurPlace.set(map.getBall().getPosition()).add(occurPlace.cpy().scl(-1).nor().scl(3)).y = recentHolder.getPosition().y;
+									
+									ArrayList<Vector3> wallPositions = new ArrayList<Vector3>(8);
+									Terrain terrain = map.getTerrain();
+									
+									for(int i = 1; i < 5; i++) {
+										Vector3 wallPos = terrain.getMatrixes().get(i).getTranslation(new Vector3());
+										wallPos.y = map.getBall().getPosition().y;
+										
+										float changer, compatibChange = map.getBall().getWidth() / 2 + Terrain.getWalldepth();
+										
+										if(wallPos.x == 0) {//Basewall
+											changer = terrain.getWidth() / 4;
+											
+											if(wallPos.z < 0)
+												compatibChange = -compatibChange;
+											
+											wallPositions.add(wallPos.cpy().add(changer, 0, -compatibChange));
+											wallPositions.add(wallPos.sub(changer, 0, compatibChange));
+										}else {//Sidewall
+											changer = terrain.getDepth() / 4;
+											
+											if(wallPos.x < 0)
+												compatibChange = -compatibChange;
+											
+											wallPositions.add(wallPos.cpy().add(-compatibChange, 0, changer));
+											wallPositions.add(wallPos.sub(compatibChange, 0, changer));
+										}
+									}
+									
+									occurPlace.set(GameTools.getShortestDistanceWVectors(map.getBall().getPosition(), wallPositions)).y = 0;
 									
 									/*if(!recentHolder.isCurrentlyAiming() && !recentHolder.isShooting())
 										map.playerReleaseBall();*/
@@ -146,14 +175,14 @@ public class Rules implements GameMessageSender {
 								recentHolder = thrower;
 								
 								
-								Vector3 posGroupPos = occurPlace.cpy().nor().scl(5);
+								//Vector3 posGroupPos = occurPlace.cpy().nor().scl(5);
 								// This is supposed to be a position right in front of
 								// the thrower's sight, and then random coordinates from
 								// -3 to 3 z-axis and -1.5 to 1.5 x-axis will be .mul()-ed by
 								// this matrix, so that the other players get in random
 								// positions in front of the thrower. Also the group
 								// should be pointed at the thrower.
-								Matrix4 positionsCalc = new Matrix4().setToLookAt(posGroupPos, thrower.getPosition(), new Vector3(0, -1, 0)).trn(posGroupPos);
+								//Matrix4 positionsCalc = new Matrix4().setToLookAt(posGroupPos, thrower.getPosition(), new Vector3(0, -1, 0)).trn(posGroupPos);
 								for(Player p : allPlayers) {
 									if(p.equals(thrower)) {
 										//map.setPlayerTargetPosition(map.getBall().getPosition(), temp);
@@ -168,7 +197,7 @@ public class Rules implements GameMessageSender {
 										Matrix4 tempTrans = new Matrix4().setToTranslation(MathUtils.random(-1.5f, 1.5f), 0, MathUtils.random(-3f, 3f)); //We need to specify that the range value is a float (with an f), otherwise we are calling the integer method
 										
 										//Putting a calculated from the original by the group one position into the targets vector
-										p.getBrain().setCustomVecTarget(positionsCalc.cpy().mul(tempTrans).getTranslation(new Vector3()), true);
+										p.getBrain().setCustomVecTarget(tempTrans.getTranslation(new Vector3()), true);
 										//p.getBrain().getMemory().setTargetFacing(p.getBrain().getMemory().getTargetPosition());
 										p.getBrain().getCustomPursue().setArrivalTolerance(thrower.getWidth() * 1.3f);
 										p.getBrain().getMemory().setTargetPlayer(thrower);
@@ -201,6 +230,7 @@ public class Rules implements GameMessageSender {
 									}
 									//map.setPlayerTargetPosition(occurPlace, recentHolder);
 									recentHolder.getBrain().setCustomVecTarget(occurPlace, true);
+									recentHolder.getBrain().getCustomPursue().setArrivalTolerance(recentHolder.getWidth());
 									
 									
 									return true;
@@ -252,7 +282,7 @@ public class Rules implements GameMessageSender {
 								// because when the action starts, the player
 								// won't be aiming or shooting, which will
 								// result in ending the action before it starts
-								if(!thrower.isHoldingBall() && !thrower.isAiming() && !thrower.isShooting())
+								if(!thrower.isHoldingBall() && !thrower.isCurrentlyAiming() && !thrower.isShooting())
 									return true;
 								
 								if (!thrower.isMainPlayer()) {
@@ -402,6 +432,51 @@ public class Rules implements GameMessageSender {
 										return "You Cannot Hold The Ball For More Than 5 Seconds During Throw-in!";
 									}
 									
+								},
+								
+								new GameRule(rules, this, "too_close", "Too Close!", map) {
+									@Override
+									public void resetRule() {
+										
+										
+									}
+
+									@Override
+									public GameRule[] createInnerRules() {
+										
+										return null;
+									}
+
+									@Override
+									public void createActions() {
+										
+										
+									}
+
+									@Override
+									public boolean checkRule() {
+										if(map.getHoldingPlayer() == null)
+											return false;
+										
+										for(Player p : map.getAllPlayers()) {
+											if(p.equals(map.getHoldingPlayer()))
+												continue;
+											
+											if(p.getPosition().dst(map.getHoldingPlayer().getPosition()) < p.getWidth() + p.getArmHeight()) {
+												parent.setRuleTriggerer(ruleTriggerer = p);
+												return true;
+											}
+										}
+											
+										return false;
+									}
+
+									@Override
+									public String getDescription() {
+										
+										return "Players Should Not Be Too Close To The Thrower-in!";
+									}
+									
 								}
 						};
 						
@@ -429,7 +504,7 @@ public class Rules implements GameMessageSender {
 
 					@Override
 					public void resetRule() {
-						recentHolder = null;
+						recentHolder = thrower = null;
 						
 						for(GameRule rule : innerRules)
 							rule.resetRule();

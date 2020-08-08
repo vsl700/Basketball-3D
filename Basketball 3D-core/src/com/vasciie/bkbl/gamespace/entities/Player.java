@@ -690,6 +690,10 @@ public abstract class Player extends Entity {
 	 * @param target
 	 */
 	public void throwBall(Vector3 target) {
+		brain.getMemory().setShootTime(0);
+		brain.getMemory().setCatchTime(0);
+		brain.getMemory().setAimingTime(0);
+		
 		Vector3 tempVec = target.cpy().sub(map.getBall().getPosition()).nor();
 		tempVec.x *= shootingPower;
 		tempVec.y *= shootingPower * 1.4f;
@@ -713,6 +717,10 @@ public abstract class Player extends Entity {
 		if(leftHoldingBall)
 			releaseBall(bodiesMap.get("handL").getWorldTransform().cpy());
 		else if(rightHoldingBall) releaseBall(bodiesMap.get("handR").getWorldTransform().cpy());
+		
+		leftHandInWorld = true;
+		rightHandInWorld = true;
+		downBody = false;
 	}
 	
 	private void releaseBall(Matrix4 trans) {

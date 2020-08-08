@@ -228,6 +228,9 @@ public class Brain {
 		if(updateAI)
 			stateMachine.update();
 		
+		if(user.isHoldingBall())
+			memory.setBallJustShot(false);
+		
 		if (!user.isHoldingBall()) {
 			Player temp = user.getMap().getRecentHolder();
 			//System.out.println(GameTools.getDistanceBetweenLocations(temp = GameTools.getClosestPlayer(user.getPosition(), user.getMap().getAllPlayers(), null), user));
@@ -266,6 +269,10 @@ public class Brain {
 	}
 	
 	public void performShooting(Vector3 tempAimVec) {
+		memory.setShootTime(0);
+		memory.setCatchTime(0);
+		memory.setAimingTime(0);
+		
 		memory.setTargetVec(tempAimVec);
 		user.interactWithBallS();
 		memory.setAimingTime(memory.getAimingTime() + Gdx.graphics.getDeltaTime());

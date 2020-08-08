@@ -1243,7 +1243,7 @@ public class TutorialLevels extends Levels {
 										
 										actions.addAction(new TutorialAction("The End!", "I Mean I Won't Be Able To Train You Play According To The Rules Of The Game, So You Should Adapt To Them By The Game Itself!", textColor));
 										
-										actions.addAction(new TutorialAction("The End!", "But I Can Reveal All The 12 Of Them! Meet Me In The Last Tutorial Level Where I'll Just Explain All Of Them!", textColor));
+										actions.addAction(new TutorialAction("The End!", "But I Can Reveal All The 13 Of Them! Meet Me In The Last Tutorial Level Where I'll Just Explain All Of Them!", textColor));
 										
 										actions.addAction(new TutorialAction("/", "main", textColor) {
 											
@@ -1295,7 +1295,7 @@ public class TutorialLevels extends Levels {
 									
 									@Override
 									protected void createActions() {
-										actions.addAction(new TutorialAction("The Rules!", "Like I Said, I'm Just Gonna Explain All The 12 Rules You Should Obey While Playing!", textColor));
+										actions.addAction(new TutorialAction("The Rules!", "Like I Said, I'm Just Gonna Explain All The 13 Rules You Should Obey While Playing!", textColor));
 										
 										actions.addAction(new TutorialAction("1. SCORE", "I Suggest Starting With That Rule! As You Probably Assume, It Triggers When A Player Scores!", textColor));
 										
@@ -1334,6 +1334,8 @@ public class TutorialLevels extends Levels {
 										actions.addAction(new TutorialAction("2.1. Moved Out", "This Inner Rule Triggers When The Thrower Moves For A Total Of 1 Second During The Throw-in! The Penalty Is A Throw-in By The Other Team!", textColor));
 										
 										actions.addAction(new TutorialAction("2.2. Time Out", "This Inner Rule Triggers When The Thrower Doesn't Manage To Release The Ball Within 5 Seconds! The Penalty Is A Throw-in By The Other Team!", textColor));
+										
+										actions.addAction(new TutorialAction("2.3. Too Close", "This Inner Rule Triggers When A Player (the new eventual rule triggerer) Gets Too Close To The Thrower-in! If The Rule Triggerer Is From The Thrower-in's Team, The Opposite Team Is Making The Throw-in!", textColor));
 										
 										actions.addAction(new TutorialAction("3. Reached In", "This Rule Triggers When A Player Tries To Steal The Ball From A Player That's Holding The Ball, But It's Not Currently Dribbling It!", textColor));
 										

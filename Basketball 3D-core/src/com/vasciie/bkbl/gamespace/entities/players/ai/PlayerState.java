@@ -253,7 +253,10 @@ public enum PlayerState implements State<Player> {
 			// memory.get(player).setBallJustShot(true);
 			// memory.get(player).setShootTime(0);
 			// memory.get(player).setAimingTime(0);
+			player.getBrain().getMemory().setShootTime(0);
+			player.getBrain().getMemory().setCatchTime(0);
 			player.getBrain().getMemory().setAimingTime(0);
+			
 			player.getBrain().getMemory().setDribbleTime(0);
 			player.getBrain().getMemory().setRandomFoulTime(0);
 			
@@ -663,6 +666,7 @@ public enum PlayerState implements State<Player> {
 		@Override
 		public void exit(Player player) {
 			Brain brain = player.getBrain();
+			AIMemory memory = brain.getMemory();
 			
 			if(brain.getCustomPursue().getTarget() != null) {
 				brain.getCustomPursue().setTarget(null);
@@ -682,6 +686,10 @@ public enum PlayerState implements State<Player> {
 			brain.getPursueBallInHand2().setEnabled(false);
 			
 			brain.getMemory().setTargetPlayer(null);
+			
+			memory.setShootTime(0);
+			memory.setCatchTime(0);
+			memory.setAimingTime(0);
 		}
 	};
 
