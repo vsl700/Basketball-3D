@@ -274,7 +274,7 @@ public class GameScreen implements Screen, GameMessageListener, GUIRenderer {
 							if (Gdx.app.getType().equals(Application.ApplicationType.Android) && Gdx.input.justTouched() || Gdx.input.isKeyJustPressed(Keys.E)) {
 								if (map.isRuleTriggered()) {
 									Player triggerer = map.getRules().getTriggeredRule().getRuleTriggerer();
-									if (triggerer.getFouls() == 7 && (triggerer.isMainPlayer() || map.getTeammates().size() == 0 || map.getOpponents().size() == 0) || (map.getTeamScore() >= 15 || map.getOppScore() >= 15) && !map.isChallenge()) {
+									if (triggerer.getFouls() == 7 && (triggerer.isMainPlayer()) || (map.getTeamScore() >= 15 || map.getOppScore() >= 15) && !map.isChallenge()) {
 										game.setScreen(game.gameOver);
 										return;
 									}
@@ -287,6 +287,9 @@ public class GameScreen implements Screen, GameMessageListener, GUIRenderer {
 								
 								String tempText = ruleHeading.getText();
 								sender.messageReceived();
+								
+								if(map.getRules().getTriggeredRule() != null && (map.getTeammates().size() == 0 || map.getOpponents().size() == 0))
+									game.setScreen(game.gameOver);
 								
 								if(ruleHeading.getText().equals(tempText))
 									sender = null;

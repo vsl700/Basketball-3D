@@ -32,7 +32,7 @@ public enum PlayerState implements State<Player> {
 			
 			
 			for(Player p : tempOpp)
-				if(p.getPosition().dst(player/*.getMap().getBall()*/.getPosition()) <= p.getWidth() + 0.75f)
+				if(p.getPosition().dst(player/*.getMap().getBall()*/.getPosition()) <= p.getWidth() + 0.6f)
 					return true;
 			
 			return false;
@@ -81,6 +81,10 @@ public enum PlayerState implements State<Player> {
 					player instanceof Opponent && player.getMap().getTeamScore() - player.getMap().getOppScore() >= scoreDiff;
 		}
 		
+		private boolean isReadyToScore(Player player) {
+			return player.getAwayBasketZone().checkZone(player.getPosition(), new Vector3(-1, -1, -1).scl(1.5f));
+		}
+		
 		@Override
 		public void update(Player player) {
 			Brain brain = player.getBrain();
@@ -95,7 +99,7 @@ public enum PlayerState implements State<Player> {
 					multiplier = player.getMap().getTeammates().size();
 				else multiplier = player.getMap().getOpponents().size();*/
 				
-				int chance = 45/* + 5 * multiplier*/;
+				int chance = 57/* + 5 * multiplier*/;
 				if (difficulty == 0 && player instanceof Opponent && MathUtils.random(0, 100) <= chance) {
 					mem.setDribbleTime(mem.getDribbleTime() - Gdx.graphics.getDeltaTime());
 				}else if(difficulty == 2 && player instanceof Teammate && MathUtils.random(0, 100) <= chance) {
@@ -161,7 +165,7 @@ public enum PlayerState implements State<Player> {
 
 				if (player.isFocusing())
 					tempAimVec = brain.getMemory().getTargetPlayer().getPosition();
-				else if (mem.isCheckZones() && (player.isInAwayBasketZone() || player.isInAwayThreePointZone() && checkPlayerPointsDiff(player)) && !brain.tooCloseOrBehindBasket())
+				else if (mem.isCheckZones() && (isReadyToScore(player) || player.isInAwayThreePointZone() && checkPlayerPointsDiff(player)) && !brain.tooCloseOrBehindBasket())
 					tempAimVec = brain.makeBasketTargetVec(player.getTargetBasket());
 				
 
@@ -205,7 +209,7 @@ public enum PlayerState implements State<Player> {
 				
 			
 			
-			if(mem.isCheckZones() && player.isInAwayBasketZone() || brain.isShooting() && (mem.isCheckZones() && !player.getHomeZone().checkZone(ball.getPosition(), ball.getDimensions()) && player.isInAwayZone()))
+			if(mem.isCheckZones() && isReadyToScore(player) || brain.isShooting() && (mem.isCheckZones() && !player.getHomeZone().checkZone(ball.getPosition(), ball.getDimensions()) && player.isInAwayZone()))
 				brain.getPursueBallInHand().setEnabled(false);
 			else {
 				brain.getPursueBallInHand().setEnabled(true);
@@ -481,7 +485,7 @@ public enum PlayerState implements State<Player> {
 				brain.getPlayerSeparate().setEnabled(false);
 			
 			if(player instanceof Teammate && player.getMap().getTeammates().size() == 1 || player instanceof Opponent && player.getMap().getOpponents().size() == 1) {
-				if(!player.isCurrentlyRunning() && player.getPosition().dst(chased.getPosition()) > 3 || player.isCurrentlyRunning() && player.getPosition().dst(chased.getPosition()) > 1.78f)
+				if(!player.isCurrentlyRunning() && player.getPosition().dst(chased.getPosition()) > player.getWidth() + 0.4f && !player.isCurrentlyPointing() || player.isCurrentlyRunning() && player.getPosition().dst(chased.getPosition()) > 1.78f)
 					player.setRunning();
 			}else player.setRunning();
 			
@@ -492,6 +496,11 @@ public enum PlayerState implements State<Player> {
 			
 			//Additional controls
 			if (chased.isDribbling() && !mem.isMissStealing() || point) {
+				if(mem.getStealTime() > 0) {
+					mem.setStealTime(mem.getStealTime() - Gdx.graphics.getDeltaTime());
+					return;
+				}
+				
 				if(difficulty == 0 && !point) {
 					if(MathUtils.random(1, 100) <= 60) {
 						mem.setMissStealing(true);
@@ -499,18 +508,13 @@ public enum PlayerState implements State<Player> {
 					}
 				}
 				
-				Vector3 ballVec = player.getMap().getBall().getModelInstance().transform.getTranslation(new Vector3());
-				ArrayList<Vector3> handVecs = new ArrayList<Vector3>();
-				handVecs.add(player.getShoulderLTrans().getTranslation(new Vector3()));
-				handVecs.add(player.getShoulderRTrans().getTranslation(new Vector3()));
-
-				Vector3 tempHandVec = GameTools.getShortestDistanceWVectors(ballVec, handVecs);
-
-				if (tempHandVec.idt(handVecs.get(0)))
-					player.interactWithBallL();
-				else if (tempHandVec.idt(handVecs.get(1)))
-					player.interactWithBallR();
-			}else if(!chased.isDribbling() && !point) mem.setMissStealing(false);
+				player.interactWithBallA();
+			}else if(!chased.isDribbling()) {
+				if(!point)
+					mem.setMissStealing(false);
+				
+				mem.setStealTime(0.13f);
+			}
 		}
 	},
 	
@@ -575,7 +579,7 @@ public enum PlayerState implements State<Player> {
 			//player.getBrain().getBasketSeparate().setEnabled(true);
 			
 			brain.getCollAvoid().setEnabled(true);
-			brain.getMemory().setTargetPlayer(null);
+			//brain.getMemory().setTargetPlayer(null);
 		}
 
 		@Override

@@ -551,7 +551,7 @@ public class Rules implements GameMessageSender {
 							public boolean act() {
 								Player holdingPlayer = map.getHoldingPlayer();
 									
-								if(holdingPlayer == null) {
+								if(holdingPlayer == null && (map.getRecentHolder() != null && !map.getRecentHolder().getBrain().isShooting() || map.getRecentHolder() == null)) {
 									unlockRunning(holdingPlayer);
 									return true;
 								}

@@ -21,7 +21,7 @@ public class AIMemory {
 	
 	Steerable<Vector3> targetPosition, targetFacing;
 	
-	float dribbleTime, aimingTime, shootTime, switchHandTime, catchTime;
+	float dribbleTime, aimingTime, shootTime, switchHandTime, catchTime, stealTime;
 	float resetTime, randomPointTime;
 	
 	boolean ballJustShot;
@@ -116,6 +116,14 @@ public class AIMemory {
 
 	public void setCatchTime(float catchTime) {
 		this.catchTime = catchTime;
+	}
+
+	public float getStealTime() {
+		return stealTime;
+	}
+
+	public void setStealTime(float stealTime) {
+		this.stealTime = stealTime;
 	}
 
 	public void setRandomFoulTime(float randomPointTime) {

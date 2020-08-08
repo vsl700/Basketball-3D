@@ -406,7 +406,7 @@ public abstract class Player extends Entity {
 		if (!isHoldingBall()) {
 			Ball tempBall = map.getBall();
 
-			Vector3 ballVec = tempBall.getModelInstance().transform.getTranslation(new Vector3());
+			Vector3 ballVec = tempBall.getPosition();
 			ArrayList<Vector3> handVecs = new ArrayList<Vector3>();
 			handVecs.add(getShoulderLTrans().getTranslation(new Vector3()));
 			handVecs.add(getShoulderRTrans().getTranslation(new Vector3()));
@@ -1322,6 +1322,10 @@ public abstract class Player extends Entity {
 			//System.out.println(len);
 			//if(len >= 0.01f)
 				walk(moveVec);
+				//setCollisionTransform(true);
+				/*System.out.println(getPosition() + "pos after update");
+				System.out.println();*/
+				
 			//else {
 				//running = false;
 			//}
