@@ -487,7 +487,7 @@ public enum PlayerState implements State<Player> {
 				brain.getPlayerSeparate().setEnabled(false);
 			
 			if(player instanceof Teammate && player.getMap().getTeammates().size() == 1 || player instanceof Opponent && player.getMap().getOpponents().size() == 1) {
-				if(!player.isCurrentlyRunning() && player.getPosition().dst(chased.getPosition()) > player.getWidth() + 0.6f && !player.isCurrentlyPointing() || player.isCurrentlyRunning() && player.getPosition().dst(chased.getPosition()) > 1.78f)
+				if(!player.isCurrentlyRunning() && player.getPosition().dst(chased.getPosition()) > player.getWidth() + 0.8f && !player.isCurrentlyPointing() || player.isCurrentlyRunning() && player.getPosition().dst(chased.getPosition()) > 1.78f)
 					player.setRunning();
 			}else player.setRunning();
 			
