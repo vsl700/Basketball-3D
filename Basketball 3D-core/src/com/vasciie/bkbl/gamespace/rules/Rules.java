@@ -1119,11 +1119,18 @@ public class Rules implements GameMessageSender {
 						}
 						
 						if(inside) {
-							if(!recentHolder.isInAwayBasketZone()) {
+							boolean isInZone = recentHolder.isInAwayBasketZone();
+							
+							if(!isInZone && !recentHolder.isPlayerColl()) {
 								ruleTriggerer = recentHolder;
 								setOccurPlace();
 								return true;
 							}else {
+								if(recentHolder.isPlayerColl() && !isInZone) {
+									inside = false;
+									return false;
+								}
+								
 								Ball ball = map.getBall();
 								
 								if(ball.getOutsideColliders().contains(recentHolder.getTargetBasket().getBasketRim())) {

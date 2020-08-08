@@ -76,7 +76,7 @@ public abstract class Player extends Entity {
 	boolean leftPointBall, rightPointBall, leftCurrentPoint, rightCurrentPoint;
 	boolean focus, avoidInterpose;
 	boolean dribbleL, dribbleR;
-	boolean ballColl; 
+	boolean ballColl, playerColl; 
 	boolean leftHandBall, rightHandBall;
 	boolean leftHandInWorld, rightHandInWorld;
 	boolean downBody;
@@ -1739,7 +1739,8 @@ public abstract class Player extends Entity {
 				eastObstacle = true;
 			else if(objInside.equals(collObjMap.get("poleWObj")))
 				westObstacle = true;*/
-		}
+		}else if(outId.contains(EntityType.TEAMMATE.getId()) || outId.contains(EntityType.OPPONENT.getId()))
+			playerColl = true;
 	}
 	
 	
@@ -1752,6 +1753,7 @@ public abstract class Player extends Entity {
 		running = false;
 		//jumping = false;
 		ballColl = false;
+		playerColl = false;
 		rightHandBall = false;
 		leftHandBall = false;
 		leftAimBall = false;
@@ -1911,6 +1913,10 @@ public abstract class Player extends Entity {
 		return !downBody;
 	}
 	
+	public boolean isPlayerColl() {
+		return playerColl;
+	}
+
 	public boolean isRunning() {
 		return running;
 	}

@@ -82,7 +82,7 @@ public enum PlayerState implements State<Player> {
 		}
 		
 		private boolean isReadyToScore(Player player) {
-			return player.getAwayBasketZone().checkZone(player.getPosition(), new Vector3(-1, -1, -1).scl(1.5f));
+			return player.getAwayBasketZone().checkZone(player.getPosition(), new Vector3(-1, -1, -1).scl(1.5f)); //We make it that way so that it requires the player to be inside the zone and not on its borders
 		}
 		
 		@Override
