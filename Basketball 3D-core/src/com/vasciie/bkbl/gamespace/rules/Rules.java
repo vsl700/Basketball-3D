@@ -551,10 +551,10 @@ public class Rules implements GameMessageSender {
 							public boolean act() {
 								Player holdingPlayer = map.getHoldingPlayer();
 									
-								if(holdingPlayer == null && (map.getRecentHolder() != null && !map.getRecentHolder().getBrain().isShooting() || map.getRecentHolder() == null)) {
+								/*if(holdingPlayer == null && (map.getRecentHolder() != null && map.getRecentHolder().getBrain().getMemory().isBallJustShot() || map.getRecentHolder() == null)) {
 									unlockRunning(holdingPlayer);
 									return true;
-								}
+								}else */if(holdingPlayer == null) holdingPlayer = map.getRecentHolder();
 								
 								boolean tooCloseOrBehind = holdingPlayer.getBrain().tooCloseOrBehindBasket();
 								
@@ -562,7 +562,7 @@ public class Rules implements GameMessageSender {
 									if(!holdingPlayer.getBrain().updateShooting(1.25f)) {
 										holdingPlayer.getBrain().clearCustomTarget();
 										holdingPlayer.getBrain().performShooting(holdingPlayer.getBrain().makeBasketTargetVec(holdingPlayer.getTargetBasket()));
-									}else if(!holdingPlayer.getBrain().isShooting()) {
+									}else if(!holdingPlayer.getBrain().isShooting() && map.getRecentHolder().getBrain().getMemory().isBallJustShot()) {
 										unlockRunning(holdingPlayer);
 										
 										return true;

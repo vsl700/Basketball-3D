@@ -645,7 +645,7 @@ public enum PlayerState implements State<Player> {
 			if(tempPlayer.getPosition().dst(player.getPosition()) < player.getWidth() * 2)
 				tempPlayer.getBrain().getAllPlayerSeparate().setEnabled(true);*/
 			
-			if(!(memory.isCatchBall() && brain.shouldStopToCatch()))//If there's no reason to stop and catch the ball
+			if(!(memory.isCatchBall() && brain.shouldStopToCatch()) && (player.isAbleToCatch() && !player.isHoldingBall() || !player.isAbleToCatch()))//If there's no reason to stop and catch the ball
 				if (!player.isRunning() && tempTarget != null && (tempTarget instanceof Entity && !((Entity) tempTarget).getLinearVelocity().isZero(0.1f) || GameTools.getDistanceBetweenLocations(tempTarget, player) >= 3))
 					player.setRunning();
 
@@ -656,7 +656,7 @@ public enum PlayerState implements State<Player> {
 
 			if(player.isHoldingBall())
 				memory.setCatchBall(false);
-			else if (memory.isCatchBall())
+			else if (memory.isCatchBall() && player.isAbleToCatch())
 				player.interactWithBallA();
 		}
 		
