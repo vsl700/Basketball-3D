@@ -38,7 +38,7 @@ public class Rules implements GameMessageSender {
 	
 	GameMessageListener rulesListener; //That's here because the GameScreen does not have any connection with the GameMap or Rules so I had to make the GameScreen an interface
 	
-	public Rules(GameMap map, GameMessageListener rulesListener) {
+	public Rules(GameMap map, final GameMessageListener rulesListener) {
 		this.map = map;
 		this.rulesListener = rulesListener;
 		
@@ -201,6 +201,7 @@ public class Rules implements GameMessageSender {
 										//p.getBrain().getMemory().setTargetFacing(p.getBrain().getMemory().getTargetPosition());
 										p.getBrain().getCustomPursue().setArrivalTolerance(thrower.getWidth() * 1.3f);
 										p.getBrain().getMemory().setTargetPlayer(thrower);
+										p.getBrain().getPursueBallInHand2().setEnabled(false);
 									}
 								}
 								
@@ -422,6 +423,9 @@ public class Rules implements GameMessageSender {
 										}
 										
 										time -= Gdx.graphics.getDeltaTime();
+										
+										if(thrower.isMainPlayer())
+											rulesListener.sendMessage((int) time + 1 + "", "RELEASE THE BALL BEFORE TIME RUNS OUT!", Color.BLUE, rules, false, true);
 											
 										return false;
 									}
@@ -708,7 +712,7 @@ public class Rules implements GameMessageSender {
 									@Override
 									public void managePlayers() {
 										GameRule switchRule = rules.getGameRuleById("basket_score");
-										switchRule.setRuleTriggerer(ruleTriggerer);
+										//switchRule.setRuleTriggerer(ruleTriggerer);
 										
 										rules.setTriggeredRule(switchRule, false);
 									}
@@ -721,6 +725,7 @@ public class Rules implements GameMessageSender {
 										GameRule tempRule = rules.getGameRuleById("basket_score"); 
 										if(tempRule.checkRule()) {
 											ruleTriggerer = tempRule.getRuleTriggerer();
+											//ruleTriggerer.getBrain().clearCustomTarget();
 											return true;
 										}
 										
@@ -1562,8 +1567,13 @@ public class Rules implements GameMessageSender {
 							recentHolder = newRecentHolder;
 						}
 						
+						boolean zone = recentHolder != null && recentHolder.getHomeZone().checkZone(ball.getPosition(), ball.getDimensions());
+						if(zone && recentHolder instanceof Teammate)
+							rulesListener.sendMessage((int) time + 1 + "", "BRING THE BALL OUT OF YOUR ZONE!", Color.BLUE, rules, false, true);
+						else rulesListener.sendMessage("", "", Color.BLUE, null, false, true);
+						
 						if (time < 0) {
-							if (recentHolder.getHomeZone().checkZone(ball.getPosition(), ball.getDimensions())) {
+							if (zone) {
 								ruleTriggerer = recentHolder;
 
 								ArrayList<Vector3> wallPositions = new ArrayList<Vector3>(4);
@@ -1789,6 +1799,10 @@ public class Rules implements GameMessageSender {
 		return gameRules;
 	}
 	
+	public GameMessageListener getRulesListener() {
+		return rulesListener;
+	}
+
 	public static abstract class GameRule{
 		String name;
 		String id;
@@ -1852,6 +1866,8 @@ public class Rules implements GameMessageSender {
 		 */
 		public void managePlayers() {
 			if(actions.act()) {
+				rules.getRulesListener().sendMessage("", "", Color.BLUE, null, false, true);
+				
 				if(parent != null) {
 					rules.setTriggeredRule(parent, false);
 					//return false;

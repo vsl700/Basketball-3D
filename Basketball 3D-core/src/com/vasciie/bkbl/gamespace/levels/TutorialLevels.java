@@ -1333,7 +1333,7 @@ public class TutorialLevels extends Levels {
 										
 										actions.addAction(new TutorialAction("2.1. Moved Out", "This Inner Rule Triggers When The Thrower Moves For A Total Of 1 Second During The Throw-in! The Penalty Is A Throw-in By The Other Team!", textColor));
 										
-										actions.addAction(new TutorialAction("2.2. Time Out", "This Inner Rule Triggers When The Thrower Doesn't Manage To Release The Ball Within 5 Seconds! The Penalty Is A Throw-in By The Other Team!", textColor));
+										actions.addAction(new TutorialAction("2.2. Time Out", "This Inner Rule Triggers When The Thrower Doesn't Manage To Release The Ball Within 5 Seconds (a timer message shows up if you are the thrower)! The Penalty Is A Throw-in By The Other Team!", textColor));
 										
 										actions.addAction(new TutorialAction("2.3. Too Close", "This Inner Rule Triggers When A Player (the new eventual rule triggerer) Gets Too Close To The Thrower-in! If The Rule Triggerer Is From The Thrower-in's Team, The Opposite Team Is Making The Throw-in!", textColor));
 										
@@ -1353,7 +1353,7 @@ public class TutorialLevels extends Levels {
 										
 										actions.addAction(new TutorialAction("8. Movement Violation", "This Rule Triggers If A Player Is Moving The Ball Without Holding Or Dribbling It! The Penalty Is A Throw-in By The Opposite Team!", textColor));
 										
-										actions.addAction(new TutorialAction("9. Time Out", "This Rule Triggers If The Ball Stays In Its Owner Team's Zone For More Than 6 Seconds! Or In Other Words, Each Team Has 6 Seconds To Bring The Ball In Their Opposite Team's Zone!", textColor));
+										actions.addAction(new TutorialAction("9. Time Out", "This Rule Triggers If The Ball Stays In Its Owner Team's Zone For More Than 6 Seconds! Or In Other Words, Each Team Has 6 Seconds To Bring The Ball In Their Opposite Team's Zone (a timer message will be shown for your team)!", textColor));
 										
 										actions.addAction(new TutorialAction("9. Time Out", "This Rule Doesn't Work In EASY Gamemode! The Penalty Is A Throw-in By The Opposite Team!", textColor));
 										

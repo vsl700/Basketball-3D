@@ -264,10 +264,12 @@ public class GameScreen implements Screen, GameMessageListener, GUIRenderer {
 				} else{ 
 					
 					
-					if (map.isTutorialMode() || map.isRuleTriggered() || map.getChallenges().isAChallengeBroken()) { // If the game is not running and there is no timer counting down
+					if (sender != null/* || map.isRuleTriggered() || map.getChallenges().isAChallengeBroken()*/) { // If the game is not running and there is no timer counting down
 						messageBox.update();
 						ruleHeading.update();
-						ruleDesc.update();
+						
+						if(!ruleDesc.getText().equals(""))
+							ruleDesc.update();
 						
 						if (map.getDifficulty() > 0 && map.isRuleTriggered() && map.getRules().getTriggeredRule().getRuleTriggerer().getFouls() == 7)
 							playerRemove.update();
