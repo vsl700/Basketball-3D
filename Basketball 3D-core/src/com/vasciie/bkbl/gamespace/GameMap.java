@@ -541,6 +541,8 @@ public class GameMap implements GameMessageSender {
     }
 
     public void clear() {
+    	if(SettingsScreen.multithreadOption)
+    		physicsThread.waitToFinish();
     	
     	if(!physicsThread.getState().equals(State.NEW)) {
     		physicsThread.interrupt();
