@@ -75,10 +75,10 @@ public class GameOverScreen implements Screen, GUIRenderer {
 	public void show() {
 		GameMap map = game.getMap();
 		
-		if(checkChallenge() && (map.getTeamScore() > map.getOppScore() || map.getOpponents().size() == 0)) {
+		if(checkChallenge() && map.getTeammates().size() > 0 && map.getTeammates().contains(map.getMainPlayer()) && (map.getTeamScore() > map.getOppScore() || map.getOpponents().size() == 0)) {
 			winInfo.setText("You Win!");
 			winInfo.setColor(Color.BLUE);
-		}else if(checkChallenge() && map.getTeamScore() == map.getOppScore() && map.getTeammates().size() > 0) {
+		}else if(checkChallenge() && map.getTeamScore() == map.getOppScore() && map.getTeammates().size() > 0 && map.getTeammates().contains(map.getMainPlayer())) {
 			winInfo.setText("Draw Game!");
 			winInfo.setColor(Color.ORANGE);
 		}else {

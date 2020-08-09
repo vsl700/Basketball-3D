@@ -51,7 +51,7 @@ public class GameScreen implements Screen, GameMessageListener, GUIRenderer {
 	
 	PauseScreen pause;
 	
-	Label homeScore, awayScore, minorMessage, power, powerNum;
+	Label homeScore, awayScore, minorMessage, power, powerNum, foulsAmount;
 	Label ruleHeading, ruleDesc, clickToCont, playerRemove;
 	Label[] challenges, currentChallenges;
 	
@@ -123,6 +123,7 @@ public class GameScreen implements Screen, GameMessageListener, GUIRenderer {
 		minorMessage = new Label("", textFont, Color.ORANGE, false, this);
 		power = new Label("POWER", textFont, Color.RED, false, this);
 		powerNum = new Label("x1", powFont, Color.WHITE, Color.RED, false, this);
+		foulsAmount = new Label("", textFont, Color.BLACK, Color.ORANGE.cpy().sub(0, 0.3f, 0, 1), false, this);
 		
 		ruleHeading = new Label("", textFont, true, this);
 		ruleDesc = new Label("", powFont, true, this);
@@ -201,6 +202,7 @@ public class GameScreen implements Screen, GameMessageListener, GUIRenderer {
 		
 		homeScore.draw();
 		awayScore.draw();
+		foulsAmount.draw();
 		
 		for(Label lbl : currentChallenges)
 			lbl.draw();
@@ -224,6 +226,15 @@ public class GameScreen implements Screen, GameMessageListener, GUIRenderer {
 		if(!map.isTutorialMode()) {
 			homeScore.update();
 			awayScore.update();
+			
+			if (limitedFouls()) {
+				foulsAmount.update();
+				String temp = foulsAmount.getText();
+				foulsAmount.setText("Commited Fouls: " + map.getMainPlayer().getFouls());
+
+				if (!temp.equals(foulsAmount.getText()))
+					resizeFoulsAmount();
+			}
 		}
 		
 		for(Label lbl : currentChallenges)
@@ -281,6 +292,7 @@ public class GameScreen implements Screen, GameMessageListener, GUIRenderer {
 								if (map.isRuleTriggered()) {
 									Player triggerer = map.getRules().getTriggeredRule().getRuleTriggerer();
 									if (triggerer.getFouls() == 7 && (triggerer.isMainPlayer()) || (map.getTeamScore() >= 15 || map.getOppScore() >= 15) && !map.isChallenge()) {
+										sender.messageReceived();
 										game.setScreen(game.gameOver);
 										return;
 									}
@@ -389,6 +401,9 @@ public class GameScreen implements Screen, GameMessageListener, GUIRenderer {
 		
 		resizeMessageText(width, height);
 		
+		if(limitedFouls())
+			resizeFoulsAmount();
+		
 		pCam.update();
 	}
 	
@@ -413,6 +428,15 @@ public class GameScreen implements Screen, GameMessageListener, GUIRenderer {
 		
 		//messageBarWidth = width - diff;
 		//messageBarHeight = ruleHeading.getRows() * 39 + 26.5f * (ruleDesc.getRows() + (skippableMessage ? clickToCont.getRows() : 0) + playerRemove.getRows()) + 13;
+	}
+	
+	private void resizeFoulsAmount() {
+		foulsAmount.setSize(foulsAmount.textSize() + 25, 50);
+		foulsAmount.setPos(cam.viewportWidth / 2 - foulsAmount.getWidth() / 2, 0);
+	}
+	
+	private boolean limitedFouls() {
+		return !map.isTutorialMode() && map.getDifficulty() > 0;
 	}
 	
 	public boolean paused() {

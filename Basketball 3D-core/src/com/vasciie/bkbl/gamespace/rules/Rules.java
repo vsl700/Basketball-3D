@@ -466,7 +466,7 @@ public class Rules implements GameMessageSender {
 											if(p.equals(map.getHoldingPlayer()))
 												continue;
 											
-											if(p.getPosition().dst(map.getHoldingPlayer().getPosition()) < p.getWidth() + p.getArmHeight()) {
+											if(p.getPosition().dst(map.getHoldingPlayer().getPosition()) < p.getWidth() + p.getArmHeight() * 1.25f) {
 												parent.setRuleTriggerer(ruleTriggerer = p);
 												return true;
 											}
@@ -1515,7 +1515,7 @@ public class Rules implements GameMessageSender {
 					@Override
 					public void resetRule() {
 						time = defaultTime;
-						
+						recentHolder = null;
 					}
 					
 					@Override
@@ -1565,6 +1565,13 @@ public class Rules implements GameMessageSender {
 							}
 
 							recentHolder = newRecentHolder;
+						}
+						
+						if(recentHolder == null) {
+							if(map.getRecentHolder() == null)
+								return false;
+							
+							recentHolder = map.getRecentHolder();
 						}
 						
 						boolean zone = recentHolder != null && recentHolder.getHomeZone().checkZone(ball.getPosition(), ball.getDimensions());
