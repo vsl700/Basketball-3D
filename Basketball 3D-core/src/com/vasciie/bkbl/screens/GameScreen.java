@@ -20,6 +20,7 @@ import com.badlogic.gdx.math.Vector3;
 import com.vasciie.bkbl.MyGdxGame;
 import com.vasciie.bkbl.gamespace.GameMap;
 import com.vasciie.bkbl.gamespace.entities.Player;
+import com.vasciie.bkbl.gamespace.levels.Challenges.ChallengeLevel;
 import com.vasciie.bkbl.GameMessageListener;
 import com.vasciie.bkbl.GameMessageSender;
 import com.vasciie.bkbl.gamespace.tools.VEThread;
@@ -160,7 +161,7 @@ public class GameScreen implements Screen, GameMessageListener, GUIRenderer {
 			challenges = new Label[map.getChallenges().getSize()];
 			
 			for(int i = 0; i < challenges.length; i++) {
-				challenges[i] = new Label(map.getChallenges().getGameLevel(i).getName(), font, Color.RED.cpy().sub(0.3f, 0, 0, 0), false, this);
+				challenges[i] = new Label(map.getChallenges().getGameLevel(i).getName() + (((ChallengeLevel) map.getChallenges().getGameLevel(i)).hasChallengeLevels() ? " (" + ((ChallengeLevel) map.getChallenges().getGameLevel(i)).getChallengeLevelsNames()[((ChallengeLevel) map.getChallenges().getGameLevel(i)).getChallengeLevel()] + ")" : ""), font, Color.RED.cpy().sub(0.3f, 0, 0, 0), false, this);
 			}
 		}
 		
@@ -339,7 +340,7 @@ public class GameScreen implements Screen, GameMessageListener, GUIRenderer {
 		
 		if(SettingsScreen.multithreadOption)
 			updateThread.waitToFinish();
-
+		
 		pCam.position.set(map.getCamera().getPosition());
 		pCam.update();
 		map.render(mBatch, environment, pCam);
@@ -348,6 +349,10 @@ public class GameScreen implements Screen, GameMessageListener, GUIRenderer {
 		game.customLookAt(pCam, tempMatrix.set(map.getMainPlayer().getModelInstance().transform).mul(tempMatrix2.setToTranslation(0, map.getMainPlayer().getHeight(), 0)).getTranslation(tempVec));
 		map.getCamera().setPosition(pCam.position);
 		map.getCamera().setDirection(pCam.direction);
+		
+		updateGUI(delta);
+		
+		renderGUI();
 		
 		if (!paused()) {
 			if(Gdx.app.getType().equals(Application.ApplicationType.Android))
@@ -358,10 +363,7 @@ public class GameScreen implements Screen, GameMessageListener, GUIRenderer {
 			else updateRunnable.run();
 		}
 		map.updateCamera();
-
-		updateGUI(delta);
-
-		renderGUI();
+		
 		
 		if(paused() && game.getScreen().equals(this)) {
 			pause.render(delta);
