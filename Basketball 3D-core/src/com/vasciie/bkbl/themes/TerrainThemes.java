@@ -1006,7 +1006,7 @@ public enum TerrainThemes {
 		if(terrain.getMap().isChallenge())
 			return TerrainThemes.CHALLENGE;
 		
-		return null;
+		return prevTheme = null;
 	}
 	
 	public void dispose(Terrain terrain) {
