@@ -86,7 +86,7 @@ public class GameOverScreen implements Screen, GUIRenderer {
 			winInfo.setColor(Color.RED);
 		}
 		
-		int basketDiff = Math.max(map.getTeamScore() - map.getOppScore(), 0);
+		int basketDiff = map.getTeammates().contains(map.getMainPlayer()) ? Math.max(map.getTeamScore() - map.getOppScore(), 0) : 0;
 		int teammatesLeft = map.getTeammates().size();
 		int mainPlayerSc = map.getMainPlayerScore();
 		int total = checkChallenge() ? basketDiff * 10 * teammatesLeft + mainPlayerSc * 10 : 0;
