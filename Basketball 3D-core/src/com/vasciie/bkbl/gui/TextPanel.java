@@ -109,8 +109,8 @@ public class TextPanel extends Text implements InputProcessor {
 		shape.rect(x, y, width, height);
 
 		if (cursor) {
-			shape.setColor(1 - fR, 1 - fG, 1 - fB, 1 - fA);
-			shape.line(textX + textW + 10, textY, textX + textW + 10, textY - textH / 2 - 5);
+			shape.setColor(1 - fR, 1 - fG, 1 - fB, fA);
+			shape.line(textX + textW + 5, textY, textX + textW + 5, textY - textH / 2 - 5);
 		}
 
 		shape.end();

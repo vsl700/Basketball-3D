@@ -26,7 +26,7 @@ public class NumUpDown extends UpDown implements TextChangeListener {
 		textPanel.setTextChangeListener(this);
 		textPanel.setText(num);
 		
-		this.diff = 1;
+		diff = 1;
 	}
 	
 	public NumUpDown(BitmapFont btnFont, BitmapFont textFont, Color color, Color fillColor, Color textFillColor, int min, int max, int diff, GUIRenderer guiRenderer) {

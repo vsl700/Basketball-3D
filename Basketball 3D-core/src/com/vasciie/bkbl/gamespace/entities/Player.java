@@ -647,7 +647,7 @@ public abstract class Player extends Entity {
 	}
 	
 	private static final Vector3 targetDir = new Vector3();
-	private static boolean achieved;
+	private static float thrownTime;
 	private void throwBall() {
 		Vector3 shootVec = brain.getMemory().getShootVec();
 		if(shootVec != null) {
@@ -682,7 +682,8 @@ public abstract class Player extends Entity {
 		
 		map.getBall().getMainBody().setLinearVelocity(tempVec);
 		targetDir.set(tempVec);
-		achieved = false;
+		targetDir.y = (float) Math.floor(targetDir.y);
+		thrownTime = 0.2f;
 	}
 	
 	/**
@@ -711,6 +712,9 @@ public abstract class Player extends Entity {
 		}
 		
 		map.getBall().getMainBody().setLinearVelocity(tempVec);
+		targetDir.set(tempVec);
+		targetDir.y = (float) Math.floor(targetDir.y);
+		thrownTime = 0.2f;
 	}
 	
 	public void releaseBall() {
@@ -1306,10 +1310,11 @@ public abstract class Player extends Entity {
 		if(!leftHoldingBall && !rightHoldingBall || !leftAimBall && !rightAimBall) {
 			leftCurrentAim = rightCurrentAim = false;
 			
-			if(!achieved) {
-				if(map.getBall().getMainBody().getLinearVelocity().idt(targetDir))
-					achieved = true;
-				else map.getBall().getMainBody().setLinearVelocity(targetDir);
+			if(map.getHoldingPlayer() != null && !map.getHoldingPlayer().equals(this))
+				thrownTime = 0;
+			else if(thrownTime > 0) {
+				map.getBall().getMainBody().setLinearVelocity(targetDir);
+				thrownTime -= delta;
 			}
 			//leftThrowBall = rightThrowBall = false;
 		}
@@ -1886,7 +1891,7 @@ public abstract class Player extends Entity {
 	}
 	
 	public boolean isShootingAchieved() {
-		return achieved;
+		return thrownTime <= 0;
 	}
 	
 	public boolean isAimingOrShooting() {

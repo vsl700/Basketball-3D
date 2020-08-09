@@ -275,7 +275,7 @@ public enum PlayerState implements State<Player> {
 		
 		@Override
 		public void enter(Player player) {
-			player.getBrain().getMemory().setCatchTime(0.2f);
+			player.getBrain().getMemory().setCatchTime(0.35f);
 		}
 		
 		@Override

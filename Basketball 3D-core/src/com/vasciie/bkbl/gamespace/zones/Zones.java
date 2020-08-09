@@ -247,11 +247,20 @@ public class Zones {
 		return null;
 	}
 	
-	private static final Vector2 tempVec = new Vector2();
+	private static final Vector2 tempVec = new Vector2(), tempVec2 = new Vector2();
 	public boolean isInZone(String id, Vector3 pos) {
 		for(Zone zone : zones) {
 			if(zone.getId().equals(id))
 				return zone.checkZone(GameTools.toVector2(pos, tempVec));
+		}
+		
+		return false;
+	}
+	
+	public boolean isInZone(String id, Vector3 pos, Vector3 dimensions) {
+		for(Zone zone : zones) {
+			if(zone.getId().equals(id))
+				return zone.checkZone(GameTools.toVector2(pos, tempVec), GameTools.toVector2(pos, tempVec2));
 		}
 		
 		return false;

@@ -346,6 +346,14 @@ public class TutorialLevels extends Levels {
 											}
 											
 											@Override
+											public void resetMessage() {
+												super.resetMessage();
+												
+												scores = 0;
+												wait = shootPowerReg = false;
+											}
+											
+											@Override
 											public boolean act() {
 												if(!shootPowerReg)
 													map.getMainPlayer().setShootPower(10);

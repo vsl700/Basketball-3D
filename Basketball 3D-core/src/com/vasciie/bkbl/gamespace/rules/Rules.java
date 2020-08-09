@@ -52,7 +52,7 @@ public class Rules implements GameMessageSender {
 					public boolean checkRule() {
 						Player tempPlayer = map.getHoldingPlayer();
 						
-						if(thrower != null && !thrower.isBallFree())
+						if(thrower != null && (thrower instanceof Teammate && map.getTeammates().size() > 1 || thrower instanceof Opponent && map.getOpponents().size() > 1) && !thrower.isBallFree())
 							return false;
 						
 						if (tempPlayer == null && (recentHolder != null && recentHolder.isAbleToCatch() || recentHolder == null)) {//If there is currently no holding player
@@ -76,7 +76,7 @@ public class Rules implements GameMessageSender {
 							justTouched = false;
 						}
 						
-						if(thrower != null && thrower.equals(recentHolder))
+						if(thrower != null && (thrower instanceof Teammate && map.getTeammates().size() > 1 || thrower instanceof Opponent && map.getOpponents().size() > 1) && thrower.equals(recentHolder))
 							return false;
 						
 						if (recentHolder != null) {//If the ball is still not ever touched, don't check for terrain bounds collision (CPU economy)
@@ -1574,7 +1574,7 @@ public class Rules implements GameMessageSender {
 							recentHolder = map.getRecentHolder();
 						}
 						
-						boolean zone = recentHolder != null && recentHolder.getHomeZone().checkZone(ball.getPosition(), ball.getDimensions());
+						boolean zone = recentHolder != null && recentHolder.getHomeZone().checkZone(ball.getPosition());
 						if(zone && recentHolder instanceof Teammate)
 							rulesListener.sendMessage((int) time + 1 + "", "BRING THE BALL OUT OF YOUR ZONE!", Color.BLUE, rules, false, true);
 						else rulesListener.sendMessage("", "", Color.BLUE, null, false, true);

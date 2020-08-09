@@ -186,16 +186,17 @@ public class Terrain extends GameObject {
 		
 		int index = 1;
 		int index1 = 0;
-		matrixes.get(index).set(getMainTrans().cpy().mul(new Matrix4().setToTranslation(x - getWidth() / 2 - wallDepth, y, z)));
+		
+		matrixes.get(index).set(getMainTrans().cpy().mul(new Matrix4().setToTranslation(-map.getZones().getZone("blue-zone").getPositions()[2].x - wallDepth, y, z)));
 		invisBodies.get(index1++).proceedToTransform(matrixes.get(index++));
 		
-		matrixes.get(index).set(getMainTrans().cpy().mul(new Matrix4().setToTranslation(x, y, z - getDepth() / 2 - wallDepth)));
+		matrixes.get(index).set(getMainTrans().cpy().mul(new Matrix4().setToTranslation(x, y, -map.getZones().getZone("blue-zone").getPositions()[1].y - wallDepth)));
 		invisBodies.get(index1++).proceedToTransform(matrixes.get(index++));
 		
-		matrixes.get(index).set(getMainTrans().cpy().mul(new Matrix4().setToTranslation(x + getWidth() / 2 + wallDepth, y, z)));
+		matrixes.get(index).set(getMainTrans().cpy().mul(new Matrix4().setToTranslation(map.getZones().getZone("blue-zone").getPositions()[2].x + wallDepth, y, z)));
 		invisBodies.get(index1++).proceedToTransform(matrixes.get(index++));
 		
-		matrixes.get(index).set(getMainTrans().cpy().mul(new Matrix4().setToTranslation(x, y, z + getDepth() / 2 + wallDepth)));
+		matrixes.get(index).set(getMainTrans().cpy().mul(new Matrix4().setToTranslation(x, y,map.getZones().getZone("blue-zone").getPositions()[1].y + wallDepth)));
 		invisBodies.get(index1++).proceedToTransform(matrixes.get(index++));
 	}
 	
