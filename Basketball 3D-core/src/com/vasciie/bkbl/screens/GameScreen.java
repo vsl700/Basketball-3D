@@ -227,7 +227,7 @@ public class GameScreen implements Screen, GameMessageListener, GUIRenderer {
 			homeScore.update();
 			awayScore.update();
 			
-			if (limitedFouls()) {
+			if (!paused() && limitedFouls()) {
 				foulsAmount.update();
 				String temp = foulsAmount.getText();
 				foulsAmount.setText("Commited Fouls: " + map.getMainPlayer().getFouls());
