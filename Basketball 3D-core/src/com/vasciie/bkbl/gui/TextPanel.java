@@ -283,13 +283,17 @@ public class TextPanel extends Text implements InputProcessor {
 				text = strB.toString();
 				
 				onResize();
-			}else if(keycode == 66) { //Enter
+			}else if(keycode == 66 || keycode == 131) { //Enter or Escape
 				deactive();
 			}
 				
 		}
 		
 		return false;
+	}
+	
+	public boolean isActive() {
+		return active;
 	}
 
 	@Override

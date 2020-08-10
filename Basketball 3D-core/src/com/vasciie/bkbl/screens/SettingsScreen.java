@@ -105,7 +105,7 @@ public class SettingsScreen implements Screen, UpDownListener, GUIRenderer, Game
 		
 		fpsLabel = new Label("THE MAXIMUM FRAMES PER SECOND", font, Color.BROWN, true, this);
 		camRotLabel = new Label("WHETHER TO INVERT THE CAMERA ROTATION", font, Color.BROWN, true, this);
-		mthLabel = new Label("INCREASES PERFORMANCE, BUT MIGHT DECREASE QUALITY", font, Color.BROWN, true, this);
+		mthLabel = new Label("INCREASES PERFORMANCE, BUT MIGHT CAUSE BOTTLENECK", font, Color.BROWN, true, this);
 		//resLabel = new Label("THE RESOLUTION OF THE WINDOW", font, Color.BROWN, true);
 		
 		if(SettingsPrefsIO.readSettingBool("exists")) {
@@ -135,7 +135,7 @@ public class SettingsScreen implements Screen, UpDownListener, GUIRenderer, Game
 	@Override
 	public void show() {
 		if(!SettingsPrefsIO.readSettingBool("editablePanels")) {
-			game.sendMessage("Note That The Menu Elements Like The One For The Max FPS Below (that contain number values) Can Also Be Edited By Keyboard! Just Click On Them, Type An Accessible By The Element Number And Click Enter Or Anywhere On The Screen To Confirm The Changes!", Color.RED, this, true);
+			game.sendMessage("Note That The Menu Elements Like The One For The Max FPS Below (that contain number values) Can Also Be Edited By Keyboard! Just Click On Them, Type An Accessible By The Element Number And Click Enter, Escape Or Anywhere On The Screen To Confirm The Changes!", Color.RED, this, true);
 			SettingsPrefsIO.writeSettingBool("editablePanels", true);
 			SettingsPrefsIO.flush();
 		}
@@ -167,7 +167,7 @@ public class SettingsScreen implements Screen, UpDownListener, GUIRenderer, Game
 		
 		if(beautifulGfx.justTouched() && !game.isThereAMessage())
 			game.setBeautifulBack(beautifulGfx.isToggled());
-		else if((goBack.justReleased() || prevScreen.equals(game.game.getPauseScreen()) && Gdx.input.isKeyJustPressed(Keys.ESCAPE)) && !game.isThereAMessage()) {
+		else if((goBack.justReleased() || prevScreen.equals(game.game.getPauseScreen()) && Gdx.input.isKeyJustPressed(Keys.ESCAPE) && !fpsUpDown.getTextPanel().isActive()) && !game.isThereAMessage()) {
 			//changeRes();
 			
 			if (fullscreen.isToggled()) {

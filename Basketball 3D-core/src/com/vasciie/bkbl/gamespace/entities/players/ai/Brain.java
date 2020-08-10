@@ -424,7 +424,7 @@ public class Brain {
 		float dst = pos.dst(targetVec);
 		
 		float targetConst = user.getDepth() / 2;
-		float checkConst = user.getWidth() / dst * 3;
+		float checkConst = user.getWidth() / dst * 3.5f;
 		for(int i = 0; i < players.size(); i++) {
 			if(players.get(i).equals(user) || players.get(i).getPosition().dst(targetVec) <= targetConst)
 				continue;

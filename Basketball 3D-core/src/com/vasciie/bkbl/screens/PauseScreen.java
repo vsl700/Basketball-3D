@@ -73,7 +73,7 @@ public class PauseScreen implements Screen, GUIRenderer {
 			}else 
 				game.game.reset();
 			
-			game.game.show();
+			game.setScreen(game.game);
 			exit();
 			return;
 		}

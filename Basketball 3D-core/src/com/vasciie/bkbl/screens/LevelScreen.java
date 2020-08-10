@@ -258,7 +258,7 @@ public class LevelScreen implements Screen, GUIRenderer, UpDownListener, GameMes
 			SettingsPrefsIO.writeSettingBool("fouls", true);
 			SettingsPrefsIO.flush();
 		}else if(!SettingsPrefsIO.readSettingBool("editablePanels")) {
-			game.sendMessage("Note That The Menu Elements Like The One For The Amount Of Players Below (that contain number values) Can Also Be Edited By Keyboard! Just Click On Them, Type An Accessible By The Element Number And Click Enter Or Anywhere On The Screen To Confirm The Changes!", Color.RED, this, true);
+			game.sendMessage("Note That The Menu Elements Like The One For The Amount Of Players Below (that contain number values) Can Also Be Edited By Keyboard! Just Click On Them, Type An Accessible By The Element Number And Click Enter, Escape Or Anywhere On The Screen To Confirm The Changes!", Color.RED, this, true);
 			SettingsPrefsIO.writeSettingBool("editablePanels", true);
 			SettingsPrefsIO.flush();
 		}

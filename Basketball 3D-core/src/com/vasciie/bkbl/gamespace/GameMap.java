@@ -162,7 +162,7 @@ public class GameMap implements GameMessageSender {
 
 				@Override
 				public void run() {
-					dynamicsWorld.stepSimulation(Gdx.graphics.getDeltaTime() * gameSpeed, 3, 1f / 90f);
+					dynamicsWorld.stepSimulation(Gdx.graphics.getDeltaTime() * gameSpeed, 5, 1f / 30f);
 				}
 
 			};

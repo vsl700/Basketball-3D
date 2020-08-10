@@ -99,6 +99,10 @@ public class NumUpDown extends UpDown implements TextChangeListener {
 		else
 			textPanel.setText(this.num);
 	}
+	
+	public TextPanel getTextPanel() {
+		return textPanel;
+	}
 
 	@Override
 	public void onTextChanged(String text) {
