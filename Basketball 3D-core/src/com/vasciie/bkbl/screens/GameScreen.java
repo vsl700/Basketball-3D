@@ -20,7 +20,6 @@ import com.badlogic.gdx.math.Vector3;
 import com.vasciie.bkbl.MyGdxGame;
 import com.vasciie.bkbl.gamespace.GameMap;
 import com.vasciie.bkbl.gamespace.entities.Player;
-import com.vasciie.bkbl.gamespace.levels.Challenges.ChallengeLevel;
 import com.vasciie.bkbl.GameMessageListener;
 import com.vasciie.bkbl.GameMessageSender;
 import com.vasciie.bkbl.gamespace.tools.VEThread;
