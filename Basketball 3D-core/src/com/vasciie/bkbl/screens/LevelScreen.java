@@ -36,7 +36,7 @@ public class LevelScreen implements Screen, GUIRenderer, UpDownListener, GameMes
 	Label highscore;
 	Label[][] difficultyDesc;
 	
-	private static final String highscoreText = "Highscore For The Game Level Combination Below: ", highscoreChText = "Highscore For The Challenge & Game Level Combination: ", foulsMessageText = "If You Are Playing A Gamemode In Which The Players Have A Limited Amount Of Fouls To Make And A Player Reaches It, The Game Removes Him From The Game! If The A Whole Team Dissapears, It Loses No Matter The Points They Have, But If The Game Removes YOU, Your Team Directly LOSES Even If There Are Teammates Left!";
+	private static final String highscoreText = "Highscore For The Game Level Combination Below: ", highscoreChText = "Highscore For The Challenge & Game Level Combination: ", foulsMessageText = "If You Are Playing A Gamemode In Which The Players Have A Limited Amount Of Fouls To Make And A Player Reaches It, The Game Removes Him From The Game! If A Whole Team Dissapears, It Loses No Matter The Points They Have, But If The Game Removes YOU, Your Team Directly LOSES Even If There Are Teammates Left!";
 	
 	
 	public LevelScreen(MyGdxGame mg) {
@@ -106,7 +106,7 @@ public class LevelScreen implements Screen, GUIRenderer, UpDownListener, GameMes
 		setHighscoreText();
 		
 		if(!game.getMap().isChallenge() && !SettingsPrefsIO.readSettingBool("maxPoints")) {
-			game.sendMessage("The Normal Matches In This Game Last Until One Of The Teams Passes 15 Points! After That, The Game Is Over And If Your Team Has More Points Than The Other, You Win And You Get Much More Points Which Are Being Saved If They're More Than The Previous! Otherwise You Only Get Points If YOU Had Earned Any Points For Your Team!", Color.RED, this, true);
+			game.sendMessage("The Normal Matches In This Game Last Until One Of The Teams Passes 15 Points! After That, The Game Is Over And If Your Team Has More Points Than The Other, You Win And You Get Much More Points Which Are Being Saved If They're More Than The Previous! Otherwise You Only Get Points If YOU Had Earned Any Points From Scoring For Your Team!", Color.RED, this, true);
 			SettingsPrefsIO.writeSettingBool("maxPoints", true);
 			SettingsPrefsIO.flush();
 		}else if(!SettingsPrefsIO.readSettingBool("fouls")) {
