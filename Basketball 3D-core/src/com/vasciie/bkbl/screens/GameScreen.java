@@ -161,16 +161,20 @@ public class GameScreen implements Screen, GameMessageListener, GUIRenderer {
 			challenges = new Label[map.getChallenges().getSize()];
 			
 			for(int i = 0; i < challenges.length; i++) {
-				challenges[i] = new Label(map.getChallenges().getGameLevel(i).getName() + (((ChallengeLevel) map.getChallenges().getGameLevel(i)).hasChallengeLevels() ? " (" + ((ChallengeLevel) map.getChallenges().getGameLevel(i)).getChallengeLevelsNames()[((ChallengeLevel) map.getChallenges().getGameLevel(i)).getChallengeLevel()] + ")" : ""), font, Color.RED.cpy().sub(0.3f, 0, 0, 0), false, this);
+				challenges[i] = new Label("", font, Color.RED.cpy().sub(0.3f, 0, 0, 0), false, this);
 			}
 		}
 		
-		if (map.isChallenge()) {
-			currentChallenges = new Label[map.getChallenges().getCurrentChallenges().length];
-			for (int i = 0; i < currentChallenges.length; i++) {
-				currentChallenges[i] = challenges[map.getChallenges().indexOf(map.getChallenges().getCurrentChallenges()[i])];
-			}
-		}else currentChallenges = new Label[0];
+		if (!ignorePause) {
+			if (map.isChallenge()) {
+				currentChallenges = new Label[map.getChallenges().getCurrentChallenges().length];
+				for (int i = 0; i < currentChallenges.length; i++) {
+					currentChallenges[i] = challenges[map.getChallenges().indexOf(map.getChallenges().getCurrentChallenges()[i])];
+					currentChallenges[i].setText(map.getChallenges().getCurrentChallenges()[i].getName() + (map.getChallenges().getCurrentChallenges()[i].hasChallengeLevels() ? " (" + map.getChallenges().getCurrentChallenges()[i].getChallengeLevelsNames()[map.getChallenges().getCurrentChallenges()[i].getChallengeLevel()] + ")" : ""));
+				}
+			} else
+				currentChallenges = new Label[0];
+		}
 		
 		environment = game.getEnvironment();
 		
