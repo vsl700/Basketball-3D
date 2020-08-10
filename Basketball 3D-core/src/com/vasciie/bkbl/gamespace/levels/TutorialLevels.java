@@ -483,7 +483,7 @@ public class TutorialLevels extends Levels {
 										
 										actions.addAction(new TutorialAction("Passing & Catching!", "First We Are Gonna Look Into Passing To Players And Also Catching Their Passes!", textColor));
 										
-										actions.addAction(new TutorialAction("Passing & Catching!", "If You Were Practising In Tutorial Level 1 You Had Probably Noticed That When The Ball Is In The Air, You Can Only Catch It With The End Of Your Arm! That's Why The Player Points To The Ball!", textColor));
+										actions.addAction(new TutorialAction("Passing & Catching!", "You Had Probably Noticed From Tutorial Level 1 That When The Ball Is In The Air, You Can Only Catch It With The End Of Your Arm! That's Why The Player Points To The Ball!", textColor));
 										
 										actions.addAction(new TutorialAction("Passing & Catching!", "That's An Important Thing Not Only For Catching Passes (or any ball catching), But Also For Ball Stealing!", textColor));
 										
