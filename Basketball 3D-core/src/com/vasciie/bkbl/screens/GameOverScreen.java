@@ -74,11 +74,12 @@ public class GameOverScreen implements Screen, GUIRenderer {
 	@Override
 	public void show() {
 		GameMap map = game.getMap();
+		boolean ch = checkChallenge();
 		
-		if(checkChallenge() && map.getTeammates().size() > 0 && map.getTeammates().contains(map.getMainPlayer()) && (map.getTeamScore() > map.getOppScore() || map.getOpponents().size() == 0)) {
+		if(ch && map.getTeammates().size() > 0 && map.getTeammates().contains(map.getMainPlayer()) && (map.getTeamScore() > map.getOppScore() || map.getOpponents().size() == 0)) {
 			winInfo.setText("You Win!");
 			winInfo.setColor(Color.BLUE);
-		}else if(checkChallenge() && map.getTeamScore() == map.getOppScore() && map.getTeammates().size() > 0 && map.getTeammates().contains(map.getMainPlayer())) {
+		}else if(ch && map.getTeamScore() == map.getOppScore() && map.getTeammates().size() > 0 && map.getTeammates().contains(map.getMainPlayer())) {
 			winInfo.setText("Draw Game!");
 			winInfo.setColor(Color.ORANGE);
 		}else {
@@ -86,10 +87,10 @@ public class GameOverScreen implements Screen, GUIRenderer {
 			winInfo.setColor(Color.RED);
 		}
 		
-		int basketDiff = map.getTeammates().contains(map.getMainPlayer()) ? Math.max(map.getTeamScore() - map.getOppScore(), 0) : 0;
+		int basketDiff = ch && map.getTeammates().contains(map.getMainPlayer()) ? Math.max(map.getTeamScore() - map.getOppScore(), 0) : 0;
 		int teammatesLeft = map.getTeammates().size();
 		int mainPlayerSc = map.getMainPlayerScore();
-		int total = checkChallenge() ? basketDiff * 10 * teammatesLeft + mainPlayerSc * 10 : 0;
+		int total = basketDiff * 10 * teammatesLeft + mainPlayerSc * 10;
 		
 		
 		String level;

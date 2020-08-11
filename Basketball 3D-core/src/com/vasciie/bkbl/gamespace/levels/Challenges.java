@@ -37,7 +37,7 @@ public class Challenges extends Levels {
 					@Override
 					public String[] getChallengeLevelsNames() {
 						
-						return new String[] {"Power of 10", "Power of 11", "Power of 12"};
+						return new String[] {"Power of 1", "Power of 2", "Power of 3"};
 					}
 
 					@Override

@@ -1895,6 +1895,7 @@ public class Rules implements GameMessageSender {
 							rule.resetRule();
 						
 						actions.firstAction();
+						return;
 						//return false;
 					}
 			

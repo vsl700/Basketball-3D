@@ -255,8 +255,9 @@ public class GameScreen implements Screen, GameMessageListener, GUIRenderer {
 				powerNum.setText("x" + pow);
 				powerNum.update();
 				
-				if(!temp) {
-					power.setY(getPowerY() - messageBox.getHeight() - 13);
+				if(sender != null) {
+					System.out.println(minorMessageRec);
+					power.setY(getPowerY() - messageBox.getHeight() - 13 * (minorMessageRec ? 5 : 1));
 					powerNum.setY(getPowerNumY());
 				}
 				else {
@@ -276,49 +277,48 @@ public class GameScreen implements Screen, GameMessageListener, GUIRenderer {
 					}
 					
 					minorMessage.update();
-				} else{ 
-					
-					
-					if (sender != null/* || map.isRuleTriggered() || map.getChallenges().isAChallengeBroken()*/) { // If the game is not running and there is no timer counting down
-						messageBox.update();
-						ruleHeading.update();
-						
-						if(!ruleDesc.getText().equals(""))
-							ruleDesc.update();
-						
-						if (map.getDifficulty() > 0 && map.isRuleTriggered() && map.getRules().getTriggeredRule().getRuleTriggerer().getFouls() == 7)
-							playerRemove.update();
+				}  
 
-						if (contTimer <= 0 && skippableMessage) {
-							clickToCont.update();
+				if (sender != null/* || map.isRuleTriggered() || map.getChallenges().isAChallengeBroken()*/) { // If the game is not running and
+											// there is no timer counting down
+					messageBox.update();
+					ruleHeading.update();
 
-							if (Gdx.app.getType().equals(Application.ApplicationType.Android) && Gdx.input.justTouched() || Gdx.input.isKeyJustPressed(Keys.E)) {
-								if (map.isRuleTriggered()) {
-									Player triggerer = map.getRules().getTriggeredRule().getRuleTriggerer();
-									if (triggerer.getFouls() == 7 && triggerer.isMainPlayer() || (map.getTeamScore() >= 15 || map.getOppScore() >= 15) && !map.isChallenge()) {
-										sender.messageReceived();
-										game.setScreen(game.gameOver);
-										return;
-									}
-								}
-								
-								if(map.getChallenges().isAChallengeBroken() && !map.isRuleTriggered()) {
+					if (!ruleDesc.getText().equals(""))
+						ruleDesc.update();
+
+					if (map.getDifficulty() > 0 && map.isRuleTriggered() && map.getRules().getTriggeredRule().getRuleTriggerer().getFouls() == 7)
+						playerRemove.update();
+
+					if (contTimer <= 0 && skippableMessage) {
+						clickToCont.update();
+
+						if (Gdx.app.getType().equals(Application.ApplicationType.Android) && Gdx.input.justTouched() || Gdx.input.isKeyJustPressed(Keys.E)) {
+							if (map.isRuleTriggered()) {
+								Player triggerer = map.getRules().getTriggeredRule().getRuleTriggerer();
+								if (triggerer.getFouls() == 7 && triggerer.isMainPlayer() || (map.getTeamScore() >= 15 || map.getOppScore() >= 15) && !map.isChallenge()) {
+									sender.messageReceived();
 									game.setScreen(game.gameOver);
 									return;
 								}
-								
-								String tempText = ruleHeading.getText();
-								sender.messageReceived();
-								
-								if(!map.isTutorialMode() && (map.getRules().getTriggeredRule() != null && (map.getTeammates().size() == 0 || map.getOpponents().size() == 0)))
-									game.setScreen(game.gameOver);
-								
-								if(ruleHeading.getText().equals(tempText))
-									sender = null;
 							}
-						} else if (contTimer > 0)
-							contTimer -= delta;
-					}
+
+							if (map.getChallenges().isAChallengeBroken() && !map.isRuleTriggered()) {
+								game.setScreen(game.gameOver);
+								return;
+							}
+
+							String tempText = ruleHeading.getText();
+							sender.messageReceived();
+
+							if (!map.isTutorialMode() && (map.getRules().getTriggeredRule() != null && (map.getTeammates().size() == 0 || map.getOpponents().size() == 0)))
+								game.setScreen(game.gameOver);
+
+							if (ruleHeading.getText().equals(tempText))
+								sender = null;
+						}
+					} else if (contTimer > 0)
+						contTimer -= delta;
 				}
 
 			}
