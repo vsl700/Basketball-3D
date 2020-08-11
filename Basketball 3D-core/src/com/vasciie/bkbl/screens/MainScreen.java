@@ -50,7 +50,7 @@ public class MainScreen implements Screen, GUIRenderer, GameMessageSender {
 	@Override
 	public void show() {
 		if(!SettingsPrefsIO.readSettingBool("welcome")) {
-			game.sendMessage("Hello And Welcome To Basketball-3D, A Free Indie 3D Basketball Simulator! There Are Some Tutorial Levels In 'Play>Tutorial Levels', Which I Highly Recommend Going Through First! They Are Not Harder Than The Game Itself, But They Will Make You Get Attatched To The Game Much Easier! Try Them Out!", Color.RED, this, true);
+			game.sendMessage("Hello And Welcome To Basketball-3D! There Are Some Tutorial Levels In 'Play>Tutorial Levels', Which I Highly Recommend Going Through First! They Are Not Harder Than The Game Itself, But They Will Make You Get Attatched To The Game Much Easier! Try Them Out!", Color.RED, this, true);
 			SettingsPrefsIO.writeSettingBool("welcome", true);
 			SettingsPrefsIO.flush();
 		}
@@ -98,7 +98,7 @@ public class MainScreen implements Screen, GUIRenderer, GameMessageSender {
 	
 	public void sendWebPageMessage() {
 		if(!SettingsPrefsIO.readSettingBool("webpage")) {
-			game.sendMessage("So How's The Game Performing? If You Like It You Can Follow Us On Twitter To Hear About Updates And Incoming Features! The Button In The Bottom-Right Will Lead You To Our Page! ALSO A LOCAL MULTIPLAYER IS COMING SOON (if the developer decides so)!", Color.RED, this, true);
+			game.sendMessage("So How's The Game Performing? If You Like It You Can Follow Us On Twitter To Hear About Updates And Incoming Features! The Button In The Bottom-Right Will Lead You To Our Page! ALSO A LOCAL MULTIPLAYER MIGHT COME SOON (if the developer decides so)!", Color.RED, this, true);
 			SettingsPrefsIO.writeSettingBool("webpage", true);
 			SettingsPrefsIO.flush();
 		}
