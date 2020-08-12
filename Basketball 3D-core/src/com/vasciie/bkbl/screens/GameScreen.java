@@ -256,7 +256,6 @@ public class GameScreen implements Screen, GameMessageListener, GUIRenderer {
 				powerNum.update();
 				
 				if(sender != null) {
-					System.out.println(minorMessageRec);
 					power.setY(getPowerY() - messageBox.getHeight() - 13 * (minorMessageRec ? 5 : 1));
 					powerNum.setY(getPowerNumY());
 				}

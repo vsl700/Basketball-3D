@@ -287,6 +287,7 @@ public enum PlayerState implements State<Player> {
 			player.getBrain().getBallSeparate().setEnabled(true);//Reset
 			player.getBrain().getCollAvoid().setEnabled(true);
 			player.getBrain().getPlayerSeparate().setEnabled(true);
+			player.getBrain().getPursue().setEnabled(true);
 		}
 		
 		@Override
@@ -335,6 +336,10 @@ public enum PlayerState implements State<Player> {
 					player.interactWithBallA();
 				//}
 			} else{
+				if(player.getPosition().scl(1, 0, 1).dst(tempBall.getPosition().scl(1, 0, 1)) < player.getWidth() * 3)
+					brain.getPursue().setEnabled(false);
+				else brain.getPursue().setEnabled(true);
+				
 				brain.getMSBallChase().calculateSteering(Player.steering);
 				// System.out.println(Player.steering.linear.cpy().x);
 				if(player.getMap().getDifficulty() < 2 || brain.canMove())
@@ -596,7 +601,8 @@ public enum PlayerState implements State<Player> {
 			/*if(memory.getTargetPlayer() == null) {
 				memory.setTargetPlayer(player.getMap().getHoldingPlayer());
 				brain.getTargetPlayerSeparate().setEnabled(false);
-			}else*/ if(memory.getTargetPlayer() != null && !player.equals(memory.getTargetPlayer()) && GameTools.getDistanceBetweenLocations(player, memory.getTargetPlayer()) < player.getWidth() + 0.2f) brain.getTargetPlayerSeparate().setEnabled(true);
+			}else*/ if(memory.getTargetPlayer() != null && !player.equals(memory.getTargetPlayer()) && GameTools.getDistanceBetweenLocations(player, memory.getTargetPlayer()) < player.getWidth() + 0.2f) 
+				brain.getTargetPlayerSeparate().setEnabled(true);
 			else brain.getTargetPlayerSeparate().setEnabled(false);
 			
 			if(brain.getPSCustom2() != null) {
