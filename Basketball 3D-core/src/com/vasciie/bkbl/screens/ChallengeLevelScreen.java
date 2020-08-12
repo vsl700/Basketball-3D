@@ -87,7 +87,7 @@ public class ChallengeLevelScreen implements Screen, GUIRenderer, GameMessageSen
 			challengeName.setText(game.getMap().getChallenges().getGameLevel(index).getName());
 			
 			if(!SettingsPrefsIO.readSettingBool("challenges")) {
-				game.sendMessage("Note That You Can Combine The Challenges Below To Make The Game You Probably Want To Make!", Color.RED, this, true);
+				game.sendMessage("Note That You Can Combine The Challenges Below To Make The Game You Probably Want To Make! Also, If You Don't Include Challenges That Require Breaking To Win Or You Don't Break A Losable Challenge, You Win If You Have More Score Than The Other Team (as soon as the game is over)! If You Don't Include A Challenge That Stops The Game, The Games Becomes Endless!", Color.RED, this, true);
 				SettingsPrefsIO.writeSettingBool("challenges", true);
 				SettingsPrefsIO.flush();
 			}
