@@ -55,8 +55,8 @@ public class Rules implements GameMessageSender {
 						if(thrower != null && (thrower instanceof Teammate && map.getTeammates().size() > 1 || thrower instanceof Opponent && map.getOpponents().size() > 1) && !thrower.isBallFree())
 							return false;
 						
-						if (tempPlayer == null && (recentHolder != null && recentHolder.isAbleToCatch() || recentHolder == null)) {//If there is currently no holding player
-							if((map.getBall().isCollidedWTeamBasket() || map.getBall().isCollidedWOppBasket()) && map.getBall().getLinearVelocity().y > 0.5f && map.getBall().getPosition().y - map.getHomeBasket().getBasketTargetTrans().getTranslation(new Vector3()).y < 0) {
+						if (tempPlayer == null/* && (recentHolder != null && recentHolder.isAbleToCatch() || recentHolder == null)*/) {//If there is currently no holding player
+							if((map.getBall().isCollidedWTeamBasket() || map.getBall().isCollidedWOppBasket()) && map.getBall().getLinearVelocity().y > 0.25f) {
 								ruleTriggerer = recentHolder;
 								basketUpsideDown = true;
 								setOccurPlace();
@@ -228,7 +228,20 @@ public class Rules implements GameMessageSender {
 											occurPlace.x = Math.min(-diff, occurPlace.x);
 										else
 											occurPlace.x = Math.max(diff, occurPlace.x);
+										
+										float maxZ = 28;
+										if(occurPlace.z > maxZ)
+											occurPlace.z = maxZ;
+										else if(occurPlace.z < -maxZ)
+											occurPlace.z = -maxZ;
 									}
+									
+									float maxX = 12;
+									if(occurPlace.x > maxX)
+										occurPlace.x = maxX;
+									else if(occurPlace.x < -maxX)
+										occurPlace.x = -maxX;
+									
 									//map.setPlayerTargetPosition(occurPlace, recentHolder);
 									recentHolder.getBrain().setCustomVecTarget(occurPlace, true);
 									recentHolder.getBrain().getCustomPursue().setArrivalTolerance(recentHolder.getWidth());
