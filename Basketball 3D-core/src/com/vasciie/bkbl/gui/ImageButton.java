@@ -38,5 +38,9 @@ public class ImageButton extends Button {
 		batch.draw(texture, x, y, width, height);
 		batch.end();
 	}
+	
+	public void disposeImage() {
+		texture.dispose();
+	}
 
 }

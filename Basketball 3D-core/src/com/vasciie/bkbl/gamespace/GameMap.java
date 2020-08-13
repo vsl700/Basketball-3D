@@ -639,7 +639,7 @@ public class GameMap implements GameMessageSender {
     	else dynamicsWorldRunnable.run();
     	
     	if(holdBall) {
-    		if(neededHolder.equals(getHoldingPlayer())) {
+    		if(neededHolder.equals(getHoldingPlayer()) && neededHolder.isDataBallHolding()) {
     			holdBall = false;
     			neededHolder = null;
     		}else setHoldingPlayer(neededHolder);

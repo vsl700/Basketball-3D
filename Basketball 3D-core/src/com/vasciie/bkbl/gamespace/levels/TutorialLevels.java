@@ -178,7 +178,7 @@ public class TutorialLevels extends Levels {
 											
 										});
 										
-										actions.addAction(new TutorialAction("Ball Taking!", "Great! Now I Guess It's Time To Jump Into Ball Dribbling!", textColor));
+										actions.addAction(new TutorialAction("Ball Taking!", "Great! Now I Guess It's Time To Jump Into Ball Shooting! But Before That I Just Want To Mention That When The Ball Is In The Air, You Can Only Catch It BY TOUCHING IT WITH THE END OF YOUR ARM By Pointing At It (with the hand controls)! You're Gonna Train This In The Ball Shooting Part! It's Not Hard At All!", textColor));
 										
 									}
 
@@ -200,19 +200,112 @@ public class TutorialLevels extends Levels {
 									
 								},
 								
+								new LevelPart("ball_shoot", "Ball Shooting", map, messageListener) {
+
+									@Override
+									protected void createActions() {
+										actions.addAction(new TutorialAction("Ball Shooting!", "The Next Thing You Can Do With The Ball Is Shooting It No Matter To The Basket Or To A Player!", textColor));
+										
+										actions.addAction(new TutorialAction("Ball Shooting!", "For Now You Will Just Learn How To Shoot The Ball To A Basket!", textColor));
+										
+										actions.addAction(new TutorialAction("Ball Shooting!", "It's Important That You Measure The Shot According To THE HAND You Hold The Ball With!", textColor));
+										
+										actions.addAction(new TutorialAction("Ball Shooting!", "You Can Now Try Putting The Ball In Any Basket! Just Hold The CTRL Button And Release It After You Aim At The Basket! Scroll Wheel Or Q & E Keys Are For The Shooting Power! Score At Least 3 Points On Any Basket!", textColor));
+										
+										actions.addAction(new TutorialAction("0 Scores!", "", textColor, false) {
+											int scores;
+											boolean shootPowerReg;
+											boolean wait;
+											
+											
+											@Override
+											protected void sendMessage() {
+												messageListener.sendMessage(heading, desc, textColor, this, skippable, true);
+											}
+											
+											@Override
+											public void resetMessage() {
+												super.resetMessage();
+												
+												scores = 0;
+												wait = shootPowerReg = false;
+											}
+											
+											@Override
+											public boolean act() {
+												if(!shootPowerReg)
+													map.getMainPlayer().setShootPower(10);
+												
+												shootPowerReg = true;
+												
+												if (!wait) {
+													if (map.getBall().isCollidedWTeamBasket() || map.getBall().isCollidedWOppBasket()) {
+														if(map.getBall().getLinearVelocity().y < 0) {
+															if (scores == 2) {
+																scores = 0;
+																shootPowerReg = false;
+
+																return true;
+															}
+
+															scores++;
+															messageListener.sendMessage(scores + (scores == 1 ? " Score!" : " Scores!"), "", textColor, this, skippable, true);
+														}
+														
+														wait = true;
+													}
+												} else if (map.getMainPlayer().isHoldingBall())
+													wait = false;
+												
+												return false;
+											}
+											
+											@Override
+											public boolean isGameDependent() {
+												return true;
+											}
+											
+										});
+										
+										actions.addAction(new TutorialAction("Ball Shooting!", "Excellent! I Think You've Got It With Shooting! Let's Go To The Last Step!", textColor));
+										
+									}
+
+									@Override
+									public boolean updatePlayersNormalAI() {
+										
+										return false;
+									}
+
+									@Override
+									public boolean usesOriginalRules() {
+										
+										return false;
+									}
+
+									@Override
+									public boolean showPower() {
+										
+										return true;
+									}
+									
+								},
+								
 								new LevelPart("ball_dribble", "Ball Dribbling", map, messageListener) {
 
 									@Override
 									protected void createActions() {
+										actions.addAction(new TutorialAction("Ball Dribble!", "The Last Important Thing You Can Do With The Ball Is Dribbling It!", textColor));
+										
 										actions.addAction(new TutorialAction("Ball Dribble!", "You'll Probably Find Out That In EASY And HARD Gamemodes There's An Auto-dribble! Well Yes, But That Doesn't Prevent Other Players From Stealing The Ball From You!!!", textColor));
 										
 										actions.addAction(new TutorialAction("Ball Dribble!", "For This Reason You Should Learn Dribbling The Ball Yourself!", textColor));
 										
-										actions.addAction(new TutorialAction("Ball Dribble!", "First, Run To The Red Basket While Dribbling The Ball! Like I Said, Left Mouse Button Controls Left Hand While Right Button Controls Right Hand!", textColor));
+										actions.addAction(new TutorialAction("Ball Dribble!", "First, Take The Ball And Run To The Red Basket While Dribbling The Ball! Like I Said, Left Mouse Button Controls Left Hand While Right Button Controls Right Hand!", textColor));
 										
 										actions.addAction(new TutorialAction("Ball Dribble!", "Controlling The Hand You Are Not Holding The Ball With Makes The Player To Dribble The Ball TO His Other Hand (Or Hand Switching)! Otherwise, He Does A Normal Dribble!", textColor));
 										
-										actions.addAction(new TutorialAction("Ball Dribble!", "Try This Out And At The Same Time Run To The Red Basket! Make Sure You Dribble On Each 0.75 Seconds While Moving Or 3 While Not Moving! When Dribble Time Is About To Run Out You'll Get A Message To Dribble!", textColor));
+										actions.addAction(new TutorialAction("Ball Dribble!", "Try This Out And At The Same Time Run To The Red Basket! When Dribble Time Is About To Run Out You'll Get A Message To Dribble!", textColor));
 										
 										actions.addAction(new TutorialAction("", "", textColor) {
 											final float defaultTime = 3, defaultTimeMove = 0.75f;
@@ -300,7 +393,11 @@ public class TutorialLevels extends Levels {
 											
 										});
 										
-										actions.addAction(new TutorialAction("Ball Dribble!", "Excellent! I Think You've Got It With Dribbling! Let's Go To The Last Step!", textColor));
+										actions.addAction(new TutorialAction("Excellent!", "Well Done! You've Learned The Basics Of Basketball-3D! Now You Can Either Remain In This Level To Practise The Way You Want To Or Get Out And Start The Next One!", textColor));
+										
+										actions.addAction(new TutorialAction("Practising!", "Remember! From This Level You Should Know How To Move And How To Take, Dribble And Shoot The Ball! I Recommend You To Practise Those Things A Bit Cuz You'll Need Them A Lot!", textColor));
+										
+										
 										
 									}
 
@@ -321,99 +418,6 @@ public class TutorialLevels extends Levels {
 									}
 									
 								}, 
-								
-								new LevelPart("ball_shoot", "Ball Shooting", map, messageListener) {
-
-									@Override
-									protected void createActions() {
-										actions.addAction(new TutorialAction("Ball Shooting!", "The Last Important Thing You Can Do With The Ball Is Shooting It No Matter To The Basket Or To A Player!", textColor));
-										
-										actions.addAction(new TutorialAction("Ball Shooting!", "For Now You Will Just Learn How To Shoot The Ball To A Basket!", textColor));
-										
-										actions.addAction(new TutorialAction("Ball Shooting!", "It's Important That You Measure The Shot According To THE HAND You Hold The Ball With!", textColor));
-										
-										actions.addAction(new TutorialAction("Ball Shooting!", "You Can Now Try Putting The Ball In Any Basket! Just Hold The CTRL Button And Release It After You Aim At The Basket! Scroll Wheel Or Q & E Keys Are For The Shooting Power! Score At Least 3 Points On Any Basket!", textColor));
-										
-										actions.addAction(new TutorialAction("0 Scores!", "", textColor, false) {
-											int scores;
-											boolean shootPowerReg;
-											boolean wait;
-											
-											
-											@Override
-											protected void sendMessage() {
-												messageListener.sendMessage(heading, desc, textColor, this, skippable, true);
-											}
-											
-											@Override
-											public void resetMessage() {
-												super.resetMessage();
-												
-												scores = 0;
-												wait = shootPowerReg = false;
-											}
-											
-											@Override
-											public boolean act() {
-												if(!shootPowerReg)
-													map.getMainPlayer().setShootPower(10);
-												
-												shootPowerReg = true;
-												
-												if (!wait) {
-													if (map.getBall().isCollidedWTeamBasket() || map.getBall().isCollidedWOppBasket()) {
-														if(map.getBall().getLinearVelocity().y < 0) {
-															if (scores == 2) {
-																scores = 0;
-																shootPowerReg = false;
-
-																return true;
-															}
-
-															scores++;
-															messageListener.sendMessage(scores + (scores == 1 ? " Score!" : " Scores!"), "", textColor, this, skippable, true);
-														}
-														
-														wait = true;
-													}
-												} else if (map.getMainPlayer().isHoldingBall())
-													wait = false;
-												
-												return false;
-											}
-											
-											@Override
-											public boolean isGameDependent() {
-												return true;
-											}
-											
-										});
-										
-										actions.addAction(new TutorialAction("Excellent!", "Well Done! You've Learned The Basics Of Basketball-3D! Now You Can Either Remain In This Level To Practise The Way You Want To Or Get Out And Start The Next One!", textColor));
-										
-										actions.addAction(new TutorialAction("Practising!", "Remember! From This Level You Should Know How To Move And How To Take, Dribble And Shoot The Ball! I Recommend You To Practise Those Things A Bit Cuz You'll Need Them A Lot!", textColor));
-										
-									}
-
-									@Override
-									public boolean updatePlayersNormalAI() {
-										
-										return false;
-									}
-
-									@Override
-									public boolean usesOriginalRules() {
-										
-										return false;
-									}
-
-									@Override
-									public boolean showPower() {
-										
-										return true;
-									}
-									
-								},
 								
 								new LevelPart("practising", "Level Practising", map, messageListener) {
 
@@ -483,11 +487,6 @@ public class TutorialLevels extends Levels {
 										
 										actions.addAction(new TutorialAction("Passing & Catching!", "First We Are Gonna Look Into Passing To Players And Also Catching Their Passes!", textColor));
 										
-										actions.addAction(new TutorialAction("Passing & Catching!", "You Had Probably Noticed From Tutorial Level 1 That When The Ball Is In The Air, You Can Only Catch It With The End Of Your Arm! That's Why The Player Points To The Ball!", textColor));
-										
-										actions.addAction(new TutorialAction("Passing & Catching!", "That's An Important Thing Not Only For Catching Passes (or any ball catching), But Also For Ball Stealing!", textColor));
-										
-										
 										actions.addAction(new Action() {
 
 											@Override
@@ -524,7 +523,7 @@ public class TutorialLevels extends Levels {
 											
 										});
 										
-										actions.addAction(new TutorialAction("Passing & Catching!", "Now Go To The Red Basket By Passing The Ball With Your Teammate! For Moving For 0.75 Seconds Without Passing Or 1 Second While Shooting You'll Be Returned To The Blue Basket! Pass The Ball TO Your Teammate At Least 3 Times!", textColor));
+										actions.addAction(new TutorialAction("Passing & Catching!", "Now Go To The Red Basket By Passing The Ball With Your Teammate! Make Sure To Start Aiming For Each Pass As Fast As Possible And Also Don't Move For Too Long While Aiming! Otherwise, You'll Be Returned To The Blue Basket! Pass The Ball TO Your Teammate At Least 3 Times!", textColor));
 										
 										Action tempAction = new TutorialAction("0 Passes!", "", textColor, false) {
 											final float defaultTime = 0.75f;
@@ -559,7 +558,7 @@ public class TutorialLevels extends Levels {
 														passes++;
 														wait = true;
 														
-														messageListener.sendMessage(passes + (passes == 1 ? " Pass!" : " Passes!"), "", textColor, this, false, true);
+														messageListener.sendMessage(passes + (passes == 1 ? " Pass!" : " Passes!") + (passes >= 3 ? " (enough)" : ""), "", textColor, this, false, true);
 													}
 													time = defaultTime;
 												}else if(!map.getMainPlayer().isShooting() && wait)
@@ -890,7 +889,7 @@ public class TutorialLevels extends Levels {
 										
 										actions.addAction(new TutorialAction("Preventing Ball Stealing!", "Now I Spawned You 1 More Opponent And 1 Teammate So That You Learn Keeping Ball Unstolen By Passing It With Your Teammate! Pass It At Least 3 Times!", textColor));
 										
-										actions.addAction(new TutorialAction("Preventing Ball Stealing!", "If You Pass It Less Times Than You Should, An Opponent Steals It Or You Walk For 1 Sec During Shooting You'll Be Returned Back To The Blue Basket! It Doesn't Matter How Long You Are Holding It Without Dribbling It!", textColor));
+										actions.addAction(new TutorialAction("Preventing Ball Stealing!", "If You Pass It Less Times Than You Should, An Opponent Steals It Or You Walk For Too Long While Aiming You'll Be Returned Back To The Blue Basket! It Doesn't Matter How Long You Are Holding It Without Dribbling It!", textColor));
 										
 										actions.addAction(new TutorialAction("Preventing Ball Stealing!", "Note That When A Player's Opponent Tries To Interpose Between It And Its Target, The Shooting Player Shoots The Ball Much Higher Than Needed In Order To Prevent Its Opponent From Stealing!", textColor));
 										
@@ -929,7 +928,7 @@ public class TutorialLevels extends Levels {
 															passes++;
 															wait = true;
 															
-															messageListener.sendMessage(passes + (passes == 1 ? " Pass!" : " Passes!"), "", textColor, this, false, true);
+															messageListener.sendMessage(passes + (passes == 1 ? " Pass!" : " Passes!") + (passes >= 3 ? " (enough)" : ""), "", textColor, this, false, true);
 													}else if(!map.getMainPlayer().isShooting() && wait)
 														wait = false;
 													
@@ -1034,7 +1033,7 @@ public class TutorialLevels extends Levels {
 
 									@Override
 									protected void createActions() {
-										actions.addAction(new TutorialAction("Ball Stealing!", "Ball Stealing Requires Players To Track Whether Their Opponents Are Supposed To Make A Dribble Or Catch The Ball Before It Gets Caught By The Opponent's Teammate!", textColor));
+										actions.addAction(new TutorialAction("Ball Stealing!", "Ball Stealing Requires Players To Either Track Whether Their Opponents Are Supposed To Make A Dribble Or Catch The Ball Before It Gets Caught By The Opponent's Teammate!", textColor));
 										
 										actions.addAction(new TutorialAction("Ball Stealing!", "Simply In This Tutorial You And Your Opponents Will Switch Places! They'll Try To Dribble Or Pass The Ball And You'll Try To Steal It!", textColor));
 										
@@ -1186,7 +1185,7 @@ public class TutorialLevels extends Levels {
 										
 										actions.addAction(new TutorialAction("Ball Stealing!", "It Is Done By Pointing Your Arm (with the mouse button hand controls) To The Ball And Making The End Of The Arm Collide With The Ball While Your Opponent Is Dribbling!", textColor));
 										
-										actions.addAction(new TutorialAction("Ball Stealing!", "However, If You Point Your Arm To And Collide Its End With The Ball While The Opponent Isn't Dribbling, It Counts As Reach-In And The Penalty Would Be An Opponent To Go To Your Team's Basket And Try To Score!", textColor));
+										actions.addAction(new TutorialAction("Ball Stealing!", "However, If You Point Your Arm To And Collide Its End With The Ball While The Opponent Isn't Dribbling, It Counts As Reach-In!", textColor));
 										
 										actions.addAction(new Action() {
 
@@ -1343,7 +1342,7 @@ public class TutorialLevels extends Levels {
 										
 										actions.addAction(new TutorialAction("2.2. Time Out", "This Inner Rule Triggers When The Thrower Doesn't Manage To Release The Ball Within 5 Seconds (a timer message shows up if you are the thrower)! The Penalty Is A Throw-in By The Other Team!", textColor));
 										
-										actions.addAction(new TutorialAction("2.3. Too Close", "This Inner Rule Triggers When A Player (the new eventual rule triggerer) Gets Too Close To The Thrower-in! If The Rule Triggerer Is From The Thrower-in's Team, The Opposite Team Is Making The Throw-in!", textColor));
+										actions.addAction(new TutorialAction("2.3. Too Close", "This Inner Rule Triggers When A Player (the new eventual rule triggerer) Gets Too Close To The Thrower-in! If The Rule Triggerer Is From The Thrower-in's Team, The Opposite Team Makes The Throw-in!", textColor));
 										
 										actions.addAction(new TutorialAction("3. Reached In", "This Rule Triggers When A Player Tries To Steal The Ball From A Player That's Holding The Ball, But It's Not Currently Dribbling It!", textColor));
 										

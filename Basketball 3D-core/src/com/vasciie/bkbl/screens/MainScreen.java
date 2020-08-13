@@ -26,7 +26,7 @@ public class MainScreen implements Screen, GUIRenderer, GameMessageSender {
 	BitmapFont font;
 	
 	Button play, settings, quit;
-	ImageButton /*facebook, */twitter;
+	ImageButton /*facebook, */twitter, itchio;
 	
 	public MainScreen(MyGdxGame mg) {
 		game = mg;
@@ -45,6 +45,7 @@ public class MainScreen implements Screen, GUIRenderer, GameMessageSender {
 		
 		//facebook = new ImageButton(this, new Texture(Gdx.files.internal("application/facebook_logo.png")));
 		twitter = new ImageButton(this, new Texture(Gdx.files.internal("application/twitter_logo.png")));
+		itchio = new ImageButton(this, new Texture(Gdx.files.internal("application/itch.io.jpg")));
 	}
 
 	@Override
@@ -69,6 +70,7 @@ public class MainScreen implements Screen, GUIRenderer, GameMessageSender {
 		
 		//facebook.update();
 		twitter.update();
+		itchio.update();
 		
 		if(quit.justReleased() && !game.isThereAMessage())
 			Gdx.app.exit();
@@ -82,6 +84,8 @@ public class MainScreen implements Screen, GUIRenderer, GameMessageSender {
 			Gdx.net.openURI("");*/
 		else if(twitter.justReleased() && !game.isThereAMessage())
 			Gdx.net.openURI("https://twitter.com/VasciiE");
+		else if(itchio.justReleased() && !game.isThereAMessage())
+			Gdx.net.openURI("https://vascii-entertainment.itch.io/");
 
 		game.renderLogo(batch, cam);
 
@@ -93,12 +97,13 @@ public class MainScreen implements Screen, GUIRenderer, GameMessageSender {
 		
 		//facebook.draw();
 		twitter.draw();
+		itchio.draw();
 		//batch.end();
 	}
 	
 	public void sendWebPageMessage() {
 		if(!SettingsPrefsIO.readSettingBool("webpage")) {
-			game.sendMessage("So How's The Game Performing? If You Like It You Can Follow Us On Twitter To Hear About Updates And Incoming Features! The Button In The Bottom-Right Will Lead You To Our Page! ALSO A LOCAL MULTIPLAYER MIGHT COME SOON (if the developer decides so)!", Color.RED, this, true);
+			game.sendMessage("So How's The Game Performing? If You Like It You Can Follow Us On itch.io And Twitter To Hear About Updates And Incoming Features! The Buttons In The Bottom-Right Will Lead You To Our Pages! ALSO A LOCAL MULTIPLAYER MIGHT COME SOON (if the developer decides so)!", Color.RED, this, true);
 			SettingsPrefsIO.writeSettingBool("webpage", true);
 			SettingsPrefsIO.flush();
 		}
@@ -123,6 +128,7 @@ public class MainScreen implements Screen, GUIRenderer, GameMessageSender {
 		
 		twitter.setPos(width - twitter.getWidth(), 0);
 		//facebook.setPos(width - facebook.getWidth() - twitter.getWidth(), 0);
+		itchio.setPos(width - itchio.getWidth() - /*facebook.getWidth() - */twitter.getWidth(), 0);
 	}
 
 	@Override
@@ -145,6 +151,9 @@ public class MainScreen implements Screen, GUIRenderer, GameMessageSender {
 		batch.dispose();
 		shape.dispose();
 		font.dispose();
+		twitter.disposeImage();
+		itchio.disposeImage();
+		//facebook.disposeImage();
 	}
 
 	@Override
