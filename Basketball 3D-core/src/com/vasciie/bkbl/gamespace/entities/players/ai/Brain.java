@@ -237,7 +237,7 @@ public class Brain {
 			Player temp = user.getMap().getRecentHolder();
 			//System.out.println(GameTools.getDistanceBetweenLocations(temp = GameTools.getClosestPlayer(user.getPosition(), user.getMap().getAllPlayers(), null), user));
 			if (temp != null && !temp.equals(user) && (!temp.isHoldingBall() || temp.isAimingOrShooting()) && temp.isInAwayThreePointZone()) {
-				if(!separating && Player.steering.linear.cpy().nor().scl(Gdx.graphics.getDeltaTime() * (user.isRunning() ? 11 : 4)).add(user.getPosition()).dst(temp.getPosition()) <= user.getWidth()/* + 0.6f*/) {
+				if(!separating && Player.steering.linear.cpy().nor().scl(Gdx.graphics.getDeltaTime() * (user.isRunning() ? 11 : 4)).add(user.getPosition()).dst(temp.getPosition()) <= user.getWidth() + 0.2f) {
 					separating = true;
 				}else if(separating && Player.steering.linear.cpy().nor().scl(Gdx.graphics.getDeltaTime() * (user.isRunning() ? 11 : 4)).add(user.getPosition()).dst(temp.getPosition()) > user.getWidth() + 2) {
 					separating = false;
