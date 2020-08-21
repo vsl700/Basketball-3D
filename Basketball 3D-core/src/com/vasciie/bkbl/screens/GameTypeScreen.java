@@ -62,7 +62,7 @@ public class GameTypeScreen implements Screen, GUIRenderer {
 		}else if(challenge.justReleased()) {
 			game.setScreen(game.challenge);
 		}else if(goBack.justReleased()) {
-			game.setScreen(game.main);
+			game.setScreen(game.playerGameType);
 		}
 		
 		game.renderLogo(batch, cam);
@@ -114,7 +114,7 @@ public class GameTypeScreen implements Screen, GUIRenderer {
 	public void dispose() {
 		batch.dispose();
 		shape.dispose();
-
+		font.dispose();
 	}
 
 	@Override

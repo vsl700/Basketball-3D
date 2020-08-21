@@ -51,7 +51,7 @@ public class MainScreen implements Screen, GUIRenderer, GameMessageSender {
 	@Override
 	public void show() {
 		if(!SettingsPrefsIO.readSettingBool("welcome")) {
-			game.sendMessage("Hello And Welcome To Basketball-3D! There Are Some Tutorial Levels In 'Play>Tutorial Levels', Which I Highly Recommend Going Through First! They Are Not Harder Than The Game Itself, But They Will Make You Get Attatched To The Game Much Easier! Try Them Out!", Color.RED, this, true);
+			game.sendMessage("Hello And Welcome To Basketball-3D! There Are Some Tutorial Levels In 'Play>Singleplayer>Tutorial Levels', Which I Highly Recommend Going Through First! They Are Not Harder Than The Game Itself, But They Will Make You Get Attatched To The Game Much Easier! Try Them Out!", Color.RED, this, true);
 			SettingsPrefsIO.writeSettingBool("welcome", true);
 			SettingsPrefsIO.flush();
 		}
@@ -79,7 +79,7 @@ public class MainScreen implements Screen, GUIRenderer, GameMessageSender {
 			game.setScreen(game.settings);
 		}
 		else if(play.justReleased() && !game.isThereAMessage())
-			game.setScreen(game.gameType);
+			game.setScreen(game.playerGameType);
 		/*else if(facebook.justReleased() && !game.isThereAMessage())
 			Gdx.net.openURI("");*/
 		else if(twitter.justReleased() && !game.isThereAMessage())
@@ -103,7 +103,7 @@ public class MainScreen implements Screen, GUIRenderer, GameMessageSender {
 	
 	public void sendWebPageMessage() {
 		if(!SettingsPrefsIO.readSettingBool("webpage")) {
-			game.sendMessage("So How's The Game Performing? If You Like It You Can Follow Us On itch.io And Twitter To Hear About Updates And Incoming Features! The Buttons In The Bottom-Right Will Lead You To Our Pages! ALSO A LOCAL MULTIPLAYER MIGHT COME SOON (if the developer decides so)!", Color.RED, this, true);
+			game.sendMessage("So How's The Game Performing? If You Like It You Can Follow Us On itch.io And Twitter To Hear About Updates And Incoming Features! The Buttons In The Bottom-Right Will Lead You To Our Pages!", Color.RED, this, true);
 			SettingsPrefsIO.writeSettingBool("webpage", true);
 			SettingsPrefsIO.flush();
 		}

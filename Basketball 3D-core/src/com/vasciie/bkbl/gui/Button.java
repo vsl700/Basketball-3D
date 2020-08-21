@@ -113,7 +113,7 @@ public class Button extends GUI {
     }
 
     @Override
-    public void render() {
+    protected void render() {
         ShapeRenderer shape = guiRenderer.getShapeRenderer();
         SpriteBatch batch = guiRenderer.getSpriteBatch();
         OrthographicCamera cam = guiRenderer.getCam();

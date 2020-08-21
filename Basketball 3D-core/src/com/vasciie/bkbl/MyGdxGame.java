@@ -55,6 +55,7 @@ public class MyGdxGame extends Game implements GameMessageListener, GUIRenderer 
 	public LevelScreen level;
 	public TutorialLevelScreen tutorial;
 	public ChallengeLevelScreen challenge;
+	public PlayerGameTypeScreen playerGameType;
 	public GameTypeScreen gameType;
 	public GameScreen game;
 	public GameOverScreen gameOver;
@@ -130,6 +131,7 @@ public class MyGdxGame extends Game implements GameMessageListener, GUIRenderer 
 		tutorial = new TutorialLevelScreen(this);
 		challenge = new ChallengeLevelScreen(this);
 		gameType = new GameTypeScreen(this);
+		playerGameType = new PlayerGameTypeScreen(this);
 		game = new GameScreen(this);
 		gameOver = new GameOverScreen(this);
 		
@@ -391,7 +393,16 @@ public class MyGdxGame extends Game implements GameMessageListener, GUIRenderer 
 		else if(background != null)
 			background.dispose();
 		
-		getScreen().dispose();
+		spScreen1.dispose();
+		spScreen2.dispose();
+		main.dispose();		
+		level.dispose();
+		tutorial.dispose();
+		challenge.dispose();
+		gameType.dispose();
+		playerGameType.dispose();
+		game.dispose();
+		gameOver.dispose();
 		
 		assets.dispose();
 	}
