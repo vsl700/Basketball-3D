@@ -23,18 +23,38 @@ import com.vasciie.bkbl.gamespace.zones.Zones.Zone;
  */
 public final class GameTools {
 	
-	/*public static float textSize(BitmapFont font, String t) {
-		float textW = 0;
-
-		for (int i = 0; i < t.length(); i++) {
-			char ch = t.charAt(i);
-			if (ch != '\n') {
-				textW += font.getData().getGlyph(ch).width * font.getScaleX();
+	public static float[] beautyX1(int totalBtns, int screenW, float btnSpace, float btnWidth) {
+		return beautyX1(totalBtns, 1, screenW, btnSpace, btnWidth)[0];
+	}
+	
+	public static float[][] beautyX1(int totalBtns, int split, int screenW, float btnSpace, float btnWidth) {
+		int parts = (int) Math.ceil(totalBtns * 1.0 / split);
+		float[][] temp = new float[split][];
+		
+		int tempTotal = totalBtns;
+		for(int i = 0; i < split; i++) {
+			if(i + 1 == split)
+				temp[i] = new float[tempTotal];
+			else {
+				temp[i] = new float[parts];
+				tempTotal -= parts;
 			}
 		}
-
-		return textW;
-	}*/
+		
+		for (int i = 0; i < split; i++) {
+			for (int j = 0; j < temp[i].length; j++) {
+				if(i + 1 == split && split > 1)
+					temp[i][j] = getBeautyX1(totalBtns - parts, screenW, btnSpace, btnWidth, j);
+				else temp[i][j] = getBeautyX1(parts, screenW, btnSpace, btnWidth, j);
+			}
+		}
+		
+		return temp;
+	}
+	
+	private static float getBeautyX1(int totalBtns, int screenW, float btnSpace, float btnWidth, int i) {
+		return screenW / 2 + btnSpace / 2 - (totalBtns / 2.0f - i) * (btnWidth + btnSpace);
+	}
 	
 	private static final StringBuilder sb = new StringBuilder();
 	public static String convertTimeToString(float time) {

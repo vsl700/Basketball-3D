@@ -56,6 +56,9 @@ public class MyGdxGame extends Game implements GameMessageListener, GUIRenderer 
 	public TutorialLevelScreen tutorial;
 	public ChallengeLevelScreen challenge;
 	public PlayerGameTypeScreen playerGameType;
+	public RulesChooseScreen rulesChoose;
+	public JoinOrCreateScreen joinOrCreate;
+	public JoinScreen join;
 	public GameTypeScreen gameType;
 	public GameScreen game;
 	public GameOverScreen gameOver;
@@ -132,6 +135,9 @@ public class MyGdxGame extends Game implements GameMessageListener, GUIRenderer 
 		challenge = new ChallengeLevelScreen(this);
 		gameType = new GameTypeScreen(this);
 		playerGameType = new PlayerGameTypeScreen(this);
+		rulesChoose = new RulesChooseScreen(this);
+		joinOrCreate = new JoinOrCreateScreen(this);
+		join = new JoinScreen(this);
 		game = new GameScreen(this);
 		gameOver = new GameOverScreen(this);
 		

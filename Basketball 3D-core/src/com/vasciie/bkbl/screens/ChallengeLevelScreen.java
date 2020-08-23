@@ -10,6 +10,7 @@ import com.badlogic.gdx.utils.Array;
 import com.vasciie.bkbl.GameMessageSender;
 import com.vasciie.bkbl.MyGdxGame;
 import com.vasciie.bkbl.gamespace.levels.Challenges.ChallengeLevel;
+import com.vasciie.bkbl.gamespace.tools.GameTools;
 import com.vasciie.bkbl.gamespace.tools.SettingsPrefsIO;
 import com.vasciie.bkbl.gui.Button;
 import com.vasciie.bkbl.gui.CheckButton;
@@ -209,11 +210,11 @@ public class ChallengeLevelScreen implements Screen, GUIRenderer, GameMessageSen
 		float btnSpace = 40;
 		float firstLevelY = game.getLogoY() - btnHeight * 1.5f, bottomLevelY = height / 4 + btnHeight / 2;
 		
-		int parts = (int) Math.ceil(challengePages.length / 2.0);
-		
-		for(int i = 0; i < parts; i++) {
+		//int parts = (int) Math.ceil(challengePages.length / 2.0);
+		float[][] tempXs = GameTools.beautyX1(challengePages.length, 2, width, btnSpace, btnWidth2);
+		for(int i = 0; i < tempXs[0].length; i++) {
 			challengePages[i].setSize(btnWidth2, btnHeight);
-			challengePages[i].setPos(width / 2 + btnSpace / 2 - (challengePages.length / 4.0f - i) * (btnWidth2 + btnSpace), firstLevelY);
+			challengePages[i].setPos(tempXs[0][i], firstLevelY);
 		}
 		
 		//challengeName.setWidth(btnWidth);
@@ -235,9 +236,9 @@ public class ChallengeLevelScreen implements Screen, GUIRenderer, GameMessageSen
 		playChallenge[index].setSize(checkBtnSize, checkBtnSize);
 		playChallenge[index].setPos(challengeName.getX() + challengeName.textSize() / 2 + checkBtnSize, challengeName.getY() - checkBtnSize / 2);
 
-		for(int i = parts; i < challengePages.length; i++) {
-			challengePages[i].setSize(btnWidth2, btnHeight);
-			challengePages[i].setPos(width / 2 + btnSpace / 2 - (challengePages.length / 4.0f - (i - challengePages.length / 2.0f)) * (btnWidth2 + btnSpace), bottomLevelY);
+		for(int i = 0; i < tempXs[1].length; i++) {
+			challengePages[i + tempXs[0].length].setSize(btnWidth2, btnHeight);
+			challengePages[i + tempXs[0].length].setPos(tempXs[1][i], bottomLevelY);
 		}
 	}
 

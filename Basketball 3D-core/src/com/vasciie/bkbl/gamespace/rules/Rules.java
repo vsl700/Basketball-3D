@@ -49,6 +49,12 @@ public class Rules implements GameMessageSender {
 					
 					
 					@Override
+					public boolean isGameStopChoosable() {
+						
+						return false;
+					}
+					
+					@Override
 					public boolean checkRule() {
 						Player tempPlayer = map.getHoldingPlayer();
 						
@@ -333,6 +339,12 @@ public class Rules implements GameMessageSender {
 								new GameRule(rules, this, "move_zone", "Moved Out!", map) {
 
 									@Override
+									public boolean isGameStopChoosable() {
+										
+										return false;
+									}
+									
+									@Override
 									public GameRule[] createInnerRules() {
 										
 										return null;
@@ -409,6 +421,12 @@ public class Rules implements GameMessageSender {
 									
 									
 									@Override
+									public boolean isGameStopChoosable() {
+										
+										return false;
+									}
+									
+									@Override
 									public void resetRule() {
 										time = defaultTime;
 										
@@ -452,6 +470,12 @@ public class Rules implements GameMessageSender {
 								},
 								
 								new GameRule(rules, this, "too_close", "Too Close!", map) {
+									@Override
+									public boolean isGameStopChoosable() {
+										
+										return false;
+									}
+									
 									@Override
 									public void resetRule() {
 										
@@ -755,6 +779,12 @@ public class Rules implements GameMessageSender {
 									public Color getTextColor() {
 										return rules.getGameRuleById("basket_score").getTextColor();
 									}
+
+									@Override
+									public boolean isGameStopChoosable() {
+										
+										return false;
+									}
 									
 								}
 						};
@@ -770,6 +800,12 @@ public class Rules implements GameMessageSender {
 					public void resetRule() {
 						recentHolder = null;
 						readyToCheck = false;
+					}
+
+					@Override
+					public boolean isGameStopChoosable() {
+						
+						return false;
 					}
 				},
 				
@@ -867,9 +903,15 @@ public class Rules implements GameMessageSender {
 						timer = defaultTime;
 						
 					}
+
+					@Override
+					public boolean isGameStopChoosable() {
+						
+						return false;
+					}
 				},
 				
-				new GameRule(this, null, "move_no_dribble", "Dribble Violation!", map) {
+				new GameRule(this, null, "move_no_dribble", "Dribble-Movement Violation!", map) {
 					Player recentHolder;
 					
 					final float defaultTime = 0.75f;
@@ -963,6 +1005,12 @@ public class Rules implements GameMessageSender {
 					public void resetRule() {
 						timer = defaultTime;
 						
+					}
+
+					@Override
+					public boolean isGameStopChoosable() {
+						
+						return false;
 					}
 				},
 				
@@ -1140,6 +1188,12 @@ public class Rules implements GameMessageSender {
 						recentHolder = null;
 						prevHoldingPlayer = null;
 					}
+
+					@Override
+					public boolean isGameStopChoosable() {
+						
+						return false;
+					}
 				},
 
 				new GameRule(this, null, "walk_shoot", "Walk Shooting!", map) {
@@ -1226,6 +1280,12 @@ public class Rules implements GameMessageSender {
 					public String getDescription() {
 						
 						return "A Shooting Player Cannot Walk At The Same Time For More Than A Total Of 1 Second!";
+					}
+
+					@Override
+					public boolean isGameStopChoosable() {
+						
+						return false;
 					}
 					
 				},
@@ -1320,6 +1380,12 @@ public class Rules implements GameMessageSender {
 					public String getDescription() {
 						
 						return "Once A Player Starts Shooting From The Free-Throw Zone He Cannot Get Out Of It Until The Ball Touches The Rim Of The Basket Or Anyone Else Catches It!";
+					}
+
+					@Override
+					public boolean isGameStopChoosable() {
+						
+						return false;
 					}
 					
 				},
@@ -1425,6 +1491,12 @@ public class Rules implements GameMessageSender {
 						
 						return "A Player That Has Just Shot The Ball Cannot Catch It Right Away Again!";
 					}
+
+					@Override
+					public boolean isGameStopChoosable() {
+						
+						return false;
+					}
 					
 				},
 				
@@ -1514,6 +1586,12 @@ public class Rules implements GameMessageSender {
 					public String getDescription() {
 						
 						return "Players Cannot Move The Ball By Not Holding It!";
+					}
+
+					@Override
+					public boolean isGameStopChoosable() {
+						
+						return false;
 					}
 					
 				},
@@ -1634,6 +1712,12 @@ public class Rules implements GameMessageSender {
 						
 						return "The Ball Must Get Out Of The Holding Player's Home Zone Within 6 Seconds!";
 					}
+
+					@Override
+					public boolean isGameStopChoosable() {
+						
+						return false;
+					}
 					
 				},
 				
@@ -1727,6 +1811,12 @@ public class Rules implements GameMessageSender {
 					@Override
 					public void resetRule() {
 						
+					}
+
+					@Override
+					public boolean isGameStopChoosable() {
+						
+						return true;
 					}
 					
 				}
@@ -1861,6 +1951,8 @@ public class Rules implements GameMessageSender {
 		
 		public abstract void createActions();
 		
+		public abstract boolean isGameStopChoosable();
+		
 		public boolean isInnerRulesGameDependent() {
 			return true;
 		}
@@ -1917,6 +2009,10 @@ public class Rules implements GameMessageSender {
 		
 		public Actions getActions() {
 			return actions;
+		}
+		
+		public GameRule[] getInnerRules() {
+			return innerRules;
 		}
 		
 		public GameRule getParent() {

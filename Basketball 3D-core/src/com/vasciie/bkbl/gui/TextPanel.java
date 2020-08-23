@@ -171,7 +171,9 @@ public class TextPanel extends Text implements InputProcessor {
 
 			else {
 				prevText = text.toString();
-				textChangeListener.onTextChanged(text);
+				
+				if(textChangeListener != null)
+					textChangeListener.onTextChanged(text);
 			}
 		}
 	}

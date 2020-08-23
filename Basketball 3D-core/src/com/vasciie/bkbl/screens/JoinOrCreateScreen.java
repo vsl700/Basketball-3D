@@ -10,7 +10,7 @@ import com.vasciie.bkbl.MyGdxGame;
 import com.vasciie.bkbl.gui.Button;
 import com.vasciie.bkbl.gui.GUIRenderer;
 
-public class PlayerGameTypeScreen implements Screen, GUIRenderer {
+public class JoinOrCreateScreen implements Screen, GUIRenderer {
 
 	MyGdxGame game;
 	
@@ -20,10 +20,10 @@ public class PlayerGameTypeScreen implements Screen, GUIRenderer {
 	
 	BitmapFont font;
 	
-	Button single, multi, goBack;
+	Button create, join, goBack;
 	
 	
-	public PlayerGameTypeScreen(MyGdxGame mg) {
+	public JoinOrCreateScreen(MyGdxGame mg) {
 		game = mg;
 		
 		cam = new OrthographicCamera();
@@ -34,8 +34,8 @@ public class PlayerGameTypeScreen implements Screen, GUIRenderer {
 		font = new BitmapFont();
 		font.getData().setScale(MyGdxGame.GUI_SCALE);
 		
-		single = new Button("Singleplayer", font, Color.ORANGE.cpy().sub(0, 0.3f, 0, 1), true, true, this);
-		multi = new Button("Multiplayer", font, Color.ORANGE.cpy().sub(0, 0.3f, 0, 1), true, true, this);
+		create = new Button("Create", font, Color.ORANGE.cpy().sub(0, 0.3f, 0, 1), true, true, this);
+		join = new Button("Join", font, Color.ORANGE.cpy().sub(0, 0.3f, 0, 1), true, true, this);
 		
 		goBack = new Button("Go Back", font, Color.ORANGE.cpy().sub(0, 0.3f, 0, 1), true, true, this);
 	}
@@ -48,37 +48,38 @@ public class PlayerGameTypeScreen implements Screen, GUIRenderer {
 
 	@Override
 	public void render(float delta) {
-		single.update();
-		multi.update();
+		create.update();
+		join.update();
 		goBack.update();
 		
 		if(goBack.justReleased())
-			game.setScreen(game.main);
-		else if(single.justReleased())
-			game.setScreen(game.gameType);
-		else if(multi.justReleased())
-			game.setScreen(game.joinOrCreate);
+			game.setScreen(game.playerGameType);
+		else if(create.justReleased())
+			game.setScreen(game.rulesChoose);
+		else if(join.justReleased())
+			game.setScreen(game.join);
 		
 		game.renderLogo(batch, cam);
 
-		single.draw();
-		multi.draw();
+		create.draw();
+		join.draw();
 		goBack.draw();
-		
+
 	}
 
 	@Override
 	public void resize(int width, int height) {
 		cam.setToOrtho(false, width, height);
 		
-		single.setSize(game.pixelXByCurrentSize(223 * MyGdxGame.GUI_SCALE), game.pixelYByCurrentSize(30 * MyGdxGame.GUI_SCALE));
-		single.setPos(width / 4 - single.getWidth() / 2, game.pixelYByCurrentSize(260));
+		float btnY = game.pixelYByCurrentSize(260);
+		create.setSize(game.pixelXByCurrentSize(223 * MyGdxGame.GUI_SCALE), game.pixelYByCurrentSize(30 * MyGdxGame.GUI_SCALE));
+		create.setPos(width / 4 - create.getWidth() / 2, btnY - 30);
 		
-		multi.setSize(single.getWidth(), single.getHeight());
-		multi.setPos(width * 3 / 4 - single.getWidth() / 2, single.getY());
+		join.setSize(create.getWidth(), create.getHeight());
+		join.setPos(width * 3 / 4 - create.getWidth() / 2, create.getY());
 		
-		goBack.setSize(single.getWidth(), single.getHeight());
-		goBack.setPos(width / 2 - single.getWidth() / 2, single.getY() / 2);
+		goBack.setSize(create.getWidth(), create.getHeight());
+		goBack.setPos(width / 2 - create.getWidth() / 2, btnY / 2);
 
 	}
 

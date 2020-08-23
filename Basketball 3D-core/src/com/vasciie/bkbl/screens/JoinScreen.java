@@ -9,8 +9,10 @@ import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 import com.vasciie.bkbl.MyGdxGame;
 import com.vasciie.bkbl.gui.Button;
 import com.vasciie.bkbl.gui.GUIRenderer;
+import com.vasciie.bkbl.gui.Label;
+import com.vasciie.bkbl.gui.TextPanel;
 
-public class PlayerGameTypeScreen implements Screen, GUIRenderer {
+public class JoinScreen implements Screen, GUIRenderer {
 
 	MyGdxGame game;
 	
@@ -18,12 +20,14 @@ public class PlayerGameTypeScreen implements Screen, GUIRenderer {
 	ShapeRenderer shape;
 	OrthographicCamera cam;
 	
-	BitmapFont font;
+	BitmapFont font, textFont;
 	
-	Button single, multi, goBack;
+	Label ipDesc;
+	TextPanel ipPanel;
+	Button join, goBack;
 	
 	
-	public PlayerGameTypeScreen(MyGdxGame mg) {
+	public JoinScreen(MyGdxGame mg) {
 		game = mg;
 		
 		cam = new OrthographicCamera();
@@ -34,9 +38,15 @@ public class PlayerGameTypeScreen implements Screen, GUIRenderer {
 		font = new BitmapFont();
 		font.getData().setScale(MyGdxGame.GUI_SCALE);
 		
-		single = new Button("Singleplayer", font, Color.ORANGE.cpy().sub(0, 0.3f, 0, 1), true, true, this);
-		multi = new Button("Multiplayer", font, Color.ORANGE.cpy().sub(0, 0.3f, 0, 1), true, true, this);
+		textFont = new BitmapFont();
+		textFont.getData().setScale(2 * MyGdxGame.GUI_SCALE);
 		
+		
+		ipDesc = new Label("THE IP ADDRESS OF THE HOST OF THE SERVER!", font, Color.BROWN, true, this);
+		
+		ipPanel = new TextPanel(textFont, Color.WHITE, new Color().set(0.8f, 0.4f, 0, 1), this);
+		
+		join = new Button("Join!", font, Color.ORANGE.cpy().sub(0, 0.3f, 0, 1), true, true, this);
 		goBack = new Button("Go Back", font, Color.ORANGE.cpy().sub(0, 0.3f, 0, 1), true, true, this);
 	}
 	
@@ -48,38 +58,38 @@ public class PlayerGameTypeScreen implements Screen, GUIRenderer {
 
 	@Override
 	public void render(float delta) {
-		single.update();
-		multi.update();
+		ipDesc.update();
+		ipPanel.update();
+		join.update();
 		goBack.update();
 		
 		if(goBack.justReleased())
-			game.setScreen(game.main);
-		else if(single.justReleased())
-			game.setScreen(game.gameType);
-		else if(multi.justReleased())
 			game.setScreen(game.joinOrCreate);
 		
 		game.renderLogo(batch, cam);
-
-		single.draw();
-		multi.draw();
-		goBack.draw();
 		
+		ipDesc.draw();
+		ipPanel.draw();
+		join.draw();
+		goBack.draw();
+
 	}
 
 	@Override
 	public void resize(int width, int height) {
 		cam.setToOrtho(false, width, height);
 		
-		single.setSize(game.pixelXByCurrentSize(223 * MyGdxGame.GUI_SCALE), game.pixelYByCurrentSize(30 * MyGdxGame.GUI_SCALE));
-		single.setPos(width / 4 - single.getWidth() / 2, game.pixelYByCurrentSize(260));
+		ipPanel.setSize(300 * MyGdxGame.GUI_SCALE, 45 * MyGdxGame.GUI_SCALE);
+		ipPanel.setPos(width / 2 - ipPanel.getWidth() / 2, height / 2);
 		
-		multi.setSize(single.getWidth(), single.getHeight());
-		multi.setPos(width * 3 / 4 - single.getWidth() / 2, single.getY());
-		
-		goBack.setSize(single.getWidth(), single.getHeight());
-		goBack.setPos(width / 2 - single.getWidth() / 2, single.getY() / 2);
+		ipDesc.setWidth(ipPanel.getWidth());
+		ipDesc.setPos(width / 2 - ipDesc.getWidth() / 2, ipPanel.getY() + ipPanel.getHeight() + 13 * ipDesc.getRows() / 2);
 
+		join.setSize(game.pixelXByCurrentSize(223 * MyGdxGame.GUI_SCALE), game.pixelYByCurrentSize(30 * MyGdxGame.GUI_SCALE));
+		join.setPos(width / 2 - join.getWidth() / 2, ipPanel.getY() / 2);
+		
+		goBack.setSize(join.getWidth(), join.getHeight());
+		goBack.setPos(join.getX(), join.getY() - 13 - goBack.getHeight());
 	}
 
 	@Override
@@ -105,9 +115,10 @@ public class PlayerGameTypeScreen implements Screen, GUIRenderer {
 		batch.dispose();
 		shape.dispose();
 		font.dispose();
+		textFont.dispose();
 
 	}
-
+	
 	@Override
 	public SpriteBatch getSpriteBatch() {
 		return batch;
