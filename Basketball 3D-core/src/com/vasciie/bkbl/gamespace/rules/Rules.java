@@ -726,7 +726,7 @@ public class Rules implements GameMessageSender {
 					public GameRule[] createInnerRules() {
 						
 						return new GameRule[] {
-								new GameRule(rules, this, "score", "SCORE!", map) {
+								new GameRule(rules, this, "basket_score", "SCORE!", map) {
 
 									@Override
 									public void resetRule() {

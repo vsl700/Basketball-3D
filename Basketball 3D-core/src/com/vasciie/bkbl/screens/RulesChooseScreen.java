@@ -25,8 +25,8 @@ public class RulesChooseScreen implements Screen, GUIRenderer {
 	
 	BitmapFont font, textFont, descFont;
 	
-	Label desc, ruleName, scoresDesc;
-	CheckButton[] includeRule, gameStop, autoAct;
+	Label desc, ruleName, scoresDesc, innerRuleDesc;
+	CheckButton[][] includeRule, gameStop, autoAct;
 	Button[] rulePages;
 	Button[][] innerRulePages;
 	Button next, goBack, selectAll;
@@ -52,9 +52,11 @@ public class RulesChooseScreen implements Screen, GUIRenderer {
 		
 		ruleName = new Label("", textFont, Color.RED, false, this);
 		
+		innerRuleDesc = new Label("Inner Rules: ", textFont, Color.RED, false, this);
+		
 		desc = new Label("Select The Game Rules You Want To Include In The Game!", textFont, Color.GREEN, false, this);
 		
-		scoresDesc = new Label("THE MAXIMUM SCORES AT WHICH THE GAME SHOULD BE OVER!", font, Color.BROWN, true, this);
+		scoresDesc = new Label("AMOUNT OF TARGET POINTS! (0 for endless)", font, Color.BROWN, true, this);
 		
 		scores = new NumUpDown(font, textFont, Color.WHITE, Color.BROWN, new Color().set(0.8f, 0.4f, 0, 1), 0, (int) Float.MAX_VALUE, this);
 		
@@ -72,29 +74,60 @@ public class RulesChooseScreen implements Screen, GUIRenderer {
 			
 			innerRulePages = new Button[rulePages.length][];
 			
-			gameStop = new CheckButton[rulePages.length];
-			autoAct = new CheckButton[rulePages.length];
+			includeRule = new CheckButton[rulePages.length][];
+			gameStop = new CheckButton[rulePages.length][];
+			autoAct = new CheckButton[rulePages.length][];
 			
 			for(int i = 0; i < rulePages.length; i++) {
-				rulePages[i] = new Button(i + 1 + "", font, Color.ORANGE.cpy().sub(0, 0.3f, 0, 1), true, true, this);
+				rulePages[i] = new Button(i + 1 + "", font, Color.ORANGE.cpy().sub(0, 0.3f, 0, 1), true, true, this); 
+				
 				
 				if(tempRules.getGameRules()[i].getInnerRules() != null) {
 					innerRulePages[i] = new Button[tempRules.getGameRules()[i].getInnerRules().length];
 					
-					for(int j = 0; j < innerRulePages[i].length; j++) {
-						innerRulePages[i][j] = new Button((i + 1) + "." + (j + 1), font, Color.ORANGE.cpy().sub(0, 0.3f, 0, 1), true, true, this);
+					gameStop[i] = new CheckButton[innerRulePages.length + 1];
+					autoAct[i] = new CheckButton[innerRulePages.length + 1];
+					
+					if(tempRules.getGameRules()[i].isGameStopChoosable()) {
+						gameStop[i][0] = new CheckButton("On Triggered Rule - Game Stop", font, Color.ORANGE.cpy().sub(0, 0.3f, 0, 1), true, true, this);
+						autoAct[i][0] = new CheckButton("On Triggered Rule - Auto-acting", font, Color.ORANGE.cpy().sub(0, 0.3f, 0, 1), true, true, this);
 					}
-				}else innerRulePages[i] = new Button[0];
-				
-				if(tempRules.getGameRules()[i].isGameStopChoosable()) {
-					gameStop[i] = new CheckButton("On Triggered Rule - Game Stop", font, Color.ORANGE.cpy().sub(0, 0.3f, 0, 1), true, true, this);
-					autoAct[i] = new CheckButton("On Triggered Rule - Auto-acting", font, Color.ORANGE.cpy().sub(0, 0.3f, 0, 1), true, true, this);
+					
+					includeRule[i] = new CheckButton[innerRulePages[i].length + 1];
+					includeRule[i][0] = new CheckButton("Include Rule", font, Color.ORANGE.cpy().sub(0, 0.3f, 0, 1), true, true, this);
+					
+					for(int j = 0; j < innerRulePages[i].length; j++) {
+						includeRule[i][j + 1] = new CheckButton("Include Rule", font, Color.ORANGE.cpy().sub(0, 0.3f, 0, 1), true, true, this);
+						
+						if (tempRules.getGameRuleById(tempRules.getGameRules()[i].getInnerRules()[j].getId()) == null) {
+							innerRulePages[i][j] = new Button((i + 1) + "." + (j + 1), font, Color.ORANGE.cpy().sub(0, 0.3f, 0, 1), true, true, this);
+							if (tempRules.getGameRules()[i].getInnerRules()[j].isGameStopChoosable()) {
+								gameStop[i][j + 1] = new CheckButton("On Triggered Rule - Game Stop", font, Color.ORANGE.cpy().sub(0, 0.3f, 0, 1), true, true, this);
+								autoAct[i][j + 1] = new CheckButton("On Triggered Rule - Auto-acting", font, Color.ORANGE.cpy().sub(0, 0.3f, 0, 1), true, true, this);
+							}
+						}
+					}
+				}else {
+					innerRulePages[i] = new Button[0];
+					includeRule[i]  = new CheckButton[1];
+					includeRule[i][0] = new CheckButton("Include Rule", font, Color.ORANGE.cpy().sub(0, 0.3f, 0, 1), true, true, this);
+					
+					gameStop[i] = new CheckButton[1];
+					autoAct[i] = new CheckButton[1];
+					
+					if(tempRules.getGameRules()[i].isGameStopChoosable()) {
+						gameStop[i][0] = new CheckButton("On Triggered Rule - Game Stop", font, Color.ORANGE.cpy().sub(0, 0.3f, 0, 1), true, true, this);
+						autoAct[i][0] = new CheckButton("On Triggered Rule - Auto-acting", font, Color.ORANGE.cpy().sub(0, 0.3f, 0, 1), true, true, this);
+					}
 				}
+				
 			}
 			
+			ruleName.setText(game.getMap().getRules().getGameRules()[page].getName());
 			
 		}
-
+		
+		
 	}
 
 	@Override
@@ -104,14 +137,26 @@ public class RulesChooseScreen implements Screen, GUIRenderer {
 			
 			if(rulePages[i].justReleased()) {
 				page = i;
-				innerPage = 0;
+				innerPage = -1;
 				ruleName.setText(game.getMap().getRules().getGameRules()[i].getName());
 				resizeRuleName();
 			}
 		}
 		
 		for(int j = 0; j < innerRulePages[page].length; j++) {
+			if(innerRulePages[page][j] == null)
+				continue;
+			
 			innerRulePages[page][j].update();
+			
+			if(!innerRuleDesc.isRenderable())
+				innerRuleDesc.update();
+			
+			if(innerRulePages[page][j].justReleased()) {
+				innerPage = j;
+				ruleName.setText(game.getMap().getRules().getGameRules()[page].getInnerRules()[j].getName());
+				resizeRuleName();
+			}
 		}
 		
 		desc.update();
@@ -119,6 +164,45 @@ public class RulesChooseScreen implements Screen, GUIRenderer {
 		ruleName.update();
 		
 		selectAll.update();
+		
+		if(selectAll.justReleased()) {
+			boolean flag = false;
+			for(int i = 0; i < includeRule.length; i++) {
+				if(!includeRule[i][0].isToggled()) {
+					includeRule[i][0].setToggled(true);
+					flag = true;
+				}
+				
+				for(int j = 1; j < includeRule[i].length; j++) {
+					if(!includeRule[i][j].isToggled()) {
+						includeRule[i][j].setToggled(true);
+						flag = true;
+					}
+				}
+			}
+			
+			if(!flag) { //Do a deselection of all check buttons
+				for(int i = 0; i < includeRule.length; i++) {
+					includeRule[i][0].setToggled(false);
+					
+					for(int j = 1; j < includeRule[i].length; j++) {
+						includeRule[i][j].setToggled(false);
+					}
+				}
+			}
+		}
+		
+		includeRule[page][innerPage + 1].update();
+		
+		if(gameStop[page][innerPage + 1] != null) {
+			gameStop[page][innerPage + 1].update();
+			autoAct[page][innerPage + 1].update();
+		}
+		
+		if (ruleName.getText().equals("SCORE!")) {
+			scores.update();
+			scoresDesc.update();
+		}
 		
 		next.update();
 		goBack.update();
@@ -133,6 +217,9 @@ public class RulesChooseScreen implements Screen, GUIRenderer {
 		}
 		
 		for(int j = 0; j < innerRulePages[page].length; j++) {
+			if(innerRulePages[page][j] == null)
+				continue;
+			
 			innerRulePages[page][j].draw();
 		}
 		
@@ -140,7 +227,19 @@ public class RulesChooseScreen implements Screen, GUIRenderer {
 		
 		ruleName.draw();
 		
+		innerRuleDesc.draw();
+		
+		includeRule[page][innerPage + 1].draw();
+		
+		if(gameStop[page][innerPage + 1] != null) {
+			gameStop[page][innerPage + 1].draw();
+			autoAct[page][innerPage + 1].draw();
+		}
+		
 		selectAll.draw();
+		
+		scores.draw();
+		scoresDesc.draw();
 		
 		next.draw();
 		goBack.draw();
@@ -149,6 +248,35 @@ public class RulesChooseScreen implements Screen, GUIRenderer {
 	
 	private void resizeRuleName() {
 		ruleName.setX(cam.viewportWidth / 2);
+		
+		resizeIncludeRule(page, innerPage + 1);
+	}
+	
+	private void resizeIncludeRule(int i, int j) {
+		float checkBtnSize = 40;
+		includeRule[i][j].setSize(checkBtnSize, checkBtnSize);
+		includeRule[i][j].setPos(ruleName.getX() + ruleName.textSize() / 2 + 20, ruleName.getY() - checkBtnSize / 2);
+		
+		if(gameStop[i][j] != null) {
+			gameStop[i][j].setSize(checkBtnSize, checkBtnSize);
+			gameStop[i][j].setPos(includeRule[i][j].getX(), includeRule[i][j].getY() - checkBtnSize - 10);
+			
+			autoAct[i][j].setSize(checkBtnSize, checkBtnSize);
+			autoAct[i][j].setPos(includeRule[i][j].getX(), gameStop[i][j].getY() - checkBtnSize - 10);
+		}
+		
+		if(innerRulePages[i].length > 0 && innerRulePages[i][0] != null) {
+			innerRuleDesc.setWidth(0);
+			innerRuleDesc.setPos(innerRulePages[i][0].getX() - innerRuleDesc.textSize() / 2 - 10, innerRulePages[i][0].getY() + textFont.getLineHeight() / 4);
+		}
+		
+		if(ruleName.getText().equals("SCORE!")) {
+			scores.setSize(game.pixelXByCurrentSize(74 * MyGdxGame.GUI_SCALE), game.pixelYByCurrentSize(45 * MyGdxGame.GUI_SCALE));
+			scores.setPos(cam.viewportWidth / 2 - scores.getTotalWidth() / 2, rulePages[rulePages.length - 1].getY() + rulePages[rulePages.length - 1].getHeight() + 10);
+			
+			scoresDesc.setWidth(scores.getTotalWidth());
+			scoresDesc.setPos(scores.getX(), scores.getY() + scores.getHeight() + 10);
+		}
 	}
 
 	@Override
@@ -169,8 +297,8 @@ public class RulesChooseScreen implements Screen, GUIRenderer {
 		float btnWidth2 = game.pixelXByCurrentSize(60 * MyGdxGame.GUI_SCALE);
 		float btnSpace = 40;
 		float firstLevelY = game.getLogoY() - btnHeight * 3f, bottomLevelY = next.getY() + btnHeight * 4, innerLevelY = firstLevelY - btnHeight - 15;
-		float[][] tempXs = GameTools.beautyX1(rulePages.length, 2, width, btnSpace, btnWidth2);
 		
+		float[][] tempXs = GameTools.beautyX1(rulePages.length, 2, width, btnSpace, btnWidth2);
 		
 		for (int i = 0; i < tempXs[0].length; i++) {
 			rulePages[i].setSize(btnWidth2, btnHeight);
@@ -180,19 +308,22 @@ public class RulesChooseScreen implements Screen, GUIRenderer {
 				float[] tempXs2 = GameTools.beautyX1(innerRulePages[i].length, width, btnSpace, btnWidth2);
 				
 				for(int j = 0; j < innerRulePages[i].length; j++) {
+					if(innerRulePages[i][j] == null)
+						continue;
+					
 					innerRulePages[i][j].setSize(btnWidth2, btnHeight);
 					innerRulePages[i][j].setPos(tempXs2[j], innerLevelY);
 				}
 			}
 		}
 		
-		ruleName.setSize(0, 0);//We want the label to calculate the text width which is done by changing either a size or a pos
-		ruleName.setPos(width / 2, innerLevelY - 26);
-		
 		for (int i = 0; i < tempXs[1].length; i++) {
 			rulePages[i + tempXs[0].length].setSize(btnWidth2, btnHeight);
 			rulePages[i + tempXs[0].length].setPos(tempXs[1][i], bottomLevelY);
 		}
+		
+		ruleName.setY(innerLevelY - 26);
+		resizeRuleName();
 		
 		selectAll.setSize(rulePages[rulePages.length - 1].getX() + rulePages[rulePages.length - 1].getWidth() - rulePages[tempXs[0].length].getX(), btnHeight);
 		selectAll.setPos(width / 2 - selectAll.getWidth() / 2, rulePages[rulePages.length - 1].getY() - btnHeight - 30);
@@ -222,7 +353,7 @@ public class RulesChooseScreen implements Screen, GUIRenderer {
 		shape.dispose();
 		font.dispose();
 		textFont.dispose();
-
+		descFont.dispose();
 	}
 	
 	@Override
