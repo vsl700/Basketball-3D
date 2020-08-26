@@ -38,6 +38,7 @@ public class Rules implements GameMessageSender {
 	
 	GameMessageListener rulesListener; //That's here because the GameScreen does not have any connection with the GameMap or Rules so I had to make the GameScreen an interface
 	
+	
 	public Rules(GameMap map, final GameMessageListener rulesListener) {
 		this.map = map;
 		this.rulesListener = rulesListener;
@@ -55,7 +56,7 @@ public class Rules implements GameMessageSender {
 					}
 					
 					@Override
-					public boolean checkRule() {
+					public boolean update() {
 						Player tempPlayer = map.getHoldingPlayer();
 						
 						if(thrower != null && (thrower instanceof Teammate && map.getTeammates().size() > 1 || thrower instanceof Opponent && map.getOpponents().size() > 1) && !thrower.isBallFree())
@@ -357,7 +358,7 @@ public class Rules implements GameMessageSender {
 									}
 
 									@Override
-									public boolean checkRule() {
+									public boolean update() {
 										//Terrain terrain = map.getTerrain();
 										
 										//Vector3 closestWallPos, secondCloseWallPos;
@@ -445,7 +446,7 @@ public class Rules implements GameMessageSender {
 									}
 
 									@Override
-									public boolean checkRule() {
+									public boolean update() {
 										if(time < 0) {
 											parent.setRuleTriggerer(ruleTriggerer = thrower);
 											map.playerReleaseBall();
@@ -495,7 +496,7 @@ public class Rules implements GameMessageSender {
 									}
 
 									@Override
-									public boolean checkRule() {
+									public boolean update() {
 										if(map.getHoldingPlayer() == null)
 											return false;
 										
@@ -557,7 +558,7 @@ public class Rules implements GameMessageSender {
 					boolean readyToCheck;
 					
 					@Override
-					public boolean checkRule() {
+					public boolean update() {
 						Player temp = map.getHoldingPlayer();
 						
 						if (temp != null) {
@@ -755,7 +756,7 @@ public class Rules implements GameMessageSender {
 									}
 
 									@Override
-									public boolean checkRule() {
+									public boolean update() {
 										if(!readyToCheck)
 											return false;
 										
@@ -816,7 +817,7 @@ public class Rules implements GameMessageSender {
 					float timer = defaultTime;
 					
 					@Override
-					public boolean checkRule() {
+					public boolean update() {
 						Player temp = map.getHoldingPlayer();
 						if(temp == null || !temp.equals(recentHolder)) {
 							timer = defaultTime;
@@ -918,7 +919,7 @@ public class Rules implements GameMessageSender {
 					float timer = defaultTime;
 					
 					@Override
-					public boolean checkRule() {
+					public boolean update() {
 						Player temp = map.getHoldingPlayer();
 						if(temp == null || !temp.equals(recentHolder)) {
 							timer = defaultTime;
@@ -1019,7 +1020,7 @@ public class Rules implements GameMessageSender {
 					boolean crossed, justTouched;
 					
 					@Override
-					public boolean checkRule() {
+					public boolean update() {
 						Player holdingPlayer = map.getHoldingPlayer();
 						Ball ball = map.getBall();
 						
@@ -1227,7 +1228,7 @@ public class Rules implements GameMessageSender {
 					}
 
 					@Override
-					public boolean checkRule() {
+					public boolean update() {
 						Player holdingPlayer = map.getHoldingPlayer();
 						if(holdingPlayer == null || !holdingPlayer.isCurrentlyAiming() && !holdingPlayer.isShooting()) {
 							time = defaultTime;
@@ -1321,7 +1322,7 @@ public class Rules implements GameMessageSender {
 					}
 
 					@Override
-					public boolean checkRule() {
+					public boolean update() {
 						if(map.getDifficulty() < 2)
 							return false;
 						
@@ -1421,7 +1422,7 @@ public class Rules implements GameMessageSender {
 					}
 
 					@Override
-					public boolean checkRule() {
+					public boolean update() {
 						Player holdingPlayer = map.getHoldingPlayer();
 						if(holdingPlayer == null && recentHolder == null)
 							return false;
@@ -1532,7 +1533,7 @@ public class Rules implements GameMessageSender {
 					}
 
 					@Override
-					public boolean checkRule() {
+					public boolean update() {
 						if(map.getHoldingPlayer() != null/* || !map.getBall().isGrounded()*/) {
 							time = defaultTime;
 							return false;
@@ -1630,7 +1631,7 @@ public class Rules implements GameMessageSender {
 					}
 
 					@Override
-					public boolean checkRule() {
+					public boolean update() {
 						if(map.getDifficulty() == 0)
 							return false;
 						
@@ -1747,7 +1748,7 @@ public class Rules implements GameMessageSender {
 					}
 
 					@Override
-					public boolean checkRule() {
+					public boolean update() {
 						if(map.getRecentHolder() != null && (map.getRecentHolder().isCurrentlyAiming() || map.getRecentHolder().isShooting())) {
 							
 							holderInZone = map.getRecentHolder().isInAwayBasketZone();
@@ -1879,8 +1880,10 @@ public class Rules implements GameMessageSender {
 	}
 	
 	public void resetRules() {
-		for(GameRule rule : gameRules)
+		for(GameRule rule : gameRules) {
 			rule.resetRule();
+			rule.setActive(true);
+		}
 	}
 	
 	public void clearTriggeredRule() {
@@ -1929,6 +1932,9 @@ public class Rules implements GameMessageSender {
 		
 		static final Vector3 occurPlace = new Vector3();
 		
+		boolean active;
+		
+		
 		public GameRule(Rules rules, GameRule parent, String id, String name, GameMap map) {
 			this.id = id;
 			this.name = name;
@@ -1940,6 +1946,8 @@ public class Rules implements GameMessageSender {
 			innerRules = createInnerRules();
 			
 			createActions();
+			
+			active = true;
 		}
 		
 		/**
@@ -1957,11 +1965,18 @@ public class Rules implements GameMessageSender {
 			return true;
 		}
 		
+		public boolean checkRule() {
+			if(active)
+				return update();
+			
+			return false;
+		}
+		
 		/**
 		 * To see if the following rule is broken, this method should be called to which should check that for each rule
 		 * @return true if the rule is broken
 		 */
-		public abstract boolean checkRule();
+		protected abstract boolean update();
 		
 		public boolean arePlayersReady() {
 			if(actions.isEmpty()) {
@@ -2047,6 +2062,14 @@ public class Rules implements GameMessageSender {
 		
 		public Player getRuleTriggerer() {
 			return ruleTriggerer;
+		}
+		
+		public void setActive(boolean active) {
+			this.active = active;
+		}
+		
+		public boolean isActive() {
+			return active;
 		}
 		
 		

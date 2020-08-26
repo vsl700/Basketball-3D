@@ -23,14 +23,14 @@ public class ChallengeLevelScreen implements Screen, GUIRenderer, GameMessageSen
 	
 	ShapeRenderer shape;
 	SpriteBatch batch;
-	BitmapFont font, bigFont, medFont, checkBtnFont;
+	BitmapFont font, bigFont, medFont, checkBtnFont, textFont;
 	OrthographicCamera cam;
 	
 	Button play, goBack;
 	Button[] challengePages;
 	CheckButton[][] challengeOptions;
 	CheckButton[] playChallenge;
-	Label challengeName, losableChallenge, urgedChallenge;
+	Label challengeName, losableChallenge, urgedChallenge, desc;
 	
 	int index;
 	
@@ -49,6 +49,8 @@ public class ChallengeLevelScreen implements Screen, GUIRenderer, GameMessageSen
 		//checkBtnFont.setColor(Color.BLUE);
 		medFont = new BitmapFont();
 		medFont.getData().setScale(2);
+		textFont = new BitmapFont();
+		textFont.getData().setScale(2 * MyGdxGame.GUI_SCALE);
 		bigFont = new BitmapFont();
 		bigFont.getData().setScale(3);
 		
@@ -60,6 +62,7 @@ public class ChallengeLevelScreen implements Screen, GUIRenderer, GameMessageSen
 		challengeName = new Label("", medFont, Color.RED, false, this);
 		losableChallenge = new Label("IF THIS CHALLENGE BREAKS, YOU LOSE!", checkBtnFont, Color.RED, false, this);
 		urgedChallenge = new Label("YOU WIN ONLY IF THIS CHALLENGE BREAKS!", checkBtnFont, Color.BLUE, false, this);
+		desc = new Label("Select The Game Challenges You Want To Include In The Game!", textFont, Color.GREEN, false, this);
 	}
 	
 	@Override
@@ -127,6 +130,8 @@ public class ChallengeLevelScreen implements Screen, GUIRenderer, GameMessageSen
 		play.update();
 		goBack.update();
 		
+		desc.update();
+		
 		challengeName.update();
 		
 		playChallenge[index].update();
@@ -184,6 +189,8 @@ public class ChallengeLevelScreen implements Screen, GUIRenderer, GameMessageSen
 		play.draw();
 		goBack.draw();
 		
+		desc.draw();
+		
 		challengeName.draw();
 		
 		playChallenge[index].draw();
@@ -206,9 +213,11 @@ public class ChallengeLevelScreen implements Screen, GUIRenderer, GameMessageSen
 		goBack.setSize(btnWidth, btnHeight);
 		goBack.setPos(width * 3 / 4 - btnWidth / 2, 50);
 		
+		desc.setPos(width / 2 - 13, game.getLogoY() - 13 * MyGdxGame.GUI_SCALE);
+		
 		float btnWidth2 = game.pixelXByCurrentSize(60 * MyGdxGame.GUI_SCALE);
 		float btnSpace = 40;
-		float firstLevelY = game.getLogoY() - btnHeight * 1.5f, bottomLevelY = height / 4 + btnHeight / 2;
+		float firstLevelY = game.getLogoY() - btnHeight * 3f, bottomLevelY = height / 4 + btnHeight / 2;
 		
 		//int parts = (int) Math.ceil(challengePages.length / 2.0);
 		float[][] tempXs = GameTools.beautyX1(challengePages.length, 2, width, btnSpace, btnWidth2);
@@ -218,7 +227,7 @@ public class ChallengeLevelScreen implements Screen, GUIRenderer, GameMessageSen
 		}
 		
 		//challengeName.setWidth(btnWidth);
-		challengeName.setPos(width / 2/* - challengeName.getWidth() / 2*/, firstLevelY - 26 * 2);
+		challengeName.setPos(width / 2/* - challengeName.getWidth() / 2*/, firstLevelY - 26);
 		
 		losableChallenge.setPos(width / 2, challengeName.getY() - 30);
 		urgedChallenge.setPos(losableChallenge.getX(), losableChallenge.getY());
@@ -268,6 +277,7 @@ public class ChallengeLevelScreen implements Screen, GUIRenderer, GameMessageSen
 		bigFont.dispose();
 		medFont.dispose();
 		checkBtnFont.dispose();
+		textFont.dispose();
 	}
 	
 	@Override

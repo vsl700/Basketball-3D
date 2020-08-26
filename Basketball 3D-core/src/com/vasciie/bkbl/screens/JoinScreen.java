@@ -6,13 +6,14 @@ import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.g2d.BitmapFont;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
+import com.vasciie.bkbl.GameMessageSender;
 import com.vasciie.bkbl.MyGdxGame;
 import com.vasciie.bkbl.gui.Button;
 import com.vasciie.bkbl.gui.GUIRenderer;
 import com.vasciie.bkbl.gui.Label;
 import com.vasciie.bkbl.gui.TextPanel;
 
-public class JoinScreen implements Screen, GUIRenderer {
+public class JoinScreen implements Screen, GUIRenderer, GameMessageSender {
 
 	MyGdxGame game;
 	
@@ -65,6 +66,16 @@ public class JoinScreen implements Screen, GUIRenderer {
 		
 		if(goBack.justReleased())
 			game.setScreen(game.joinOrCreate);
+		else if(join.justReleased()) {
+			try {
+				game.getMap().getMultiplayer().join(ipPanel.getText());
+			}catch(Exception e) {
+				String tempStr = e.toString();
+				game.sendMessage(tempStr.substring(0, tempStr.indexOf(":27960")), Color.RED, this, true);
+				
+				e.printStackTrace();
+			}
+		}
 		
 		game.renderLogo(batch, cam);
 		
@@ -132,6 +143,11 @@ public class JoinScreen implements Screen, GUIRenderer {
 	@Override
 	public OrthographicCamera getCam() {
 		return cam;
+	}
+
+	@Override
+	public void messageReceived() {
+		
 	}
 
 }

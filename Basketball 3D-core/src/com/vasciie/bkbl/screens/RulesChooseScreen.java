@@ -207,8 +207,29 @@ public class RulesChooseScreen implements Screen, GUIRenderer {
 		next.update();
 		goBack.update();
 		
-		if(goBack.justReleased())
+		if(goBack.justReleased()) {
+			game.getMap().stopMultiplayer();
+			
 			game.setScreen(game.joinOrCreate);
+		}else if(next.justReleased()) {
+			Rules tempRules = game.getMap().getRules();
+			for(int i = 0; i < includeRule.length; i++) {
+				if(!includeRule[i][0].isToggled()) {
+					tempRules.getGameRules()[i].setActive(false);
+				}
+				
+				for(int j = 1; j < includeRule[i].length - 1; j++) {
+					if(!includeRule[i][j].isToggled()) {
+						tempRules.getGameRules()[i].getInnerRules()[j].setActive(false);
+					}
+				}
+			}
+			
+			game.getMap().setTargetScore(scores.getOption());
+			
+			//TODO Add something about the GAMESTOP and AUTO-ACTING for the score rule!
+			game.setScreen(game.challenge);
+		}
 		
 		game.renderLogo(batch, cam);
 

@@ -39,6 +39,7 @@ import com.vasciie.bkbl.gamespace.entities.Player;
 import com.vasciie.bkbl.gamespace.levels.Challenges;
 import com.vasciie.bkbl.gamespace.levels.TutorialLevels;
 import com.vasciie.bkbl.gamespace.levels.TutorialLevels.TutorialLevel;
+import com.vasciie.bkbl.gamespace.multiplayer.Multiplayer;
 import com.vasciie.bkbl.gamespace.objects.Basket;
 import com.vasciie.bkbl.gamespace.objects.Camera;
 import com.vasciie.bkbl.gamespace.objects.GameObject;
@@ -104,6 +105,8 @@ public class GameMap implements GameMessageSender {
     TutorialLevel currentTutorialLevel;
     
     Challenges challenges;
+    
+    Multiplayer multiplayer;
 
     ArrayList<Player> teammates;
     ArrayList<Player> opponents;
@@ -138,6 +141,7 @@ public class GameMap implements GameMessageSender {
 
     int teamScore, oppScore;
     int mainPlayerScore;
+    int targetScore;
 
     int difficulty = 0;
 
@@ -180,6 +184,8 @@ public class GameMap implements GameMessageSender {
         
         challenges = new Challenges(this, messageListener);
         
+        multiplayer = new Multiplayer(this);
+        
         zones = new Zones(this);
 
         mCache = new ModelCache();
@@ -204,6 +210,8 @@ public class GameMap implements GameMessageSender {
 
         teammates = new ArrayList<Player>(5);
         opponents = new ArrayList<Player>(5);
+        
+        targetScore = 15;
     }
     
     private void createPhysics() {
@@ -559,10 +567,13 @@ public class GameMap implements GameMessageSender {
         //MyGdxGame.clearColor();
 
         teamScore = oppScore = mainPlayerScore = 0;
+        targetScore = 15;
         
         if(isTutorialMode())
         	currentTutorialLevel.reset();
         currentTutorialLevel = null;
+        
+        stopMultiplayer();
         
         //challenges.reset();
 
@@ -962,6 +973,8 @@ public class GameMap implements GameMessageSender {
 
             e.dispose();
         }
+
+        stopMultiplayer();
     }
 
     private static final Vector3 tempVec = new Vector3();
@@ -1119,6 +1132,14 @@ public class GameMap implements GameMessageSender {
     	
     	oppScore+= add;
     }
+    
+    public void stopMultiplayer() {
+    	if(multiplayer.isMultiplayer()) {
+        	if(multiplayer.isServer())
+        		multiplayer.quit();
+        	else multiplayer.disconnect();
+        }
+    }
 
     public btDynamicsWorld getDynamicsWorld() {
         return dynamicsWorld;
@@ -1162,6 +1183,10 @@ public class GameMap implements GameMessageSender {
 	
 	public Challenges getChallenges() {
 		return challenges;
+	}
+
+	public Multiplayer getMultiplayer() {
+		return multiplayer;
 	}
 
 	public Player getMainPlayer() {
@@ -1252,6 +1277,10 @@ public class GameMap implements GameMessageSender {
         
         currentTutorialLevel.setup();
     }
+    
+    public void setTargetScore(int targetScore) {
+    	this.targetScore = targetScore;
+    }
 
     public int getCurrentPlayerHoldTeam() {
         return currentPlayerHoldTeam;
@@ -1267,6 +1296,10 @@ public class GameMap implements GameMessageSender {
 
     public int getOppScore() {
         return oppScore;
+    }
+    
+    public int getTargetScore() {
+    	return targetScore;
     }
 
     public int getMainPlayerScore() {

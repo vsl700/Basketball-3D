@@ -54,10 +54,17 @@ public class JoinOrCreateScreen implements Screen, GUIRenderer {
 		
 		if(goBack.justReleased())
 			game.setScreen(game.playerGameType);
-		else if(create.justReleased())
+		else if(create.justReleased()) {
+			try {
+				game.getMap().getMultiplayer().create();
+			}catch(Exception e) {
+				e.printStackTrace();
+			}
+			
 			game.setScreen(game.rulesChoose);
-		else if(join.justReleased())
+		}else if(join.justReleased()) {
 			game.setScreen(game.join);
+		}
 		
 		game.renderLogo(batch, cam);
 
