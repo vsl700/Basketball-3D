@@ -140,7 +140,6 @@ public class GameMap implements GameMessageSender {
     int currentPlayerHoldTeam, currentPlayerHoldOpp;
 
     int teamScore, oppScore;
-    int mainPlayerScore;
     int targetScore;
 
     int difficulty = 0;
@@ -166,7 +165,8 @@ public class GameMap implements GameMessageSender {
 
 				@Override
 				public void run() {
-					dynamicsWorld.stepSimulation(Gdx.graphics.getDeltaTime() * gameSpeed, 5, 1f / 30f);
+					if(shouldMakeUpdates())
+						dynamicsWorld.stepSimulation(Gdx.graphics.getDeltaTime() * gameSpeed, 5, 1f / 30f);
 				}
 
 			};
@@ -361,89 +361,102 @@ public class GameMap implements GameMessageSender {
         else index2 = lastIndex + 1;
         
         int playerIndex = 1;
+        boolean addCollisions = shouldMakeUpdates();
 
         for (int i = 0; i < countTeam; i++) {
             Player teammate = EntityType.createPlayer(EntityType.TEAMMATE.getId(), this, new Vector3(spawnCoords[i][0], spawnCoords[i][1], spawnCoords[i][2]));
-            for (btRigidBody co : teammate.getBodies()) {
-                co.setUserValue(index2);
-                co.setCollisionFlags(co.getCollisionFlags() | btCollisionObject.CollisionFlags.CF_CUSTOM_MATERIAL_CALLBACK);
+            
+			if (addCollisions) {
+				for (btRigidBody co : teammate.getBodies()) {
+					co.setUserValue(index2);
+					co.setCollisionFlags(co.getCollisionFlags() | btCollisionObject.CollisionFlags.CF_CUSTOM_MATERIAL_CALLBACK);
 
-                dynamicsWorld.addRigidBody(co, ENTITY_FLAG, ALL_FLAG);
-                co.setContactCallbackFlag(ENTITY_FLAG);
-                co.setContactCallbackFilter(ALL_FLAG);
-                if (teammate.getMainBody().equals(co)) {
-                    objectsMap.put(index2, EntityType.TEAMMATE.getId());
-                } else {
-                    objectsMap.put(index2, EntityType.TEAMMATE.getId() + "Hand");
-                }
+					dynamicsWorld.addRigidBody(co, ENTITY_FLAG, ALL_FLAG);
+					co.setContactCallbackFlag(ENTITY_FLAG);
+					co.setContactCallbackFilter(ALL_FLAG);
+					if (teammate.getMainBody().equals(co)) {
+						objectsMap.put(index2, EntityType.TEAMMATE.getId());
+					} else {
+						objectsMap.put(index2, EntityType.TEAMMATE.getId() + "Hand");
+					}
 
-                collObjsInEntityMap.put(co, teammate);
-                collObjsValsMap.put(index2, co);
+					collObjsInEntityMap.put(co, teammate);
+					collObjsValsMap.put(index2, co);
 
-                index2++;
-            }
+					index2++;
+				}
 
-            for (btCollisionObject co : teammate.getCollisionObjects()) {
-                co.setUserValue(index2);
-                co.setCollisionFlags(co.getCollisionFlags() | btCollisionObject.CollisionFlags.CF_CUSTOM_MATERIAL_CALLBACK);
+				for (btCollisionObject co : teammate.getCollisionObjects()) {
+					co.setUserValue(index2);
+					co.setCollisionFlags(co.getCollisionFlags() | btCollisionObject.CollisionFlags.CF_CUSTOM_MATERIAL_CALLBACK);
 
-                dynamicsWorld.addCollisionObject(co, SPECIAL_FLAG, ENT_SPECIAL_FLAG);
-                co.setContactCallbackFlag(SPECIAL_FLAG);
-                co.setContactCallbackFilter(ENT_SPECIAL_FLAG);
+					dynamicsWorld.addCollisionObject(co, SPECIAL_FLAG, ENT_SPECIAL_FLAG);
+					co.setContactCallbackFlag(SPECIAL_FLAG);
+					co.setContactCallbackFilter(ENT_SPECIAL_FLAG);
 
-                objectsMap.put(index2, EntityType.TEAMMATE.getId() + "Obj");
+					objectsMap.put(index2, EntityType.TEAMMATE.getId() + "Obj");
 
-                collObjsInEntityMap.put(co, teammate);
-                collObjsValsMap.put(index2, co);
+					collObjsInEntityMap.put(co, teammate);
+					collObjsValsMap.put(index2, co);
 
-                index2++;
-            }
+					index2++;
+				}
+			}
 
             teammate.turnY(180);
-            teammate.setCollisionTransform(true);
+            
+            if(addCollisions)
+            	teammate.setCollisionTransform(true);
 
             teammates.add(teammate);
 
             teammate.setPlayerIndex(playerIndex);
             playerIndex++;
+            
+            if(!multiplayer.isMultiplayer()) {
+            	
+            }
         }
 
         playerIndex = 1;
         for (int i = 0; i < countOpp; i++) {
             Player opponent = EntityType.createPlayer(EntityType.OPPONENT.getId(), this, new Vector3(spawnCoords[i][0], spawnCoords[i][1], -spawnCoords[i][2]));
-            for (btRigidBody co : opponent.getBodies()) {
-                co.setUserValue(index2);
-                co.setCollisionFlags(co.getCollisionFlags() | btCollisionObject.CollisionFlags.CF_CUSTOM_MATERIAL_CALLBACK);
-                dynamicsWorld.addRigidBody(co, ENTITY_FLAG, ALL_FLAG);
-                co.setContactCallbackFlag(ENTITY_FLAG);
-                co.setContactCallbackFilter(ALL_FLAG);
-                if (opponent.getMainBody().equals(co)) {
-                    objectsMap.put(index2, EntityType.OPPONENT.getId());
-                } else {
-                    objectsMap.put(index2, EntityType.OPPONENT.getId() + "Hand");
-                }
+            
+			if (addCollisions) {
+				for (btRigidBody co : opponent.getBodies()) {
+					co.setUserValue(index2);
+					co.setCollisionFlags(co.getCollisionFlags() | btCollisionObject.CollisionFlags.CF_CUSTOM_MATERIAL_CALLBACK);
+					dynamicsWorld.addRigidBody(co, ENTITY_FLAG, ALL_FLAG);
+					co.setContactCallbackFlag(ENTITY_FLAG);
+					co.setContactCallbackFilter(ALL_FLAG);
+					if (opponent.getMainBody().equals(co)) {
+						objectsMap.put(index2, EntityType.OPPONENT.getId());
+					} else {
+						objectsMap.put(index2, EntityType.OPPONENT.getId() + "Hand");
+					}
 
-                collObjsInEntityMap.put(co, opponent);
-                collObjsValsMap.put(index2, co);
+					collObjsInEntityMap.put(co, opponent);
+					collObjsValsMap.put(index2, co);
 
-                index2++;
-            }
+					index2++;
+				}
 
-            for (btCollisionObject co : opponent.getCollisionObjects()) {
-                co.setUserValue(index2);
-                co.setCollisionFlags(co.getCollisionFlags() | btCollisionObject.CollisionFlags.CF_CUSTOM_MATERIAL_CALLBACK);
+				for (btCollisionObject co : opponent.getCollisionObjects()) {
+					co.setUserValue(index2);
+					co.setCollisionFlags(co.getCollisionFlags() | btCollisionObject.CollisionFlags.CF_CUSTOM_MATERIAL_CALLBACK);
 
-                dynamicsWorld.addCollisionObject(co, SPECIAL_FLAG, ENT_SPECIAL_FLAG);
-                co.setContactCallbackFlag(SPECIAL_FLAG);
-                co.setContactCallbackFilter(ENT_SPECIAL_FLAG);
+					dynamicsWorld.addCollisionObject(co, SPECIAL_FLAG, ENT_SPECIAL_FLAG);
+					co.setContactCallbackFlag(SPECIAL_FLAG);
+					co.setContactCallbackFilter(ENT_SPECIAL_FLAG);
 
-                objectsMap.put(index2, EntityType.OPPONENT.getId() + "Obj");
+					objectsMap.put(index2, EntityType.OPPONENT.getId() + "Obj");
 
-                collObjsInEntityMap.put(co, opponent);
-                collObjsValsMap.put(index2, co);
+					collObjsInEntityMap.put(co, opponent);
+					collObjsValsMap.put(index2, co);
 
-                index2++;
-            }
+					index2++;
+				}
+			}
 
             opponents.add(opponent);
 
@@ -457,7 +470,7 @@ public class GameMap implements GameMessageSender {
         currentPlayerHoldTeam = -1;
         currentPlayerHoldOpp = -1;
 
-        mainPlayer = teammates.get(0);
+        mainPlayer = getAllPlayers().get(0);
 
         for (btCollisionObject co : getCollObjectsOfAll()) {
             for (btRigidBody bo : getBodiesOfAll())
@@ -486,7 +499,7 @@ public class GameMap implements GameMessageSender {
         
         firstShown = false;
         
-        if(isChallenge())
+        if(isChallenge() && !challenges.isSetup())
         	challenges.setup();
         
         /*currentTutorialLevel = (TutorialLevel) tutorial.getGameLevel(difficulty);
@@ -566,7 +579,7 @@ public class GameMap implements GameMessageSender {
         
         //MyGdxGame.clearColor();
 
-        teamScore = oppScore = mainPlayerScore = 0;
+        teamScore = oppScore = 0;
         targetScore = 15;
         
         if(isTutorialMode())
@@ -662,10 +675,10 @@ public class GameMap implements GameMessageSender {
     		startTimer = 0;
     	}
     	
-        if (!gameRunning) {
-            turnPlayer(delta);
+        /*if (!gameRunning) {
+            turnPlayer(inputs, mainPlayer, delta);
             updateInputs();
-        } else controlPlayer(delta);
+        } else */controlPlayer(inputs, mainPlayer, delta);
         if (playersReady && !gameRunning) {
             if (!ruleTriggered) {
                 if (startTimer <= 0)
@@ -1008,12 +1021,13 @@ public class GameMap implements GameMessageSender {
         ball.getMainBody().setLinearVelocity(Vector3.Zero);
     }
 
-    private void controlPlayer(float delta) {
-        movePlayer(delta);
+    public void controlPlayer(InputController inputs, Player player, float delta) {
+    	if(isGameRunning())
+    		movePlayer(inputs, player, delta);
 
-        turnPlayer(delta);
+        turnPlayer(inputs, player, delta);
 
-        if (!Gdx.app.getType().equals(Application.ApplicationType.Android))
+        if (inputs.equals(this.inputs) && !Gdx.app.getType().equals(Application.ApplicationType.Android))
             updateInputs();
     }
 
@@ -1021,8 +1035,8 @@ public class GameMap implements GameMessageSender {
         inputs.update(mainPlayer.isHoldingBall());
     }
 
-    private void movePlayer(float delta) {
-        Matrix4 playerM = new Matrix4().set(mainPlayer.getMainBody().getWorldTransform().val);
+    private void movePlayer(InputController inputs, Player player, float delta) {
+        Matrix4 playerM = new Matrix4().set(player.getMainBody().getWorldTransform().val);
 
         Quaternion dir = playerM.getRotation(new Quaternion());
 
@@ -1034,47 +1048,47 @@ public class GameMap implements GameMessageSender {
 
         if (inputs.isSprintPressed()) {
             if (inputs.isForwardPressed()) {
-                mainPlayer.run(new Vector3(dirX * delta, 0, dirZ * delta));
+                player.run(new Vector3(dirX * delta, 0, dirZ * delta));
             } else if (Gdx.app.getType().equals(Application.ApplicationType.Android)) {
-                mainPlayer.run(inputs.getMovementVec().rotate(dir.getYaw(), 0, 1, 0).nor().scl(delta));
+                player.run(inputs.getMovementVec().rotate(dir.getYaw(), 0, 1, 0).nor().scl(delta));
             }
 
             if (inputs.isStrLeftPressed())
-                mainPlayer.turnY(delta * 90);
+                player.turnY(delta * 90);
 
             if (inputs.isStrRightPressed())
-                mainPlayer.turnY(-delta * 90);
+                player.turnY(-delta * 90);
         } else if (Gdx.app.getType().equals(Application.ApplicationType.Android)) {
             if (!inputs.getMovementVec().isZero())
-                mainPlayer.walk(inputs.getMovementVec().scl(-1, 0, 1).rotate(dir.getYaw(), 0, 1, 0).scl(delta));
+                player.walk(inputs.getMovementVec().scl(-1, 0, 1).rotate(dir.getYaw(), 0, 1, 0).scl(delta));
         } else {
             if (inputs.isForwardPressed()) {
-                mainPlayer.walk(new Vector3(dirX * delta, 0, dirZ * delta));
+                player.walk(new Vector3(dirX * delta, 0, dirZ * delta));
             } else if (inputs.isBackwardPressed())
-                mainPlayer.walk(new Vector3(dirX * -delta, 0, dirZ * -delta));
+                player.walk(new Vector3(dirX * -delta, 0, dirZ * -delta));
 
             if (inputs.isStrLeftPressed())
-                mainPlayer.walk(new Vector3(dirZ * delta, 0, dirX * -delta));
+                player.walk(new Vector3(dirZ * delta, 0, dirX * -delta));
             else if (inputs.isStrRightPressed())
-                mainPlayer.walk(new Vector3(dirZ * -delta, 0, dirX * delta));
+                player.walk(new Vector3(dirZ * -delta, 0, dirX * delta));
         }
 
-        if(mainPlayer.equals(getHoldingPlayer()))
-        	mainPlayer.shootPowerScroll(inputs.getScroll());
+        if(player.equals(getHoldingPlayer()))
+        	player.shootPowerScroll(inputs.getScroll());
 
         if (inputs.isFocusPressed())
-            mainPlayer.focus(false);
+            player.focus(false);
 
-        if (inputs.isShootPressed() && !mainPlayer.isShooting()) {
-            mainPlayer.interactWithBallS();
-        } else if (inputs.isDribbleLPressed() && !mainPlayer.isShooting()) {
-            mainPlayer.interactWithBallL();
-        } else if (inputs.isDribbleRPressed() && !mainPlayer.isShooting()) {
-            mainPlayer.interactWithBallR();
+        if (inputs.isShootPressed() && !player.isShooting()) {
+            player.interactWithBallS();
+        } else if (inputs.isDribbleLPressed() && !player.isShooting()) {
+            player.interactWithBallL();
+        } else if (inputs.isDribbleRPressed() && !player.isShooting()) {
+            player.interactWithBallR();
         }
     }
 
-    private void turnPlayer(float delta) {
+    private void turnPlayer(InputController inputs, Player player, float delta) {
         if (Gdx.app.getType().equals(Application.ApplicationType.Android) && !gameRunning)
             inputs.updateRotation();
 
@@ -1082,19 +1096,19 @@ public class GameMap implements GameMessageSender {
         float turnX = inputs.getDeltaY(); //Around the X-axis
 
         if (Gdx.app.getType().equals(Application.ApplicationType.Android)) {
-            mainPlayer.turnX(turnX / 2);//We lower the sensitivity on mobile version
-            mainPlayer.turnY(turnY / 2);
+            player.turnX(turnX / 2);//We lower the sensitivity on mobile version
+            player.turnY(turnY / 2);
 
             return;
         }
         
         float add = 0.05f;
         if (Math.abs(turnY) < Gdx.graphics.getWidth() / 4) {
-            mainPlayer.turnY(turnY * (delta + add));
+            player.turnY(turnY * (delta + add));
         }
 
         if (Math.abs(turnX) < Gdx.graphics.getHeight() / 4) {
-            mainPlayer.turnX(turnX * (delta + add));
+            player.turnX(turnX * (delta + add));
         }
 
         int substractor = 140;
@@ -1119,8 +1133,7 @@ public class GameMap implements GameMessageSender {
     	
     	teamScore+= add;
         
-        if(scorer.equals(mainPlayer))
-        	mainPlayerScore+= add;
+        scorer.addPoints(add);
     }
 
     public void scoreOpp(boolean doub, boolean triple, Player scorer) {
@@ -1131,6 +1144,8 @@ public class GameMap implements GameMessageSender {
         else add = 1;
     	
     	oppScore+= add;
+    	
+    	scorer.addPoints(add);
     }
     
     public void stopMultiplayer() {
@@ -1187,6 +1202,10 @@ public class GameMap implements GameMessageSender {
 
 	public Multiplayer getMultiplayer() {
 		return multiplayer;
+	}
+
+	public void setMainPlayer(Player mainPlayer) {
+		this.mainPlayer = mainPlayer;
 	}
 
 	public Player getMainPlayer() {
@@ -1303,7 +1322,7 @@ public class GameMap implements GameMessageSender {
     }
 
     public int getMainPlayerScore() {
-		return mainPlayerScore;
+		return mainPlayer.getPoints();
 	}
 
 	public float getTimer() {
@@ -1340,6 +1359,10 @@ public class GameMap implements GameMessageSender {
 
     public boolean isBallInOpp() {
         return currentPlayerHoldOpp > -1;
+    }
+    
+    private boolean shouldMakeUpdates() {
+    	return !multiplayer.isMultiplayer() || multiplayer.isServer();
     }
 
     public ArrayList<btRigidBody> getBodiesOfAll() {

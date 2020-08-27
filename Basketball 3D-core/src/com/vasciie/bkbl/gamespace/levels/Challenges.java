@@ -10,6 +10,8 @@ public class Challenges extends Levels {
 	ChallengeLevel[] currentChallenges;
 	ChallengeLevel brokenChallenge;
 	
+	boolean setup;
+	
 	
 	public Challenges(GameMap map, GameMessageListener messageListener) {
 		super(map, messageListener);
@@ -264,6 +266,8 @@ public class Challenges extends Levels {
 		
 		for(ChallengeLevel ch : currentChallenges)
 			ch.setup();
+		
+		setup = true;
 	}
 	
 	public void setChallenge(ChallengeLevel[] chosenChallenges){
@@ -307,6 +311,8 @@ public class Challenges extends Levels {
 	public void reset() {
 		currentChallenges = null;
 		brokenChallenge = null;
+		
+		setup = false;
 	}
 	
 	public ChallengeLevel getBrokenChallenge() {
@@ -322,6 +328,11 @@ public class Challenges extends Levels {
 	}
 	
 	
+	public boolean isSetup() {
+		return setup;
+	}
+
+
 	public static abstract class ChallengeLevel extends GameLevel{
 		int challengeLevel;
 		

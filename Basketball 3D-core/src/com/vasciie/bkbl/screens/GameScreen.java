@@ -177,13 +177,14 @@ public class GameScreen implements Screen, GameMessageListener, GUIRenderer {
 		
 		environment = game.getEnvironment();
 		
-		if(!map.isTutorialMode() && !ignorePause) {
+		if(!map.getMultiplayer().isMultiplayer() && !map.isTutorialMode() && !ignorePause) {
 			map.setDifficulty(game.level.getDifficulty());
 			
 			if(!map.isChallenge() || !map.getChallenges().containsCurrentChallenge("alone"))
 				map.spawnPlayers(amount, amount);
 			else map.spawnPlayers(1, amount);
-		}
+		}else if(map.getMultiplayer().isMultiplayer())
+			map.getMultiplayer().begin();
 		
 		Gdx.input.setInputProcessor(map.getInputs());
 	}

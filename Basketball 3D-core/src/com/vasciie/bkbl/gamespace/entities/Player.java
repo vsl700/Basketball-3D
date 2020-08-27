@@ -8,6 +8,7 @@ import com.badlogic.gdx.ai.steer.SteeringAcceleration;
 import com.badlogic.gdx.ai.utils.Location;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.g3d.ModelInstance;
+import com.badlogic.gdx.graphics.g3d.model.Node;
 import com.badlogic.gdx.graphics.g3d.utils.AnimationController;
 import com.badlogic.gdx.graphics.g3d.utils.AnimationController.AnimationDesc;
 import com.badlogic.gdx.graphics.g3d.utils.AnimationController.AnimationListener;
@@ -91,10 +92,12 @@ public abstract class Player extends Entity {
 	
 	int playerIndex;
 	
-	int fouls;
+	int fouls, points;
 	
 	//Abilities
 	boolean ableToRun;
+	
+	boolean isABot;
 	
 	@Override
 	public void create(EntityType type, GameMap map, Vector3 pos) {
@@ -1783,6 +1786,41 @@ public abstract class Player extends Entity {
 		moveVec.setZero();
 	}
 	
+	private final Array<Matrix4> nodesTransforms = new Array<Matrix4>();
+	public Array<Matrix4> getNodesTransforms(){
+		nodesTransforms.clear();
+		
+		for(Node node : modelInstance.nodes)
+			getNodesTrans(node);
+		
+		return nodesTransforms;
+	}
+	
+	private void getNodesTrans(Node currentNode) {
+		for(Node child : currentNode.getChildren()) {
+			getNodesTrans(child);
+		}
+		
+		nodesTransforms.add(currentNode.globalTransform);
+	}
+	
+	private static int index;
+	public void setNodesTransforms(Array<Matrix4> nodesTrans) {
+		index = 0;
+		
+		for(Node node : modelInstance.nodes)
+			setNodesTrans(node, nodesTrans);
+	}
+	
+	private void setNodesTrans(Node currentNode, Array<Matrix4> nodesTrans) {
+		for(Node child : currentNode.getChildren()) {
+			setNodesTrans(child, nodesTrans);
+		}
+		
+		currentNode.globalTransform.set(nodesTrans.get(index));
+		index++;
+	}
+	
 	public Matrix4 getShoulderLTrans() {
 		return calcTransformFromNodesTransform(modelInstance.getNode("shoulderL").globalTransform);
 	}
@@ -1807,6 +1845,14 @@ public abstract class Player extends Entity {
 		return fouls;
 	}
 	
+	public int getPoints() {
+		return points;
+	}
+
+	public void addPoints(int points) {
+		this.points += points;
+	}
+
 	public void setPlayerIndex(int playerIndex) {
 		this.playerIndex = playerIndex;
 	}

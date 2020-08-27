@@ -228,7 +228,8 @@ public class RulesChooseScreen implements Screen, GUIRenderer {
 			game.getMap().setTargetScore(scores.getOption());
 			
 			//TODO Add something about the GAMESTOP and AUTO-ACTING for the score rule!
-			game.setScreen(game.challenge);
+			//game.setScreen(game.challenge);
+			game.setScreen(game.game);
 		}
 		
 		game.renderLogo(batch, cam);
