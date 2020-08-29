@@ -97,7 +97,7 @@ public abstract class Player extends Entity {
 	//Abilities
 	boolean ableToRun;
 	
-	boolean isABot;
+	boolean isABot = true;
 	
 	@Override
 	public void create(EntityType type, GameMap map, Vector3 pos) {
@@ -128,6 +128,8 @@ public abstract class Player extends Entity {
 		invTrans.set(modelInstance.transform);
 			//stateMachine = new DefaultStateMachine<Player, PlayerState>(this, PlayerState.IDLING);
 			//stateMachine.changeState(PlayerState.IDLING);
+		
+		
 
 	}
 	
@@ -1325,7 +1327,7 @@ public abstract class Player extends Entity {
 		
 		
 		boolean mainPlayerBrainUpdate = isMainPlayer() && map.isRuleTriggeredActing() && !map.isGameRunning();
-		if(mainPlayerBrainUpdate /*updateBrain && map.isRuleBrokenActing()*/ || !isMainPlayer() && !map.isRuleTriggered()) {
+		if(mainPlayerBrainUpdate /*updateBrain && map.isRuleBrokenActing()*/ || isABot && !isMainPlayer() && !map.isRuleTriggered()) {
 			brain.update(true);
 			//Vector3 tempVec = moveVec.add(new Vector3(steering.linear.cpy().x, 0, steering.linear.cpy().y)).scl(0.5f);
 			//float tempAng = steering.angular;
@@ -2029,6 +2031,14 @@ public abstract class Player extends Entity {
 		return westObstacle;
 	}*/
 	
+	public boolean isABot() {
+		return isABot;
+	}
+
+	public void setABot(boolean isABot) {
+		this.isABot = isABot;
+	}
+
 	public abstract Zone getHomeZone();
 	
 	public abstract Zone getAwayZone();

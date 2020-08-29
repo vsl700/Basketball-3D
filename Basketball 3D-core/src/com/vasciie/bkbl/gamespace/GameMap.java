@@ -165,7 +165,7 @@ public class GameMap implements GameMessageSender {
 
 				@Override
 				public void run() {
-					if(shouldMakeUpdates())
+					if(isSingleOrServer())
 						dynamicsWorld.stepSimulation(Gdx.graphics.getDeltaTime() * gameSpeed, 5, 1f / 30f);
 				}
 
@@ -361,10 +361,10 @@ public class GameMap implements GameMessageSender {
         else index2 = lastIndex + 1;
         
         int playerIndex = 1;
-        boolean addCollisions = shouldMakeUpdates();
+        boolean addCollisions = isSingleOrServer();
 
         for (int i = 0; i < countTeam; i++) {
-            Player teammate = EntityType.createPlayer(EntityType.TEAMMATE.getId(), this, new Vector3(spawnCoords[i][0], spawnCoords[i][1], spawnCoords[i][2]));
+            Player teammate = EntityType.createPlayer(EntityType.TEAMMATE.getId(), this, new Vector3(spawnCoords[i + teammates.size()][0], spawnCoords[i + teammates.size()][1], spawnCoords[i + teammates.size()][2]));
             
 			if (addCollisions) {
 				for (btRigidBody co : teammate.getBodies()) {
@@ -413,14 +413,14 @@ public class GameMap implements GameMessageSender {
             teammate.setPlayerIndex(playerIndex);
             playerIndex++;
             
-            if(!multiplayer.isMultiplayer()) {
+            /*if(!multiplayer.isMultiplayer()) {
             	
-            }
+            }*/
         }
 
         playerIndex = 1;
         for (int i = 0; i < countOpp; i++) {
-            Player opponent = EntityType.createPlayer(EntityType.OPPONENT.getId(), this, new Vector3(spawnCoords[i][0], spawnCoords[i][1], -spawnCoords[i][2]));
+            Player opponent = EntityType.createPlayer(EntityType.OPPONENT.getId(), this, new Vector3(spawnCoords[i + opponents.size()][0], spawnCoords[i + opponents.size()][1], -spawnCoords[i + opponents.size()][2]));
             
 			if (addCollisions) {
 				for (btRigidBody co : opponent.getBodies()) {
@@ -654,8 +654,19 @@ public class GameMap implements GameMessageSender {
     	camera.updateCamera();
     }
     
+    private void updateMultiplayer() {
+    	multiplayer.update();
+    }
+    
     public void update(float delta) {
         //camera.setWorldTransform(new Matrix4(mainPlayer.getModelInstance().transform).mul(mainPlayer.getCamMatrix()).mul(new Matrix4().setToTranslation(0, mainPlayer.getHeight(), -10)));
+    	if(multiplayer.isMultiplayer()) {
+    		updateMultiplayer();
+    		
+    		if(!multiplayer.isServer())
+    			return;
+    	}
+    	
     	float delta2 = delta * gameSpeed;
         //float delta2 = Math.min(1f / 30f, delta);
     	if(SettingsScreen.multithreadOption)
@@ -815,16 +826,23 @@ public class GameMap implements GameMessageSender {
     }
     
     public void removePlayer(Player player) {
+    	if(player == null)
+    		return;
+    	
     	teammates.remove(player);
     	opponents.remove(player);
     	
+    	if(player.getBodies() != null && !multiplayer.isMultiplayer())
     	for(btRigidBody obj : player.getBodies()) {
-    		dynamicsWorld.removeRigidBody(obj);
+    		//if(isSingleOrServer())
+    			dynamicsWorld.removeRigidBody(obj);
     		obj.dispose();
     	}
     	
+    	if(player.getCollisionObjects() != null && !multiplayer.isMultiplayer())
     	for(btCollisionObject obj : player.getCollisionObjects()) {
-    		dynamicsWorld.removeCollisionObject(obj);
+    		//if(isSingleOrServer())
+    			dynamicsWorld.removeCollisionObject(obj);
     		obj.dispose();
     	}
     	//FIXME Think about index changing!
@@ -974,11 +992,13 @@ public class GameMap implements GameMessageSender {
 
     private void disposePlayers() {
         for (Player e : getAllPlayers()) {
+        	if(e.getBodies() != null)
             for (btRigidBody co : e.getBodies()) {
                 dynamicsWorld.removeRigidBody(co);
                 collObjsInEntityMap.remove(co);
             }
 
+        	if(e.getCollisionObjects() != null)
             for (btCollisionObject co : e.getCollisionObjects()) {
                 dynamicsWorld.removeCollisionObject(co);
                 collObjsInEntityMap.remove(co);
@@ -1361,7 +1381,7 @@ public class GameMap implements GameMessageSender {
         return currentPlayerHoldOpp > -1;
     }
     
-    private boolean shouldMakeUpdates() {
+    private boolean isSingleOrServer() {
     	return !multiplayer.isMultiplayer() || multiplayer.isServer();
     }
 

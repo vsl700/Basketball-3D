@@ -79,6 +79,7 @@ public class MyGdxGame extends Game implements GameMessageListener, GUIRenderer 
 	Label messageLabel;
 	Button messageCont;
 	float messageTime;
+	boolean skippable;
 	
 	
 	@Override
@@ -251,7 +252,7 @@ public class MyGdxGame extends Game implements GameMessageListener, GUIRenderer 
 		
 		if(sender != null) {
 			messageLabel.update();
-			if(messageTime < 0)
+			if(messageTime < 0 && skippable)
 				messageCont.update();
 			else messageTime -= Gdx.graphics.getDeltaTime();
 			messageBox.update();
@@ -472,6 +473,7 @@ public class MyGdxGame extends Game implements GameMessageListener, GUIRenderer 
 		messageResize();
 		
 		messageTime = 1;
+		this.skippable = skippable;
 	}
 
 	@Override

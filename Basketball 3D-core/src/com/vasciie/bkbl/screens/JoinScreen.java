@@ -64,17 +64,29 @@ public class JoinScreen implements Screen, GUIRenderer, GameMessageSender {
 		join.update();
 		goBack.update();
 		
-		if(goBack.justReleased())
+		if(goBack.justReleased()) {
 			game.setScreen(game.joinOrCreate);
-		else if(join.justReleased()) {
+			
+			game.getMap().getMultiplayer().disconnect();
+		}else if(join.justReleased()) {
 			try {
+				game.sendMessage("Joining...", Color.RED, this, false);
+				
 				game.getMap().getMultiplayer().join(ipPanel.getText());
+				
+				game.sendMessage("Waiting the hosted game to start...", Color.RED, this, false);
 			}catch(Exception e) {
 				String tempStr = e.toString();
-				game.sendMessage(tempStr.substring(0, tempStr.indexOf(":27960")), Color.RED, this, true);
+				if(tempStr.contains(":27960"))
+					game.sendMessage(tempStr.substring(0, tempStr.indexOf(":27960")), Color.RED, this, true);
+				else game.sendMessage(tempStr, Color.RED, this, true);
 				
 				e.printStackTrace();
 			}
+		}
+		
+		if(game.getMap().getMainPlayer() != null) {
+			game.setScreen(game.game);
 		}
 		
 		game.renderLogo(batch, cam);
@@ -117,7 +129,7 @@ public class JoinScreen implements Screen, GUIRenderer, GameMessageSender {
 
 	@Override
 	public void hide() {
-		
+		game.sendMessage("", Color.RED, null, false);
 
 	}
 

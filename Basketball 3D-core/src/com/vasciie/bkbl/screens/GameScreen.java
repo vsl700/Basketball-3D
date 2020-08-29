@@ -177,14 +177,17 @@ public class GameScreen implements Screen, GameMessageListener, GUIRenderer {
 		
 		environment = game.getEnvironment();
 		
-		if(!map.getMultiplayer().isMultiplayer() && !map.isTutorialMode() && !ignorePause) {
-			map.setDifficulty(game.level.getDifficulty());
-			
-			if(!map.isChallenge() || !map.getChallenges().containsCurrentChallenge("alone"))
-				map.spawnPlayers(amount, amount);
-			else map.spawnPlayers(1, amount);
-		}else if(map.getMultiplayer().isMultiplayer())
-			map.getMultiplayer().begin();
+		if (!ignorePause) {
+			if (!map.getMultiplayer().isMultiplayer() && !map.isTutorialMode()) {
+				map.setDifficulty(game.level.getDifficulty());
+
+				if (!map.isChallenge() || !map.getChallenges().containsCurrentChallenge("alone"))
+					map.spawnPlayers(amount, amount);
+				else
+					map.spawnPlayers(1, amount);
+			} else if (map.getMultiplayer().isMultiplayer() && map.getMultiplayer().isServer())
+				map.getMultiplayer().begin();
+		}
 		
 		Gdx.input.setInputProcessor(map.getInputs());
 	}
@@ -357,7 +360,7 @@ public class GameScreen implements Screen, GameMessageListener, GUIRenderer {
 		
 		renderGUI();
 		
-		if (!paused()) {
+		if (!paused() || map.getMultiplayer().isMultiplayer()) {
 			if(Gdx.app.getType().equals(Application.ApplicationType.Android))
 				map.updateController();
 
@@ -450,8 +453,8 @@ public class GameScreen implements Screen, GameMessageListener, GUIRenderer {
 
 	@Override
 	public void pause() {
-		pause.show();
-		recentlyPaused = true;
+		//pause.show();
+		//recentlyPaused = true;
 	}
 	
 	public PauseScreen getPauseScreen() {
