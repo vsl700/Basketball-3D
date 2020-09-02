@@ -43,6 +43,14 @@ public class InputController implements InputProcessor {
     float dX, dY;
     int multitouch = -1;
     boolean dribble;
+    
+    
+    /**
+     * DO NOT USE IT! IT"S JUST FOR THE MULTIPLAYER!
+     */
+    public InputController() {
+    	
+    }
 
     public InputController(GUIRenderer guiRenderer) {
         if (Gdx.app.getType().equals(Application.ApplicationType.Android)) {

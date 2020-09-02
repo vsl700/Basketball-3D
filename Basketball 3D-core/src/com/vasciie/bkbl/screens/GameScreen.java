@@ -76,7 +76,7 @@ public class GameScreen implements Screen, GameMessageListener, GUIRenderer {
 			public void run() {
 
 
-				map.update(Gdx.graphics.getDeltaTime());
+				map.update(Gdx.graphics.getDeltaTime(), !paused());
 				
 				if(SettingsScreen.multithreadOption && !paused() && !game.getScreen().equals(game.game) && !game.getScreen().equals(game.settings) && !game.getScreen().equals(game.gameOver)) {
 					reset();

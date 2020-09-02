@@ -658,7 +658,7 @@ public class GameMap implements GameMessageSender {
     	multiplayer.update();
     }
     
-    public void update(float delta) {
+    public void update(float delta, boolean controlPlayer) {
         //camera.setWorldTransform(new Matrix4(mainPlayer.getModelInstance().transform).mul(mainPlayer.getCamMatrix()).mul(new Matrix4().setToTranslation(0, mainPlayer.getHeight(), -10)));
     	if(multiplayer.isMultiplayer()) {
     		updateMultiplayer();
@@ -689,7 +689,7 @@ public class GameMap implements GameMessageSender {
         /*if (!gameRunning) {
             turnPlayer(inputs, mainPlayer, delta);
             updateInputs();
-        } else */controlPlayer(inputs, mainPlayer, delta);
+        } else */if(controlPlayer) controlPlayer(inputs, mainPlayer, delta);
         if (playersReady && !gameRunning) {
             if (!ruleTriggered) {
                 if (startTimer <= 0)
@@ -1130,7 +1130,10 @@ public class GameMap implements GameMessageSender {
         if (Math.abs(turnX) < Gdx.graphics.getHeight() / 4) {
             player.turnX(turnX * (delta + add));
         }
-
+        
+        if(!player.equals(mainPlayer))
+        	return;
+        	
         int substractor = 140;
 
         if (Gdx.input.getX() > Gdx.graphics.getWidth() - substractor)

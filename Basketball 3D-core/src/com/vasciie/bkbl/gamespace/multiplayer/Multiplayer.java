@@ -79,7 +79,7 @@ public class Multiplayer extends Listener {
 			System.out.println(a.getHostAddress());
 		}*/
 		
-		client.connect(999999999, ip, tcpPort, udpPort); //Connect to the server - wait 5000 ms before failing
+		client.connect(5000, ip, tcpPort, udpPort); //Connect to the server - wait 5000 ms before failing
 		
 		client.addListener(this); //Add a listener
 		
@@ -103,11 +103,11 @@ public class Multiplayer extends Listener {
 		ArrayList<Player> tempPlayers = map.getAllPlayers();
 		for(int i = 0; i < server.getConnections().length; i++) {
 			Connection c = server.getConnections()[i];
-			connectionPlayer.put(c, tempPlayers.get(i));
+			connectionPlayer.put(c, tempPlayers.get(i + 1));
 			
-			tempPlayers.get(i).setABot(false);
+			tempPlayers.get(i + 1).setABot(false);
 			
-			message.message = "mainPlayer:" + i;
+			message.message = "mainPlayer:" + (i + 1);
 			c.sendTCP(message);
 		}
 		
@@ -128,9 +128,18 @@ public class Multiplayer extends Listener {
 				sendToAllTCP(message);
 				
 				sendToAllTCP(tempPlayers.get(i).getNodesTransforms());
+				
+				message.message = "ball";
+				
+				sendToAllTCP(message);
+				
+				sendToAllTCP(map.getBall().getModelInstance().transform);
 			}
 		}else if(client.getTcpWriteBufferSize() < 8000){
 			client.sendTCP(map.getInputs());
+			
+			message.message = "delta:" + Gdx.graphics.getDeltaTime();
+			client.sendTCP(message);
 		}
 	}
 	
@@ -183,23 +192,32 @@ public class Multiplayer extends Listener {
 	}*/
 	
 	private Queue<Integer> awaitingIndexes = new Queue<Integer>();
-	private HashMap<Connection, InputController> awaitingInput;
-	private boolean awaitingBall;
+	private final HashMap<Connection, InputController> awaitingInput = new HashMap<Connection, InputController>();
 	@SuppressWarnings("unchecked")
 	@Override
-	public void received(Connection c, final Object o) {
+	public void received(final Connection c, final Object o) {
 		if(o instanceof PacketMessage) {
 			final String message = ((PacketMessage) o).message;
 			/*if(message.equals("shareInputs")) {
 				c.sendTCP(map.getInputs());
 			}else */if(message.contains("delta:")) {
-				map.controlPlayer(awaitingInput.remove(c), connectionPlayer.get(c), Float.parseFloat(message.substring(message.indexOf(':') + 1)));
-				awaitingInput = null;
+				Gdx.app.postRunnable(new Runnable() {
+
+					@Override
+					public void run() {
+						map.controlPlayer(awaitingInput.remove(c), connectionPlayer.get(c), Float.parseFloat(message.substring(message.indexOf(':') + 1)));
+						
+					}
+					
+				});
+				
+				//awaitingInput.clear();
 			}else if(message.contains("mainPlayer:")) {
 				Gdx.app.postRunnable(new Runnable() {
 
 					@Override
 					public void run() {
+						System.out.println(Integer.parseInt(message.substring(message.indexOf(':') + 1)));
 						map.setMainPlayer(map.getAllPlayers().get(Integer.parseInt(message.substring(message.indexOf(':') + 1))));
 						
 					}
@@ -234,25 +252,29 @@ public class Multiplayer extends Listener {
 				});
 			}else if(message.contains("index:")) {
 				awaitingIndexes.enqueue(Integer.parseInt(message.substring(message.indexOf(':') + 1)));
+			}else if(message.equals("ball")) {
+				awaitingIndexes.enqueue(-1);
 			}
 		}else if(o instanceof InputController) {
 			awaitingInput.put(c, (InputController) o);
 		}else if(o instanceof Matrix4) {
-			if(awaitingBall) {
-				map.getBall().setWorldTransform((Matrix4) o);
-				awaitingBall = false;
-				return;
-			}
-			
 			Runnable tempRunnable = new Runnable() {
 
 				@Override
 				public void run() {
+					final int index;
 					try {
-						map.getAllPlayers().get(awaitingIndexes.dequeue()).setWorldTransform((Matrix4) o);
-					} catch (InterruptedException e) {
-						e.printStackTrace();
+						index = awaitingIndexes.dequeue();
+					} catch (InterruptedException e1) {
+						e1.printStackTrace();
+						return;
 					}
+					if(index == -1) {
+						map.getBall().setWorldTransform((Matrix4) o);
+						return;
+					}
+					
+					map.getAllPlayers().get(index).setWorldTransform((Matrix4) o);
 					
 				}
 				
@@ -289,6 +311,8 @@ public class Multiplayer extends Listener {
 			public void run() {
 				
 				map.removePlayer(connectionPlayer.remove(c));
+				
+				//TODO If the host disconnects, then there should be a gameover screen (or maybe setting someone else as a host)!
 			}
 			
 		});

@@ -7,4 +7,9 @@ package com.vasciie.bkbl.gamespace.multiplayer;
 public class PacketMessage {
 
 	public String message;
+	
+	
+	public PacketMessage() {
+		
+	}
 }
