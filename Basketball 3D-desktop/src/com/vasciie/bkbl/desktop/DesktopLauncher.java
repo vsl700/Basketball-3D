@@ -19,7 +19,7 @@ public class DesktopLauncher {
 			
 			@Override
 			public void setForegroundFps(int fps) {
-				config.foregroundFPS = fps;
+				config.foregroundFPS = config.backgroundFPS = fps;
 			}
 			
 			@Override
@@ -39,6 +39,6 @@ public class DesktopLauncher {
 		//LwjglApplicationConfiguration.disableAudio = true;
 		//config.resizable = false;
 		config.foregroundFPS = 60;
-		config.backgroundFPS = 20;
+		//config.backgroundFPS = 20;
 	}
 }

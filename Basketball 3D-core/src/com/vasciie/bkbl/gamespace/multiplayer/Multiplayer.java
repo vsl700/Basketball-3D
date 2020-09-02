@@ -201,15 +201,15 @@ public class Multiplayer extends Listener {
 			/*if(message.equals("shareInputs")) {
 				c.sendTCP(map.getInputs());
 			}else */if(message.contains("delta:")) {
-				Gdx.app.postRunnable(new Runnable() {
+				/*Gdx.app.postRunnable(new Runnable() {
 
 					@Override
-					public void run() {
+					public void run() {*/
 						map.controlPlayer(awaitingInput.remove(c), connectionPlayer.get(c), Float.parseFloat(message.substring(message.indexOf(':') + 1)));
-						
+						/*
 					}
 					
-				});
+				});*/
 				
 				//awaitingInput.clear();
 			}else if(message.contains("mainPlayer:")) {

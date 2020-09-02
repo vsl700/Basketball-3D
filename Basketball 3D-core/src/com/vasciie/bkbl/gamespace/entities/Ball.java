@@ -110,7 +110,7 @@ public class Ball extends Entity {
 		super.createCollisionObjectAndBodies();
 		
 		//if(collisionObjects == null)//If we are only resetting rigid body
-		modelInstance.transform = getMainBody().getWorldTransform();
+		//modelInstance.transform = getMainBody().getWorldTransform();
 		
 		collisionObjects = new ArrayList<btCollisionObject>();
 		
