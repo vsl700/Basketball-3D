@@ -92,7 +92,9 @@ public class InputController implements InputProcessor {
      * @param resetDribble - whether to reset the ball dribble indicators
      */
     public void update(boolean resetDribble) {
-        if (resetDribble) {
+    	updateCameraRotPC();
+    	
+    	if (resetDribble) {
             dribbleLPressed = false;
             dribbleRPressed = false;
         }
@@ -201,6 +203,23 @@ public class InputController implements InputProcessor {
         dX = Gdx.input.getDeltaX(multitouch);
         dY = Gdx.input.getDeltaY(multitouch);
     }
+    
+    public void updateCameraRotPC() {
+    	dX = -Gdx.input.getDeltaX();
+        dY = Gdx.input.getDeltaY();
+        
+        int substractor = 140;
+
+        if (Gdx.input.getX() > Gdx.graphics.getWidth() - substractor)
+            Gdx.input.setCursorPosition(substractor, Gdx.input.getY());
+        else if (Gdx.input.getX() < substractor)
+            Gdx.input.setCursorPosition(Gdx.graphics.getWidth() - substractor, Gdx.input.getY());
+
+        if (Gdx.input.getY() > Gdx.graphics.getHeight() - substractor)
+            Gdx.input.setCursorPosition(Gdx.input.getX(), substractor);
+        else if (Gdx.input.getY() < substractor)
+            Gdx.input.setCursorPosition(Gdx.input.getX(), Gdx.graphics.getHeight() - substractor);
+    }
 
     private boolean isTouchPointerUsed(int multitouch) {
         if (multitouch == -1)
@@ -217,13 +236,11 @@ public class InputController implements InputProcessor {
     public float getDeltaX() {
     	float returnDx;
     	
-        if (Gdx.app.getType().equals(Application.ApplicationType.Android)) {
+        /*if (Gdx.app.getType().equals(Application.ApplicationType.Android)) {*/
             float temp = dX;
             dX = 0;
             returnDx = temp;
-        }
-
-        returnDx = -Gdx.input.getDeltaX();
+        /*}else returnDx = -Gdx.input.getDeltaX();*/
         
         if(SettingsScreen.invertX)
         	returnDx = -returnDx;
@@ -234,13 +251,11 @@ public class InputController implements InputProcessor {
     public float getDeltaY() {
     	float returnDy;
     	
-        if (Gdx.app.getType().equals(Application.ApplicationType.Android)) {
+        /*if (Gdx.app.getType().equals(Application.ApplicationType.Android)) {*/
             float temp = dY;
             dY = 0;
             returnDy = temp;
-        }
-
-        returnDy = Gdx.input.getDeltaY();
+        /*}else returnDy = Gdx.input.getDeltaY();*/
         
         if(SettingsScreen.invertY)
         	returnDy = -returnDy;

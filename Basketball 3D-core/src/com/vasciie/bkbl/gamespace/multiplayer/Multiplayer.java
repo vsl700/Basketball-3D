@@ -14,8 +14,6 @@ import com.vasciie.bkbl.gamespace.GameMap;
 import com.vasciie.bkbl.gamespace.entities.Player;
 import com.vasciie.bkbl.gamespace.tools.InputController;
 
-import sun.misc.Queue;
-
 public class Multiplayer extends Listener {
 
 	private static final PacketMessage message = new PacketMessage();
@@ -32,6 +30,7 @@ public class Multiplayer extends Listener {
 	int team; //0 - unassigned, 1 - blue, 2 - red
 	
 	boolean host, join;
+	boolean gameReady;
 	
 	
 	public Multiplayer(GameMap map) {
@@ -112,34 +111,40 @@ public class Multiplayer extends Listener {
 		}
 		
 		
-		
+		message.message = "ready";
+		sendToAllTCP(message);
 		
 	}
 	
 	public void update() {
-		if(isServer()) {
-			ArrayList<Player> tempPlayers = map.getAllPlayers();
-			for(int i = 0; i < tempPlayers.size(); i++) {
-				message.message = "index:" + i;
-				sendToAllTCP(message);
-				
-				sendToAllTCP(tempPlayers.get(i).getModelInstance().transform);
-				
-				sendToAllTCP(message);
-				
-				sendToAllTCP(tempPlayers.get(i).getNodesTransforms());
-				
-				message.message = "ball";
-				
-				sendToAllTCP(message);
-				
-				sendToAllTCP(map.getBall().getModelInstance().transform);
-			}
-		}else if(client.getTcpWriteBufferSize() < 8000){
-			client.sendTCP(map.getInputs());
+		/*if(isServer()) {
+			sendTransforms();
+		}else */if (gameReady && client.getTcpWriteBufferSize() < 8000){
 			
 			message.message = "delta:" + Gdx.graphics.getDeltaTime();
+			message.object = map.getInputs();
 			client.sendTCP(message);
+			
+			map.updateInputs();
+			
+			message.message = "shareTrans";
+			client.sendTCP(message);
+		}
+	}
+	
+	private void sendTransforms(Connection c) {
+		ArrayList<Player> tempPlayers = map.getAllPlayers();
+		for(int i = 0; i < tempPlayers.size(); i++) {
+			message.message = "index:" + i;
+			message.object = tempPlayers.get(i).getModelInstance().transform;
+			c.sendTCP(message);
+			
+			message.object = tempPlayers.get(i).getNodesTransforms();
+			c.sendTCP(message);
+			
+			message.message = "ball";
+			message.object = map.getBall().getModelInstance().transform;
+			c.sendTCP(message);
 		}
 	}
 	
@@ -155,6 +160,10 @@ public class Multiplayer extends Listener {
 		client.stop();
 		
 		join = false;
+		gameReady = false;
+		
+		message.object = null;
+		
 		//client = null;
 	}
 	
@@ -164,6 +173,8 @@ public class Multiplayer extends Listener {
 		connectionPlayer.clear();
 		//inputConnection.clear();
 		host = false;
+		
+		message.object = null;
 		//server = null;
 	}
 	
@@ -191,21 +202,27 @@ public class Multiplayer extends Listener {
 		assignPlayer(1);
 	}*/
 	
-	private Queue<Integer> awaitingIndexes = new Queue<Integer>();
-	private final HashMap<Connection, InputController> awaitingInput = new HashMap<Connection, InputController>();
+	//private Queue<Integer> awaitingIndexes = new Queue<Integer>();
+	//private final HashMap<Connection, InputController> awaitingInput = new HashMap<Connection, InputController>();
 	@SuppressWarnings("unchecked")
 	@Override
 	public void received(final Connection c, final Object o) {
 		if(o instanceof PacketMessage) {
-			final String message = ((PacketMessage) o).message;
+			final PacketMessage packet = (PacketMessage) o;
+			final String message = packet.message;
 			/*if(message.equals("shareInputs")) {
 				c.sendTCP(map.getInputs());
-			}else */if(message.contains("delta:")) {
+			}else */if(message.equals("ready")) {
+				gameReady = true;
+			}else if(message.equals("shareTrans")) {
+				sendTransforms(c);
+			}else if(message.contains("delta:")) {
 				/*Gdx.app.postRunnable(new Runnable() {
 
 					@Override
 					public void run() {*/
-						map.controlPlayer(awaitingInput.remove(c), connectionPlayer.get(c), Float.parseFloat(message.substring(message.indexOf(':') + 1)));
+						
+						map.controlPlayer((InputController) packet.object, connectionPlayer.get(c), Float.parseFloat(message.substring(message.indexOf(':') + 1)));
 						/*
 					}
 					
@@ -251,13 +268,19 @@ public class Multiplayer extends Listener {
 					
 				});
 			}else if(message.contains("index:")) {
-				awaitingIndexes.enqueue(Integer.parseInt(message.substring(message.indexOf(':') + 1)));
+				int index = Integer.parseInt(message.substring(message.indexOf(':') + 1));
+				
+				if(packet.object instanceof Matrix4) {
+					map.getAllPlayers().get(index).setWorldTransform((Matrix4) packet.object);
+				}else if(packet.object instanceof Array) {
+					map.getAllPlayers().get(index).setNodesTransforms((Array<Matrix4>) packet.object);
+				}
 			}else if(message.equals("ball")) {
-				awaitingIndexes.enqueue(-1);
+				if(packet.object instanceof Matrix4) {
+					map.getBall().setWorldTransform((Matrix4) packet.object);
+				}
 			}
-		}else if(o instanceof InputController) {
-			awaitingInput.put(c, (InputController) o);
-		}else if(o instanceof Matrix4) {
+		}/*else if(o instanceof Matrix4) {
 			Runnable tempRunnable = new Runnable() {
 
 				@Override
@@ -300,7 +323,7 @@ public class Multiplayer extends Listener {
 			//if(map.getAllPlayers().size() == 0) {
 				Gdx.app.postRunnable(tempRunnable);
 			//}else tempRunnable.run();
-		}
+		}*/
 	}
 	
 	@Override

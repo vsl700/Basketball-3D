@@ -646,6 +646,9 @@ public class GameMap implements GameMessageSender {
     }
     
     public void updatePlayerAnimations(float delta) {
+    	if(!isSingleOrServer())
+    		return;
+    	
     	for(Player p : getAllPlayers())
     		p.updateAnimations(delta);
     }
@@ -1051,7 +1054,7 @@ public class GameMap implements GameMessageSender {
             updateInputs();
     }
 
-    private void updateInputs() {
+    public void updateInputs() {
         inputs.update(mainPlayer.isHoldingBall());
     }
 
@@ -1133,18 +1136,6 @@ public class GameMap implements GameMessageSender {
         
         if(!player.equals(mainPlayer))
         	return;
-        	
-        int substractor = 140;
-
-        if (Gdx.input.getX() > Gdx.graphics.getWidth() - substractor)
-            Gdx.input.setCursorPosition(substractor, Gdx.input.getY());
-        else if (Gdx.input.getX() < substractor)
-            Gdx.input.setCursorPosition(Gdx.graphics.getWidth() - substractor, Gdx.input.getY());
-
-        if (Gdx.input.getY() > Gdx.graphics.getHeight() - substractor)
-            Gdx.input.setCursorPosition(Gdx.input.getX(), substractor);
-        else if (Gdx.input.getY() < substractor)
-            Gdx.input.setCursorPosition(Gdx.input.getX(), Gdx.graphics.getHeight() - substractor);
     }
 
     public void scoreTeam(boolean doub, boolean triple, Player scorer) {

@@ -21,6 +21,7 @@ import com.badlogic.gdx.physics.bullet.collision.btCollisionShape;
 import com.badlogic.gdx.physics.bullet.collision.btSphereShape;
 import com.badlogic.gdx.physics.bullet.dynamics.btRigidBody;
 import com.badlogic.gdx.utils.Array;
+import com.badlogic.gdx.utils.Array.ArrayIterator;
 import com.vasciie.bkbl.gamespace.GameMap;
 import com.vasciie.bkbl.gamespace.entities.players.Opponent;
 import com.vasciie.bkbl.gamespace.entities.players.Teammate;
@@ -1792,14 +1793,20 @@ public abstract class Player extends Entity {
 	public Array<Matrix4> getNodesTransforms(){
 		nodesTransforms.clear();
 		
-		for(Node node : modelInstance.nodes)
-			getNodesTrans(node);
+		for(Object node : modelInstance.nodes.items) {
+			if(node == null)
+				break;
+			
+			getNodesTrans((Node) node);
+		}
 		
 		return nodesTransforms;
 	}
 	
 	private void getNodesTrans(Node currentNode) {
-		for(Node child : currentNode.getChildren()) {
+		ArrayIterator<Node> tempIterable = new ArrayIterator<Node>((Array<Node>) currentNode.getChildren());
+		
+		for(Node child : tempIterable) {
 			getNodesTrans(child);
 		}
 		
@@ -1810,12 +1817,17 @@ public abstract class Player extends Entity {
 	public void setNodesTransforms(Array<Matrix4> nodesTrans) {
 		index = 0;
 		
-		for(Node node : modelInstance.nodes)
-			setNodesTrans(node, nodesTrans);
+		for(Object node : modelInstance.nodes.items) {
+			if(node == null)
+				break;
+			
+			setNodesTrans((Node) node, nodesTrans);
+		}
 	}
 	
 	private void setNodesTrans(Node currentNode, Array<Matrix4> nodesTrans) {
-		for(Node child : currentNode.getChildren()) {
+		ArrayIterator<Node> tempIterable = new ArrayIterator<Node>((Array<Node>) currentNode.getChildren());
+		for(Node child : tempIterable) {
 			setNodesTrans(child, nodesTrans);
 		}
 		
