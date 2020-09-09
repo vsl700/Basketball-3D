@@ -170,8 +170,6 @@ public class GameMap implements GameMessageSender {
 				}
 
 			};
-
-			physicsThread = new VEThread(dynamicsWorldRunnable);
 		}
 		
 		rulesListener = messageListener;
@@ -355,6 +353,9 @@ public class GameMap implements GameMessageSender {
     }
 
     public void spawnPlayers(int countTeam, int countOpp) {
+    	if(physicsThread == null)
+    		physicsThread = new VEThread(dynamicsWorldRunnable);
+    	
         int index2;
         if(getAllPlayers().size() == 0)
         	index2 = index;
@@ -562,11 +563,10 @@ public class GameMap implements GameMessageSender {
     }
 
     public void clear() {
-    	if(SettingsScreen.multithreadOption)
+    	if(SettingsScreen.multithreadOption || !physicsThread.getState().equals(State.NEW)) {
     		physicsThread.waitToFinish();
-    	
-    	if(!physicsThread.getState().equals(State.NEW)) {
     		physicsThread.interrupt();
+    		physicsThread = null;
     		interrupted = true;
     	}
     	
@@ -657,17 +657,16 @@ public class GameMap implements GameMessageSender {
     	camera.updateCamera();
     }
     
-    private void updateMultiplayer() {
-    	multiplayer.update();
+    private void updateMultiplayer(boolean controlPlayer) {
+    	multiplayer.updateClient(controlPlayer);
     }
     
     public void update(float delta, boolean controlPlayer) {
         //camera.setWorldTransform(new Matrix4(mainPlayer.getModelInstance().transform).mul(mainPlayer.getCamMatrix()).mul(new Matrix4().setToTranslation(0, mainPlayer.getHeight(), -10)));
-    	if(multiplayer.isMultiplayer()) {
-    		updateMultiplayer();
+    	if(multiplayer.isMultiplayer() && !multiplayer.isServer()) {
+    		updateMultiplayer(controlPlayer);
     		
-    		if(!multiplayer.isServer())
-    			return;
+    		return;
     	}
     	
     	float delta2 = delta * gameSpeed;
@@ -693,6 +692,8 @@ public class GameMap implements GameMessageSender {
             turnPlayer(inputs, mainPlayer, delta);
             updateInputs();
         } else */if(controlPlayer) controlPlayer(inputs, mainPlayer, delta);
+        multiplayer.processInputs();
+        
         if (playersReady && !gameRunning) {
             if (!ruleTriggered) {
                 if (startTimer <= 0)

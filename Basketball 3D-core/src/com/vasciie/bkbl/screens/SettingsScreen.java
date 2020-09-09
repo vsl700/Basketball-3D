@@ -103,7 +103,7 @@ public class SettingsScreen implements Screen, UpDownListener, GUIRenderer, Game
 		//resUpDown = new TextUpDown(font, font, Color.WHITE, Color.BROWN, new Color().set(0.8f, 0.4f, 0, 1), res, false);
 		//resUpDown.setListener(this);
 		
-		fpsLabel = new Label("THE MAXIMUM FRAMES PER SECOND", font, Color.BROWN, true, this);
+		fpsLabel = new Label("MAX. FPS", font, Color.BROWN, true, this);
 		camRotLabel = new Label("WHETHER TO INVERT THE CAMERA ROTATION", font, Color.BROWN, true, this);
 		mthLabel = new Label("INCREASES PERFORMANCE, BUT MIGHT CAUSE BOTTLENECK", font, Color.BROWN, true, this);
 		//resLabel = new Label("THE RESOLUTION OF THE WINDOW", font, Color.BROWN, true);
@@ -156,8 +156,8 @@ public class SettingsScreen implements Screen, UpDownListener, GUIRenderer, Game
 		
 		fpsUpDown.update();
 		
+		fpsLabel.update();
 		if (cam.viewportHeight >= 814) {
-			fpsLabel.update();
 			camRotLabel.update();
 			mthLabel.update();
 		}

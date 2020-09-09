@@ -82,7 +82,7 @@ public class Multiplayer extends Listener {
 		
 		client.addListener(this); //Add a listener
 		
-		client.setKeepAliveTCP(1);
+		//client.setKeepAliveTCP(1);
 		
 		join = true;
 	}
@@ -91,7 +91,9 @@ public class Multiplayer extends Listener {
 		//When the host starts the game (sending chosen rules & challenges & available players, creating hashmaps)
 		
 		assignPlayer(team);
-		assignPlayer(1);
+		
+		for(int i = 0; i < server.getConnections().length; i++)
+			assignPlayer(1);
 		
 		message.message = "teammates:" + map.getTeammates().size();
 		sendToAllTCP(message);
@@ -116,20 +118,37 @@ public class Multiplayer extends Listener {
 		
 	}
 	
-	public void update() {
+	public void updateClient(boolean controlPlayer) {
 		/*if(isServer()) {
 			sendTransforms();
-		}else */if (gameReady && client.getTcpWriteBufferSize() < 8000){
+		}else */if (controlPlayer && gameReady && client.getTcpWriteBufferSize() < 8000){
 			
 			message.message = "delta:" + Gdx.graphics.getDeltaTime();
 			message.object = map.getInputs();
 			client.sendTCP(message);
 			
-			map.updateInputs();
 			
-			message.message = "shareTrans";
-			client.sendTCP(message);
+			map.updateInputs();
 		}
+		
+		message.message = "shareTrans";
+		client.sendTCP(message);
+	}
+	
+	public void processInputs() {
+		processingInputs = true;
+		
+		while(receivingInputs) {System.out.println("Waiting sh*t!");};
+		
+		for(int i = 0; i < awaitingInputs.size(); i++) {
+			map.controlPlayer(awaitingInputs.get(i), awaitingPlayers.get(i), awaitingInputDeltas.get(i));
+			
+			/*awaitingInputs.remove(i);
+			awaitingPlayers.remove(i);
+			awaitingInputDeltas.remove(i);*/
+		}
+		
+		processingInputs = false;
 	}
 	
 	private void sendTransforms(Connection c) {
@@ -204,6 +223,10 @@ public class Multiplayer extends Listener {
 	
 	//private Queue<Integer> awaitingIndexes = new Queue<Integer>();
 	//private final HashMap<Connection, InputController> awaitingInput = new HashMap<Connection, InputController>();
+	private final ArrayList<InputController> awaitingInputs = new ArrayList<InputController>();
+	private final ArrayList<Float> awaitingInputDeltas = new ArrayList<Float>();
+	private final ArrayList<Player> awaitingPlayers = new ArrayList<Player>();
+	private boolean processingInputs, receivingInputs;
 	@SuppressWarnings("unchecked")
 	@Override
 	public void received(final Connection c, final Object o) {
@@ -217,18 +240,22 @@ public class Multiplayer extends Listener {
 			}else if(message.equals("shareTrans")) {
 				sendTransforms(c);
 			}else if(message.contains("delta:")) {
-				/*Gdx.app.postRunnable(new Runnable() {
-
-					@Override
-					public void run() {*/
-						
-						map.controlPlayer((InputController) packet.object, connectionPlayer.get(c), Float.parseFloat(message.substring(message.indexOf(':') + 1)));
-						/*
-					}
-					
-				});*/
+				while(processingInputs) {System.out.println("Waiting sh*t!");}
 				
-				//awaitingInput.clear();
+				receivingInputs = true;
+				
+				int tempIndex = awaitingPlayers.indexOf(connectionPlayer.get(c));
+				if(tempIndex != -1) {
+					awaitingInputs.remove(tempIndex);
+					awaitingPlayers.remove(tempIndex);
+					awaitingInputDeltas.remove(tempIndex);
+				}
+				
+				awaitingInputs.add((InputController) packet.object);
+				awaitingInputDeltas.add(Float.parseFloat(message.substring(message.indexOf(':') + 1)));
+				awaitingPlayers.add(connectionPlayer.get(c));
+				
+				receivingInputs = false;
 			}else if(message.contains("mainPlayer:")) {
 				Gdx.app.postRunnable(new Runnable() {
 

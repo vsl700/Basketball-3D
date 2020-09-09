@@ -85,8 +85,6 @@ public class GameScreen implements Screen, GameMessageListener, GUIRenderer {
 			}
 
 		};
-		
-		updateThread = new VEThread(updateRunnable);
 
 		mBatch = new ModelBatch();
 
@@ -188,6 +186,9 @@ public class GameScreen implements Screen, GameMessageListener, GUIRenderer {
 			} else if (map.getMultiplayer().isMultiplayer() && map.getMultiplayer().isServer())
 				map.getMultiplayer().begin();
 		}
+		
+		if(updateThread == null)
+			updateThread = new VEThread(updateRunnable);
 		
 		Gdx.input.setInputProcessor(map.getInputs());
 	}
@@ -474,6 +475,12 @@ public class GameScreen implements Screen, GameMessageListener, GUIRenderer {
 		awayScore.setText(0 + "");
 		
 		sender = null;
+		
+		if (updateThread != null) {
+			updateThread.waitToFinish();
+			updateThread.interrupt();
+			updateThread = null;
+		}
 		//map.dispose();
 		//game.resetMap();
 	}
@@ -487,8 +494,10 @@ public class GameScreen implements Screen, GameMessageListener, GUIRenderer {
 	public void dispose() {
 		mBatch.dispose();
 		
-		if(!updateThread.getState().equals(State.NEW))
+		if(updateThread != null && !updateThread.getState().equals(State.NEW)) {
+			updateThread.waitToFinish();
 			updateThread.interrupt();
+		}
 		
 		batch.dispose();
 		shape.dispose();

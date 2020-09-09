@@ -45,6 +45,7 @@ public class VEThread extends Thread {
 
 	@Override
     public void interrupt(){
+		uses--;
 	    run = false;
         synchronized(this) {
             notify();

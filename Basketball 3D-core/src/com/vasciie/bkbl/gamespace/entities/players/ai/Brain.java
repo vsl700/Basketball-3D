@@ -205,7 +205,7 @@ public class Brain {
 				
 				//If a teammate of the current player (either a teammate or an opponent to the main player) is holding the ball
 				if(user instanceof Teammate && user.getMap().isBallInTeam() || user instanceof Opponent && user.getMap().isBallInOpp()) {
-					if(user.getMap().getHoldingPlayer().isCurrentlyAiming() || user.getMap().getHoldingPlayer().isShooting()) {
+					if(user.getMap().getHoldingPlayer() != null && user.getMap().getHoldingPlayer().isCurrentlyAiming() || user.getMap().getHoldingPlayer().isShooting()) {
 						if(!stateMachine.isInState(PlayerState.HOLDING_PLAYER_SHOOTING)) stateMachine.changeState(PlayerState.HOLDING_PLAYER_SHOOTING);
 					}
 					else if(!stateMachine.isInState(PlayerState.COOPERATIVE)) stateMachine.changeState(PlayerState.COOPERATIVE);

@@ -242,7 +242,7 @@ public class MyGdxGame extends Game implements GameMessageListener, GUIRenderer 
 				batch.end();
 			}
 		}
-		else if(game.paused()) game.render(Gdx.graphics.getDeltaTime());
+		else if(game.paused() && !map.getMultiplayer().isMultiplayer()) game.render(Gdx.graphics.getDeltaTime());
 		
 		super.render();
 		

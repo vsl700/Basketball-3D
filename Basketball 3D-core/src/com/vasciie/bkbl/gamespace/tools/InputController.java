@@ -306,6 +306,10 @@ public class InputController implements InputProcessor {
     public int getScroll() {
         return scroll;
     }
+    
+    /*public boolean[] toBooleanArray() {
+    	return new boolean[] {forwardPressed, backwardPressed, strRightPressed, strLeftPressed, sprintPressed, shootPressed, dribbleLPressed, dribbleRPressed};
+    }*/
 
     @Override
     public boolean keyDown(int keycode) {
