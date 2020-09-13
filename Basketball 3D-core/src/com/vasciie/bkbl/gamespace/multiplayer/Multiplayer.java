@@ -3,6 +3,7 @@ package com.vasciie.bkbl.gamespace.multiplayer;
 import java.util.ArrayList;
 import java.util.HashMap;
 
+import com.badlogic.gdx.Application;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.math.Matrix4;
 import com.badlogic.gdx.utils.Array;
@@ -123,22 +124,25 @@ public class Multiplayer extends Listener {
 			sendTransforms();
 		}else */if (controlPlayer && gameReady && client.getTcpWriteBufferSize() < 8000){
 			
+			if(Gdx.app.getType().equals(Application.ApplicationType.Android) && !map.isGameRunning())
+				map.getInputs().updateRotation();
+			
 			message.message = "delta:" + Gdx.graphics.getDeltaTime();
 			message.object = map.getInputs();
 			client.sendTCP(message);
-			
 			
 			map.updateInputs();
 		}
 		
 		message.message = "shareTrans";
+		message.object = null;
 		client.sendTCP(message);
 	}
 	
 	public void processInputs() {
 		processingInputs = true;
 		
-		while(receivingInputs) {System.out.println("Waiting sh*t!");};
+		while(receivingInputs) {System.out.println("Waiting input receiving!");};
 		
 		for(int i = 0; i < awaitingInputs.size(); i++) {
 			map.controlPlayer(awaitingInputs.get(i), awaitingPlayers.get(i), awaitingInputDeltas.get(i));
@@ -152,6 +156,9 @@ public class Multiplayer extends Listener {
 	}
 	
 	private void sendTransforms(Connection c) {
+		if(c.getTcpWriteBufferSize() >= 8000)
+			return;
+		
 		ArrayList<Player> tempPlayers = map.getAllPlayers();
 		for(int i = 0; i < tempPlayers.size(); i++) {
 			message.message = "index:" + i;
@@ -181,6 +188,7 @@ public class Multiplayer extends Listener {
 		join = false;
 		gameReady = false;
 		
+		message.message = null;
 		message.object = null;
 		
 		//client = null;
@@ -193,7 +201,14 @@ public class Multiplayer extends Listener {
 		//inputConnection.clear();
 		host = false;
 		
+		message.message = null;
 		message.object = null;
+		
+		awaitingInputs.clear();
+		awaitingInputDeltas.clear();
+		awaitingPlayers.clear();
+		
+		processingInputs = receivingInputs = false;
 		//server = null;
 	}
 	
@@ -240,7 +255,7 @@ public class Multiplayer extends Listener {
 			}else if(message.equals("shareTrans")) {
 				sendTransforms(c);
 			}else if(message.contains("delta:")) {
-				while(processingInputs) {System.out.println("Waiting sh*t!");}
+				while(processingInputs) {System.out.println("Waiting inputs processing!");}
 				
 				receivingInputs = true;
 				

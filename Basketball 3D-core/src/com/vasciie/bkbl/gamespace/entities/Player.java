@@ -302,8 +302,9 @@ public abstract class Player extends Entity {
 	public void turnX(float x) {
 		float pitch = camMatrix.getRotation(new Quaternion()).getPitch();
 		
-		if(Math.abs(pitch + x) <= 38)
+		if(Math.abs(pitch + x) <= 38) {
 			camMatrix.rotate(1, 0, 0, x);
+		}
 	}
 	
 	public void walk(Vector3 dir) {
@@ -669,7 +670,7 @@ public abstract class Player extends Entity {
 		tempVec.y = (-camMatrix.getRotation(new Quaternion()).getPitch() / 100) * 2;
 		
 		float tempShootPower;
-		if(isMainPlayer())
+		if(!isABot())
 			tempShootPower = shootingPower - 1;
 		else tempShootPower = shootingPower;
 		
@@ -808,6 +809,7 @@ public abstract class Player extends Entity {
 			oppositeHolding = leftHoldingBall;
 		}
 		
+		System.out.println(handBall);
 		
 		
 		if(oppositeHolding) {
@@ -1793,6 +1795,8 @@ public abstract class Player extends Entity {
 	public Array<Matrix4> getNodesTransforms(){
 		nodesTransforms.clear();
 		
+		nodesTransforms.add(camMatrix);
+		
 		for(Object node : modelInstance.nodes.items) {
 			if(node == null)
 				break;
@@ -1817,6 +1821,9 @@ public abstract class Player extends Entity {
 	public void setNodesTransforms(Array<Matrix4> nodesTrans) {
 		index = 0;
 		
+		camMatrix.set(nodesTrans.get(index));
+		index++;
+		
 		for(Object node : modelInstance.nodes.items) {
 			if(node == null)
 				break;
@@ -1832,6 +1839,9 @@ public abstract class Player extends Entity {
 		}
 		
 		currentNode.globalTransform.set(nodesTrans.get(index));
+		/*if(currentNode.id.equals("head"))
+			camMatrix.set(currentNode.globalTransform);*/
+		
 		index++;
 	}
 	

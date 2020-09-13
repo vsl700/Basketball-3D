@@ -464,7 +464,7 @@ public class GameScreen implements Screen, GameMessageListener, GUIRenderer {
 
 	@Override
 	public void resume() {
-		
+		Gdx.input.setCursorPosition((int) cam.viewportWidth / 2, (int) cam.viewportHeight / 2);
 	}
 	
 	public void reset() {

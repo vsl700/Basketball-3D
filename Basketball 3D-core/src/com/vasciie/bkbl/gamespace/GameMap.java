@@ -1113,7 +1113,7 @@ public class GameMap implements GameMessageSender {
     }
 
     private void turnPlayer(InputController inputs, Player player, float delta) {
-        if (Gdx.app.getType().equals(Application.ApplicationType.Android) && !gameRunning)
+        if (Gdx.app.getType().equals(Application.ApplicationType.Android) && !gameRunning && inputs.equals(this.inputs))
             inputs.updateRotation();
 
         float turnY = inputs.getDeltaX(); //Around the Y-axis
@@ -1130,6 +1130,12 @@ public class GameMap implements GameMessageSender {
         if (Math.abs(turnY) < Gdx.graphics.getWidth() / 4) {
             player.turnY(turnY * (delta + add));
         }
+        
+        /*if(!inputs.equals(this.inputs)) {
+        	System.out.println(turnX);
+        	System.out.println(turnX * (delta + add));
+        	System.out.println();
+        }*/
 
         if (Math.abs(turnX) < Gdx.graphics.getHeight() / 4) {
             player.turnX(turnX * (delta + add));
