@@ -210,6 +210,8 @@ public class GameMap implements GameMessageSender {
         opponents = new ArrayList<Player>(5);
         
         targetScore = 15;
+        
+        interrupted = true;
     }
     
     private void createPhysics() {

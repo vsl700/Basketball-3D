@@ -1318,7 +1318,7 @@ public abstract class Player extends Entity {
 		if(!leftHoldingBall && !rightHoldingBall || !leftAimBall && !rightAimBall) {
 			leftCurrentAim = rightCurrentAim = false;
 			
-			if(map.getHoldingPlayer() != null && !map.getHoldingPlayer().equals(this) || map.isTutorialMode())
+			if(map.getHoldingPlayer() != null && !map.getHoldingPlayer().equals(this) || map.isTutorialMode() || map.getMultiplayer().isMultiplayer())
 				thrownTime = 0;
 			else if(thrownTime > 0) {
 				map.getBall().getMainBody().setLinearVelocity(targetDir);
