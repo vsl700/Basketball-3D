@@ -52,7 +52,7 @@ public class GameScreen implements Screen, GameMessageListener, GUIRenderer {
 	PauseScreen pause;
 	
 	Label homeScore, awayScore, minorMessage, power, powerNum, foulsAmount;
-	Label ruleHeading, ruleDesc, clickToCont, playerRemove;
+	Label messageHeading, messageDesc, clickToCont, playerRemove;
 	Label[] challenges, currentChallenges;
 	
 	GUIBox messageBox;
@@ -123,8 +123,8 @@ public class GameScreen implements Screen, GameMessageListener, GUIRenderer {
 		powerNum = new Label("x1", powFont, Color.WHITE, Color.RED, false, this);
 		foulsAmount = new Label("", textFont, Color.BLACK, Color.ORANGE.cpy().sub(0, 0.3f, 0, 1), false, this);
 		
-		ruleHeading = new Label("", textFont, true, this);
-		ruleDesc = new Label("", powFont, true, this);
+		messageHeading = new Label("", textFont, true, this);
+		messageDesc = new Label("", powFont, true, this);
 
 		String message;
 		if(Gdx.app.getType().equals(Application.ApplicationType.Android))
@@ -134,7 +134,7 @@ public class GameScreen implements Screen, GameMessageListener, GUIRenderer {
 		
 		playerRemove = new Label("Rule Triggerer Will Be Removed From The Game As He Just Got His 7th Foul!", powFont, Color.RED, true, this);
 		
-		messageBox = new GUIBox(this, new GUI[] {ruleHeading, ruleDesc, clickToCont, playerRemove}, 0);
+		messageBox = new GUIBox(this, new GUI[] {messageHeading, messageDesc, clickToCont, playerRemove}, 0);
 	}
 
 	@Override
@@ -183,8 +183,11 @@ public class GameScreen implements Screen, GameMessageListener, GUIRenderer {
 					map.spawnPlayers(amount, amount);
 				else
 					map.spawnPlayers(1, amount);
-			} else if (map.getMultiplayer().isMultiplayer() && map.getMultiplayer().isServer())
-				map.getMultiplayer().begin();
+			} else if (map.getMultiplayer().isMultiplayer() && map.getMultiplayer().isServer()) {
+				map.setDifficulty(0);
+			}
+			
+			map.begin();
 		}
 		
 		if(updateThread == null)
@@ -222,8 +225,8 @@ public class GameScreen implements Screen, GameMessageListener, GUIRenderer {
 		if(Gdx.app.getType().equals(Application.ApplicationType.Android))
 			map.renderController();
 		
-		ruleHeading.draw();
-		ruleDesc.draw();
+		messageHeading.draw();
+		messageDesc.draw();
 		clickToCont.draw();
 		playerRemove.draw();
 
@@ -286,10 +289,10 @@ public class GameScreen implements Screen, GameMessageListener, GUIRenderer {
 				if (sender != null/* || map.isRuleTriggered() || map.getChallenges().isAChallengeBroken()*/) { // If the game is not running and
 											// there is no timer counting down
 					messageBox.update();
-					ruleHeading.update();
+					messageHeading.update();
 
-					if (!ruleDesc.getText().equals(""))
-						ruleDesc.update();
+					if (!messageDesc.getText().equals(""))
+						messageDesc.update();
 
 					if (map.getDifficulty() > 0 && map.isRuleTriggered() && map.getRules().getTriggeredRule().getRuleTriggerer().getFouls() == 7)
 						playerRemove.update();
@@ -312,13 +315,13 @@ public class GameScreen implements Screen, GameMessageListener, GUIRenderer {
 								return;
 							}
 
-							String tempText = ruleHeading.getText();
+							String tempText = messageHeading.getText();
 							sender.messageReceived();
 
 							if (!map.isTutorialMode() && (map.getRules().getTriggeredRule() != null && (map.getTeammates().size() == 0 || map.getOpponents().size() == 0)))
 								game.setScreen(game.gameOver);
 
-							if (ruleHeading.getText().equals(tempText))
+							if (messageHeading.getText().equals(tempText))
 								sender = null;
 						}
 					} else if (contTimer > 0)
@@ -430,9 +433,9 @@ public class GameScreen implements Screen, GameMessageListener, GUIRenderer {
 	
 	private void resizeMessageText(int width, int height) {
 		float diff = 140;
-		ruleHeading.setPosAndSize(width / 2 - (width - diff) / 2, height - 80, width - diff, ruleHeading.getRows() * textFont.getLineHeight());
-		ruleDesc.setPosAndSize(width / 2 - (width - diff) / 2, ruleHeading.getY() - 30 * ruleDesc.getRows(), width - diff);
-		clickToCont.setPosAndSize(width / 2 - (width - diff) / 2, ruleDesc.getY() - 40 * clickToCont.getRows(), width - diff);
+		messageHeading.setPosAndSize(width / 2 - (width - diff) / 2, height - 80, width - diff, messageHeading.getRows() * textFont.getLineHeight());
+		messageDesc.setPosAndSize(width / 2 - (width - diff) / 2, messageHeading.getY() - 30 * messageDesc.getRows(), width - diff);
+		clickToCont.setPosAndSize(width / 2 - (width - diff) / 2, messageDesc.getY() - 40 * clickToCont.getRows(), width - diff);
 		playerRemove.setPosAndSize(width / 2 - (width - diff) / 2, clickToCont.getY() - 30 * playerRemove.getRows(), width - diff);
 		
 		//messageBarWidth = width - diff;
@@ -523,11 +526,11 @@ public class GameScreen implements Screen, GameMessageListener, GUIRenderer {
 			}
 		}
 		
-		ruleHeading.setText(heading);
-		ruleHeading.setColor(textColor);
+		messageHeading.setText(heading);
+		messageHeading.setColor(textColor);
 		
-		ruleDesc.setText(desc);
-		ruleDesc.setColor(textColor);
+		messageDesc.setText(desc);
+		messageDesc.setColor(textColor);
 		
 		homeScore.setText(map.getTeamScore() + "");
 		awayScore.setText(map.getOppScore() + "");
@@ -540,6 +543,8 @@ public class GameScreen implements Screen, GameMessageListener, GUIRenderer {
 		
 		resizeMessageText();
 		
+		if(map.getMultiplayer().isServer())
+			map.getMultiplayer().sendMessage();
 		
 	}
 
@@ -574,5 +579,22 @@ public class GameScreen implements Screen, GameMessageListener, GUIRenderer {
 	public void sendMessage(String message, Color textColor, GameMessageSender sender, boolean skippable) {
 		
 		
+	}
+
+	@Override
+	public String getMessageHeading() {
+		
+		return messageHeading.getText();
+	}
+
+	@Override
+	public String getMessageDesc() {
+		
+		return messageDesc.getText();
+	}
+
+	@Override
+	public Color getMessageColor() {
+		return messageHeading.getColor();
 	}
 }

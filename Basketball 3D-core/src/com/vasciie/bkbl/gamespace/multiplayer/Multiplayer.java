@@ -5,6 +5,7 @@ import java.util.HashMap;
 
 import com.badlogic.gdx.Application;
 import com.badlogic.gdx.Gdx;
+import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.math.Matrix4;
 import com.badlogic.gdx.utils.Array;
 import com.esotericsoftware.kryonet.Client;
@@ -18,6 +19,7 @@ import com.vasciie.bkbl.gamespace.tools.InputController;
 public class Multiplayer extends Listener {
 
 	private static final PacketMessage message = new PacketMessage();
+	private static final GameMessage gameMessage = new GameMessage();
 	
 	private static final int udpPort = 27960, tcpPort = 27960;
 	Server server;
@@ -38,7 +40,26 @@ public class Multiplayer extends Listener {
 		this.map = map;
 		
 		server = new Server(); //Create the server
+		server.getKryo().register(PacketMessage.class); //Register a packet class. We can only send objects as packets if they are registered!
+		server.getKryo().register(float.class);
+		server.getKryo().register(float[].class);
+		server.getKryo().register(Object[].class);
+		server.getKryo().register(Matrix4.class);
+		server.getKryo().register(Array.class);//For the transforms
+		server.getKryo().register(InputController.class);
+		server.getKryo().register(GameMessage.class);
+		server.getKryo().register(Color.class);
+		
 		client = new Client(); //Create the client
+		client.getKryo().register(PacketMessage.class);
+		client.getKryo().register(float.class);
+		client.getKryo().register(float[].class);
+		client.getKryo().register(Object[].class);
+		client.getKryo().register(Matrix4.class);
+		client.getKryo().register(Array.class);//For the transforms
+		client.getKryo().register(InputController.class);
+		client.getKryo().register(GameMessage.class);
+		client.getKryo().register(Color.class);
 		
 		//inputConnection = new HashMap<InputController, Connection>();
 		connectionPlayer = new HashMap<Connection, Player>();
@@ -46,13 +67,6 @@ public class Multiplayer extends Listener {
 	
 	public void create() throws Exception {
 		team = 1;
-		
-		server.getKryo().register(PacketMessage.class); //Register a packet class. We can only send objects as packets if they are registered!
-		server.getKryo().register(float[].class);
-		server.getKryo().register(Object[].class);
-		server.getKryo().register(Matrix4.class);
-		server.getKryo().register(Array.class);//For the transforms
-		server.getKryo().register(InputController.class);
 		
 		server.bind(tcpPort, udpPort); //Bind to a port
 		
@@ -64,13 +78,6 @@ public class Multiplayer extends Listener {
 	}
 	
 	public void join(String ip) throws Exception {
-		client.getKryo().register(PacketMessage.class);
-		client.getKryo().register(float[].class);
-		client.getKryo().register(Object[].class);
-		client.getKryo().register(Matrix4.class);
-		client.getKryo().register(Array.class);//For the transforms
-		client.getKryo().register(InputController.class);
-		
 		client.setName("tempClient");
 		
 		new Thread(client).start(); //Start the client! The client MUST be started before connecting can take place
@@ -97,10 +104,10 @@ public class Multiplayer extends Listener {
 			assignPlayer(1);
 		
 		message.message = "teammates:" + map.getTeammates().size();
-		sendToAllTCP(message);
+		sendToAllTCP(message, true);
 		
 		message.message = "opponents:" + map.getOpponents().size();
-		sendToAllTCP(message);
+		sendToAllTCP(message, true);
 		
 		ArrayList<Player> tempPlayers = map.getAllPlayers();
 		for(int i = 0; i < server.getConnections().length; i++) {
@@ -115,7 +122,7 @@ public class Multiplayer extends Listener {
 		
 		
 		message.message = "ready";
-		sendToAllTCP(message);
+		sendToAllTCP(message, true);
 		
 	}
 	
@@ -134,7 +141,7 @@ public class Multiplayer extends Listener {
 			map.updateInputs();
 		}
 		
-		message.message = "shareTrans";
+		message.message = "shareData";
 		message.object = null;
 		client.sendTCP(message);
 	}
@@ -153,6 +160,23 @@ public class Multiplayer extends Listener {
 		}
 		
 		processingInputs = false;
+	}
+	
+	public void sendMessage() {
+		gameMessage.heading = map.getMessageListener().getMessageHeading();
+		gameMessage.desc = map.getMessageListener().getMessageDesc();
+		gameMessage.color = map.getMessageListener().getMessageColor();
+		sendToAllTCP(gameMessage, false);
+		
+		gameMessage.reset();
+	}
+	
+	private void sendGameData(Connection c) {
+		message.message = "timer";
+		message.object = map.getTimer();
+		c.sendTCP(message);
+		
+		sendTransforms(c);
 	}
 	
 	private void sendTransforms(Connection c) {
@@ -174,9 +198,9 @@ public class Multiplayer extends Listener {
 		}
 	}
 	
-	private void sendToAllTCP(Object o) {
+	private void sendToAllTCP(Object o, boolean waitTCP) {
 		for(Connection c : server.getConnections()) {
-			if(c.getTcpWriteBufferSize() < 8000) {
+			if(waitTCP && c.getTcpWriteBufferSize() < 8000 || !waitTCP) {
 				c.sendTCP(o);
 			}
 		}
@@ -252,8 +276,8 @@ public class Multiplayer extends Listener {
 				c.sendTCP(map.getInputs());
 			}else */if(message.equals("ready")) {
 				gameReady = true;
-			}else if(message.equals("shareTrans")) {
-				sendTransforms(c);
+			}else if(message.equals("shareData")) {
+				sendGameData(c);
 			}else if(message.contains("delta:")) {
 				while(processingInputs) {System.out.println("Waiting inputs processing!");}
 				

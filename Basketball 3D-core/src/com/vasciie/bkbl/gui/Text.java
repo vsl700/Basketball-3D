@@ -64,4 +64,8 @@ public abstract class Text extends GUI {
 		a = color.a;
 	}
 	
+	public Color getColor() {
+		return new Color(r, g, b, a);
+	}
+	
 }

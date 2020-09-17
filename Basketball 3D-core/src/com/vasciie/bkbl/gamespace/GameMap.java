@@ -96,7 +96,7 @@ public class GameMap implements GameMessageSender {
     private VEThread physicsThread;
     Runnable dynamicsWorldRunnable;
 
-    GameMessageListener rulesListener;
+    GameMessageListener messageListener;
     
     Rules rules;
     Zones zones;
@@ -172,7 +172,7 @@ public class GameMap implements GameMessageSender {
 			};
 		}
 		
-		rulesListener = messageListener;
+		this.messageListener = messageListener;
 		
         inputs = new InputController(guiRenderer);
 
@@ -367,7 +367,7 @@ public class GameMap implements GameMessageSender {
         boolean addCollisions = isSingleOrServer();
 
         for (int i = 0; i < countTeam; i++) {
-            Player teammate = EntityType.createPlayer(EntityType.TEAMMATE.getId(), this, new Vector3(spawnCoords[i + teammates.size()][0], spawnCoords[i + teammates.size()][1], spawnCoords[i + teammates.size()][2]));
+            Player teammate = EntityType.createPlayer(EntityType.TEAMMATE.getId(), this, new Vector3(spawnCoords[teammates.size()][0], spawnCoords[teammates.size()][1], spawnCoords[teammates.size()][2]));
             
 			if (addCollisions) {
 				for (btRigidBody co : teammate.getBodies()) {
@@ -423,7 +423,7 @@ public class GameMap implements GameMessageSender {
 
         playerIndex = 1;
         for (int i = 0; i < countOpp; i++) {
-            Player opponent = EntityType.createPlayer(EntityType.OPPONENT.getId(), this, new Vector3(spawnCoords[i + opponents.size()][0], spawnCoords[i + opponents.size()][1], -spawnCoords[i + opponents.size()][2]));
+            Player opponent = EntityType.createPlayer(EntityType.OPPONENT.getId(), this, new Vector3(spawnCoords[opponents.size()][0], spawnCoords[opponents.size()][1], -spawnCoords[opponents.size()][2]));
             
 			if (addCollisions) {
 				for (btRigidBody co : opponent.getBodies()) {
@@ -490,20 +490,7 @@ public class GameMap implements GameMessageSender {
         //if (Gdx.app.getType().equals(Application.ApplicationType.Android))
             //Gdx.input.setCatchKey(com.badlogic.gdx.Input.Keys.BACK, true);
 
-        startTimer = 5.5f;
-        playersReady = true;
         
-        terrain.createTheme();
-        if(terrain.getTheme() != null)
-        	MyGdxGame.setColor(terrain.getTheme().getThemeColor());
-        else MyGdxGame.clearColor();
-        
-        createCache();
-        
-        firstShown = false;
-        
-        if(isChallenge() && !challenges.isSetup())
-        	challenges.setup();
         
         /*currentTutorialLevel = (TutorialLevel) tutorial.getGameLevel(difficulty);
         currentTutorialLevel.setLevelPart(0);*/
@@ -564,6 +551,26 @@ public class GameMap implements GameMessageSender {
         //lastBallIndex = index - 1;
     }
 
+    public void begin() {
+    	if(multiplayer.isServer())
+    		multiplayer.begin();
+    	
+    	startTimer = 5.5f;
+        playersReady = true;
+        
+        terrain.createTheme();
+        if(terrain.getTheme() != null)
+        	MyGdxGame.setColor(terrain.getTheme().getThemeColor());
+        else MyGdxGame.clearColor();
+        
+        createCache();
+        
+        firstShown = false;
+        
+        if(isChallenge())
+        	challenges.setup();
+    }
+    
     public void clear() {
     	if(SettingsScreen.multithreadOption || !physicsThread.getState().equals(State.NEW)) {
     		physicsThread.waitToFinish();
@@ -759,7 +766,7 @@ public class GameMap implements GameMessageSender {
         		GameRule rule = rules.getTriggeredRule();
         		
         		onRuleTriggered(rule);
-				rulesListener.sendMessage(rule.getName(), rule.getDescription(), rule.getTextColor(), this, true, false);
+				messageListener.sendMessage(rule.getName(), rule.getDescription(), rule.getTextColor(), this, true, false);
         	}
 
         	if(isChallenge())
@@ -872,7 +879,7 @@ public class GameMap implements GameMessageSender {
     }
     
     private void sendChallengeMessage() {
-    	rulesListener.sendMessage(challenges.getBrokenChallenge().getName(), "According To This Challenge The Game Is Over!", Color.RED, this, true, false);
+    	messageListener.sendMessage(challenges.getBrokenChallenge().getName(), "According To This Challenge The Game Is Over!", Color.RED, this, true, false);
     }
 
     public void onMessageContinue() {
@@ -1179,7 +1186,11 @@ public class GameMap implements GameMessageSender {
         }
     }
 
-    public btDynamicsWorld getDynamicsWorld() {
+    public GameMessageListener getMessageListener() {
+		return messageListener;
+	}
+
+	public btDynamicsWorld getDynamicsWorld() {
         return dynamicsWorld;
     }
 

@@ -124,7 +124,7 @@ public class SettingsScreen implements Screen, UpDownListener, GUIRenderer, Game
 			fullscreen.setToggled(Gdx.graphics.isFullscreen());
 			fpsUpDown.setOption(game.getForegroundFps());
 			//multithread.setToggled(true);
-			multithreadOption = true;
+			multithreadOption = false;
 			
 			SettingsPrefsIO.writeSettingBool("exists", true);
 			writeSettings();

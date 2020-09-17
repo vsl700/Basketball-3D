@@ -493,4 +493,22 @@ public class MyGdxGame extends Game implements GameMessageListener, GUIRenderer 
 		
 		return cam;
 	}
+
+	@Override
+	public String getMessageHeading() {
+		
+		return messageLabel.getText();
+	}
+
+	@Override
+	public String getMessageDesc() {
+		
+		return messageLabel.getText();
+	}
+
+	@Override
+	public Color getMessageColor() {
+		
+		return messageLabel.getColor();
+	}
 }

@@ -12,4 +12,10 @@ public interface GameMessageListener {
 	
 	public void sendMinorMessage(String message);
 	
+	public String getMessageHeading();
+	
+	public String getMessageDesc();
+	
+	public Color getMessageColor();
+	
 }

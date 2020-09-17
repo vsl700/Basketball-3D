@@ -36,7 +36,7 @@ public class Ball extends Entity {
 	@Override
 	public void update(float delta) {
 		//System.out.println(getWidth() + " ball radius");
-		modelInstance.transform.set(getMainBody().getWorldTransform());
+		//modelInstance.transform.set(getMainBody().getWorldTransform());
 		manuallySetCollTransform();
 		//getMainBody().getWorldTransform(); //For some reason I had to call this to make everything work :| (ball's modelInstance teleports into the main player's stomach)
 	}
@@ -86,7 +86,7 @@ public class Ball extends Entity {
 			modelInstance.transform.set(trans);
 		else {*/
 		modelInstance.transform.set(trans);
-		getMainBody().setWorldTransform(trans);
+		getMainBody().proceedToTransform(modelInstance.transform);
 		manuallySetCollTransform();
 		//}
 	}
@@ -112,6 +112,8 @@ public class Ball extends Entity {
 		
 		//if(collisionObjects == null)//If we are only resetting rigid body
 		//modelInstance.transform = getMainBody().getWorldTransform();
+		
+		//getMainBody().proceedToTransform(modelInstance.transform);
 		
 		collisionObjects = new ArrayList<btCollisionObject>();
 		
