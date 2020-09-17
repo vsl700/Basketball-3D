@@ -809,8 +809,6 @@ public abstract class Player extends Entity {
 			oppositeHolding = leftHoldingBall;
 		}
 		
-		System.out.println(handBall);
-		
 		
 		if(oppositeHolding) {
 			if(!opposite.current.animation.id.equals("dribblePhase1Arm" + oppositeId)) {

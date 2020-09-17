@@ -144,7 +144,7 @@ public class Multiplayer extends Listener {
 		
 		while(receivingInputs) {System.out.println("Waiting input receiving!");};
 		
-		for(int i = 0; i < awaitingInputs.size(); i++) {
+		for(int i = awaitingInputs.size() - 1; i >= 0; i--) {
 			map.controlPlayer(awaitingInputs.get(i), awaitingPlayers.get(i), awaitingInputDeltas.get(i));
 			
 			/*awaitingInputs.remove(i);

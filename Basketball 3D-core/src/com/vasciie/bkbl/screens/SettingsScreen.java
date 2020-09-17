@@ -36,7 +36,7 @@ public class SettingsScreen implements Screen, UpDownListener, GUIRenderer, Game
 	Button goBack;
 	CheckButton beautifulGfx, fullscreen;
 	CheckButton invX, invY;
-	CheckButton multithread;
+	//CheckButton multithread;
 	NumUpDown fpsUpDown;
 	//TextUpDown resUpDown;
 	Label fpsLabel, camRotLabel, mthLabel;
@@ -93,7 +93,7 @@ public class SettingsScreen implements Screen, UpDownListener, GUIRenderer, Game
 		fullscreen = new CheckButton("Fullscreen", font, Color.ORANGE.cpy().sub(0, 0.3f, 0, 1), true, true, this);
 		invX = new CheckButton("Invert camera X", font, Color.ORANGE.cpy().sub(0, 0.3f, 0, 1), true, true, this);
 		invY = new CheckButton("Invert camera Y", font, Color.ORANGE.cpy().sub(0, 0.3f, 0, 1), true, true, this);
-		multithread = new CheckButton("Multithreaded Update", font, Color.ORANGE.cpy().sub(0, 0.3f, 0, 1), true, true, this);
+		//multithread = new CheckButton("Multithreaded Update", font, Color.ORANGE.cpy().sub(0, 0.3f, 0, 1), true, true, this);
 		
 		fpsUpDown = new NumUpDown(font, font2, Color.WHITE, Color.BROWN, new Color().set(0.8f, 0.4f, 0, 1), 20, 240, 10, this);
 		//fpsUpDown.addException(0, "Inf.");
@@ -112,7 +112,7 @@ public class SettingsScreen implements Screen, UpDownListener, GUIRenderer, Game
 			beautifulGfx.setToggled(SettingsPrefsIO.readSettingBool("beautifulBack"));
 			fullscreen.setToggled(SettingsPrefsIO.readSettingBool("fullscreen"));
 			fpsUpDown.setOption(SettingsPrefsIO.readSettingInteger("fps"));
-			multithread.setToggled(multithreadOption = SettingsPrefsIO.readSettingBool("multithread"));
+			//multithread.setToggled(multithreadOption = SettingsPrefsIO.readSettingBool("multithread"));
 			invX.setToggled(invertX = SettingsPrefsIO.readSettingBool("invertX"));
 			invY.setToggled(invertY = SettingsPrefsIO.readSettingBool("invertY"));
 			
@@ -123,7 +123,7 @@ public class SettingsScreen implements Screen, UpDownListener, GUIRenderer, Game
 			beautifulGfx.setToggled(game.isBeautifulBack());
 			fullscreen.setToggled(Gdx.graphics.isFullscreen());
 			fpsUpDown.setOption(game.getForegroundFps());
-			multithread.setToggled(true);
+			//multithread.setToggled(true);
 			multithreadOption = true;
 			
 			SettingsPrefsIO.writeSettingBool("exists", true);
@@ -152,7 +152,7 @@ public class SettingsScreen implements Screen, UpDownListener, GUIRenderer, Game
 		fullscreen.update();
 		invX.update();
 		invY.update();
-		multithread.update();
+		//multithread.update();
 		
 		fpsUpDown.update();
 		
@@ -183,8 +183,8 @@ public class SettingsScreen implements Screen, UpDownListener, GUIRenderer, Game
 			invertX = invX.isToggled();
 		if(invY.justTouched() && !game.isThereAMessage())
 			invertY = invY.isToggled();
-		if(multithread.justTouched() && !game.isThereAMessage())
-			multithreadOption = multithread.isToggled();
+		/*if(multithread.justTouched() && !game.isThereAMessage())
+			multithreadOption = multithread.isToggled();*/
 
 		game.renderLogo(batch, cam);
 
@@ -194,7 +194,7 @@ public class SettingsScreen implements Screen, UpDownListener, GUIRenderer, Game
 		fullscreen.draw();
 		invX.draw();
 		invY.draw();
-		multithread.draw();
+		//multithread.draw();
 
 		fpsUpDown.draw();
 		fpsLabel.draw();
@@ -205,7 +205,7 @@ public class SettingsScreen implements Screen, UpDownListener, GUIRenderer, Game
 	private void writeSettings() {
 		SettingsPrefsIO.writeSettingBool("beautifulBack", game.isBeautifulBack());
 		SettingsPrefsIO.writeSettingBool("fullscreen", fullscreen.isToggled());
-		SettingsPrefsIO.writeSettingBool("multithread", multithread.isToggled());
+		//SettingsPrefsIO.writeSettingBool("multithread", multithread.isToggled());
 		SettingsPrefsIO.writeSettingBool("invertX", invertX);
 		SettingsPrefsIO.writeSettingBool("invertY", invertY);
 		if(fpsUpDown.getOption() == 0 || fpsUpDown.getOption() > 19)
@@ -247,8 +247,8 @@ public class SettingsScreen implements Screen, UpDownListener, GUIRenderer, Game
 		//resUpDown.setSize(game.pixelXByCurrentSize(74), game.pixelYByCurrentSize(45));
 		//resUpDown.setPos(width / 2 - resUpDown.getTotalWidth() / 2, height / 2 - resUpDown.getHeight() / 2);
 		
-		multithread.setSize(40, 40);
-		multithread.setPos(width / 2 - multithread.getTotalWidth() / 2, game.pixelYByCurrentSize(425));
+		//multithread.setSize(40, 40);
+		//multithread.setPos(width / 2 - multithread.getTotalWidth() / 2, game.pixelYByCurrentSize(425));
 		
 		fpsUpDown.setSize(game.pixelXByCurrentSize(74), game.pixelYByCurrentSize(45));
 		//fpsUpDown.setPos(width / 2 - fpsUpDown.getTotalWidth() / 2, height / 2 - fpsUpDown.getHeight() / 2 - resUpDown.getHeight() * 3);
@@ -266,7 +266,7 @@ public class SettingsScreen implements Screen, UpDownListener, GUIRenderer, Game
 		
 		camRotLabel.setPosAndSize(fpsUpDown.getX() + fpsUpDown.getTotalWidth() / 2 - 194 / 2, invY.getY() + invY.getHeight(), 194);
 		
-		mthLabel.setPosAndSize(fpsUpDown.getX() + fpsUpDown.getTotalWidth() / 2 - 194 / 2, multithread.getY() + invY.getHeight(), 194);
+		//mthLabel.setPosAndSize(fpsUpDown.getX() + fpsUpDown.getTotalWidth() / 2 - 194 / 2, multithread.getY() + invY.getHeight(), 194);
 		
 		fpsLabel.setPosAndSize(fpsUpDown.getX() + fpsUpDown.getTotalWidth() / 2 - 164 / 2, fpsUpDown.getY() + fpsUpDown.getHeight() + 10, 164);
 		//resLabel.setPosAndSize(resUpDown.getX() + resUpDown.getTotalWidth() / 2 - 164 / 2, resUpDown.getY() + resUpDown.getHeight() + 10, 164);

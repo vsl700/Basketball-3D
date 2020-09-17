@@ -82,12 +82,13 @@ public class Ball extends Entity {
 	
 	@Override
 	public void setWorldTransform(Matrix4 trans) {
-		if(map.getMultiplayer().isMultiplayer())
+		/*if(map.getMultiplayer().isMultiplayer())
 			modelInstance.transform.set(trans);
-		else {
-			getMainBody().setWorldTransform(trans);
-			manuallySetCollTransform();
-		}
+		else {*/
+		modelInstance.transform.set(trans);
+		getMainBody().setWorldTransform(trans);
+		manuallySetCollTransform();
+		//}
 	}
 	
 	/**
