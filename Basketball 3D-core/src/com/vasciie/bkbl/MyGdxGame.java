@@ -78,6 +78,7 @@ public class MyGdxGame extends Game implements GameMessageListener, GUIRenderer 
 	GUIBox messageBox;
 	Label messageLabel;
 	Button messageCont;
+	String[] messageArgs;
 	float messageTime;
 	boolean skippable;
 	
@@ -449,7 +450,7 @@ public class MyGdxGame extends Game implements GameMessageListener, GUIRenderer 
 	}
 
 	@Override
-	public void sendMessage(String heading, String description, Color textColor, GameMessageSender sender, boolean skippable, boolean showPower) {
+	public void sendMessage(String heading, String description, Color textColor, GameMessageSender sender, boolean skippable, String[] args) {
 		
 	}
 
@@ -510,5 +511,17 @@ public class MyGdxGame extends Game implements GameMessageListener, GUIRenderer 
 	public Color getMessageColor() {
 		
 		return messageLabel.getColor();
+	}
+
+	@Override
+	public String[] getMessageArgs() {
+		
+		return messageArgs;
+	}
+
+	@Override
+	public boolean isMessageSkippable() {
+		
+		return skippable;
 	}
 }

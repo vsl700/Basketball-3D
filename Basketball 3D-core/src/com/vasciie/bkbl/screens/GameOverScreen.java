@@ -113,11 +113,15 @@ public class GameOverScreen implements Screen, GUIRenderer {
 		basketScore.setText(basketScoreText + map.getTeamScore() + "-" + map.getOppScore());
 		mainPlayerScore.setText(mainPlayerScoreText + mainPlayerSc);
 		totalScore.setText(totalScoreText + (total));
+		
+		
+		map.getMultiplayer().onGameOver();
 	}
 
 	@Override
 	public void render(float delta) {
-		newGame.update();
+		if(game.getMap().isSingleOrServer())
+			newGame.update();
 		quit.update();
 		
 		gameOver.update();
@@ -137,6 +141,7 @@ public class GameOverScreen implements Screen, GUIRenderer {
 			game.setScreen(game.main);
 			game.game.reset();
 			game.getMap().getChallenges().reset();
+			game.getMap().stopMultiplayer();
 			game.main.sendWebPageMessage();
 			return;
 		}
@@ -162,10 +167,17 @@ public class GameOverScreen implements Screen, GUIRenderer {
 	public void resize(int width, int height) {
 		cam.setToOrtho(false, width, height);
 		
-		newGame.setSize(game.pixelXByCurrentSize(223 * MyGdxGame.GUI_SCALE), game.pixelYByCurrentSize(30 * MyGdxGame.GUI_SCALE));
-		newGame.setPos(width / 4 - newGame.getWidth() / 2 - 60, game.pixelYByCurrentSize(150 / MyGdxGame.GUI_SCALE));
+		if (game.getMap().isSingleOrServer()) {
+			newGame.setSize(game.pixelXByCurrentSize(223 * MyGdxGame.GUI_SCALE), game.pixelYByCurrentSize(30 * MyGdxGame.GUI_SCALE));
+			newGame.setPos(width / 4 - newGame.getWidth() / 2 - 60, game.pixelYByCurrentSize(150 / MyGdxGame.GUI_SCALE));
+		}
+		
 		quit.setSize(game.pixelXByCurrentSize(223 * MyGdxGame.GUI_SCALE), game.pixelYByCurrentSize(30 * MyGdxGame.GUI_SCALE));
-		quit.setPos(width * 3 / 4 - newGame.getWidth() / 2 + 60, game.pixelYByCurrentSize(150 / MyGdxGame.GUI_SCALE));
+		
+		quit.setY(game.pixelYByCurrentSize(150 / MyGdxGame.GUI_SCALE));
+		if(game.getMap().isSingleOrServer())
+			quit.setX(width * 3 / 4 - newGame.getWidth() / 2 + 60);
+		else quit.setX(width / 2 - newGame.getWidth() / 2 + 60);
 		
 		gameOver.setPos(width / 2, height - 40);
 		winInfo.setPos(width / 2, gameOver.getY() - 39);

@@ -43,6 +43,7 @@ public class Multiplayer extends Listener {
 		server.getKryo().register(PacketMessage.class); //Register a packet class. We can only send objects as packets if they are registered!
 		server.getKryo().register(float.class);
 		server.getKryo().register(float[].class);
+		server.getKryo().register(String[].class);
 		server.getKryo().register(Object[].class);
 		server.getKryo().register(Matrix4.class);
 		server.getKryo().register(Array.class);//For the transforms
@@ -54,6 +55,7 @@ public class Multiplayer extends Listener {
 		client.getKryo().register(PacketMessage.class);
 		client.getKryo().register(float.class);
 		client.getKryo().register(float[].class);
+		client.getKryo().register(String[].class);
 		client.getKryo().register(Object[].class);
 		client.getKryo().register(Matrix4.class);
 		client.getKryo().register(Array.class);//For the transforms
@@ -104,10 +106,10 @@ public class Multiplayer extends Listener {
 			assignPlayer(1);
 		
 		message.message = "teammates:" + map.getTeammates().size();
-		sendToAllTCP(message, true);
+		sendToAllTCP(message, false);
 		
 		message.message = "opponents:" + map.getOpponents().size();
-		sendToAllTCP(message, true);
+		sendToAllTCP(message, false);
 		
 		ArrayList<Player> tempPlayers = map.getAllPlayers();
 		for(int i = 0; i < server.getConnections().length; i++) {
@@ -122,14 +124,20 @@ public class Multiplayer extends Listener {
 		
 		
 		message.message = "ready";
-		sendToAllTCP(message, true);
+		sendToAllTCP(message, false);
 		
 	}
 	
 	public void updateClient(boolean controlPlayer) {
 		/*if(isServer()) {
 			sendTransforms();
-		}else */if (controlPlayer && gameReady && client.getTcpWriteBufferSize() < 8000){
+		}else */
+		/*if(!isServer() && !client.isConnected()) {
+			map.getMessageListener().sendMessage("", "", null, null, false, new String[] {"main"});
+			return;
+		}*/
+		
+		if (controlPlayer && gameReady && client.getTcpWriteBufferSize() < 8000){
 			
 			if(Gdx.app.getType().equals(Application.ApplicationType.Android) && !map.isGameRunning())
 				map.getInputs().updateRotation();
@@ -166,14 +174,25 @@ public class Multiplayer extends Listener {
 		gameMessage.heading = map.getMessageListener().getMessageHeading();
 		gameMessage.desc = map.getMessageListener().getMessageDesc();
 		gameMessage.color = map.getMessageListener().getMessageColor();
+		gameMessage.skippable = map.getMessageListener().isMessageSkippable();
+		gameMessage.args = map.getMessageListener().getMessageArgs();
 		sendToAllTCP(gameMessage, false);
 		
 		gameMessage.reset();
 	}
 	
+	public void receivedMessage() {
+		message.message = "received";
+		message.object = null;
+		
+		if(isServer())
+			sendToAllTCP(message, false);
+		else client.sendTCP(message);
+	}
+	
 	private void sendGameData(Connection c) {
-		message.message = "timer";
-		message.object = map.getTimer();
+		message.message = "timer:" + map.getTimer();
+		message.object = null;
 		c.sendTCP(message);
 		
 		sendTransforms(c);
@@ -218,7 +237,22 @@ public class Multiplayer extends Listener {
 		//client = null;
 	}
 	
+	public void onNewGame() {
+		message.message = "newGame";
+		message.object = null;
+		sendToAllTCP(message, false);
+	}
+	
+	public void onGameOver() {
+		message.message = "gameOver";
+		message.object = null;
+		sendToAllTCP(message, false);
+	}
+	
 	public void quit() {
+		gameMessage.args = new String[] {"main"};
+		sendToAllTCP(gameMessage, false);
+		
 		server.stop();
 		
 		connectionPlayer.clear();
@@ -278,6 +312,18 @@ public class Multiplayer extends Listener {
 				gameReady = true;
 			}else if(message.equals("shareData")) {
 				sendGameData(c);
+			}else if(message.contains("timer:")) {
+				map.setTimer(Float.parseFloat(message.substring(message.indexOf(':') + 1)));
+			}else if(message.equals("newGame")) {
+				for(Player p : map.getAllPlayers())
+					map.removePlayer(p);
+			}else if(message.equals("gameOver")) {
+				map.getMessageListener().sendMessage("", "", new Color(), null, true, new String[] {"gameOver"});
+			}else if(message.equals("received")) {
+				map.getMessageListener().sendMessage("", "", new Color(), null, true);
+				
+				if(isServer())
+					sendToAllTCP(packet, false);
 			}else if(message.contains("delta:")) {
 				while(processingInputs) {System.out.println("Waiting inputs processing!");}
 				
@@ -346,6 +392,9 @@ public class Multiplayer extends Listener {
 					map.getBall().setWorldTransform((Matrix4) packet.object);
 				}
 			}
+		}else if(o instanceof GameMessage) {
+			GameMessage message = (GameMessage) o;
+			map.getMessageListener().sendMessage(message.heading, message.desc, message.color, map, message.skippable, message.args);
 		}/*else if(o instanceof Matrix4) {
 			Runnable tempRunnable = new Runnable() {
 

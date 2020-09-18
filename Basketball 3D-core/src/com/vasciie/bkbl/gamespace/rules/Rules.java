@@ -31,6 +31,8 @@ import com.vasciie.bkbl.gamespace.tools.GameTools;
  */
 public class Rules implements GameMessageSender {
 	
+	private static final String[] messageArgs = new String[] {"showPower"};
+	
 	final GameRule[] gameRules;
 	GameRule triggeredRule;
 	
@@ -457,7 +459,7 @@ public class Rules implements GameMessageSender {
 										time -= Gdx.graphics.getDeltaTime();
 										
 										if(thrower.isMainPlayer())
-											rulesListener.sendMessage((int) time + 1 + "", "RELEASE THE BALL BEFORE TIME RUNS OUT!", Color.BLUE, rules, false, true);
+											rulesListener.sendMessage((int) time + 1 + "", "RELEASE THE BALL BEFORE TIME RUNS OUT!", Color.BLUE, rules, false, messageArgs);
 											
 										return false;
 									}
@@ -1668,8 +1670,8 @@ public class Rules implements GameMessageSender {
 						
 						boolean zone = recentHolder != null && recentHolder.getHomeZone().checkZone(ball.getPosition());
 						if(zone && recentHolder instanceof Teammate)
-							rulesListener.sendMessage((int) time + 1 + "", "BRING THE BALL OUT OF YOUR ZONE!", Color.BLUE, rules, false, true);
-						else rulesListener.sendMessage("", "", Color.BLUE, null, false, true);
+							rulesListener.sendMessage((int) time + 1 + "", "BRING THE BALL OUT OF YOUR ZONE!", Color.BLUE, rules, false, messageArgs);
+						else rulesListener.sendMessage("", "", Color.BLUE, null, false, messageArgs);
 						
 						if (time < 0) {
 							if (zone) {
@@ -1873,7 +1875,7 @@ public class Rules implements GameMessageSender {
 	public void setTriggeredRule(GameRule rule, boolean forceMessage) {
 		if(forceMessage || rule.getParent() != null || triggeredRule == null) {
 			map.onRuleTriggered(rule);
-			rulesListener.sendMessage(rule.getName(), rule.getDescription(), rule.getTextColor(), this, true, false);
+			rulesListener.sendMessage(rule.getName(), rule.getDescription(), rule.getTextColor(), this, true);
 		}
 		
 		triggeredRule = rule;
@@ -1993,7 +1995,7 @@ public class Rules implements GameMessageSender {
 		 */
 		public void managePlayers() {
 			if(actions.act()) {
-				rules.getRulesListener().sendMessage("", "", Color.BLUE, null, false, true);
+				rules.getRulesListener().sendMessage("", "", Color.BLUE, null, false, messageArgs);
 				
 				if(parent != null) {
 					rules.setTriggeredRule(parent, false);

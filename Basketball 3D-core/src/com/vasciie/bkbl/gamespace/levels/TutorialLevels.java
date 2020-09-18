@@ -16,6 +16,8 @@ import com.vasciie.bkbl.gamespace.tools.GameTools;
 
 public class TutorialLevels extends Levels {
 	
+	private static final String[] messageArgs = new String[] {"showPower"};
+	
 	private static final Color textColor = Color.BLUE;
 	
 	private static final Matrix4 tempMx = new Matrix4();
@@ -220,7 +222,7 @@ public class TutorialLevels extends Levels {
 											
 											@Override
 											protected void sendMessage() {
-												messageListener.sendMessage(heading, desc, textColor, this, skippable, true);
+												messageListener.sendMessage(heading, desc, textColor, this, skippable, messageArgs);
 											}
 											
 											@Override
@@ -249,7 +251,7 @@ public class TutorialLevels extends Levels {
 															}
 
 															scores++;
-															messageListener.sendMessage(scores + (scores == 1 ? " Score!" : " Scores!"), "", textColor, this, skippable, true);
+															messageListener.sendMessage(scores + (scores == 1 ? " Score!" : " Scores!"), "", textColor, this, skippable, messageArgs);
 														}
 														
 														wait = true;
@@ -314,7 +316,7 @@ public class TutorialLevels extends Levels {
 											
 											@Override
 											protected void sendMessage() {
-												messageListener.sendMessage(heading, desc, textColor, null, skippable, false);
+												messageListener.sendMessage(heading, desc, textColor, null, skippable);
 											}
 											
 											@Override
@@ -323,23 +325,23 @@ public class TutorialLevels extends Levels {
 													time = defaultTime;
 													timeMove = defaultTimeMove;
 													
-													messageListener.sendMessage("", "", textColor, null, skippable, false);
+													messageListener.sendMessage("", "", textColor, null, skippable);
 												}else if((time < 0 || timeMove < 0) && map.getMainPlayer().isHoldingBall()) {
 													map.getMainPlayer().setWorldTransform(tempMx.setToTranslation(0, map.getMainPlayer().getHeight() / 1.5f, 25));
 													time = defaultTime;
 													timeMove = defaultTimeMove;
 													
-													messageListener.sendMessage("", "", textColor, null, skippable, false);
+													messageListener.sendMessage("", "", textColor, null, skippable);
 												}else if(!map.getMainPlayer().getPrevMoveVec().isZero() || !map.getMainPlayer().getMoveVector().isZero()) {
 													timeMove -= Gdx.graphics.getDeltaTime();
 													
 													if(timeMove < 0.5f && map.getMainPlayer().isHoldingBall())
-														messageListener.sendMessage("Dribble!", "", textColor, this, skippable, false);
+														messageListener.sendMessage("Dribble!", "", textColor, this, skippable);
 												}else {
 													time -= Gdx.graphics.getDeltaTime();
 													
 													if(time < 0.5f && map.getMainPlayer().isHoldingBall())
-														messageListener.sendMessage("Dribble!", "", textColor, this, skippable, false);
+														messageListener.sendMessage("Dribble!", "", textColor, this, skippable);
 												}
 												
 												if(map.getMainPlayer().isInAwayThreePointZone()) {
@@ -534,7 +536,7 @@ public class TutorialLevels extends Levels {
 											
 											@Override
 											protected void sendMessage() {
-												messageListener.sendMessage(heading, desc, textColor, this, skippable, true);
+												messageListener.sendMessage(heading, desc, textColor, this, skippable, messageArgs);
 												
 												if(map.getTeammates().get(1).getBrain().getMemory().isCheckZones())
 													tempRules = new GameRule[] {map.getRules().getGameRuleById("backcourt_violation"), map.getRules().getGameRuleById("walk_shoot"), map.getRules().getGameRuleById("shoot_catch")};
@@ -558,7 +560,7 @@ public class TutorialLevels extends Levels {
 														passes++;
 														wait = true;
 														
-														messageListener.sendMessage(passes + (passes == 1 ? " Pass!" : " Passes!") + (passes >= 3 ? " (enough)" : ""), "", textColor, this, false, true);
+														messageListener.sendMessage(passes + (passes == 1 ? " Pass!" : " Passes!") + (passes >= 3 ? " (enough)" : ""), "", textColor, this, false, messageArgs);
 													}
 													time = defaultTime;
 												}else if(!map.getMainPlayer().isShooting() && wait)
@@ -592,7 +594,7 @@ public class TutorialLevels extends Levels {
 												wait = false;
 												time = defaultTime;
 												
-												messageListener.sendMessage("0 Passes!", "", textColor, this, false, true);
+												messageListener.sendMessage("0 Passes!", "", textColor, this, false, messageArgs);
 											}
 											
 											private void returnPlayers() {
@@ -750,7 +752,7 @@ public class TutorialLevels extends Levels {
 											
 											@Override
 											protected void sendMessage() {
-												messageListener.sendMessage(heading, desc, textColor, null, skippable, false);
+												messageListener.sendMessage(heading, desc, textColor, null, skippable);
 											}
 											
 											@Override
@@ -781,7 +783,7 @@ public class TutorialLevels extends Levels {
 															timeMove -= Gdx.graphics.getDeltaTime();
 														
 														if(time < 0.5f || timeMove < 0.5f)
-															messageListener.sendMessage("Dribble!", "", textColor, this, skippable, false);
+															messageListener.sendMessage("Dribble!", "", textColor, this, skippable);
 													}
 												}
 												
@@ -799,7 +801,7 @@ public class TutorialLevels extends Levels {
 												time = defaultTime;
 												timeMove = defaultTimeMove;
 												
-												messageListener.sendMessage("", "", textColor, null, skippable, false);
+												messageListener.sendMessage("", "", textColor, null, skippable);
 											}
 											
 											private void returnPlayers() {
@@ -904,7 +906,7 @@ public class TutorialLevels extends Levels {
 											
 											@Override
 											protected void sendMessage() {
-												messageListener.sendMessage(heading, desc, textColor, this, skippable, true);
+												messageListener.sendMessage(heading, desc, textColor, this, skippable, messageArgs);
 												
 												tempRules = new GameRule[] {map.getRules().getGameRuleById("walk_shoot"), map.getRules().getGameRuleById("shoot_catch")};
 											}
@@ -928,7 +930,7 @@ public class TutorialLevels extends Levels {
 															passes++;
 															wait = true;
 															
-															messageListener.sendMessage(passes + (passes == 1 ? " Pass!" : " Passes!") + (passes >= 3 ? " (enough)" : ""), "", textColor, this, false, true);
+															messageListener.sendMessage(passes + (passes == 1 ? " Pass!" : " Passes!") + (passes >= 3 ? " (enough)" : ""), "", textColor, this, false, messageArgs);
 													}else if(!map.getMainPlayer().isShooting() && wait)
 														wait = false;
 													
@@ -956,7 +958,7 @@ public class TutorialLevels extends Levels {
 												passes = 0;
 												wait = false;
 												
-												messageListener.sendMessage("0 Passes!", "", textColor, this, false, true);
+												messageListener.sendMessage("0 Passes!", "", textColor, this, false, messageArgs);
 											}
 											
 											private void returnPlayers() {
@@ -1256,7 +1258,7 @@ public class TutorialLevels extends Levels {
 											
 											@Override
 											protected void sendMessage() {
-												messageListener.sendMessage(heading, desc, textColor, null, skippable, true);
+												messageListener.sendMessage(heading, desc, textColor, null, skippable, messageArgs);
 											}
 											
 										});
@@ -1376,7 +1378,7 @@ public class TutorialLevels extends Levels {
 											
 											@Override
 											protected void sendMessage() {
-												messageListener.sendMessage(heading, desc, textColor, null, skippable, true);
+												messageListener.sendMessage(heading, desc, textColor, null, skippable, messageArgs);
 											}
 											
 										});
@@ -1641,7 +1643,7 @@ public class TutorialLevels extends Levels {
 			}
 			
 			protected void sendMessage() {
-				messageListener.sendMessage(heading, desc, textColor, this, skippable, false);
+				messageListener.sendMessage(heading, desc, textColor, this, skippable);
 			}
 			
 			@Override

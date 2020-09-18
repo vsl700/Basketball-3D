@@ -155,7 +155,7 @@ public class GameMap implements GameMessageSender {
 
     int index = 0, lastIndex;
     
-    boolean interrupted = false;
+    boolean interrupted;
     
     boolean firstShown;
 
@@ -569,6 +569,11 @@ public class GameMap implements GameMessageSender {
         
         if(isChallenge())
         	challenges.setup();
+        
+        if(interrupted) {
+        	physicsThread = new VEThread(dynamicsWorldRunnable);
+        	interrupted = false;
+        }
     }
     
     public void clear() {
@@ -595,7 +600,7 @@ public class GameMap implements GameMessageSender {
         	currentTutorialLevel.reset();
         currentTutorialLevel = null;
         
-        stopMultiplayer();
+        //stopMultiplayer();
         
         //challenges.reset();
 
@@ -633,11 +638,6 @@ public class GameMap implements GameMessageSender {
 
         //index = ballIndex;
         createBall();
-        
-        if(interrupted) {
-        	physicsThread = new VEThread(dynamicsWorldRunnable);
-        	interrupted = false;
-        }
 
         gameRunning = false;
         ruleTriggeredActing = false;
@@ -766,7 +766,7 @@ public class GameMap implements GameMessageSender {
         		GameRule rule = rules.getTriggeredRule();
         		
         		onRuleTriggered(rule);
-				messageListener.sendMessage(rule.getName(), rule.getDescription(), rule.getTextColor(), this, true, false);
+				messageListener.sendMessage(rule.getName(), rule.getDescription(), rule.getTextColor(), this, true);
         	}
 
         	if(isChallenge())
@@ -879,7 +879,7 @@ public class GameMap implements GameMessageSender {
     }
     
     private void sendChallengeMessage() {
-    	messageListener.sendMessage(challenges.getBrokenChallenge().getName(), "According To This Challenge The Game Is Over!", Color.RED, this, true, false);
+    	messageListener.sendMessage(challenges.getBrokenChallenge().getName(), "According To This Challenge The Game Is Over!", Color.RED, this, true);
     }
 
     public void onMessageContinue() {
@@ -1020,7 +1020,7 @@ public class GameMap implements GameMessageSender {
             e.dispose();
         }
 
-        stopMultiplayer();
+        //stopMultiplayer();
     }
 
     private static final Vector3 tempVec = new Vector3();
@@ -1335,7 +1335,19 @@ public class GameMap implements GameMessageSender {
     	this.targetScore = targetScore;
     }
 
-    public int getCurrentPlayerHoldTeam() {
+    public void setTeamScore(int teamScore) {
+		this.teamScore = teamScore;
+	}
+
+	public void setOppScore(int oppScore) {
+		this.oppScore = oppScore;
+	}
+
+	public void setTimer(float startTimer) {
+		this.startTimer = startTimer;
+	}
+
+	public int getCurrentPlayerHoldTeam() {
         return currentPlayerHoldTeam;
     }
 
@@ -1363,7 +1375,7 @@ public class GameMap implements GameMessageSender {
         return startTimer;
     }
 
-    public boolean isChallenge() {
+	public boolean isChallenge() {
 		return challenges.getCurrentChallenges() != null;
 	}
 
@@ -1395,7 +1407,11 @@ public class GameMap implements GameMessageSender {
         return currentPlayerHoldOpp > -1;
     }
     
-    private boolean isSingleOrServer() {
+    public boolean hasGameBegun() {
+    	return !interrupted;
+    }
+    
+    public boolean isSingleOrServer() {
     	return !multiplayer.isMultiplayer() || multiplayer.isServer();
     }
 
@@ -1468,6 +1484,9 @@ public class GameMap implements GameMessageSender {
 	@Override
 	public void messageReceived() {
 		onMessageContinue();
+		
+		if(multiplayer.isMultiplayer())
+			multiplayer.receivedMessage();
 	}
 
 }

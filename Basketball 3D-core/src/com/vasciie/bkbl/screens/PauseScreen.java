@@ -73,6 +73,8 @@ public class PauseScreen implements Screen, GUIRenderer {
 			}else 
 				game.game.reset();
 			
+			game.getMap().getMultiplayer().onNewGame();
+			
 			game.setScreen(game.game);
 			exit();
 			return;
@@ -86,6 +88,7 @@ public class PauseScreen implements Screen, GUIRenderer {
 			game.game.reset();
 			game.getMap().getChallenges().reset();
 			game.setScreen(game.main);
+			game.getMap().stopMultiplayer();
 			game.main.sendWebPageMessage();
 			return;
 		}else if(backToTutorial.justReleased()) {

@@ -57,6 +57,8 @@ public class GameScreen implements Screen, GameMessageListener, GUIRenderer {
 	
 	GUIBox messageBox;
 	
+	String[] messageArgs;
+	
 	int amount; //Player amount per team
 	
 	float contTimer;//clickToCont timer
@@ -147,7 +149,7 @@ public class GameScreen implements Screen, GameMessageListener, GUIRenderer {
 			
 			map = game.getMap();
 		}else {
-			if(map.getTeammates().size() > 0) {
+			if(map.hasGameBegun()) {
 				ignorePause = true;
 			}
 			
@@ -179,7 +181,7 @@ public class GameScreen implements Screen, GameMessageListener, GUIRenderer {
 			if (!map.getMultiplayer().isMultiplayer() && !map.isTutorialMode()) {
 				map.setDifficulty(game.level.getDifficulty());
 
-				if (!map.isChallenge() || !map.getChallenges().containsCurrentChallenge("alone"))
+				if ((map.getMultiplayer().isMultiplayer() && !map.getMultiplayer().isServer() || !map.getMultiplayer().isMultiplayer()) && (!map.isChallenge() || !map.getChallenges().containsCurrentChallenge("alone")))
 					map.spawnPlayers(amount, amount);
 				else
 					map.spawnPlayers(1, amount);
@@ -188,6 +190,7 @@ public class GameScreen implements Screen, GameMessageListener, GUIRenderer {
 			}
 			
 			map.begin();
+			amount = map.getTeammates().size();
 		}
 		
 		if(updateThread == null)
@@ -318,7 +321,7 @@ public class GameScreen implements Screen, GameMessageListener, GUIRenderer {
 							String tempText = messageHeading.getText();
 							sender.messageReceived();
 
-							if (!map.isTutorialMode() && (map.getRules().getTriggeredRule() != null && (map.getTeammates().size() == 0 || map.getOpponents().size() == 0)))
+							if (map.getRules().getTriggeredRule() != null && map.getRules().getTriggeredRule().getId().equals("basket_score") && (map.getTeammates().size() == 0 || map.getOpponents().size() == 0))
 								game.setScreen(game.gameOver);
 
 							if (messageHeading.getText().equals(tempText))
@@ -518,12 +521,26 @@ public class GameScreen implements Screen, GameMessageListener, GUIRenderer {
 	}
 
 	@Override
-	public void sendMessage(String heading, String desc, Color textColor, GameMessageSender sender, boolean skippable, boolean showPower) {
-		if(heading.equals("/")) {
+	public void sendMessage(String heading, String desc, Color textColor, GameMessageSender sender, boolean skippable, String[] args) {
+		if(heading != null && heading.equals("/")) {
 			if(desc.equals("main")) {
 				game.setScreen(game.main);
 				return;
 			}
+		}
+		
+		for(String arg : args) {
+			if(arg.equals("showPower")) {
+				showPower = true;
+				break;
+			}
+			
+			if(arg.equals("main")) {
+				game.setScreen(game.main);
+				return;
+			}
+			
+			showPower = false;
 		}
 		
 		messageHeading.setText(heading);
@@ -539,7 +556,7 @@ public class GameScreen implements Screen, GameMessageListener, GUIRenderer {
 		
 		this.sender = sender;
 		skippableMessage = skippable;
-		this.showPower = showPower;
+		messageArgs = args;
 		
 		resizeMessageText();
 		
@@ -569,9 +586,10 @@ public class GameScreen implements Screen, GameMessageListener, GUIRenderer {
 		minorMessageRec = true;
 	}
 
+	private static final String[] tempArgs = new String[] {};
 	@Override
 	public void sendMessage(String heading, String description, Color textColor, GameMessageSender sender, boolean skippable) {
-		
+		sendMessage(heading, description, textColor, sender, skippable, tempArgs);
 		
 	}
 
@@ -596,5 +614,17 @@ public class GameScreen implements Screen, GameMessageListener, GUIRenderer {
 	@Override
 	public Color getMessageColor() {
 		return messageHeading.getColor();
+	}
+
+	@Override
+	public String[] getMessageArgs() {
+		
+		return messageArgs;
+	}
+
+	@Override
+	public boolean isMessageSkippable() {
+		
+		return skippableMessage;
 	}
 }
