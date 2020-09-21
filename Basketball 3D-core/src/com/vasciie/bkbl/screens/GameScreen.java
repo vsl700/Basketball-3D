@@ -181,7 +181,7 @@ public class GameScreen implements Screen, GameMessageListener, GUIRenderer {
 			if (!map.getMultiplayer().isMultiplayer() && !map.isTutorialMode()) {
 				map.setDifficulty(game.level.getDifficulty());
 
-				if ((map.getMultiplayer().isMultiplayer() && !map.getMultiplayer().isServer() || !map.getMultiplayer().isMultiplayer()) && (!map.isChallenge() || !map.getChallenges().containsCurrentChallenge("alone")))
+				if (!map.getMultiplayer().isMultiplayer() && (!map.isChallenge() || !map.getChallenges().containsCurrentChallenge("alone")))
 					map.spawnPlayers(amount, amount);
 				else
 					map.spawnPlayers(1, amount);
@@ -358,6 +358,9 @@ public class GameScreen implements Screen, GameMessageListener, GUIRenderer {
 		pCam.update();
 		map.render(mBatch, environment, pCam);
 		
+		if (map.getMainPlayer() == null)
+			return;
+
 		map.getMainPlayer().getFocusTransform().mul(tempMatrix.setToTranslation(0, map.getMainPlayer().getHeight(), -10)).getTranslation(pCam.position);
 		game.customLookAt(pCam, tempMatrix.set(map.getMainPlayer().getModelInstance().transform).mul(tempMatrix2.setToTranslation(0, map.getMainPlayer().getHeight(), 0)).getTranslation(tempVec));
 		map.getCamera().setPosition(pCam.position);
@@ -537,6 +540,11 @@ public class GameScreen implements Screen, GameMessageListener, GUIRenderer {
 			
 			if(arg.equals("main")) {
 				game.setScreen(game.main);
+				return;
+			}
+			
+			if(arg.equals("gameOver")) {
+				game.setScreen(game.gameOver);
 				return;
 			}
 			

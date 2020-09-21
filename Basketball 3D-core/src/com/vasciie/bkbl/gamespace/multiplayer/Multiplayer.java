@@ -157,7 +157,7 @@ public class Multiplayer extends Listener {
 	public void processInputs() {
 		processingInputs = true;
 		
-		while(receivingInputs) {System.out.println("Waiting input receiving!");};
+		while(receivingInputs) {System.out.print("");};
 		
 		for(int i = awaitingInputs.size() - 1; i >= 0; i--) {
 			map.controlPlayer(awaitingInputs.get(i), awaitingPlayers.get(i), awaitingInputDeltas.get(i));
@@ -238,9 +238,14 @@ public class Multiplayer extends Listener {
 	}
 	
 	public void onNewGame() {
+		if(!host && !join)
+			return;
+		
 		message.message = "newGame";
 		message.object = null;
 		sendToAllTCP(message, false);
+		
+		//begin();
 	}
 	
 	public void onGameOver() {
@@ -315,8 +320,15 @@ public class Multiplayer extends Listener {
 			}else if(message.contains("timer:")) {
 				map.setTimer(Float.parseFloat(message.substring(message.indexOf(':') + 1)));
 			}else if(message.equals("newGame")) {
-				for(Player p : map.getAllPlayers())
-					map.removePlayer(p);
+				Gdx.app.postRunnable(new Runnable() {
+
+					@Override
+					public void run() {
+						map.clear();
+						
+					}
+					
+				});
 			}else if(message.equals("gameOver")) {
 				map.getMessageListener().sendMessage("", "", new Color(), null, true, new String[] {"gameOver"});
 			}else if(message.equals("received")) {
@@ -325,7 +337,7 @@ public class Multiplayer extends Listener {
 				if(isServer())
 					sendToAllTCP(packet, false);
 			}else if(message.contains("delta:")) {
-				while(processingInputs) {System.out.println("Waiting inputs processing!");}
+				while(processingInputs) {System.out.print("");}
 				
 				receivingInputs = true;
 				

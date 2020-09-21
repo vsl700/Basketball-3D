@@ -571,7 +571,8 @@ public class GameMap implements GameMessageSender {
         	challenges.setup();
         
         if(interrupted) {
-        	physicsThread = new VEThread(dynamicsWorldRunnable);
+        	if(physicsThread == null)
+        		physicsThread = new VEThread(dynamicsWorldRunnable);
         	interrupted = false;
         }
     }
