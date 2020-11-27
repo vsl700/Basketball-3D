@@ -65,7 +65,34 @@ public abstract class Entity implements Proximity<Vector3>, Steerable<Vector3> {
 		outsideColliders = new ArrayList<btCollisionObject>();
 		
 		collisionShapes = new ArrayList<btCollisionShape>();
-		bodies = new ArrayList<btRigidBody>();
+		bodies = new ArrayList<btRigidBody>() {
+
+			/**
+			 * 
+			 */
+			private static final long serialVersionUID = 1L;
+
+			@Override
+			public void clear() {
+				
+				super.clear();
+			}
+
+			@Override
+			public btRigidBody remove(int arg0) {
+				
+				return super.remove(arg0);
+			}
+
+			@Override
+			public boolean remove(Object arg0) {
+				
+				return super.remove(arg0);
+			}
+			
+			
+			
+		};
 		motionStates = new ArrayList<MotionState>();
 		constructionInfos = new ArrayList<btRigidBody.btRigidBodyConstructionInfo>();
 		

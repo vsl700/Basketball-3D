@@ -32,7 +32,7 @@ import com.vasciie.bkbl.screens.*;
 public class MyGdxGame extends Game implements GameMessageListener, GUIRenderer {
 	
 	public static Color defaultColor = new Color(0, 0.7f, 0.8f, 1), currentColor;
-	public static final boolean TESTING = false;
+	public static final boolean TESTING = true;
 	
 	Matrix4 spinMx;
 	
@@ -401,16 +401,19 @@ public class MyGdxGame extends Game implements GameMessageListener, GUIRenderer 
 		else if(background != null)
 			background.dispose();
 		
-		spScreen1.dispose();
-		spScreen2.dispose();
-		main.dispose();		
-		level.dispose();
-		tutorial.dispose();
-		challenge.dispose();
-		gameType.dispose();
-		playerGameType.dispose();
-		game.dispose();
-		gameOver.dispose();
+		if(!TESTING) {
+			spScreen1.dispose();
+			spScreen2.dispose();
+			main.dispose();		
+			level.dispose();
+			tutorial.dispose();
+			challenge.dispose();
+			gameType.dispose();
+			playerGameType.dispose();
+			game.dispose();
+			gameOver.dispose();
+		}
+		
 		
 		assets.dispose();
 	}

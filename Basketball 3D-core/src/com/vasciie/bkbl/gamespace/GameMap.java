@@ -555,6 +555,10 @@ public class GameMap implements GameMessageSender {
     	if(multiplayer.isServer())
     		multiplayer.begin();
     	
+    	for(Player p : getAllPlayers()) {
+    		System.out.println(p.getBodies().size());
+    	}
+    	
     	startTimer = 5.5f;
         playersReady = true;
         

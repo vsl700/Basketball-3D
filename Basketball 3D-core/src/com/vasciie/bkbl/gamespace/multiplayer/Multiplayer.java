@@ -358,7 +358,7 @@ public class Multiplayer extends Listener {
 
 					@Override
 					public void run() {
-						System.out.println(Integer.parseInt(message.substring(message.indexOf(':') + 1)));
+						//System.out.println(Integer.parseInt(message.substring(message.indexOf(':') + 1)));
 						map.setMainPlayer(map.getAllPlayers().get(Integer.parseInt(message.substring(message.indexOf(':') + 1))));
 						
 					}
