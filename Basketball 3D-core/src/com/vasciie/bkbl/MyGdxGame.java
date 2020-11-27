@@ -32,7 +32,7 @@ import com.vasciie.bkbl.screens.*;
 public class MyGdxGame extends Game implements GameMessageListener, GUIRenderer {
 	
 	public static Color defaultColor = new Color(0, 0.7f, 0.8f, 1), currentColor;
-	public static final boolean TESTING = true;
+	public static final boolean TESTING = false;
 	
 	Matrix4 spinMx;
 	
